@@ -23,42 +23,53 @@
       min-height: 100vh;
     }
     
-    .phone {
-      width: 100%;
-      max-width: 420px;
-      background: #ffffff;
-      border-radius: 32px;
-      padding: 20px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-      position: relative;
-      min-height: 700px;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    /* 로그인 화면 */
-    .login-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 500px;
-      text-align: center;
-    }
-    .login-btn {
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 16px 32px;
-      border-radius: 40px;
-      font-size: 18px;
-      font-weight: 600;
-      margin-top: 24px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+  /* 기존 스타일에 추가/수정 */
+  .phone {
+    /* 기존 유지 */
+    position: relative;
+  }
+  
+  /* 로그인 컨테이너 수정 */
+  .login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-height: 100%;
+    padding-bottom: 30%;  /* 아래에서 30% 위치 */
+  }
+  
+  /* 로고 영역은 위쪽에 고정 */
+  .login-logo {
+    margin-top: 20px;
+  }
+  
+  /* 버튼 영역을 아래로 밀어내기 */
+  .login-content {
+    margin-top: auto;
+    width: 100%;
+    padding-bottom: 30%;  /* 화면 기준 아래 30% 지점 */
+  }
+  
+  .login-btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 40px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
     .user-info {
       display: flex;
       align-items: center;
@@ -355,15 +366,22 @@
       </div>
     </div>
     
-    <div id="loginContainer" class="login-container">
-      <div style="font-size: 64px;">🏢</div>
-      <h2 style="margin: 20px 0;">월세 관리</h2>
-      <p style="color: #64748b; margin-bottom: 20px;">월세 관리를<br>편리하게</p>
-      <button id="googleLoginBtn" class="login-btn">
-        🚀 Google 로그인
-      </button>
-    </div>
+<!-- HTML 수정 -->
+<div id="loginContainer" class="login-container">
+  <div class="login-logo">
+    <div style="font-size: 64px;">🏢</div>
+    <h2 style="margin: 20px 0 8px 0;">월세 관리</h2>
   </div>
+  
+  <div class="login-content">
+    <p style="color: #64748b; margin-bottom: 20px; font-size: 14px;">
+      월세 관리를<br>편리하게
+    </p>
+    <button id="googleLoginBtn" class="login-btn">
+      🚀 Google 로그인
+    </button>
+  </div>
+</div>
   
   <button class="fab" id="fabBtn" style="display: none;">+</button>
   
