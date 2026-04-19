@@ -37,7 +37,7 @@
       flex-direction: column;
     }
     
-    /* 헤더 - 수정됨: 한 줄 배치 */
+    /* 헤더 */
     .header {
       margin-bottom: 24px;
     }
@@ -45,8 +45,12 @@
     .building-input-wrapper {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       margin-bottom: 12px;
+    }
+    
+    .building-icon {
+      font-size: 24px;
     }
     
     .building-name {
@@ -67,11 +71,6 @@
       border-bottom-color: #2563eb;
     }
     
-    .dropdown-icon {
-      font-size: 18px;
-      color: #94a3b8;
-    }
-    
     /* 한 줄에 월별 선택 + 메모 버튼 */
     .top-controls {
       display: flex;
@@ -81,7 +80,6 @@
     }
     
     .month-picker {
-      flex: 1;
       padding: 10px 12px;
       border-radius: 14px;
       border: 1px solid #e2e8f0;
@@ -89,6 +87,7 @@
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
+      width: auto;
     }
     
     .memo-btn {
@@ -296,17 +295,17 @@
 </head>
 <body>
   <div class="phone" id="app">
-    <!-- 헤더: 건물명 -->
+    <!-- 헤더: 건물명 앞에 🏣 아이콘 -->
     <div class="header">
       <div class="building-input-wrapper">
-        <input type="text" id="buildingName" class="building-name" value="조아빌" maxlength="20">
-        <span class="dropdown-icon">▼</span>
+        <span class="building-icon">🏣</span>
+        <input type="text" id="buildingName" class="building-name" value="조아빌" maxlength="10">
       </div>
       
       <!-- 한 줄: 월별 선택 + 메모 버튼 -->
       <div class="top-controls">
         <select id="monthPicker" class="month-picker"></select>
-        <button class="memo-btn" id="memoBtn">📝 메모</button>
+        <button class="memo-btn" id="memoBtn">📝 메 모</button>
       </div>
     </div>
     
