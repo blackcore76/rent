@@ -278,7 +278,168 @@
       width: 100%;
       max-height: 80vh;
       overflow-y: auto;
-      padding: 20px;
+      padding: 24px;
+    }
+    
+    /* 폼 스타일 */
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+    
+    .form-group input, 
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .form-group input:focus, 
+    .form-group select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    
+    .radio-group {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+    }
+    
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: normal;
+      cursor: pointer;
+    }
+    
+    .radio-group input {
+      width: auto;
+    }
+    
+    .modal-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 20px;
+    }
+    
+    .modal-buttons button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+    
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #334155;
+    }
+    
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+    
+    .btn-danger {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    
+    .btn-danger:hover {
+      background: #fecaca;
+    }
+    
+    /* 세대 목록 스타일 */
+    .unit-list-item {
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: all 0.2s;
+    }
+    
+    .unit-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .unit-number-badge {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1f2937;
+    }
+    
+    .unit-status {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .status-vacant {
+      background: #e2e8f0;
+      color: #64748b;
+    }
+    
+    .status-occupied {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+    
+    .unit-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    
+    .unit-info-item {
+      color: #475569;
+    }
+    
+    .unit-info-item strong {
+      color: #1f2937;
+    }
+    
+    .unit-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .unit-actions button {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
     }
     
     /* 반응형 */
@@ -295,17 +456,16 @@
 </head>
 <body>
   <div class="phone" id="app">
-    <!-- 헤더: 건물명 앞에 🏣 아이콘 -->
+    <!-- 헤더 -->
     <div class="header">
       <div class="building-input-wrapper">
         <span class="building-icon">🏣</span>
-        <input type="text" id="buildingName" class="building-name" value="  조 아 빌" maxlength="10">
+        <input type="text" id="buildingName" class="building-name" value="조아빌" maxlength="20">
       </div>
       
-      <!-- 한 줄: 월별 선택 + 메모 버튼 -->
       <div class="top-controls">
         <select id="monthPicker" class="month-picker"></select>
-        <button class="memo-btn" id="memoBtn">📝 메 모</button>
+        <button class="memo-btn" id="memoBtn">📝 메모</button>
       </div>
     </div>
     
@@ -363,19 +523,121 @@
     <div class="modal-content">
       <h3 style="margin-bottom: 16px;">📝 메모 작성</h3>
       <textarea id="memoText" rows="6" style="width:100%; padding:12px; border-radius:12px; border:1px solid #e2e8f0; font-size:14px;" placeholder="메모를 입력하세요..."></textarea>
-      <div style="display: flex; gap: 8px; margin-top: 16px;">
-        <button id="saveMemoBtn" style="flex:1; padding:12px; background:#2563eb; color:white; border:none; border-radius:12px; font-weight:600;">저장</button>
-        <button id="closeMemoBtn" style="flex:1; padding:12px; background:#f1f5f9; border:none; border-radius:12px;">닫기</button>
+      <div class="modal-buttons">
+        <button id="saveMemoBtn" class="btn-primary">저장</button>
+        <button id="closeMemoBtn" class="btn-secondary">닫기</button>
       </div>
     </div>
   </div>
   
-  <!-- 세대 관리 모달 -->
-  <div id="unitModal" class="modal">
+  <!-- 세대 입력/수정 모달 -->
+  <div id="unitFormModal" class="modal">
     <div class="modal-content">
-      <h3 id="unitModalTitle">세대 관리</h3>
-      <div id="unitForm"></div>
-      <button id="closeUnitBtn" style="margin-top:16px; width:100%; padding:12px; background:#f1f5f9; border:none; border-radius:12px;">닫기</button>
+      <h3 id="unitFormTitle" style="margin-bottom: 20px;">➕ 세대 정보 입력</h3>
+      <div id="unitFormFields">
+        <div class="form-group">
+          <label>호수 *</label>
+          <select id="unitNumber" class="unit-number-select">
+            <option value="">호수를 선택하세요</option>
+            <option value="201">201호</option>
+            <option value="202">202호</option>
+            <option value="203">203호</option>
+            <option value="204">204호</option>
+            <option value="205">205호</option>
+            <option value="206">206호</option>
+            <option value="301">301호</option>
+            <option value="302">302호</option>
+            <option value="303">303호</option>
+            <option value="304">304호</option>
+            <option value="305">305호</option>
+            <option value="306">306호</option>
+            <option value="401">401호</option>
+            <option value="402">402호</option>
+            <option value="403">403호</option>
+            <option value="404">404호</option>
+            <option value="405">405호</option>
+            <option value="406">406호</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>임차인 이름</label>
+          <input type="text" id="tenantName" placeholder="예: 김철수">
+        </div>
+        
+        <div class="form-group">
+          <label>연락처</label>
+          <input type="tel" id="phoneNumber" placeholder="010-0000-0000">
+        </div>
+        
+        <div class="form-group">
+          <label>월세 (원)</label>
+          <input type="number" id="rentAmount" placeholder="500,000" value="500000">
+        </div>
+        
+        <div class="form-group">
+          <label>보증금 (원)</label>
+          <input type="number" id="depositAmount" placeholder="5,000,000" value="5000000">
+        </div>
+        
+        <div class="form-group">
+          <label>계약 시작일</label>
+          <input type="date" id="contractStart">
+        </div>
+        
+        <div class="form-group">
+          <label>계약 종료일</label>
+          <input type="date" id="contractEnd">
+        </div>
+        
+        <div class="form-group">
+          <label>상태</label>
+          <div class="radio-group">
+            <label>
+              <input type="radio" name="status" value="vacant" checked> 공실
+            </label>
+            <label>
+              <input type="radio" name="status" value="occupied"> 임대중
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group" id="paymentGroup" style="display: none;">
+          <label>월세 납부 상태</label>
+          <div class="radio-group">
+            <label>
+              <input type="radio" name="payment" value="paid" checked> 납부 완료
+            </label>
+            <label>
+              <input type="radio" name="payment" value="unpaid"> 미납
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>입주 예정일 (선택)</label>
+          <input type="date" id="moveInDate">
+        </div>
+        
+        <div class="form-group">
+          <label>퇴실 예정일 (선택)</label>
+          <input type="date" id="moveOutDate">
+        </div>
+      </div>
+      
+      <div class="modal-buttons">
+        <button id="saveUnitBtn" class="btn-primary">저장</button>
+        <button id="closeUnitFormBtn" class="btn-secondary">닫기</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 세대 목록 모달 -->
+  <div id="unitListModal" class="modal">
+    <div class="modal-content">
+      <h3 style="margin-bottom: 20px;">🏢 세대 목록</h3>
+      <div id="unitListContainer" style="max-height: 500px; overflow-y: auto;"></div>
+      <button id="closeUnitListBtn" class="btn-secondary" style="margin-top: 16px; width: 100%;">닫기</button>
     </div>
   </div>
 
@@ -385,7 +647,6 @@
     import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
     import { getStorage } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
     
-    // Firebase 구성 (여기에 실제 설정을 입력하세요)
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_AUTH_DOMAIN",
@@ -395,9 +656,7 @@
       appId: "YOUR_APP_ID"
     };
     
-    // 임시: Firebase 없이 로컬 스토리지로 먼저 테스트 (데모 모드)
-    const USE_FIREBASE = false; // 실제 Firebase 설정 후 true로 변경
-    
+    const USE_FIREBASE = false;
     let app, db, storage;
     if (USE_FIREBASE) {
       app = initializeApp(firebaseConfig);
@@ -412,7 +671,7 @@
       MEMO: 'memo_data'
     };
     
-    // 기본 세대 데이터 (201호 ~ 406호, 총 18세대)
+    // 기본 세대 데이터
     const generateDefaultUnits = () => {
       const units = [];
       const floors = [2, 3, 4];
@@ -427,8 +686,8 @@
             phone: '',
             rent: 500000,
             deposit: 5000000,
-            contractStart: '2024-01-01',
-            contractEnd: '2025-01-01',
+            contractStart: '',
+            contractEnd: '',
             isVacant: true,
             isPaid: true,
             requests: [],
@@ -445,6 +704,7 @@
     let currentYearMonth = '2026-04';
     let unitsData = [];
     let currentTab = 'home';
+    let editingUnitId = null;
     
     // 월 선택기 초기화
     const initMonthPicker = () => {
@@ -467,14 +727,12 @@
     
     // 데이터 로드
     const loadData = () => {
-      // 건물명 로드
       const savedBuilding = localStorage.getItem(`${STORAGE_KEYS.BUILDINGS}_${currentYearMonth}`);
       if (savedBuilding) {
         currentBuilding = savedBuilding;
         document.getElementById('buildingName').value = currentBuilding;
       }
       
-      // 세대 데이터 로드
       const savedUnits = localStorage.getItem(`${STORAGE_KEYS.UNITS}_${currentBuilding}`);
       if (savedUnits) {
         unitsData = JSON.parse(savedUnits);
@@ -494,16 +752,13 @@
     
     // 대시보드 업데이트
     const updateDashboard = () => {
-      // 공실 계산
       const vacantUnits = unitsData.filter(u => u.isVacant === true);
       const vacancyRate = unitsData.length > 0 ? Math.round((vacantUnits.length / unitsData.length) * 100) : 0;
       document.getElementById('vacancyRate').innerHTML = `${vacancyRate}%`;
       
-      // 미납 계산
       const unpaidUnits = unitsData.filter(u => !u.isVacant && !u.isPaid);
       document.getElementById('unpaidCount').innerHTML = `${unpaidUnits.length}건`;
       
-      // 만기 예정
       const today = new Date();
       const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
       const expiringUnits = unitsData.filter(u => {
@@ -513,15 +768,12 @@
       });
       document.getElementById('expiringCount').innerHTML = `${expiringUnits.length}건`;
       
-      // 요청사항
       const requestsCount = unitsData.reduce((sum, u) => sum + (u.requests?.length || 0), 0);
       document.getElementById('requestCount').innerHTML = `${requestsCount}건`;
       
-      // 이번달 수입
       const totalRent = unitsData.filter(u => !u.isVacant && u.isPaid).reduce((sum, u) => sum + (u.rent || 0), 0);
       document.getElementById('monthlyIncome').innerHTML = `₩ ${totalRent.toLocaleString()}`;
       
-      // 미납 세대 목록
       const unpaidListDiv = document.getElementById('unpaidList');
       if (unpaidUnits.length === 0) {
         unpaidListDiv.innerHTML = '<div class="list-item" style="color:#94a3b8;">✨ 모든 세대가 납부 완료!</div>';
@@ -534,7 +786,6 @@
         `).join('');
       }
       
-      // 만기 예정 목록
       const expiringListDiv = document.getElementById('expiringList');
       if (expiringUnits.length === 0) {
         expiringListDiv.innerHTML = '<div class="list-item" style="color:#94a3b8;">📋 만기 예정 계약이 없습니다</div>';
@@ -551,6 +802,174 @@
         }).join('');
       }
     };
+    
+    // 세대 폼 초기화
+    const resetUnitForm = () => {
+      editingUnitId = null;
+      document.getElementById('unitFormTitle').innerText = '➕ 세대 정보 입력';
+      document.getElementById('unitNumber').value = '';
+      document.getElementById('tenantName').value = '';
+      document.getElementById('phoneNumber').value = '';
+      document.getElementById('rentAmount').value = '500000';
+      document.getElementById('depositAmount').value = '5000000';
+      document.getElementById('contractStart').value = '';
+      document.getElementById('contractEnd').value = '';
+      document.querySelector('input[name="status"][value="vacant"]').checked = true;
+      document.getElementById('paymentGroup').style.display = 'none';
+      document.getElementById('moveInDate').value = '';
+      document.getElementById('moveOutDate').value = '';
+    };
+    
+    // 세대 저장
+    const saveUnit = () => {
+      const unitNumber = document.getElementById('unitNumber').value;
+      if (!unitNumber) {
+        alert('호수를 선택해주세요!');
+        return;
+      }
+      
+      const tenantName = document.getElementById('tenantName').value;
+      const phoneNumber = document.getElementById('phoneNumber').value;
+      const rentAmount = parseInt(document.getElementById('rentAmount').value) || 0;
+      const depositAmount = parseInt(document.getElementById('depositAmount').value) || 0;
+      const contractStart = document.getElementById('contractStart').value;
+      const contractEnd = document.getElementById('contractEnd').value;
+      const status = document.querySelector('input[name="status"]:checked').value;
+      const isVacant = status === 'vacant';
+      const isPaid = !isVacant && document.querySelector('input[name="payment"]:checked')?.value === 'paid';
+      const moveInDate = document.getElementById('moveInDate').value || null;
+      const moveOutDate = document.getElementById('moveOutDate').value || null;
+      
+      let unit = unitsData.find(u => u.id === unitNumber);
+      
+      if (unit) {
+        // 기존 세대 업데이트
+        unit.tenant = tenantName;
+        unit.phone = phoneNumber;
+        unit.rent = rentAmount;
+        unit.deposit = depositAmount;
+        unit.contractStart = contractStart;
+        unit.contractEnd = contractEnd;
+        unit.isVacant = isVacant;
+        unit.isPaid = isPaid;
+        unit.moveInDate = moveInDate;
+        unit.moveOutDate = moveOutDate;
+      } else {
+        // 새 세대 추가 (없는 경우)
+        unit = {
+          id: unitNumber,
+          number: unitNumber,
+          tenant: tenantName,
+          phone: phoneNumber,
+          rent: rentAmount,
+          deposit: depositAmount,
+          contractStart: contractStart,
+          contractEnd: contractEnd,
+          isVacant: isVacant,
+          isPaid: isPaid,
+          requests: [],
+          moveInDate: moveInDate,
+          moveOutDate: moveOutDate
+        };
+        unitsData.push(unit);
+      }
+      
+      saveUnitsData();
+      updateDashboard();
+      closeUnitFormModal();
+      alert('저장되었습니다!');
+    };
+    
+    // 세대 수정 폼 열기
+    const openEditUnitForm = (unitId) => {
+      const unit = unitsData.find(u => u.id === unitId);
+      if (!unit) return;
+      
+      editingUnitId = unitId;
+      document.getElementById('unitFormTitle').innerText = '✏️ 세대 정보 수정';
+      document.getElementById('unitNumber').value = unit.number;
+      document.getElementById('unitNumber').disabled = true;
+      document.getElementById('tenantName').value = unit.tenant;
+      document.getElementById('phoneNumber').value = unit.phone;
+      document.getElementById('rentAmount').value = unit.rent;
+      document.getElementById('depositAmount').value = unit.deposit;
+      document.getElementById('contractStart').value = unit.contractStart;
+      document.getElementById('contractEnd').value = unit.contractEnd;
+      document.querySelector(`input[name="status"][value="${unit.isVacant ? 'vacant' : 'occupied'}"]`).checked = true;
+      
+      if (!unit.isVacant) {
+        document.getElementById('paymentGroup').style.display = 'block';
+        document.querySelector(`input[name="payment"][value="${unit.isPaid ? 'paid' : 'unpaid'}"]`).checked = true;
+      } else {
+        document.getElementById('paymentGroup').style.display = 'none';
+      }
+      
+      document.getElementById('moveInDate').value = unit.moveInDate || '';
+      document.getElementById('moveOutDate').value = unit.moveOutDate || '';
+      
+      document.getElementById('unitFormModal').classList.add('active');
+    };
+    
+    // 세대 삭제
+    const deleteUnit = (unitId) => {
+      if (confirm('정말 삭제하시겠습니까?')) {
+        const index = unitsData.findIndex(u => u.id === unitId);
+        if (index !== -1) {
+          unitsData.splice(index, 1);
+          saveUnitsData();
+          updateDashboard();
+          showUnitList();
+        }
+      }
+    };
+    
+    // 세대 목록 보여주기
+    const showUnitList = () => {
+      const container = document.getElementById('unitListContainer');
+      container.innerHTML = unitsData.map(unit => `
+        <div class="unit-list-item">
+          <div class="unit-list-header">
+            <span class="unit-number-badge">🏠 ${unit.number}호</span>
+            <span class="unit-status ${unit.isVacant ? 'status-vacant' : 'status-occupied'}">
+              ${unit.isVacant ? '🔴 공실' : '🟢 임대중'}
+            </span>
+          </div>
+          <div class="unit-info">
+            <div class="unit-info-item"><strong>임차인</strong><br>${unit.tenant || '-'}</div>
+            <div class="unit-info-item"><strong>연락처</strong><br>${unit.phone || '-'}</div>
+            <div class="unit-info-item"><strong>월세</strong><br>${unit.rent.toLocaleString()}원</div>
+            <div class="unit-info-item"><strong>보증금</strong><br>${unit.deposit.toLocaleString()}원</div>
+            <div class="unit-info-item"><strong>계약기간</strong><br>${unit.contractStart || '-'} ~ ${unit.contractEnd || '-'}</div>
+            <div class="unit-info-item"><strong>납부상태</strong><br>${!unit.isVacant && !unit.isPaid ? '❌ 미납' : '✅ 완료'}</div>
+          </div>
+          <div class="unit-actions">
+            <button class="btn-secondary" onclick="window.editUnit('${unit.id}')">수정</button>
+            <button class="btn-danger" onclick="window.deleteUnit('${unit.id}')">삭제</button>
+          </div>
+        </div>
+      `).join('');
+      
+      document.getElementById('unitListModal').classList.add('active');
+    };
+    
+    // 폼 닫기
+    const closeUnitFormModal = () => {
+      document.getElementById('unitNumber').disabled = false;
+      resetUnitForm();
+      document.getElementById('unitFormModal').classList.remove('active');
+    };
+    
+    // 상태 변경 시 납부 그룹 표시/숨김
+    document.querySelectorAll('input[name="status"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        const paymentGroup = document.getElementById('paymentGroup');
+        if (e.target.value === 'occupied') {
+          paymentGroup.style.display = 'block';
+        } else {
+          paymentGroup.style.display = 'none';
+        }
+      });
+    });
     
     // 건물명 저장
     document.getElementById('buildingName').addEventListener('change', (e) => {
@@ -580,6 +999,23 @@
       memoModal.classList.remove('active');
     });
     
+    // FAB 버튼 - 세대 입력 폼 열기
+    document.getElementById('fabBtn').addEventListener('click', () => {
+      resetUnitForm();
+      document.getElementById('unitFormModal').classList.add('active');
+    });
+    
+    // 세대 폼 저장 버튼
+    document.getElementById('saveUnitBtn').addEventListener('click', saveUnit);
+    document.getElementById('closeUnitFormBtn').addEventListener('click', closeUnitFormModal);
+    document.getElementById('closeUnitListBtn').addEventListener('click', () => {
+      document.getElementById('unitListModal').classList.remove('active');
+    });
+    
+    // 전역 함수 등록
+    window.editUnit = openEditUnitForm;
+    window.deleteUnit = deleteUnit;
+    
     // 탭 전환
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => {
@@ -590,7 +1026,7 @@
         item.classList.add('active');
         
         if (tab === 'units') {
-          showUnitManagement();
+          showUnitList();
         } else if (tab === 'calendar') {
           showCalendar();
         } else if (tab === 'settings') {
@@ -605,57 +1041,6 @@
           updateDashboard();
         }
       });
-    });
-    
-    // 세대 관리 화면
-    const showUnitManagement = () => {
-      const unitModal = document.getElementById('unitModal');
-      const unitFormDiv = document.getElementById('unitForm');
-      unitFormDiv.innerHTML = `
-        <div style="max-height: 500px; overflow-y: auto;">
-          ${unitsData.map(unit => `
-            <div style="padding: 12px; border-bottom: 1px solid #e2e8f0; margin-bottom: 8px;">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <strong>${unit.number}호</strong>
-                <button class="editUnitBtn" data-id="${unit.id}" style="padding: 6px 12px; background:#2563eb; color:white; border:none; border-radius:8px; cursor:pointer;">수정</button>
-              </div>
-              <div style="font-size: 13px; margin-top: 8px;">
-                <div>임차인: ${unit.tenant || '미정'}</div>
-                <div>월세: ${unit.rent?.toLocaleString()}원</div>
-                <div>상태: ${unit.isVacant ? '🔴 공실' : '🟢 임대중'}</div>
-                <div>납부: ${unit.isPaid ? '✅ 완료' : '❌ 미납'}</div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-      unitModal.classList.add('active');
-      
-      document.querySelectorAll('.editUnitBtn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const unitId = btn.dataset.id;
-          const unit = unitsData.find(u => u.id === unitId);
-          if (unit) {
-            const newTenant = prompt('임차인 이름:', unit.tenant || '');
-            const newRent = prompt('월세 금액:', unit.rent);
-            const isVacant = confirm('공실로 설정하시겠습니까? (확인: 공실, 취소: 임대중)');
-            const isPaid = confirm('월세 납부 완료? (확인: 완료, 취소: 미납)');
-            
-            if (newTenant !== null) unit.tenant = newTenant;
-            if (newRent !== null) unit.rent = parseInt(newRent) || unit.rent;
-            unit.isVacant = isVacant;
-            unit.isPaid = isPaid;
-            
-            saveUnitsData();
-            updateDashboard();
-            showUnitManagement();
-          }
-        });
-      });
-    };
-    
-    document.getElementById('closeUnitBtn').addEventListener('click', () => {
-      document.getElementById('unitModal').classList.remove('active');
     });
     
     // 캘린더 표시
@@ -754,11 +1139,6 @@
         document.querySelector('.nav-item[data-tab="home"]').click();
       });
     };
-    
-    // FAB 버튼
-    document.getElementById('fabBtn').addEventListener('click', () => {
-      showUnitManagement();
-    });
     
     // 초기화
     initMonthPicker();
