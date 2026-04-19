@@ -308,16 +308,17 @@
     <div class="header">
       <div class="building-section">
         <div class="building-input-wrapper">
-          <input type="text" id="buildingName" class="building-name" value="조아빌" maxlength="20">
+          <input type="text" id="buildingName" class="building-name" value="조아빌" maxlength="10">
           <span class="dropdown-icon">▼</span>
         </div>
-        <div class="month-selector">
-          <select id="monthPicker" class="month-picker"></select>    <button class="memo-btn" id="memoBtn">📝 메모</button>
-        </div>
-      </div>
 
+      <!-- 한 줄: 월별 선택 + 메모 버튼 -->
+      <div class="top-controls">
+        <select id="monthPicker" class="month-picker"></select>
+        <button class="memo-btn" id="memoBtn">📝 메모</button>
+      </div>
     </div>
-    
+          
     <!-- 대시보드 카드 -->
     <div class="cards">
       <div class="card">
