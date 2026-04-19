@@ -4,8 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#2563eb" />
-  <link rel="manifest" href="manifest.json" />
-  <title>월세 관리</title>
+  <title>월세 관리 - 빌리지</title>
   <style>
     * { 
       box-sizing: border-box; 
@@ -16,100 +15,25 @@
     
     body {
       background: #f4f7fb;
+      color: #1f2937;
       display: flex;
       justify-content: center;
-      align-items: center;
-      min-height: 100vh;
       padding: 16px;
+      min-height: 100vh;
     }
     
-    /* 모바일 컨테이너 */
     .phone {
       width: 100%;
       max-width: 420px;
-      height: 700px;
       background: #ffffff;
       border-radius: 32px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    /* 스크롤 가능한 콘텐츠 영역 */
-    .app-content {
-      flex: 1;
-      overflow-y: auto;
       padding: 20px;
       padding-bottom: 80px;
-    }
-    
-    /* 로그인 컨테이너 - 전체 높이 사용 */
-    .login-container {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      min-height: 100%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
       position: relative;
-    }
-    
-    /* 로고 영역 - 상단 여백 */
-    .login-logo {
-      flex: 1;
+      min-height: 700px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding-top: 60px;
-    }
-    
-    .login-logo .building-icon {
-      font-size: 80px;
-      margin-bottom: 20px;
-    }
-    
-    .login-logo h2 {
-      font-size: 28px;
-      color: #1f2937;
-      font-weight: 800;
-    }
-    
-    /* 버튼 영역 - 아래 30% 위치 */
-    .login-content {
-      margin-bottom: 25%;
-      padding: 0 24px;
-      width: 100%;
-    }
-    
-    .login-content p {
-      color: #64748b;
-      margin-bottom: 24px;
-      font-size: 14px;
-      line-height: 1.5;
-      text-align: center;
-    }
-    
-    .login-btn {
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 16px 24px;
-      border-radius: 48px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      width: 100%;
-      transition: all 0.2s;
-    }
-    
-    .login-btn:hover {
-      background: #1d4ed8;
-      transform: scale(1.02);
     }
     
     /* 헤더 */
@@ -117,52 +41,14 @@
       margin-bottom: 24px;
     }
     
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-      padding: 8px 12px;
-      background: #f1f5f9;
-      border-radius: 20px;
-    }
-    
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-    
-    .user-name {
-      flex: 1;
-      font-weight: 600;
-      font-size: 14px;
-      color: #1f2937;
-    }
-    
-    .logout-btn {
-      background: #ef4444;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    
     .building-input-wrapper {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
     
-    .building-icon-small {
-      font-size: 24px;
-    }
-    
+    .building-icon { font-size: 24px; }
     .building-name {
       font-size: 22px;
       font-weight: 800;
@@ -175,10 +61,53 @@
       cursor: pointer;
       border-bottom: 2px dashed #cbd5e1;
     }
+    .building-name:focus { outline: none; border-bottom-color: #2563eb; }
+    .building-name:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
     
-    .building-name:focus {
-      outline: none;
-      border-bottom-color: #2563eb;
+    /* 로그인 박스 */
+    .login-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f1f5f9;
+      padding: 8px 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+    .login-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #64748b;
+    }
+    .login-status img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+    }
+    .small-login-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .small-logout-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
     }
     
     .top-controls {
@@ -189,7 +118,6 @@
     }
     
     .month-picker {
-      flex: 1;
       padding: 10px 12px;
       border-radius: 14px;
       border: 1px solid #e2e8f0;
@@ -209,6 +137,10 @@
       cursor: pointer;
       white-space: nowrap;
     }
+    .memo-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
     
     /* 카드 */
     .cards {
@@ -223,19 +155,8 @@
       border-radius: 20px;
       padding: 16px;
     }
-    
-    .card small {
-      color: #64748b;
-      display: block;
-      margin-bottom: 8px;
-      font-size: 12px;
-    }
-    
-    .card strong {
-      font-size: 28px;
-      font-weight: 800;
-    }
-    
+    .card small { color: #64748b; display: block; margin-bottom: 8px; font-size: 12px; }
+    .card strong { font-size: 28px; font-weight: 800; }
     .danger { color: #dc2626; }
     .warning { color: #d97706; }
     
@@ -246,28 +167,10 @@
       padding: 20px;
       margin-bottom: 24px;
     }
+    .income-card strong { font-size: 32px; font-weight: 800; }
     
-    .income-card p {
-      opacity: 0.9;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-    
-    .income-card strong {
-      font-size: 32px;
-      font-weight: 800;
-    }
-    
-    .section {
-      margin-bottom: 24px;
-    }
-    
-    .section h3 {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: #334155;
-    }
+    .section { margin-bottom: 24px; }
+    .section h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: #334155; }
     
     .list-item {
       display: flex;
@@ -277,34 +180,21 @@
       border-bottom: 1px solid #f1f5f9;
     }
     
-    .status-badge {
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    
-    .status-delayed {
-      background: #fee2e2;
-      color: #dc2626;
-    }
-    
-    .status-expiring {
-      background: #fffbeb;
-      color: #d97706;
-    }
+    .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .status-delayed { background: #fee2e2; color: #dc2626; }
+    .status-expiring { background: #fffbeb; color: #d97706; }
     
     /* 하단 네비 */
     .nav {
       display: flex;
       justify-content: space-around;
-      padding: 12px 20px;
-      background: white;
+      padding: 12px 0 8px;
+      margin-top: auto;
       border-top: 1px solid #f1f5f9;
+      background: white;
       position: sticky;
       bottom: 0;
     }
-    
     .nav-item {
       text-align: center;
       padding: 8px 12px;
@@ -313,19 +203,14 @@
       font-size: 13px;
       font-weight: 500;
       color: #94a3b8;
-      transition: all 0.2s;
     }
+    .nav-item.active { background: #eff6ff; color: #2563eb; }
     
-    .nav-item.active {
-      background: #eff6ff;
-      color: #2563eb;
-    }
-    
-    /* FAB 버튼 */
+    /* FAB 버튼 - 하단바 위로 */
     .fab {
       position: fixed;
-      bottom: 30px;
-      right: calc(50% - 190px);
+      bottom: 80px;
+      right: calc(50% - 180px);
       width: 56px;
       height: 56px;
       border-radius: 28px;
@@ -333,15 +218,13 @@
       background: #2563eb;
       color: white;
       font-size: 28px;
-      font-weight: 300;
       box-shadow: 0 8px 20px rgba(37,99,235,0.4);
       cursor: pointer;
       z-index: 1000;
-      transition: all 0.2s;
     }
-    
-    .fab:hover {
-      transform: scale(1.05);
+    .fab:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
     
     /* 모달 */
@@ -358,11 +241,7 @@
       justify-content: center;
       padding: 20px;
     }
-    
-    .modal.active {
-      display: flex;
-    }
-    
+    .modal.active { display: flex; }
     .modal-content {
       background: white;
       border-radius: 28px;
@@ -373,57 +252,27 @@
       padding: 24px;
     }
     
-    .modal-content h3 {
-      margin-bottom: 20px;
-      font-size: 20px;
-    }
-    
     /* 폼 스타일 */
-    .form-group {
-      margin-bottom: 16px;
-    }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
     
-    .form-group label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: #334155;
-      margin-bottom: 6px;
-    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .form-row-30-70 { display: grid; grid-template-columns: 30% 70%; gap: 12px; margin-bottom: 16px; }
     
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    
-    .form-row-30-70 {
-      display: grid;
-      grid-template-columns: 30% 70%;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
+    .form-group input, .form-group select, .form-group textarea {
       width: 100%;
       padding: 10px 12px;
       border: 1px solid #e2e8f0;
       border-radius: 12px;
       font-size: 14px;
     }
-    
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
       outline: none;
       border-color: #2563eb;
       box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
     }
     
-    /* 토글 버튼 */
+    /* 토글 버튼 스타일 */
     .toggle-group {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -432,7 +281,6 @@
       padding: 4px;
       border-radius: 16px;
     }
-    
     .toggle-btn {
       text-align: center;
       padding: 10px;
@@ -440,50 +288,27 @@
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.2s;
       background: transparent;
       border: none;
-      transition: all 0.2s;
     }
-    
     .toggle-btn.active {
       background: white;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       color: #2563eb;
     }
-    
-    .toggle-btn:not(.active) {
-      color: #64748b;
+    .toggle-btn:not(.active) { color: #64748b; }
+    .toggle-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
     }
     
-    .modal-buttons {
-      display: flex;
-      gap: 8px;
-      margin-top: 20px;
-    }
-    
-    .modal-buttons button {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    
-    .btn-primary {
-      background: #2563eb;
-      color: white;
-    }
-    
-    .btn-secondary {
-      background: #f1f5f9;
-      color: #334155;
-    }
-    
-    .btn-danger {
-      background: #fee2e2;
-      color: #dc2626;
-    }
+    .modal-buttons { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; }
+    .btn-primary { background: #2563eb; color: white; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: #f1f5f9; color: #334155; }
+    .btn-danger { background: #fee2e2; color: #dc2626; }
     
     /* 사진 업로드 */
     .photo-upload-area {
@@ -492,13 +317,12 @@
       padding: 16px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.2s;
       margin-bottom: 12px;
     }
-    
-    .photo-upload-area:hover {
-      border-color: #2563eb;
-      background: #f8fafc;
+    .photo-upload-area:hover { border-color: #2563eb; background: #f8fafc; }
+    .photo-upload-area.disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
     }
     
     .photo-preview {
@@ -507,7 +331,6 @@
       gap: 12px;
       margin-top: 12px;
     }
-    
     .photo-item {
       position: relative;
       border-radius: 12px;
@@ -516,13 +339,7 @@
       aspect-ratio: 1;
       cursor: pointer;
     }
-    
-    .photo-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
+    .photo-item img { width: 100%; height: 100%; object-fit: cover; }
     .photo-delete {
       position: absolute;
       top: 4px;
@@ -540,7 +357,7 @@
       justify-content: center;
     }
     
-    /* 이미지 뷰어 */
+    /* 이미지 확대 모달 */
     .image-viewer {
       position: fixed;
       top: 0;
@@ -554,16 +371,8 @@
       justify-content: center;
       cursor: pointer;
     }
-    
-    .image-viewer.active {
-      display: flex;
-    }
-    
-    .image-viewer img {
-      max-width: 90%;
-      max-height: 90%;
-      object-fit: contain;
-    }
+    .image-viewer.active { display: flex; }
+    .image-viewer img { max-width: 90%; max-height: 90%; object-fit: contain; }
     
     /* 세대 목록 */
     .unit-list-item {
@@ -572,68 +381,22 @@
       padding: 16px;
       margin-bottom: 12px;
     }
-    
     .unit-list-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
     }
+    .unit-number-badge { font-size: 18px; font-weight: 800; }
+    .unit-status { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .status-vacant { background: #e2e8f0; color: #64748b; }
+    .status-occupied { background: #dcfce7; color: #16a34a; }
+    .unit-info { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; margin-bottom: 12px; }
+    .unit-actions { display: flex; gap: 8px; }
+    .unit-actions button { flex: 1; padding: 8px; border: none; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .unit-actions button:disabled { opacity: 0.5; cursor: not-allowed; }
     
-    .unit-number-badge {
-      font-size: 18px;
-      font-weight: 800;
-    }
-    
-    .unit-status {
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    
-    .status-vacant {
-      background: #e2e8f0;
-      color: #64748b;
-    }
-    
-    .status-occupied {
-      background: #dcfce7;
-      color: #16a34a;
-    }
-    
-    .unit-info {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      font-size: 13px;
-      margin-bottom: 12px;
-    }
-    
-    .unit-info div strong {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 11px;
-      color: #64748b;
-    }
-    
-    .unit-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-    }
-    
-    .unit-actions button {
-      flex: 1;
-      padding: 8px;
-      border: none;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    
-    /* 납부 관리 */
+    /* 월별 납부 관리 */
     .payment-unit-item {
       display: flex;
       justify-content: space-between;
@@ -641,123 +404,110 @@
       padding: 12px;
       border-bottom: 1px solid #e2e8f0;
     }
-    
     .payment-badge {
       padding: 4px 12px;
       border-radius: 20px;
       font-size: 12px;
       font-weight: 600;
     }
+    .payment-paid { background: #dcfce7; color: #16a34a; }
+    .payment-unpaid { background: #fee2e2; color: #dc2626; }
+    .toggle-payment:disabled { opacity: 0.5; cursor: not-allowed; }
     
-    .payment-paid {
-      background: #dcfce7;
-      color: #16a34a;
+    /* 로그인 필요 알림 */
+    .login-required {
+      text-align: center;
+      padding: 40px 20px;
+      color: #94a3b8;
+    }
+    .login-required button {
+      margin-top: 16px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 28px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
     }
     
-    .payment-unpaid {
-      background: #fee2e2;
-      color: #dc2626;
-    }
-    
-    /* 숨김/표시 */
-    .hidden {
-      display: none !important;
-    }
-    
-    /* 반응형 */
     @media (max-width: 480px) {
-      body {
-        padding: 0;
-        background: white;
-      }
-      
-      .phone {
-        border-radius: 0;
-        height: 100vh;
-        max-width: 100%;
-      }
-      
-      .fab {
-        right: 20px;
-        bottom: 20px;
-      }
+      .phone { padding: 16px; }
+      .fab { right: 20px; bottom: 80px; }
     }
   </style>
 </head>
 <body>
   <div class="phone" id="app">
-    <!-- 로그인 화면 -->
-    <div id="loginContainer" class="login-container">
-      <div class="login-logo">
-        <div class="building-icon">🏢</div>
-        <h2>월세 관리</h2>
-      </div>
-      <div class="login-content">
-        <p>월세 관리를<br>편리하게</p>
-        <button id="googleLoginBtn" class="login-btn">
-          🚀 Google 로그인
-        </button>
-      </div>
-    </div>
-    
-    <!-- 메인 화면 (처음엔 숨김) -->
-    <div id="mainContent" class="hidden">
-      <div class="app-content">
-        <div class="header">
-          <div class="user-info">
-            <img id="userAvatar" class="user-avatar" src="" alt="">
-            <span id="userName" class="user-name"></span>
-            <button id="logoutBtn" class="logout-btn">로그아웃</button>
-          </div>
-          <div class="building-input-wrapper">
-            <span class="building-icon-small">🏣</span>
-            <input type="text" id="buildingName" class="building-name" value="조아빌" maxlength="20">
-          </div>
-          <div class="top-controls">
-            <select id="monthPicker" class="month-picker"></select>
-            <button class="memo-btn" id="memoBtn">📝 메모</button>
-          </div>
+    <div class="header">
+      <!-- 로그인 박스 -->
+      <div class="login-box" id="loginBox">
+        <div class="login-status" id="loginStatus">
+          <span>🔓</span>
+          <span>로그인이 필요합니다</span>
         </div>
-        
-        <div class="cards">
-          <div class="card"><small>❎ 공실현황</small><strong id="vacancyRate">0%</strong></div>
-          <div class="card"><small>😨 미납현황</small><strong id="unpaidCount" class="danger">0건</strong></div>
-          <div class="card"><small>🔜 만기예정</small><strong id="expiringCount" class="warning">0건</strong></div>
-          <div class="card"><small>🛠️ 요청사항</small><strong id="requestCount">0건</strong></div>
-        </div>
-        
-        <div class="income-card">
-          <p>💰 이번달 수입</p>
-          <strong id="monthlyIncome">₩ 0</strong>
-        </div>
-        
-        <div class="section">
-          <h3>😨 미납 세대</h3>
-          <div id="unpaidList"></div>
-        </div>
-        
-        <div class="section">
-          <h3>🔜 만기 예정</h3>
-          <div id="expiringList"></div>
-        </div>
+        <button class="small-login-btn" id="headerLoginBtn">로그인</button>
       </div>
       
-      <div class="nav">
-        <div class="nav-item active" data-tab="home">🏠 홈</div>
-        <div class="nav-item" data-tab="units">🏢 세대</div>
-        <div class="nav-item" data-tab="calendar">📅 일정</div>
-        <div class="nav-item" data-tab="payments">💰 납부관리</div>
-        <div class="nav-item" data-tab="settings">⚙️ 설정</div>
+      <div class="building-input-wrapper">
+        <span class="building-icon">🏣</span>
+        <input type="text" id="buildingName" class="building-name" value="조아빌" maxlength="10">
+      </div>
+      <div class="top-controls">
+        <select id="monthPicker" class="month-picker"></select>
+        <button class="memo-btn" id="memoBtn">📝 메모</button>
       </div>
     </div>
     
-    <button id="fabBtn" class="fab hidden">+</button>
+    <div class="cards">
+      <div class="card"><small>❎ 공실현황</small><strong id="vacancyRate">0%</strong></div>
+      <div class="card"><small>😨 미납현황</small><strong id="unpaidCount" class="danger">0건</strong></div>
+      <div class="card"><small>🔜 만기예정</small><strong id="expiringCount" class="warning">0건</strong></div>
+      <div class="card"><small>🛠️ 요청사항</small><strong id="requestCount">0건</strong></div>
+    </div>
+    
+    <div class="income-card">
+      <p>💰 이번달 수입</p>
+      <strong id="monthlyIncome">₩ 0</strong>
+    </div>
+    
+    <div class="section">
+      <h3>😨 미납 세대</h3>
+      <div id="unpaidList"></div>
+    </div>
+    
+    <div class="section">
+      <h3>🔜 만기 예정</h3>
+      <div id="expiringList"></div>
+    </div>
+    
+    <div class="nav">
+      <div class="nav-item active" data-tab="home">🏠 홈</div>
+      <div class="nav-item" data-tab="units">🏢 세대</div>
+      <div class="nav-item" data-tab="calendar">📅 일정</div>
+      <div class="nav-item" data-tab="payments">💰 납부관리</div>
+      <div class="nav-item" data-tab="settings">⚙️ 설정</div>
+    </div>
+  </div>
+  
+  <button class="fab" id="fabBtn">+</button>
+  
+  <!-- 로그인 모달 -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content" style="text-align: center;">
+      <div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
+      <h3 style="margin-bottom: 12px;">로그인이 필요합니다</h3>
+      <p style="color: #64748b; margin-bottom: 24px;">읽기는 가능하지만<br>쓰기/수정/삭제는 로그인 후 이용 가능합니다</p>
+      <button id="googleLoginBtn" class="btn-primary" style="width: 100%;">🚀 Google 로그인</button>
+      <button id="closeLoginModal" class="btn-secondary" style="margin-top: 12px; width: 100%;">닫기</button>
+    </div>
   </div>
   
   <!-- 메모 모달 -->
   <div id="memoModal" class="modal">
     <div class="modal-content">
-      <h3>📝 메모 작성</h3>
+      <h3 style="margin-bottom: 16px;">📝 메모 작성</h3>
       <textarea id="memoText" rows="6" style="width:100%; padding:12px; border-radius:12px; border:1px solid #e2e8f0;"></textarea>
       <div class="modal-buttons">
         <button id="saveMemoBtn" class="btn-primary">저장</button>
@@ -769,7 +519,8 @@
   <!-- 세대 입력 모달 -->
   <div id="unitFormModal" class="modal">
     <div class="modal-content">
-      <h3 id="unitFormTitle">➕ 세대 정보 입력</h3>
+      <h3 id="unitFormTitle" style="margin-bottom: 20px;">➕ 세대 정보 입력</h3>
+      
       <div class="form-row-30-70">
         <div class="form-group">
           <label>호수 *</label>
@@ -787,20 +538,22 @@
           </select>
         </div>
         <div class="form-group">
-          <label>임차인</label>
+          <label>임차인 이름</label>
           <input type="text" id="tenantName" placeholder="이름">
         </div>
       </div>
+      
       <div class="form-row">
         <div class="form-group">
-          <label>연락처1</label>
+          <label>연락처 1</label>
           <input type="tel" id="phone1" placeholder="010-0000-0000">
         </div>
         <div class="form-group">
-          <label>연락처2</label>
+          <label>연락처 2</label>
           <input type="tel" id="phone2" placeholder="010-0000-0000">
         </div>
       </div>
+      
       <div class="form-row">
         <div class="form-group">
           <label>보증금 (원)</label>
@@ -811,6 +564,7 @@
           <input type="number" id="rentAmount" value="500000">
         </div>
       </div>
+      
       <div class="form-row">
         <div class="form-group">
           <label>계약 시작일</label>
@@ -821,6 +575,7 @@
           <input type="date" id="contractEnd">
         </div>
       </div>
+      
       <div class="form-row">
         <div class="form-group">
           <label>입주 예정일</label>
@@ -831,10 +586,12 @@
           <input type="date" id="moveOutDate">
         </div>
       </div>
+      
       <div class="form-group">
         <label>📋 메모</label>
         <textarea id="unitMemo" rows="3" placeholder="특이사항, 요청사항 등"></textarea>
       </div>
+      
       <div class="form-group">
         <label>상태</label>
         <div class="toggle-group" id="statusToggle">
@@ -842,7 +599,8 @@
           <button type="button" class="toggle-btn" data-status="occupied">🟢 임대중</button>
         </div>
       </div>
-      <div id="paymentToggleGroup" style="display:none;">
+      
+      <div id="paymentToggleGroup" style="display: none;">
         <div class="form-group">
           <label>월세 납부 상태</label>
           <div class="toggle-group" id="paymentToggle">
@@ -851,14 +609,14 @@
           </div>
         </div>
       </div>
+      
       <div class="form-group">
         <label>📎 계약서 사진</label>
-        <div id="photoUploadArea" class="photo-upload-area">
-          📸 사진을 선택하세요<br><small>클릭하여 업로드</small>
-        </div>
-        <input type="file" id="photoInput" accept="image/*" multiple style="display:none;">
+        <div id="photoUploadArea" class="photo-upload-area">📸 사진을 선택하세요<br><small>클릭하여 업로드</small></div>
+        <input type="file" id="photoInput" accept="image/*" multiple style="display: none;">
         <div id="photoPreview" class="photo-preview"></div>
       </div>
+      
       <div class="modal-buttons">
         <button id="saveUnitBtn" class="btn-primary">저장</button>
         <button id="closeUnitFormBtn" class="btn-secondary">닫기</button>
@@ -869,13 +627,13 @@
   <!-- 세대 목록 모달 -->
   <div id="unitListModal" class="modal">
     <div class="modal-content">
-      <h3>🏢 세대 목록</h3>
+      <h3 style="margin-bottom: 20px;">🏢 세대 목록</h3>
       <div id="unitListContainer" style="max-height: 500px; overflow-y: auto;"></div>
-      <button id="closeUnitListBtn" class="btn-secondary" style="margin-top:16px; width:100%;">닫기</button>
+      <button id="closeUnitListBtn" class="btn-secondary" style="margin-top: 16px; width: 100%;">닫기</button>
     </div>
   </div>
   
-  <!-- 이미지 뷰어 -->
+  <!-- 이미지 확대 뷰어 -->
   <div id="imageViewer" class="image-viewer">
     <img id="viewerImage" src="">
   </div>
@@ -891,162 +649,320 @@
       appId: "YOUR_APP_ID"
     };
     
-    // Firebase 초기화
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
-    import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
-    import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
     
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
     const provider = new GoogleAuthProvider();
     
-    // 상태 변수
-    let currentUser = null;
-    let currentBuilding = '조아빌';
-    let currentYearMonth = '2026-04';
-    let unitsData = [];
-    let tempPhotoFiles = [];
+    const STORAGE_KEYS = { BUILDINGS: 'building_data', UNITS: 'units_data', MEMO: 'memo_data', PAYMENTS: 'payments_data' };
     
-    // DOM 요소
-    const loginContainer = document.getElementById('loginContainer');
-    const mainContent = document.getElementById('mainContent');
-    const fabBtn = document.getElementById('fabBtn');
-    
-    // 기본 세대 생성
-    function generateDefaultUnits() {
+    const generateDefaultUnits = () => {
       const units = [];
-      [2, 3, 4].forEach(floor => {
-        [1, 2, 3, 4, 5, 6].forEach(num => {
+      [2,3,4].forEach(floor => {
+        [1,2,3,4,5,6].forEach(num => {
+          const unitNum = `${floor}0${num}`;
           units.push({
-            id: `${floor}0${num}`,
-            number: `${floor}0${num}`,
-            tenant: '',
-            phone1: '',
-            phone2: '',
-            rent: 500000,
-            deposit: 5000000,
-            contractStart: '',
-            contractEnd: '',
-            isVacant: true,
-            moveInDate: null,
-            moveOutDate: null,
-            memo: '',
-            photos: []
+            id: unitNum, number: unitNum, tenant: '', phone1: '', phone2: '',
+            rent: 500000, deposit: 5000000, contractStart: '', contractEnd: '',
+            isVacant: true, moveInDate: null, moveOutDate: null, memo: '', photos: []
           });
         });
       });
       return units;
-    }
+    };
+    
+    let currentUser = null;
+    let currentBuilding = '조아빌';
+    let currentYearMonth = '2026-04';
+    let unitsData = [];
+    let paymentsData = {};
+    let tempPhotos = [];
+    
+    // UI 요소
+    const loginBox = document.getElementById('loginBox');
+    const loginStatus = document.getElementById('loginStatus');
+    const headerLoginBtn = document.getElementById('headerLoginBtn');
+    const loginModal = document.getElementById('loginModal');
+    const googleLoginBtn = document.getElementById('googleLoginBtn');
+    const closeLoginModal = document.getElementById('closeLoginModal');
+    const buildingNameInput = document.getElementById('buildingName');
+    const fabBtn = document.getElementById('fabBtn');
+    const memoBtn = document.getElementById('memoBtn');
+    
+    // 로그인 UI 업데이트
+    const updateLoginUI = () => {
+      if (currentUser) {
+        loginStatus.innerHTML = `<img src="${currentUser.photoURL || ''}" onerror="this.style.display='none'"><span>👤 ${currentUser.displayName || currentUser.email}</span>`;
+        headerLoginBtn.textContent = '로그아웃';
+        headerLoginBtn.className = 'small-logout-btn';
+        buildingNameInput.disabled = false;
+        fabBtn.disabled = false;
+        memoBtn.disabled = false;
+        enableWriteButtons(true);
+      } else {
+        loginStatus.innerHTML = '<span>🔓</span><span>로그인이 필요합니다</span>';
+        headerLoginBtn.textContent = '로그인';
+        headerLoginBtn.className = 'small-login-btn';
+        buildingNameInput.disabled = true;
+        fabBtn.disabled = true;
+        memoBtn.disabled = true;
+        enableWriteButtons(false);
+      }
+    };
+    
+    // 쓰기 버튼들 활성화/비활성화
+    const enableWriteButtons = (enabled) => {
+      const btns = document.querySelectorAll('.unit-actions button, .toggle-payment, .photo-delete, .toggle-btn, #saveUnitBtn, #saveMemoBtn');
+      btns.forEach(btn => {
+        if (btn) btn.disabled = !enabled;
+      });
+      const uploadArea = document.getElementById('photoUploadArea');
+      if (uploadArea) {
+        if (enabled) uploadArea.classList.remove('disabled');
+        else uploadArea.classList.add('disabled');
+      }
+    };
+    
+    // 로그인 필요 알림
+    const requireLogin = () => {
+      loginModal.classList.add('active');
+    };
     
     // 데이터 로드
-    async function loadData() {
-      if (!currentUser) return;
+    const loadData = () => {
+      const savedBuilding = localStorage.getItem(`${STORAGE_KEYS.BUILDINGS}_${currentYearMonth}`);
+      if (savedBuilding) { currentBuilding = savedBuilding; buildingNameInput.value = currentBuilding; }
       
-      const userDocRef = doc(db, 'users', currentUser.uid);
-      const userDoc = await getDoc(userDocRef);
+      const savedUnits = localStorage.getItem(`${STORAGE_KEYS.UNITS}_${currentBuilding}`);
+      unitsData = savedUnits ? JSON.parse(savedUnits) : generateDefaultUnits();
+      saveUnitsData();
       
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        const buildingData = userData.buildings?.[currentBuilding];
-        if (buildingData && buildingData.units) {
-          unitsData = buildingData.units;
-        } else {
-          unitsData = generateDefaultUnits();
-          await saveData();
-        }
-      } else {
-        unitsData = generateDefaultUnits();
-        await saveData();
-      }
-      
-      updateDashboard();
-    }
+      const savedPayments = localStorage.getItem(`${STORAGE_KEYS.PAYMENTS}_${currentBuilding}`);
+      paymentsData = savedPayments ? JSON.parse(savedPayments) : {};
+    };
     
-    // 데이터 저장
-    async function saveData() {
-      if (!currentUser) return;
-      
-      const userDocRef = doc(db, 'users', currentUser.uid);
-      const userDoc = await getDoc(userDocRef);
-      const existingData = userDoc.exists() ? userDoc.data() : {};
-      
-      await setDoc(userDocRef, {
-        ...existingData,
-        buildings: {
-          ...existingData.buildings,
-          [currentBuilding]: {
-            units: unitsData,
-            lastUpdated: new Date().toISOString()
-          }
-        }
-      }, { merge: true });
-    }
+    const saveUnitsData = () => localStorage.setItem(`${STORAGE_KEYS.UNITS}_${currentBuilding}`, JSON.stringify(unitsData));
+    const savePaymentsData = () => localStorage.setItem(`${STORAGE_KEYS.PAYMENTS}_${currentBuilding}`, JSON.stringify(paymentsData));
     
-    // 사진 업로드
-    async function uploadPhotos(unitId, files) {
-      const photoUrls = [];
-      for (const file of files) {
-        const fileName = `${currentUser.uid}/${currentBuilding}/${unitId}/${Date.now()}_${file.name}`;
-        const storageRef = ref(storage, fileName);
-        await uploadBytes(storageRef, file);
-        const url = await getDownloadURL(storageRef);
-        photoUrls.push(url);
-      }
-      return photoUrls;
-    }
+    const getPaymentStatus = (unitId, yearMonth) => paymentsData[yearMonth]?.[unitId] ?? true;
+    const setPaymentStatus = (unitId, yearMonth, isPaid) => {
+      if (!currentUser) { requireLogin(); return false; }
+      if (!paymentsData[yearMonth]) paymentsData[yearMonth] = {};
+      paymentsData[yearMonth][unitId] = isPaid;
+      savePaymentsData();
+      return true;
+    };
     
-    // 대시보드 업데이트
-    function updateDashboard() {
+    // 대시보드
+    const updateDashboard = () => {
       const vacantUnits = unitsData.filter(u => u.isVacant);
-      const vacancyRate = unitsData.length ? Math.round((vacantUnits.length / unitsData.length) * 100) : 0;
-      document.getElementById('vacancyRate').innerHTML = `${vacancyRate}%`;
-      document.getElementById('unpaidCount').innerHTML = `${vacantUnits.length}건`;
-      document.getElementById('expiringCount').innerHTML = `0건`;
-      document.getElementById('requestCount').innerHTML = `0건`;
+      document.getElementById('vacancyRate').innerHTML = `${Math.round((vacantUnits.length/unitsData.length)*100)}%`;
       
-      const totalRent = unitsData.filter(u => !u.isVacant).reduce((sum, u) => sum + u.rent, 0);
+      const unpaidUnits = unitsData.filter(u => !u.isVacant && !getPaymentStatus(u.id, currentYearMonth));
+      document.getElementById('unpaidCount').innerHTML = `${unpaidUnits.length}건`;
+      
+      const today = new Date();
+      const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+      const expiringUnits = unitsData.filter(u => !u.isVacant && u.contractEnd && new Date(u.contractEnd) <= endOfNextMonth && new Date(u.contractEnd) >= today);
+      document.getElementById('expiringCount').innerHTML = `${expiringUnits.length}건`;
+      
+      const requestsCount = unitsData.reduce((sum, u) => sum + (u.requests?.length || 0), 0);
+      document.getElementById('requestCount').innerHTML = `${requestsCount}건`;
+      
+      const totalRent = unitsData.filter(u => !u.isVacant && getPaymentStatus(u.id, currentYearMonth)).reduce((sum, u) => sum + (u.rent || 0), 0);
       document.getElementById('monthlyIncome').innerHTML = `₩ ${totalRent.toLocaleString()}`;
       
-      // 미납 세대 목록 (임시로 공실 세대 표시)
       const unpaidListDiv = document.getElementById('unpaidList');
-      if (vacantUnits.length === 0) {
+      if (unpaidUnits.length === 0) {
         unpaidListDiv.innerHTML = '<div class="list-item" style="color:#94a3b8;">✨ 모든 세대가 납부 완료!</div>';
       } else {
-        unpaidListDiv.innerHTML = vacantUnits.map(u => `
-          <div class="list-item">
-            <span>${u.number}호 ${u.tenant || '미기입'}</span>
-            <span class="status-badge status-delayed">공실</span>
-          </div>
-        `).join('');
+        unpaidListDiv.innerHTML = unpaidUnits.map(u => `<div class="list-item"><span>${u.number}호 ${u.tenant || '미기입'}</span><span class="status-badge status-delayed">미납</span></div>`).join('');
       }
       
       const expiringListDiv = document.getElementById('expiringList');
-      expiringListDiv.innerHTML = '<div class="list-item" style="color:#94a3b8;">📋 만기 예정 계약이 없습니다</div>';
-    }
-    
-    // 세대 저장
-    async function saveUnit() {
-      const unitNumber = document.getElementById('unitNumber').value;
-      if (!unitNumber) {
-        alert('호수를 선택해주세요!');
-        return;
+      if (expiringUnits.length === 0) {
+        expiringListDiv.innerHTML = '<div class="list-item" style="color:#94a3b8;">📋 만기 예정 계약이 없습니다</div>';
+      } else {
+        expiringListDiv.innerHTML = expiringUnits.map(u => {
+          const daysLeft = Math.ceil((new Date(u.contractEnd) - new Date()) / (1000*60*60*24));
+          return `<div class="list-item"><span>${u.number}호 ${u.tenant || '미기입'}</span><span class="status-badge status-expiring">D-${daysLeft}</span></div>`;
+        }).join('');
       }
+    };
+    
+    // 납부 관리 화면
+    const updatePaymentView = () => {
+      let paymentDiv = document.getElementById('paymentView');
+      if (!paymentDiv) {
+        paymentDiv = document.createElement('div');
+        paymentDiv.id = 'paymentView';
+        document.getElementById('app').appendChild(paymentDiv);
+      }
+      
+      const occupiedUnits = unitsData.filter(u => !u.isVacant);
+      paymentDiv.innerHTML = `
+        <h3 style="margin-bottom:16px;">💰 ${currentYearMonth} 월세 납부 현황</h3>
+        <div style="background:#f8fafc; border-radius:16px; padding:8px;">
+          ${occupiedUnits.map(unit => {
+            const isPaid = getPaymentStatus(unit.id, currentYearMonth);
+            return `
+              <div class="payment-unit-item">
+                <div><strong>${unit.number}호</strong><br><small>${unit.tenant || '미기입'}</small></div>
+                <div>
+                  <span class="payment-badge ${isPaid ? 'payment-paid' : 'payment-unpaid'}">${isPaid ? '✅ 납부완료' : '❌ 미납'}</span>
+                  <button class="toggle-payment" data-id="${unit.id}" style="margin-left:8px; padding:6px 12px; border-radius:10px; border:none; background:#2563eb; color:white; cursor:pointer;" ${!currentUser ? 'disabled' : ''}>
+                    ${isPaid ? '미납으로 변경' : '납부완료로 변경'}
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+          ${occupiedUnits.length === 0 ? '<div style="padding:20px; text-align:center; color:#94a3b8;">📭 임대중인 세대가 없습니다</div>' : ''}
+        </div>
+        <div class="form-group" style="margin-top:16px;">
+          <label>📝 월별 한줄 메모</label>
+          <textarea id="monthlyMemo" rows="2" placeholder="이번달 특이사항을 입력하세요..." style="width:100%; padding:12px; border-radius:12px; border:1px solid #e2e8f0;" ${!currentUser ? 'disabled' : ''}></textarea>
+          <button id="saveMonthlyMemo" class="btn-primary" style="margin-top:8px; width:100%;" ${!currentUser ? 'disabled' : ''}>메모 저장</button>
+        </div>
+        <button id="backFromPayment" style="margin-top:16px; width:100%; padding:12px; background:#64748b; color:white; border:none; border-radius:12px;">홈으로</button>
+      `;
+      
+      const savedMonthlyMemo = localStorage.getItem(`${STORAGE_KEYS.MEMO}_monthly_${currentBuilding}_${currentYearMonth}`) || '';
+      document.getElementById('monthlyMemo') && (document.getElementById('monthlyMemo').value = savedMonthlyMemo);
+      
+      document.querySelectorAll('.toggle-payment').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          if (!currentUser) { requireLogin(); return; }
+          const unitId = btn.dataset.id;
+          const currentStatus = getPaymentStatus(unitId, currentYearMonth);
+          setPaymentStatus(unitId, currentYearMonth, !currentStatus);
+          updatePaymentView();
+          updateDashboard();
+        });
+      });
+      
+      document.getElementById('saveMonthlyMemo')?.addEventListener('click', () => {
+        if (!currentUser) { requireLogin(); return; }
+        const memo = document.getElementById('monthlyMemo').value;
+        localStorage.setItem(`${STORAGE_KEYS.MEMO}_monthly_${currentBuilding}_${currentYearMonth}`, memo);
+        alert('월별 메모가 저장되었습니다!');
+      });
+      
+      document.getElementById('backFromPayment')?.addEventListener('click', () => {
+        document.querySelector('.nav-item[data-tab="home"]').click();
+      });
+    };
+    
+    // 사진 처리 (이전과 동일)
+    const fileToBase64 = (file) => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+    });
+    
+    const updatePhotoPreview = () => {
+      const previewDiv = document.getElementById('photoPreview');
+      previewDiv.innerHTML = tempPhotos.map((photo, index) => `
+        <div class="photo-item" data-index="${index}">
+          <img src="${photo}" alt="계약서">
+          <button class="photo-delete" data-index="${index}" ${!currentUser ? 'disabled' : ''}>×</button>
+        </div>
+      `).join('');
+      
+      document.querySelectorAll('.photo-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          if (e.target.classList.contains('photo-delete')) return;
+          const img = item.querySelector('img');
+          document.getElementById('viewerImage').src = img.src;
+          document.getElementById('imageViewer').classList.add('active');
+        });
+      });
+      
+      document.querySelectorAll('.photo-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (!currentUser) { requireLogin(); return; }
+          const index = parseInt(btn.dataset.index);
+          tempPhotos.splice(index, 1);
+          updatePhotoPreview();
+        });
+      });
+    };
+    
+    const setupPhotoUpload = () => {
+      const uploadArea = document.getElementById('photoUploadArea');
+      const photoInput = document.getElementById('photoInput');
+      uploadArea.addEventListener('click', () => {
+        if (!currentUser) { requireLogin(); return; }
+        photoInput.click();
+      });
+      photoInput.addEventListener('change', async (e) => {
+        if (!currentUser) { requireLogin(); return; }
+        for (const file of Array.from(e.target.files)) {
+          if (file.type.startsWith('image/')) tempPhotos.push(await fileToBase64(file));
+        }
+        updatePhotoPreview();
+        photoInput.value = '';
+      });
+    };
+    
+    // 토글 버튼 초기화
+    const initToggles = () => {
+      const statusBtns = document.querySelectorAll('#statusToggle .toggle-btn');
+      const paymentBtns = document.querySelectorAll('#paymentToggle .toggle-btn');
+      
+      statusBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (!currentUser) { requireLogin(); return; }
+          statusBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const isVacant = btn.dataset.status === 'vacant';
+          document.getElementById('paymentToggleGroup').style.display = isVacant ? 'none' : 'block';
+        });
+      });
+      
+      paymentBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (!currentUser) { requireLogin(); return; }
+          paymentBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+    };
+    
+    const resetUnitForm = () => {
+      tempPhotos = [];
+      document.getElementById('unitFormTitle').innerText = '➕ 세대 정보 입력';
+      document.getElementById('unitNumber').value = '';
+      document.getElementById('unitNumber').disabled = false;
+      document.getElementById('tenantName').value = '';
+      document.getElementById('phone1').value = '';
+      document.getElementById('phone2').value = '';
+      document.getElementById('depositAmount').value = '5000000';
+      document.getElementById('rentAmount').value = '500000';
+      document.getElementById('contractStart').value = '';
+      document.getElementById('contractEnd').value = '';
+      document.getElementById('moveInDate').value = '';
+      document.getElementById('moveOutDate').value = '';
+      document.getElementById('unitMemo').value = '';
+      document.querySelector('#statusToggle .toggle-btn[data-status="vacant"]').click();
+      document.querySelector('#paymentToggle .toggle-btn[data-payment="paid"]').click();
+      document.getElementById('photoPreview').innerHTML = '';
+    };
+    
+    const saveUnit = () => {
+      if (!currentUser) { requireLogin(); return; }
+      
+      const unitNumber = document.getElementById('unitNumber').value;
+      if (!unitNumber) { alert('호수를 선택해주세요!'); return; }
       
       const isVacant = document.querySelector('#statusToggle .toggle-btn.active').dataset.status === 'vacant';
       
-      // 새 사진 업로드
-      let photoUrls = [];
-      if (tempPhotoFiles.length > 0) {
-        photoUrls = await uploadPhotos(unitNumber, tempPhotoFiles);
-      }
-      
-      const existingUnit = unitsData.find(u => u.id === unitNumber);
       const unitData = {
-        id: unitNumber,
-        number: unitNumber,
+        id: unitNumber, number: unitNumber,
         tenant: document.getElementById('tenantName').value,
         phone1: document.getElementById('phone1').value,
         phone2: document.getElementById('phone2').value,
@@ -1058,65 +974,42 @@
         moveOutDate: document.getElementById('moveOutDate').value || null,
         memo: document.getElementById('unitMemo').value,
         isVacant: isVacant,
-        photos: [...(existingUnit?.photos || []), ...photoUrls]
+        photos: tempPhotos,
+        requests: []
       };
       
       const index = unitsData.findIndex(u => u.id === unitNumber);
-      if (index !== -1) {
-        unitsData[index] = unitData;
-      } else {
-        unitsData.push(unitData);
+      if (index !== -1) unitsData[index] = { ...unitsData[index], ...unitData };
+      else unitsData.push(unitData);
+      
+      if (!isVacant) {
+        const isPaid = document.querySelector('#paymentToggle .toggle-btn.active').dataset.payment === 'paid';
+        setPaymentStatus(unitNumber, currentYearMonth, isPaid);
       }
       
-      await saveData();
+      saveUnitsData();
       updateDashboard();
       closeUnitFormModal();
       alert('저장되었습니다!');
-    }
+    };
     
-    // 세대 목록 표시
-    function showUnitList() {
-      const container = document.getElementById('unitListContainer');
-      container.innerHTML = unitsData.map(unit => `
-        <div class="unit-list-item">
-          <div class="unit-list-header">
-            <span class="unit-number-badge">🏠 ${unit.number}호</span>
-            <span class="unit-status ${unit.isVacant ? 'status-vacant' : 'status-occupied'}">
-              ${unit.isVacant ? '🔴 공실' : '🟢 임대중'}
-            </span>
-          </div>
-          <div class="unit-info">
-            <div><strong>임차인</strong>${unit.tenant || '-'}</div>
-            <div><strong>연락처</strong>${unit.phone1 || '-'}</div>
-            <div><strong>월세</strong>${unit.rent.toLocaleString()}원</div>
-            <div><strong>보증금</strong>${unit.deposit.toLocaleString()}원</div>
-          </div>
-          ${unit.memo ? `<div style="font-size:12px; color:#64748b; margin-bottom:12px;">📝 ${unit.memo}</div>` : ''}
-          ${unit.photos?.length ? `<div style="font-size:12px; color:#2563eb;">📎 계약서 ${unit.photos.length}장</div>` : ''}
-          <div class="unit-actions">
-            <button class="btn-secondary" onclick="window.editUnit('${unit.id}')">수정</button>
-            <button class="btn-danger" onclick="window.deleteUnit('${unit.id}')">삭제</button>
-          </div>
-        </div>
-      `).join('');
-      document.getElementById('unitListModal').classList.add('active');
-    }
-    
-    // 세대 수정
-    window.editUnit = (unitId) => {
+    const openEditUnitForm = (unitId) => {
+      if (!currentUser) { requireLogin(); return; }
+      
       const unit = unitsData.find(u => u.id === unitId);
       if (!unit) return;
       
+      tempPhotos = [...(unit.photos || [])];
       document.getElementById('unitFormTitle').innerText = '✏️ 세대 정보 수정';
       document.getElementById('unitNumber').value = unit.number;
       document.getElementById('unitNumber').disabled = true;
-      document.getElementById('tenantName').value = unit.tenant;
-      document.getElementById('phone1').value = unit.phone1;
-      document.getElementById('phone2').value = unit.phone2;
+      document.getElementById('tenantName').value = unit.tenant || '';
+      document.getElementById('phone1').value = unit.phone1 || '';
+      document.getElementById('phone2').value = unit.phone2 || '';
       document.getElementById('depositAmount').value = unit.deposit;
       document.getElementById('rentAmount').value = unit.rent;
-      document.getElementById('contractStart').value = unit.contractStart;
-      document.getElementById('contractEnd').value = unit.contractEnd;
+      document.getElementById('contractStart').value = unit.contractStart || '';
+      document.getElementById('contractEnd').value = unit.contractEnd || '';
       document.getElementById('moveInDate').value = unit.moveInDate || '';
       document.getElementById('moveOutDate').value = unit.moveOutDate || '';
       document.getElementById('unitMemo').value = unit.memo || '';
@@ -1124,331 +1017,194 @@
       const statusBtn = unit.isVacant ? '[data-status="vacant"]' : '[data-status="occupied"]';
       document.querySelector(`#statusToggle .toggle-btn${statusBtn}`).click();
       
+      if (!unit.isVacant) {
+        const currentPaid = getPaymentStatus(unit.id, currentYearMonth);
+        const paymentBtn = currentPaid ? '[data-payment="paid"]' : '[data-payment="unpaid"]';
+        document.querySelector(`#paymentToggle .toggle-btn${paymentBtn}`).click();
+      }
+      
+      updatePhotoPreview();
       document.getElementById('unitFormModal').classList.add('active');
     };
     
-    // 세대 삭제
-    window.deleteUnit = async (unitId) => {
+    const deleteUnit = (unitId) => {
+      if (!currentUser) { requireLogin(); return; }
       if (confirm('정말 삭제하시겠습니까?')) {
         unitsData = unitsData.filter(u => u.id !== unitId);
-        await saveData();
+        saveUnitsData();
         updateDashboard();
         showUnitList();
       }
     };
     
-    // 폼 닫기
-    function closeUnitFormModal() {
-      tempPhotoFiles = [];
-      document.getElementById('unitNumber').disabled = false;
-      document.getElementById('unitFormTitle').innerText = '➕ 세대 정보 입력';
-      document.getElementById('unitNumber').value = '';
-      document.getElementById('tenantName').value = '';
-      document.getElementById('phone1').value = '';
-      document.getElementById('phone2').value = '';
-      document.getElementById('depositAmount').value = '5000000';
-      document.getElementById('rentAmount').value = '500000';
-      document.getElementById('contractStart').value = '';
-      document.getElementById('contractEnd').value = '';
-      document.getElementById('moveInDate').value = '';
-      document.getElementById('moveOutDate').value = '';
-      document.getElementById('unitMemo').value = '';
-      document.getElementById('photoPreview').innerHTML = '';
-      document.getElementById('unitFormModal').classList.remove('active');
-    }
-    
-    // 납부 관리 화면
-    function showPaymentView() {
-      let paymentDiv = document.getElementById('paymentView');
-      if (!paymentDiv) {
-        paymentDiv = document.createElement('div');
-        paymentDiv.id = 'paymentView';
-        document.querySelector('.app-content').appendChild(paymentDiv);
-      }
-      
-      const occupiedUnits = unitsData.filter(u => !u.isVacant);
-      paymentDiv.innerHTML = `
-        <h3 style="margin-bottom:16px;">💰 ${currentYearMonth} 월세 납부 현황</h3>
-        <div style="background:#f8fafc; border-radius:16px; padding:8px;">
-          ${occupiedUnits.map(unit => `
-            <div class="payment-unit-item">
-              <div><strong>${unit.number}호</strong><br><small>${unit.tenant || '미기입'}</small></div>
-              <div>
-                <span class="payment-badge payment-unpaid">❌ 미납</span>
-                <button class="toggle-payment" data-id="${unit.id}" style="margin-left:8px; padding:6px 12px; border-radius:10px; border:none; background:#2563eb; color:white; cursor:pointer;">
-                  납부완료로 변경
-                </button>
-              </div>
-            </div>
-          `).join('')}
-          ${occupiedUnits.length === 0 ? '<div style="padding:20px; text-align:center; color:#94a3b8;">📭 임대중인 세대가 없습니다</div>' : ''}
+    const showUnitList = () => {
+      const container = document.getElementById('unitListContainer');
+      container.innerHTML = unitsData.map(unit => `
+        <div class="unit-list-item">
+          <div class="unit-list-header">
+            <span class="unit-number-badge">🏠 ${unit.number}호</span>
+            <span class="unit-status ${unit.isVacant ? 'status-vacant' : 'status-occupied'}">${unit.isVacant ? '🔴 공실' : '🟢 임대중'}</span>
+          </div>
+          <div class="unit-info">
+            <div><strong>임차인</strong><br>${unit.tenant || '-'}</div>
+            <div><strong>연락처</strong><br>${unit.phone1 || '-'}${unit.phone2 ? `<br>${unit.phone2}` : ''}</div>
+            <div><strong>월세/보증금</strong><br>${unit.rent.toLocaleString()} / ${unit.deposit.toLocaleString()}</div>
+            <div><strong>계약기간</strong><br>${unit.contractStart || '-'} ~ ${unit.contractEnd || '-'}</div>
+          </div>
+          ${unit.memo ? `<div style="font-size:12px; color:#64748b; margin-bottom:12px;">📝 ${unit.memo}</div>` : ''}
+          ${unit.photos?.length ? `<div style="font-size:12px; color:#2563eb;">📎 계약서 ${unit.photos.length}장</div>` : ''}
+          <div class="unit-actions">
+            <button class="btn-secondary" onclick="window.editUnit('${unit.id}')" ${!currentUser ? 'disabled' : ''}>수정</button>
+            <button class="btn-danger" onclick="window.deleteUnit('${unit.id}')" ${!currentUser ? 'disabled' : ''}>삭제</button>
+          </div>
         </div>
-      `;
-      
-      document.querySelectorAll('.toggle-payment').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          alert('납부 상태가 변경되었습니다!');
-        });
-      });
-    }
+      `).join('');
+      document.getElementById('unitListModal').classList.add('active');
+    };
     
-    // 캘린더 화면
-    function showCalendar() {
-      let calDiv = document.getElementById('calendarView');
-      if (!calDiv) {
-        calDiv = document.createElement('div');
-        calDiv.id = 'calendarView';
-        document.querySelector('.app-content').appendChild(calDiv);
-      }
-      
-      const events = unitsData.filter(u => u.moveInDate || u.moveOutDate);
-      calDiv.innerHTML = `
-        <h3 style="margin-bottom:16px;">📅 입주/퇴실 일정</h3>
-        <div style="background:#f8fafc; border-radius:16px; padding:16px;">
-          ${events.map(u => `
-            <div style="padding:8px 0; border-bottom:1px solid #e2e8f0;">
-              <strong>${u.number}호</strong>
-              ${u.moveInDate ? `<div>🏠 입주: ${u.moveInDate}</div>` : ''}
-              ${u.moveOutDate ? `<div>🚪 퇴실: ${u.moveOutDate}</div>` : ''}
-            </div>
-          `).join('')}
-          ${events.length === 0 ? '<div>등록된 일정이 없습니다</div>' : ''}
-        </div>
-      `;
-    }
+    const closeUnitFormModal = () => { resetUnitForm(); document.getElementById('unitFormModal').classList.remove('active'); };
     
-    // 설정 화면
-    function showSettings() {
-      let setDiv = document.getElementById('settingsView');
-      if (!setDiv) {
-        setDiv = document.createElement('div');
-        setDiv.id = 'settingsView';
-        document.querySelector('.app-content').appendChild(setDiv);
-      }
-      
-      setDiv.innerHTML = `
-        <h3 style="margin-bottom:16px;">⚙️ 관리자 설정</h3>
-        <button id="resetDataBtn" style="width:100%; padding:12px; background:#ef4444; color:white; border:none; border-radius:12px; margin-bottom:12px;">모든 데이터 초기화</button>
-        <button id="exportDataBtn" style="width:100%; padding:12px; background:#10b981; color:white; border:none; border-radius:12px;">데이터 내보내기</button>
-      `;
-      
-      document.getElementById('resetDataBtn')?.addEventListener('click', async () => {
-        if (confirm('모든 데이터를 초기화하시겠습니까?')) {
-          unitsData = generateDefaultUnits();
-          await saveData();
-          alert('초기화 완료!');
-          location.reload();
-        }
-      });
-      
-      document.getElementById('exportDataBtn')?.addEventListener('click', () => {
-        const data = { building: currentBuilding, units: unitsData };
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)]));
-        a.download = `building_data_${currentBuilding}.json`;
-        a.click();
-      });
-    }
-    
-    // 탭 전환
-    function switchTab(tab) {
-      // 모든 뷰 숨기기
-      ['calendarView', 'settingsView', 'paymentView'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = 'none';
-      });
-      
-      // 기본 홈 화면 요소들
-      const homeElements = document.querySelectorAll('.cards, .income-card, .section');
-      
-      if (tab === 'home') {
-        homeElements.forEach(el => el.style.display = '');
-        fabBtn.classList.remove('hidden');
-      } else if (tab === 'units') {
-        homeElements.forEach(el => el.style.display = 'none');
-        fabBtn.classList.add('hidden');
-        showUnitList();
-      } else if (tab === 'payments') {
-        homeElements.forEach(el => el.style.display = 'none');
-        fabBtn.classList.add('hidden');
-        showPaymentView();
-        const paymentView = document.getElementById('paymentView');
-        if (paymentView) paymentView.style.display = 'block';
-      } else if (tab === 'calendar') {
-        homeElements.forEach(el => el.style.display = 'none');
-        fabBtn.classList.add('hidden');
-        showCalendar();
-        const calendarView = document.getElementById('calendarView');
-        if (calendarView) calendarView.style.display = 'block';
-      } else if (tab === 'settings') {
-        homeElements.forEach(el => el.style.display = 'none');
-        fabBtn.classList.add('hidden');
-        showSettings();
-        const settingsView = document.getElementById('settingsView');
-        if (settingsView) settingsView.style.display = 'block';
-      }
-    }
-    
-    // 사진 업로드 UI 설정
-    function setupPhotoUpload() {
-      const uploadArea = document.getElementById('photoUploadArea');
-      const photoInput = document.getElementById('photoInput');
-      
-      uploadArea.addEventListener('click', () => photoInput.click());
-      photoInput.addEventListener('change', (e) => {
-        tempPhotoFiles = Array.from(e.target.files);
-        const previewDiv = document.getElementById('photoPreview');
-        previewDiv.innerHTML = '';
-        tempPhotoFiles.forEach(file => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const div = document.createElement('div');
-            div.className = 'photo-item';
-            div.innerHTML = `<img src="${e.target.result}"><button class="photo-delete">×</button>`;
-            previewDiv.appendChild(div);
-          };
-          reader.readAsDataURL(file);
-        });
-      });
-    }
-    
-    // 월 선택기 초기화
-    function initMonthPicker() {
+    // 월 선택기
+    const initMonthPicker = () => {
       const picker = document.getElementById('monthPicker');
       const today = new Date();
       for (let i = -5; i <= 5; i++) {
         const date = new Date(today.getFullYear(), today.getMonth() + i, 1);
         const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-        const display = `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
-        picker.innerHTML += `<option value="${yearMonth}" ${yearMonth === currentYearMonth ? 'selected' : ''}>${display}</option>`;
+        picker.innerHTML += `<option value="${yearMonth}" ${yearMonth === currentYearMonth ? 'selected' : ''}>${date.getFullYear()}년 ${date.getMonth()+1}월</option>`;
       }
-      picker.addEventListener('change', (e) => {
-        currentYearMonth = e.target.value;
-        loadData();
-      });
-    }
+      picker.addEventListener('change', (e) => { currentYearMonth = e.target.value; loadData(); updateDashboard(); updatePaymentView(); });
+    };
     
-    // 토글 버튼 초기화
-    function initToggles() {
-      const statusBtns = document.querySelectorAll('#statusToggle .toggle-btn');
-      const paymentBtns = document.querySelectorAll('#paymentToggle .toggle-btn');
-      
-      statusBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          statusBtns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          const isVacant = btn.dataset.status === 'vacant';
-          document.getElementById('paymentToggleGroup').style.display = isVacant ? 'none' : 'block';
-        });
-      });
-      
-      paymentBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          paymentBtns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-        });
-      });
-    }
-    
-    // 이벤트 리스너
-    document.getElementById('googleLoginBtn').addEventListener('click', async () => {
-      try {
-        const result = await signInWithPopup(auth, provider);
-        currentUser = result.user;
-        await loadData();
-        loginContainer.classList.add('hidden');
-        mainContent.classList.remove('hidden');
-        fabBtn.classList.remove('hidden');
-        document.getElementById('userName').innerText = currentUser.displayName;
-        document.getElementById('userAvatar').src = currentUser.photoURL || '';
-      } catch (error) {
-        console.error(error);
-        alert('로그인에 실패했습니다.');
-      }
-    });
-    
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-      await signOut(auth);
-      currentUser = null;
-      loginContainer.classList.remove('hidden');
-      mainContent.classList.add('hidden');
-      fabBtn.classList.add('hidden');
-    });
-    
-    document.getElementById('buildingName').addEventListener('change', async (e) => {
+    // 이벤트 바인딩
+    buildingNameInput.addEventListener('change', (e) => {
+      if (!currentUser) { requireLogin(); buildingNameInput.value = currentBuilding; return; }
       currentBuilding = e.target.value;
-      await loadData();
-      updateDashboard();
+      localStorage.setItem(`${STORAGE_KEYS.BUILDINGS}_${currentYearMonth}`, currentBuilding);
+      loadData(); updateDashboard();
     });
     
-    document.getElementById('memoBtn').addEventListener('click', () => {
+    memoBtn.addEventListener('click', () => {
+      if (!currentUser) { requireLogin(); return; }
+      const savedMemo = localStorage.getItem(`${STORAGE_KEYS.MEMO}_${currentBuilding}_${currentYearMonth}`) || '';
+      document.getElementById('memoText').value = savedMemo;
       document.getElementById('memoModal').classList.add('active');
     });
     
     document.getElementById('saveMemoBtn').addEventListener('click', () => {
-      alert('메모가 저장되었습니다!');
+      if (!currentUser) { requireLogin(); return; }
+      localStorage.setItem(`${STORAGE_KEYS.MEMO}_${currentBuilding}_${currentYearMonth}`, document.getElementById('memoText').value);
       document.getElementById('memoModal').classList.remove('active');
+      alert('메모 저장됨');
     });
+    document.getElementById('closeMemoBtn').addEventListener('click', () => document.getElementById('memoModal').classList.remove('active'));
     
-    document.getElementById('closeMemoBtn').addEventListener('click', () => {
-      document.getElementById('memoModal').classList.remove('active');
-    });
-    
-    document.getElementById('fabBtn').addEventListener('click', () => {
+    fabBtn.addEventListener('click', () => {
+      if (!currentUser) { requireLogin(); return; }
+      resetUnitForm();
       document.getElementById('unitFormModal').classList.add('active');
     });
-    
     document.getElementById('saveUnitBtn').addEventListener('click', saveUnit);
     document.getElementById('closeUnitFormBtn').addEventListener('click', closeUnitFormModal);
-    document.getElementById('closeUnitListBtn').addEventListener('click', () => {
-      document.getElementById('unitListModal').classList.remove('active');
+    document.getElementById('closeUnitListBtn').addEventListener('click', () => document.getElementById('unitListModal').classList.remove('active'));
+    
+    document.getElementById('imageViewer').addEventListener('click', () => document.getElementById('imageViewer').classList.remove('active'));
+    
+    window.editUnit = openEditUnitForm;
+    window.deleteUnit = deleteUnit;
+    
+    // 로그인 관련
+    headerLoginBtn.addEventListener('click', () => {
+      if (currentUser) {
+        signOut(auth);
+      } else {
+        loginModal.classList.add('active');
+      }
     });
     
-    document.querySelectorAll('.nav-item').forEach(item => {
+    googleLoginBtn.addEventListener('click', async () => {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        currentUser = result.user;
+        updateLoginUI();
+        loginModal.classList.remove('active');
+      } catch (error) {
+        console.error(error);
+        alert('로그인 실패');
+      }
+    });
+    
+    closeLoginModal.addEventListener('click', () => {
+      loginModal.classList.remove('active');
+    });
+    
+    // 탭 전환
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
       item.addEventListener('click', () => {
-        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        const tab = item.dataset.tab;
+        
+        // 비로그인 시 세대/납부관리/설정 탭 클릭하면 로그인 요청
+        if (!currentUser && (tab === 'units' || tab === 'payments' || tab === 'settings')) {
+          requireLogin();
+          return;
+        }
+        
+        navItems.forEach(nav => nav.classList.remove('active'));
         item.classList.add('active');
-        switchTab(item.dataset.tab);
+        
+        document.querySelectorAll('.cards, .income-card, .section').forEach(el => {
+          if (el.parentElement === document.getElementById('app')) el.style.display = 'none';
+        });
+        fabBtn.style.display = 'none';
+        ['calendarView', 'settingsView', 'paymentView'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+        
+        if (tab === 'home') {
+          document.querySelectorAll('.cards, .income-card, .section').forEach(el => {
+            if (el.parentElement === document.getElementById('app')) el.style.display = '';
+          });
+          fabBtn.style.display = 'flex';
+          updateDashboard();
+        } else if (tab === 'units') {
+          showUnitList();
+        } else if (tab === 'payments') {
+          updatePaymentView();
+          document.getElementById('paymentView').style.display = 'block';
+        } else if (tab === 'calendar') {
+          let calDiv = document.getElementById('calendarView') || (() => { const div = document.createElement('div'); div.id = 'calendarView'; document.getElementById('app').appendChild(div); return div; })();
+          calDiv.style.display = 'block';
+          const events = unitsData.filter(u => u.moveInDate || u.moveOutDate);
+          calDiv.innerHTML = `<h3>📅 입주/퇴실 일정</h3><div style="background:#f8fafc; border-radius:16px; padding:16px;">${events.map(u => `<div style="padding:8px 0;"><strong>${u.number}호</strong> ${u.moveInDate ? `🏠 입주 ${u.moveInDate}` : ''} ${u.moveOutDate ? `🚪 퇴실 ${u.moveOutDate}` : ''}</div>`).join('') || '등록된 일정이 없습니다'}</div><button id="backHome" style="margin-top:16px; width:100%; padding:12px; background:#2563eb; color:white; border:none; border-radius:12px;">홈</button>`;
+          document.getElementById('backHome')?.addEventListener('click', () => document.querySelector('.nav-item[data-tab="home"]').click());
+        } else if (tab === 'settings') {
+          let setDiv = document.getElementById('settingsView') || (() => { const div = document.createElement('div'); div.id = 'settingsView'; document.getElementById('app').appendChild(div); return div; })();
+          setDiv.style.display = 'block';
+          setDiv.innerHTML = `<h3>⚙️ 설정</h3><button id="resetData" style="width:100%; padding:12px; background:#ef4444; color:white; border:none; border-radius:12px; margin-bottom:12px;">모든 데이터 초기화</button><button id="exportData" style="width:100%; padding:12px; background:#10b981; color:white; border:none; border-radius:12px;">데이터 내보내기</button><button id="backHomeSet" style="margin-top:12px; width:100%; padding:12px; background:#64748b; color:white; border:none; border-radius:12px;">홈</button>`;
+          document.getElementById('resetData')?.addEventListener('click', () => { if(confirm('초기화?')){localStorage.clear(); location.reload();} });
+          document.getElementById('exportData')?.addEventListener('click', () => { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify({building:currentBuilding, units:unitsData, payments:paymentsData})])); a.download='data.json'; a.click(); });
+          document.getElementById('backHomeSet')?.addEventListener('click', () => document.querySelector('.nav-item[data-tab="home"]').click());
+        }
       });
     });
     
-    document.getElementById('imageViewer').addEventListener('click', () => {
-      document.getElementById('imageViewer').classList.remove('active');
-    });
-    
-    // 이미지 클릭 시 확대 (동적 이벤트)
-    document.addEventListener('click', (e) => {
-      if (e.target.closest('.photo-item') && !e.target.closest('.photo-delete')) {
-        const img = e.target.closest('.photo-item').querySelector('img');
-        if (img) {
-          document.getElementById('viewerImage').src = img.src;
-          document.getElementById('imageViewer').classList.add('active');
-        }
-      }
-    });
-    
     // 인증 상태 감지
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        currentUser = user;
-        await loadData();
-        loginContainer.classList.add('hidden');
-        mainContent.classList.remove('hidden');
-        fabBtn.classList.remove('hidden');
-        document.getElementById('userName').innerText = currentUser.displayName;
-        document.getElementById('userAvatar').src = currentUser.photoURL || '';
-      } else {
-        currentUser = null;
-        loginContainer.classList.remove('hidden');
-        mainContent.classList.add('hidden');
-        fabBtn.classList.add('hidden');
-      }
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      updateLoginUI();
+      loadData();
+      updateDashboard();
     });
     
-    // 초기화
-    initMonthPicker();
     setupPhotoUpload();
+    initMonthPicker();
+    loadData();
+    updateDashboard();
     initToggles();
+    
+    window.addEventListener('click', (e) => { if (e.target.classList.contains('modal')) e.target.classList.remove('active'); });
   </script>
 </body>
 </html>
