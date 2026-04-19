@@ -2,131 +2,794 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>💯 월세 관리</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="manifest" href="manifest.json" />
+  <title>월세 관리 - 빌리지</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+    
     body {
       background: #f4f7fb;
       color: #1f2937;
       display: flex;
       justify-content: center;
-      padding: 24px;
+      padding: 16px;
+      min-height: 100vh;
     }
+    
+    /* 모바일 컨테이너 */
     .phone {
-      width: 390px;
+      width: 100%;
+      max-width: 420px;
       background: #ffffff;
-      border-radius: 28px;
+      border-radius: 32px;
       padding: 20px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      position: relative;
+      min-height: 700px;
+      display: flex;
+      flex-direction: column;
     }
+    
+    /* 헤더 */
     .header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
     }
-    .building { font-size: 20px; font-weight: 700; }
-    .month { color: #6b7280; font-size: 14px; }
+    
+    .building-section {
+      flex: 1;
+    }
+    
+    .building-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .building-name {
+      font-size: 22px;
+      font-weight: 800;
+      background: none;
+      border: none;
+      padding: 4px 0;
+      font-size: 22px;
+      font-weight: 800;
+      color: #1f2937;
+      width: auto;
+      min-width: 120px;
+      cursor: pointer;
+      border-bottom: 2px dashed #cbd5e1;
+    }
+    
+    .building-name:focus {
+      outline: none;
+      border-bottom-color: #2563eb;
+    }
+    
+    .month-selector {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    
+    .month-picker {
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    
+    .memo-btn {
+      background: #f1f5f9;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .memo-btn:hover {
+      background: #e2e8f0;
+    }
+    
+    /* 카드 그리드 */
     .cards {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
       margin-bottom: 20px;
     }
+    
     .card {
       background: #f8fafc;
       border-radius: 20px;
       padding: 16px;
+      transition: transform 0.2s;
     }
-    .card small { color: #6b7280; display:block; margin-bottom: 8px; }
-    .card strong { font-size: 24px; }
-    .income {
-      background: linear-gradient(135deg, #2563eb, #60a5fa);
+    
+    .card small {
+      color: #64748b;
+      display: block;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    
+    .card strong {
+      font-size: 28px;
+      font-weight: 800;
+    }
+    
+    .danger { color: #dc2626; }
+    .warning { color: #d97706; }
+    .success { color: #10b981; }
+    
+    /* 수입 카드 */
+    .income-card {
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
       color: white;
-      border-radius: 22px;
+      border-radius: 24px;
       padding: 20px;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
-    .income p { opacity: 0.9; margin-bottom: 8px; }
-    .income strong { font-size: 30px; }
-    .section { margin-bottom: 20px; }
-    .section h3 { font-size: 16px; margin-bottom: 12px; }
+    
+    .income-card p {
+      opacity: 0.9;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    .income-card strong {
+      font-size: 32px;
+      font-weight: 800;
+    }
+    
+    /* 섹션 */
+    .section {
+      margin-bottom: 24px;
+    }
+    
+    .section h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #334155;
+    }
+    
     .list-item {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       padding: 12px 0;
-      border-bottom: 1px solid #eef2f7;
+      border-bottom: 1px solid #f1f5f9;
     }
-    .danger { color: #dc2626; font-weight: 600; }
-    .warning { color: #d97706; font-weight: 600; }
+    
+    .list-item:last-child {
+      border-bottom: none;
+    }
+    
+    .unit-number {
+      font-weight: 600;
+    }
+    
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .status-delayed {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    
+    .status-expiring {
+      background: #fffbeb;
+      color: #d97706;
+    }
+    
+    /* 하단 네비게이션 */
     .nav {
       display: flex;
       justify-content: space-around;
-      padding-top: 12px;
-      border-top: 1px solid #e5e7eb;
-      color: #6b7280;
-      font-size: 13px;
+      padding: 12px 0 8px;
+      margin-top: auto;
+      border-top: 1px solid #f1f5f9;
+      background: white;
     }
-    .nav .active { color: #2563eb; font-weight: 700; }
+    
+    .nav-item {
+      text-align: center;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 24px;
+      transition: all 0.2s;
+      font-size: 13px;
+      font-weight: 500;
+      color: #94a3b8;
+    }
+    
+    .nav-item.active {
+      background: #eff6ff;
+      color: #2563eb;
+    }
+    
+    /* FAB 버튼 */
     .fab {
       position: fixed;
-      bottom: 97px;
-      right: calc(50% - 170px);
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
+      bottom: 24px;
+      right: calc(50% - 180px);
+      width: 56px;
+      height: 56px;
+      border-radius: 28px;
       border: none;
       background: #2563eb;
       color: white;
       font-size: 28px;
-      box-shadow: 0 10px 20px rgba(37,99,235,0.35);
+      font-weight: 300;
+      box-shadow: 0 8px 20px rgba(37,99,235,0.4);
       cursor: pointer;
+      transition: all 0.2s;
+      z-index: 1000;
+    }
+    
+    .fab:hover {
+      transform: scale(1.05);
+    }
+    
+    /* 모달 */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 28px;
+      max-width: 400px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    
+    /* 반응형 */
+    @media (max-width: 480px) {
+      .phone {
+        padding: 16px;
+      }
+      .fab {
+        right: 20px;
+        bottom: 20px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="phone">
+  <div class="phone" id="app">
+    <!-- 헤더 -->
     <div class="header">
-      <div>
-        <div class="building">🏣 조아빌 ▾</div>
-        <div class="month"> 📅 2026년 4월</div>
+      <div class="building-section">
+        <div class="building-input-wrapper">
+          <input type="text" id="buildingName" class="building-name" value="조아빌" maxlength="20">
+          <span>▾</span>
+        </div>
+        <div class="month-selector">
+          <select id="monthPicker" class="month-picker"></select>
+        </div>
       </div>
-      <div>📝 메 모</div>
+      <button class="memo-btn" id="memoBtn">📝 메모</button>
     </div>
-
+    
+    <!-- 대시보드 카드 -->
     <div class="cards">
-      <div class="card"><small>❎ 공실현황</small><strong>25%</strong></div>
-      <div class="card"><small>😨 미납현황</small><strong class="danger">2건</strong></div>
-      <div class="card"><small>🔜 만기예정</small><strong class="warning">1건</strong></div>
-      <div class="card"><small>🛠️ 요청사항</small><strong class="request">1건</strong></div>
+      <div class="card">
+        <small>❎ 공실현황</small>
+        <strong id="vacancyRate">0%</strong>
+      </div>
+      <div class="card">
+        <small>😨 미납현황</small>
+        <strong id="unpaidCount" class="danger">0건</strong>
+      </div>
+      <div class="card">
+        <small>🔜 만기예정</small>
+        <strong id="expiringCount" class="warning">0건</strong>
+      </div>
+      <div class="card">
+        <small>🛠️ 요청사항</small>
+        <strong id="requestCount">0건</strong>
+      </div>
     </div>
-
-    <div class="income">
-      <p>😊 이번달 수입</p>
-      <strong>₩ 2,150,000</strong>
+    
+    <!-- 수입 -->
+    <div class="income-card">
+      <p>💰 이번달 수입</p>
+      <strong id="monthlyIncome">₩ 0</strong>
     </div>
-
+    
+    <!-- 미납 세대 목록 -->
     <div class="section">
       <h3>😨 미납 세대</h3>
-      <div class="list-item"><span>201호 김OO</span><span class="danger">5일 지연</span></div>
-      <div class="list-item"><span>305호 박OO</span><span class="danger">2일 지연</span></div>
+      <div id="unpaidList"></div>
     </div>
-
+    
+    <!-- 만기 예정 -->
     <div class="section">
       <h3>🔜 만기 예정</h3>
-      <div class="list-item"><span>303호 이OO</span><span class="warning">D-14</span></div>
+      <div id="expiringList"></div>
     </div>
-
+    
+    <!-- 하단 네비게이션 -->
     <div class="nav">
-      <div class="active">홈</div>
-      <div>세대</div>
-      <div>일정</div>
-      <div>설정</div>
+      <div class="nav-item active" data-tab="home">🏠 홈</div>
+      <div class="nav-item" data-tab="units">🏢 세대</div>
+      <div class="nav-item" data-tab="calendar">📅 일정</div>
+      <div class="nav-item" data-tab="settings">⚙️ 설정</div>
+    </div>
+  </div>
+  
+  <button class="fab" id="fabBtn">+</button>
+  
+  <!-- 메모 모달 -->
+  <div id="memoModal" class="modal">
+    <div class="modal-content">
+      <h3 style="margin-bottom: 16px;">📝 메모 작성</h3>
+      <textarea id="memoText" rows="6" style="width:100%; padding:12px; border-radius:12px; border:1px solid #e2e8f0; font-size:14px;" placeholder="메모를 입력하세요..."></textarea>
+      <div style="display: flex; gap: 8px; margin-top: 16px;">
+        <button id="saveMemoBtn" style="flex:1; padding:12px; background:#2563eb; color:white; border:none; border-radius:12px; font-weight:600;">저장</button>
+        <button id="closeMemoBtn" style="flex:1; padding:12px; background:#f1f5f9; border:none; border-radius:12px;">닫기</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 세대 관리 모달 (간단한 예시) -->
+  <div id="unitModal" class="modal">
+    <div class="modal-content">
+      <h3 id="unitModalTitle">세대 관리</h3>
+      <div id="unitForm"></div>
+      <button id="closeUnitBtn" style="margin-top:16px; width:100%; padding:12px; background:#f1f5f9; border:none; border-radius:12px;">닫기</button>
     </div>
   </div>
 
-  <button class="fab">+</button>
-  
+  <script type="module">
+    // Firebase 설정 (실제 프로젝트로 교체 필요)
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
+    import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+    import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
+    
+    // Firebase 구성 (여기에 실제 설정을 입력하세요)
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    
+    // 임시: Firebase 없이 로컬 스토리지로 먼저 테스트 (데모 모드)
+    const USE_FIREBASE = false; // 실제 Firebase 설정 후 true로 변경
+    
+    let app, db, storage;
+    if (USE_FIREBASE) {
+      app = initializeApp(firebaseConfig);
+      db = getFirestore(app);
+      storage = getStorage(app);
+    }
+    
+    // 로컬 스토리지 키
+    const STORAGE_KEYS = {
+      BUILDINGS: 'building_data',
+      UNITS: 'units_data',
+      MEMO: 'memo_data'
+    };
+    
+    // 기본 세대 데이터 (201호 ~ 406호, 총 18세대)
+    const generateDefaultUnits = () => {
+      const units = [];
+      const floors = [2, 3, 4];
+      const numbers = [1, 2, 3, 4, 5, 6];
+      floors.forEach(floor => {
+        numbers.forEach(num => {
+          const unitNum = `${floor}0${num}`;
+          units.push({
+            id: unitNum,
+            number: unitNum,
+            tenant: '',
+            phone: '',
+            rent: 500000,
+            deposit: 5000000,
+            contractStart: '2024-01-01',
+            contractEnd: '2025-01-01',
+            isVacant: true,
+            isPaid: true,
+            requests: [],
+            moveInDate: null,
+            moveOutDate: null
+          });
+        });
+      });
+      return units;
+    };
+    
+    // 상태 관리
+    let currentBuilding = '조아빌';
+    let currentYearMonth = '2026-04';
+    let unitsData = [];
+    let currentTab = 'home';
+    
+    // 날짜 포맷
+    const getCurrentYearMonth = () => {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    };
+    
+    // 월 선택기 초기화
+    const initMonthPicker = () => {
+      const picker = document.getElementById('monthPicker');
+      const months = [];
+      const today = new Date();
+      for (let i = -5; i <= 5; i++) {
+        const date = new Date(today.getFullYear(), today.getMonth() + i, 1);
+        const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        const display = `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
+        months.push({ value: yearMonth, label: display });
+      }
+      picker.innerHTML = months.map(m => `<option value="${m.value}" ${m.value === currentYearMonth ? 'selected' : ''}>${m.label}</option>`);
+      picker.addEventListener('change', (e) => {
+        currentYearMonth = e.target.value;
+        loadData();
+        updateDashboard();
+      });
+    };
+    
+    // 데이터 로드
+    const loadData = () => {
+      // 건물명 로드
+      const savedBuilding = localStorage.getItem(`${STORAGE_KEYS.BUILDINGS}_${currentYearMonth}`);
+      if (savedBuilding) {
+        currentBuilding = savedBuilding;
+        document.getElementById('buildingName').value = currentBuilding;
+      }
+      
+      // 세대 데이터 로드
+      const savedUnits = localStorage.getItem(`${STORAGE_KEYS.UNITS}_${currentBuilding}`);
+      if (savedUnits) {
+        unitsData = JSON.parse(savedUnits);
+      } else {
+        unitsData = generateDefaultUnits();
+        saveUnitsData();
+      }
+    };
+    
+    const saveUnitsData = () => {
+      localStorage.setItem(`${STORAGE_KEYS.UNITS}_${currentBuilding}`, JSON.stringify(unitsData));
+    };
+    
+    const saveBuildingName = () => {
+      localStorage.setItem(`${STORAGE_KEYS.BUILDINGS}_${currentYearMonth}`, currentBuilding);
+    };
+    
+    // 대시보드 업데이트
+    const updateDashboard = () => {
+      // 공실 계산
+      const vacantUnits = unitsData.filter(u => u.isVacant === true);
+      const vacancyRate = unitsData.length > 0 ? Math.round((vacantUnits.length / unitsData.length) * 100) : 0;
+      document.getElementById('vacancyRate').innerHTML = `${vacancyRate}%`;
+      
+      // 미납 계산 (isPaid가 false인 세대)
+      const unpaidUnits = unitsData.filter(u => !u.isVacant && !u.isPaid);
+      document.getElementById('unpaidCount').innerHTML = `${unpaidUnits.length}건`;
+      document.getElementById('unpaidCount').className = unpaidUnits.length > 0 ? 'danger' : '';
+      
+      // 만기 예정 (계약종료일이 이번달 또는 다음달인 세대)
+      const today = new Date();
+      const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+      const expiringUnits = unitsData.filter(u => {
+        if (u.isVacant || !u.contractEnd) return false;
+        const endDate = new Date(u.contractEnd);
+        return endDate <= endOfNextMonth && endDate >= today;
+      });
+      document.getElementById('expiringCount').innerHTML = `${expiringUnits.length}건`;
+      
+      // 요청사항 (requests 배열 길이)
+      const requestsCount = unitsData.reduce((sum, u) => sum + (u.requests?.length || 0), 0);
+      document.getElementById('requestCount').innerHTML = `${requestsCount}건`;
+      
+      // 이번달 수입 (임대료 합계, 미납 제외? 실제로는 납부된 금액)
+      const totalRent = unitsData.filter(u => !u.isVacant && u.isPaid).reduce((sum, u) => sum + (u.rent || 0), 0);
+      document.getElementById('monthlyIncome').innerHTML = `₩ ${totalRent.toLocaleString()}`;
+      
+      // 미납 세대 목록
+      const unpaidListDiv = document.getElementById('unpaidList');
+      if (unpaidUnits.length === 0) {
+        unpaidListDiv.innerHTML = '<div class="list-item" style="color:#94a3b8;">✨ 모든 세대가 납부 완료!</div>';
+      } else {
+        unpaidListDiv.innerHTML = unpaidUnits.map(u => `
+          <div class="list-item">
+            <span class="unit-number">${u.number}호 ${u.tenant || '미기입'}</span>
+            <span class="status-badge status-delayed">미납</span>
+          </div>
+        `).join('');
+      }
+      
+      // 만기 예정 목록
+      const expiringListDiv = document.getElementById('expiringList');
+      if (expiringUnits.length === 0) {
+        expiringListDiv.innerHTML = '<div class="list-item" style="color:#94a3b8;">📋 만기 예정 계약이 없습니다</div>';
+      } else {
+        expiringListDiv.innerHTML = expiringUnits.map(u => {
+          const endDate = new Date(u.contractEnd);
+          const daysLeft = Math.ceil((endDate - new Date()) / (1000 * 60 * 60 * 24));
+          return `
+            <div class="list-item">
+              <span class="unit-number">${u.number}호 ${u.tenant || '미기입'}</span>
+              <span class="status-badge status-expiring">D-${daysLeft}</span>
+            </div>
+          `;
+        }).join('');
+      }
+    };
+    
+    // 건물명 저장
+    document.getElementById('buildingName').addEventListener('change', (e) => {
+      currentBuilding = e.target.value;
+      saveBuildingName();
+      loadData();
+      updateDashboard();
+    });
+    
+    // 메모 모달
+    const memoModal = document.getElementById('memoModal');
+    const memoText = document.getElementById('memoText');
+    
+    document.getElementById('memoBtn').addEventListener('click', () => {
+      const savedMemo = localStorage.getItem(`${STORAGE_KEYS.MEMO}_${currentBuilding}_${currentYearMonth}`);
+      memoText.value = savedMemo || '';
+      memoModal.classList.add('active');
+    });
+    
+    document.getElementById('saveMemoBtn').addEventListener('click', () => {
+      localStorage.setItem(`${STORAGE_KEYS.MEMO}_${currentBuilding}_${currentYearMonth}`, memoText.value);
+      memoModal.classList.remove('active');
+      alert('메모가 저장되었습니다!');
+    });
+    
+    document.getElementById('closeMemoBtn').addEventListener('click', () => {
+      memoModal.classList.remove('active');
+    });
+    
+    // 탭 전환
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const tab = item.dataset.tab;
+        currentTab = tab;
+        navItems.forEach(nav => nav.classList.remove('active'));
+        item.classList.add('active');
+        
+        if (tab === 'units') {
+          showUnitManagement();
+        } else if (tab === 'calendar') {
+          showCalendar();
+        } else if (tab === 'settings') {
+          showSettings();
+        } else {
+          // 홈 화면 보여주기
+          document.querySelectorAll('.cards, .income-card, .section').forEach(el => {
+            if (el.parentElement === document.getElementById('app')) {
+              el.style.display = '';
+            }
+          });
+          document.getElementById('fabBtn').style.display = 'flex';
+          updateDashboard();
+        }
+      });
+    });
+    
+    // 세대 관리 화면
+    const showUnitManagement = () => {
+      // 간단히 모달로 표시 (실제로는 별도 페이지로)
+      const unitModal = document.getElementById('unitModal');
+      const unitFormDiv = document.getElementById('unitForm');
+      unitFormDiv.innerHTML = `
+        <div style="max-height: 500px; overflow-y: auto;">
+          ${unitsData.map(unit => `
+            <div style="padding: 12px; border-bottom: 1px solid #e2e8f0; margin-bottom: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong>${unit.number}호</strong>
+                <button class="editUnitBtn" data-id="${unit.id}" style="padding: 6px 12px; background:#2563eb; color:white; border:none; border-radius:8px; cursor:pointer;">수정</button>
+              </div>
+              <div style="font-size: 13px; margin-top: 8px;">
+                <div>임차인: ${unit.tenant || '미정'}</div>
+                <div>월세: ${unit.rent?.toLocaleString()}원</div>
+                <div>상태: ${unit.isVacant ? '🔴 공실' : '🟢 임대중'}</div>
+                <div>납부: ${unit.isPaid ? '✅ 완료' : '❌ 미납'}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      unitModal.classList.add('active');
+      
+      // 수정 버튼 이벤트
+      document.querySelectorAll('.editUnitBtn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const unitId = btn.dataset.id;
+          const unit = unitsData.find(u => u.id === unitId);
+          if (unit) {
+            const newTenant = prompt('임차인 이름:', unit.tenant || '');
+            const newRent = prompt('월세 금액:', unit.rent);
+            const isVacant = confirm('공실로 설정하시겠습니까? (확인: 공실, 취소: 임대중)');
+            const isPaid = confirm('월세 납부 완료? (확인: 완료, 취소: 미납)');
+            
+            if (newTenant !== null) unit.tenant = newTenant;
+            if (newRent !== null) unit.rent = parseInt(newRent) || unit.rent;
+            unit.isVacant = isVacant;
+            unit.isPaid = isPaid;
+            
+            saveUnitsData();
+            updateDashboard();
+            showUnitManagement(); // 새로고침
+          }
+        });
+      });
+    };
+    
+    document.getElementById('closeUnitBtn').addEventListener('click', () => {
+      document.getElementById('unitModal').classList.remove('active');
+    });
+    
+    // 캘린더 표시
+    const showCalendar = () => {
+      // 홈 화면 숨기고 캘린더 표시
+      document.querySelectorAll('.cards, .income-card, .section').forEach(el => {
+        if (el.parentElement === document.getElementById('app')) {
+          el.style.display = 'none';
+        }
+      });
+      document.getElementById('fabBtn').style.display = 'none';
+      
+      let calendarDiv = document.getElementById('calendarView');
+      if (!calendarDiv) {
+        calendarDiv = document.createElement('div');
+        calendarDiv.id = 'calendarView';
+        document.getElementById('app').appendChild(calendarDiv);
+      }
+      calendarDiv.style.display = 'block';
+      
+      // 간단한 캘린더 표시
+      const moveEvents = unitsData.filter(u => u.moveInDate || u.moveOutDate);
+      calendarDiv.innerHTML = `
+        <h3 style="margin-bottom:16px;">📅 입주/퇴실 일정</h3>
+        <div style="background:#f8fafc; border-radius:16px; padding:16px;">
+          ${moveEvents.length === 0 ? '<div>등록된 일정이 없습니다</div>' : moveEvents.map(u => `
+            <div style="padding:12px 0; border-bottom:1px solid #e2e8f0;">
+              <strong>${u.number}호</strong>
+              ${u.moveInDate ? `<div>🏠 입주: ${u.moveInDate}</div>` : ''}
+              ${u.moveOutDate ? `<div>🚪 퇴실: ${u.moveOutDate}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+        <button id="backToHome" style="margin-top:20px; width:100%; padding:12px; background:#2563eb; color:white; border:none; border-radius:12px;">홈으로 돌아가기</button>
+      `;
+      
+      document.getElementById('backToHome')?.addEventListener('click', () => {
+        document.querySelector('.nav-item[data-tab="home"]').click();
+      });
+    };
+    
+    // 설정 화면
+    const showSettings = () => {
+      const password = prompt('관리자 비밀번호를 입력하세요 (기본: 0000)');
+      if (password !== '0000') {
+        alert('접근 권한이 없습니다.');
+        document.querySelector('.nav-item[data-tab="home"]').click();
+        return;
+      }
+      
+      document.querySelectorAll('.cards, .income-card, .section').forEach(el => {
+        if (el.parentElement === document.getElementById('app')) {
+          el.style.display = 'none';
+        }
+      });
+      document.getElementById('fabBtn').style.display = 'none';
+      
+      let settingsDiv = document.getElementById('settingsView');
+      if (!settingsDiv) {
+        settingsDiv = document.createElement('div');
+        settingsDiv.id = 'settingsView';
+        document.getElementById('app').appendChild(settingsDiv);
+      }
+      settingsDiv.style.display = 'block';
+      settingsDiv.innerHTML = `
+        <h3 style="margin-bottom:16px;">⚙️ 관리자 설정</h3>
+        <button id="resetDataBtn" style="width:100%; padding:12px; background:#ef4444; color:white; border:none; border-radius:12px; margin-bottom:12px;">모든 데이터 초기화</button>
+        <button id="exportDataBtn" style="width:100%; padding:12px; background:#10b981; color:white; border:none; border-radius:12px; margin-bottom:12px;">데이터 내보내기</button>
+        <button id="backHomeBtn" style="width:100%; padding:12px; background:#64748b; color:white; border:none; border-radius:12px;">홈으로</button>
+      `;
+      
+      document.getElementById('resetDataBtn')?.addEventListener('click', () => {
+        if (confirm('모든 데이터를 초기화하시겠습니까? 복구할 수 없습니다.')) {
+          localStorage.clear();
+          unitsData = generateDefaultUnits();
+          saveUnitsData();
+          alert('초기화 완료!');
+          location.reload();
+        }
+      });
+      
+      document.getElementById('exportDataBtn')?.addEventListener('click', () => {
+        const data = {
+          building: currentBuilding,
+          units: unitsData,
+          memos: localStorage.getItem(`${STORAGE_KEYS.MEMO}_${currentBuilding}_${currentYearMonth}`)
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `building_data_${currentBuilding}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+      
+      document.getElementById('backHomeBtn')?.addEventListener('click', () => {
+        document.querySelector('.nav-item[data-tab="home"]').click();
+      });
+    };
+    
+    // FAB 버튼 (빠른 세대 추가/수정)
+    document.getElementById('fabBtn').addEventListener('click', () => {
+      if (currentTab === 'units') {
+        showUnitManagement();
+      } else {
+        showUnitManagement();
+      }
+    });
+    
+    // 초기화
+    initMonthPicker();
+    loadData();
+    updateDashboard();
+    
+    // 모달 배경 클릭시 닫기
+    window.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal')) {
+        e.target.classList.remove('active');
+      }
+    });
+  </script>
 </body>
 </html>
