@@ -37,24 +37,16 @@
       flex-direction: column;
     }
     
-    /* 헤더 - 수정됨 */
+    /* 헤더 - 수정됨: 한 줄 배치 */
     .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 20px;
-      gap: 12px;
-    }
-    
-    .building-section {
-      flex: 1;
+      margin-bottom: 24px;
     }
     
     .building-input-wrapper {
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
     
     .building-name {
@@ -63,8 +55,6 @@
       background: none;
       border: none;
       padding: 4px 0;
-      font-size: 22px;
-      font-weight: 800;
       color: #1f2937;
       width: auto;
       min-width: 120px;
@@ -82,28 +72,30 @@
       color: #94a3b8;
     }
     
-    .month-selector {
-      margin-top: 4px;
+    /* 한 줄에 월별 선택 + 메모 버튼 */
+    .top-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
     }
     
     .month-picker {
-      padding: 8px 12px;
-      border-radius: 12px;
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 14px;
       border: 1px solid #e2e8f0;
       background: #f8fafc;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
-      width: auto;
-      min-width: 130px;
     }
     
-    /* 메모 버튼 - 우측 상단 독립 */
     .memo-btn {
       background: #f1f5f9;
       border: none;
-      padding: 10px 16px;
-      border-radius: 20px;
+      padding: 10px 18px;
+      border-radius: 14px;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
@@ -304,21 +296,20 @@
 </head>
 <body>
   <div class="phone" id="app">
-    <!-- 헤더 - 수정됨: 메모 버튼 우측 상단 -->
+    <!-- 헤더: 건물명 -->
     <div class="header">
-      <div class="building-section">
-        <div class="building-input-wrapper">
-          <input type="text" id="buildingName" class="building-name" value="조아빌" maxlength="10">
-          <span class="dropdown-icon">▼</span>
-        </div>
-
+      <div class="building-input-wrapper">
+        <input type="text" id="buildingName" class="building-name" value="조아빌" maxlength="20">
+        <span class="dropdown-icon">▼</span>
+      </div>
+      
       <!-- 한 줄: 월별 선택 + 메모 버튼 -->
       <div class="top-controls">
         <select id="monthPicker" class="month-picker"></select>
         <button class="memo-btn" id="memoBtn">📝 메모</button>
       </div>
     </div>
-          
+    
     <!-- 대시보드 카드 -->
     <div class="cards">
       <div class="card">
@@ -392,8 +383,8 @@
   <script type="module">
     // Firebase 설정 (실제 프로젝트로 교체 필요)
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
-    import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
-    import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+    import { getStorage } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
     
     // Firebase 구성 (여기에 실제 설정을 입력하세요)
     const firebaseConfig = {
@@ -456,12 +447,6 @@
     let unitsData = [];
     let currentTab = 'home';
     
-    // 날짜 포맷
-    const getCurrentYearMonth = () => {
-      const now = new Date();
-      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-    };
-    
     // 월 선택기 초기화
     const initMonthPicker = () => {
       const picker = document.getElementById('monthPicker');
@@ -515,12 +500,11 @@
       const vacancyRate = unitsData.length > 0 ? Math.round((vacantUnits.length / unitsData.length) * 100) : 0;
       document.getElementById('vacancyRate').innerHTML = `${vacancyRate}%`;
       
-      // 미납 계산 (isPaid가 false인 세대)
+      // 미납 계산
       const unpaidUnits = unitsData.filter(u => !u.isVacant && !u.isPaid);
       document.getElementById('unpaidCount').innerHTML = `${unpaidUnits.length}건`;
-      document.getElementById('unpaidCount').className = unpaidUnits.length > 0 ? 'danger' : '';
       
-      // 만기 예정 (계약종료일이 이번달 또는 다음달인 세대)
+      // 만기 예정
       const today = new Date();
       const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
       const expiringUnits = unitsData.filter(u => {
@@ -530,11 +514,11 @@
       });
       document.getElementById('expiringCount').innerHTML = `${expiringUnits.length}건`;
       
-      // 요청사항 (requests 배열 길이)
+      // 요청사항
       const requestsCount = unitsData.reduce((sum, u) => sum + (u.requests?.length || 0), 0);
       document.getElementById('requestCount').innerHTML = `${requestsCount}건`;
       
-      // 이번달 수입 (임대료 합계, 미납 제외? 실제로는 납부된 금액)
+      // 이번달 수입
       const totalRent = unitsData.filter(u => !u.isVacant && u.isPaid).reduce((sum, u) => sum + (u.rent || 0), 0);
       document.getElementById('monthlyIncome').innerHTML = `₩ ${totalRent.toLocaleString()}`;
       
@@ -613,7 +597,6 @@
         } else if (tab === 'settings') {
           showSettings();
         } else {
-          // 홈 화면 보여주기
           document.querySelectorAll('.cards, .income-card, .section').forEach(el => {
             if (el.parentElement === document.getElementById('app')) {
               el.style.display = '';
@@ -627,7 +610,6 @@
     
     // 세대 관리 화면
     const showUnitManagement = () => {
-      // 간단히 모달로 표시 (실제로는 별도 페이지로)
       const unitModal = document.getElementById('unitModal');
       const unitFormDiv = document.getElementById('unitForm');
       unitFormDiv.innerHTML = `
@@ -650,7 +632,6 @@
       `;
       unitModal.classList.add('active');
       
-      // 수정 버튼 이벤트
       document.querySelectorAll('.editUnitBtn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const unitId = btn.dataset.id;
@@ -668,7 +649,7 @@
             
             saveUnitsData();
             updateDashboard();
-            showUnitManagement(); // 새로고침
+            showUnitManagement();
           }
         });
       });
@@ -680,7 +661,6 @@
     
     // 캘린더 표시
     const showCalendar = () => {
-      // 홈 화면 숨기고 캘린더 표시
       document.querySelectorAll('.cards, .income-card, .section').forEach(el => {
         if (el.parentElement === document.getElementById('app')) {
           el.style.display = 'none';
@@ -696,7 +676,6 @@
       }
       calendarDiv.style.display = 'block';
       
-      // 간단한 캘린더 표시
       const moveEvents = unitsData.filter(u => u.moveInDate || u.moveOutDate);
       calendarDiv.innerHTML = `
         <h3 style="margin-bottom:16px;">📅 입주/퇴실 일정</h3>
@@ -777,13 +756,9 @@
       });
     };
     
-    // FAB 버튼 (빠른 세대 추가/수정)
+    // FAB 버튼
     document.getElementById('fabBtn').addEventListener('click', () => {
-      if (currentTab === 'units') {
-        showUnitManagement();
-      } else {
-        showUnitManagement();
-      }
+      showUnitManagement();
     });
     
     // 초기화
