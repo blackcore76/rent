@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/style.css" />
+  <title>월세 관리 - 세대</title>
+</head>
+<body>
+  <div class="phone">
+    <div class="header">
+      <div class="login-box" id="loginBox">
+        <div class="login-status" id="loginStatus">
+          <span>🔓</span>
+          <span>로그인이 필요합니다</span>
+        </div>
+        <button class="small-login-btn" id="headerLoginBtn">로그인</button>
+      </div>
+      
+      <div class="building-input-wrapper">
+        <span class="building-icon">🏣</span>
+        <input type="text" id="buildingName" class="building-name" value="조아빌" maxlength="10" disabled>
+      </div>
+      <div class="top-controls">
+        <select id="monthPicker" class="month-picker"></select>
+        <button class="memo-btn" id="memoBtn" disabled>📝 메모</button>
+      </div>
+    </div>
+    
+    <!-- 세대 목록 컨테이너 -->
+    <div id="unitListContainer" style="flex: 1; overflow-y: auto; margin-bottom: 16px;"></div>
+    
+    <div class="nav">
+      <a href="index.html" class="nav-item">🏠 홈</a>
+      <a href="units.html" class="nav-item active">🏢 세대</a>
+      <a href="calendar.html" class="nav-item">📅 일정</a>
+      <a href="payments.html" class="nav-item">💰 납부관리</a>
+      <a href="settings.html" class="nav-item">⚙️ 설정</a>
+    </div>
+  </div>
+  
+  <button class="fab" id="fabBtn" disabled>+</button>
+  
+  <!-- 로그인 모달 -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content" style="text-align: center;">
+      <div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
+      <h3 style="margin-bottom: 12px;">로그인이 필요합니다</h3>
+      <p style="color: #64748b; margin-bottom: 24px;">세대 정보를 관리하려면<br>로그인이 필요합니다</p>
+      <button id="googleLoginBtn" class="btn-primary" style="width: 100%;">🚀 Google 로그인</button>
+      <button id="closeLoginModal" class="btn-secondary" style="margin-top: 12px; width: 100%;">닫기</button>
+    </div>
+  </div>
+  
+  <!-- 세대 입력/수정 모달 -->
+  <div id="unitFormModal" class="modal">
+    <div class="modal-content">
+      <h3 id="unitFormTitle" style="margin-bottom: 20px;">➕ 세대 정보 입력</h3>
+      
+      <div class="form-row-30-70">
+        <div class="form-group">
+          <label>호수 *</label>
+          <select id="unitNumber">
+            <option value="">선택</option>
+            <option value="201">201호</option><option value="202">202호</option>
+            <option value="203">203호</option><option value="204">204호</option>
+            <option value="205">205호</option><option value="206">206호</option>
+            <option value="301">301호</option><option value="302">302호</option>
+            <option value="303">303호</option><option value="304">304호</option>
+            <option value="305">305호</option><option value="306">306호</option>
+            <option value="401">401호</option><option value="402">402호</option>
+            <option value="403">403호</option><option value="404">404호</option>
+            <option value="405">405호</option><option value="406">406호</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>임차인 이름</label>
+          <input type="text" id="tenantName" placeholder="이름">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>연락처 1</label>
+          <input type="tel" id="phone1" placeholder="010-0000-0000">
+        </div>
+        <div class="form-group">
+          <label>연락처 2</label>
+          <input type="tel" id="phone2" placeholder="010-0000-0000">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>보증금 (원)</label>
+          <input type="number" id="depositAmount" value="5000000">
+        </div>
+        <div class="form-group">
+          <label>월세 (원)</label>
+          <input type="number" id="rentAmount" value="500000">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>계약 시작일</label>
+          <input type="date" id="contractStart">
+        </div>
+        <div class="form-group">
+          <label>계약 종료일</label>
+          <input type="date" id="contractEnd">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>입주 예정일</label>
+          <input type="date" id="moveInDate">
+        </div>
+        <div class="form-group">
+          <label>퇴실 예정일</label>
+          <input type="date" id="moveOutDate">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>📋 메모</label>
+        <textarea id="unitMemo" rows="3" placeholder="특이사항, 요청사항 등"></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label>상태</label>
+        <div class="toggle-group" id="statusToggle">
+          <button type="button" class="toggle-btn active" data-status="vacant">🔴 공실</button>
+          <button type="button" class="toggle-btn" data-status="occupied">🟢 임대중</button>
+        </div>
+      </div>
+      
+      <div id="paymentToggleGroup" style="display: none;">
+        <div class="form-group">
+          <label>월세 납부 상태</label>
+          <div class="toggle-group" id="paymentToggle">
+            <button type="button" class="toggle-btn active" data-payment="paid">✅ 납부완료</button>
+            <button type="button" class="toggle-btn" data-payment="unpaid">❌ 미납중</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>📎 계약서 사진</label>
+        <div id="photoUploadArea" class="photo-upload-area">📸 사진을 선택하세요<br><small>클릭하여 업로드</small></div>
+        <input type="file" id="photoInput" accept="image/*" multiple style="display: none;">
+        <div id="photoPreview" class="photo-preview"></div>
+      </div>
+      
+      <div class="modal-buttons">
+        <button id="saveUnitBtn" class="btn-primary">저장</button>
+        <button id="closeUnitFormBtn" class="btn-secondary">닫기</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 이미지 확대 뷰어 -->
+  <div id="imageViewer" class="image-viewer">
+    <img id="viewerImage" src="">
+  </div>
+
+  <script type="module" src="js/units.js"></script>
+</body>
+</html>

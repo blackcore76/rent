@@ -6,7 +6,35 @@
   <meta name="theme-color" content="#2563eb" />
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="css/style.css" />
-  <title>월세 관리 - 홈</title>
+  <title>월세 관리 - 납부관리</title>
+  <style>
+    .payment-unit-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .payment-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+    .payment-paid { background: #dcfce7; color: #16a34a; }
+    .payment-unpaid { background: #fee2e2; color: #dc2626; }
+    .toggle-payment {
+      padding: 6px 12px;
+      border-radius: 10px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .toggle-payment:disabled { opacity: 0.5; cursor: not-allowed; }
+  </style>
 </head>
 <body>
   <div class="phone">
@@ -29,62 +57,29 @@
       </div>
     </div>
     
-    <div class="cards">
-      <div class="card"><small>❎ 공실현황</small><strong id="vacancyRate">0%</strong></div>
-      <div class="card"><small>😨 미납현황</small><strong id="unpaidCount" class="danger">0건</strong></div>
-      <div class="card"><small>🔜 만기예정</small><strong id="expiringCount" class="warning">0건</strong></div>
-      <div class="card"><small>🛠️ 요청사항</small><strong id="requestCount">0건</strong></div>
-    </div>
-    
-    <div class="income-card">
-      <p>💰 이번달 수입</p>
-      <strong id="monthlyIncome">₩ 0</strong>
-    </div>
-    
-    <div class="section">
-      <h3>😨 미납 세대</h3>
-      <div id="unpaidList"></div>
-    </div>
-    
-    <div class="section">
-      <h3>🔜 만기 예정</h3>
-      <div id="expiringList"></div>
-    </div>
+    <!-- 납부 관리 컨테이너 -->
+    <div id="paymentContainer" style="flex: 1; overflow-y: auto; margin-bottom: 16px;"></div>
     
     <div class="nav">
-      <a href="index.html" class="nav-item active">🏠 홈</a>
+      <a href="index.html" class="nav-item">🏠 홈</a>
       <a href="units.html" class="nav-item">🏢 세대</a>
       <a href="calendar.html" class="nav-item">📅 일정</a>
-      <a href="payments.html" class="nav-item">💰 납부관리</a>
+      <a href="payments.html" class="nav-item active">💰 납부관리</a>
       <a href="settings.html" class="nav-item">⚙️ 설정</a>
     </div>
   </div>
-  
-  <button class="fab" id="fabBtn" disabled>+</button>
   
   <!-- 로그인 모달 -->
   <div id="loginModal" class="modal">
     <div class="modal-content" style="text-align: center;">
       <div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
       <h3 style="margin-bottom: 12px;">로그인이 필요합니다</h3>
-      <p style="color: #64748b; margin-bottom: 24px;">읽기는 가능하지만<br>쓰기/수정/삭제는 로그인 후 이용 가능합니다</p>
+      <p style="color: #64748b; margin-bottom: 24px;">납부 정보를 관리하려면<br>로그인이 필요합니다</p>
       <button id="googleLoginBtn" class="btn-primary" style="width: 100%;">🚀 Google 로그인</button>
       <button id="closeLoginModal" class="btn-secondary" style="margin-top: 12px; width: 100%;">닫기</button>
     </div>
   </div>
-  
-  <!-- 메모 모달 -->
-  <div id="memoModal" class="modal">
-    <div class="modal-content">
-      <h3 style="margin-bottom: 16px;">📝 메모 작성</h3>
-      <textarea id="memoText" rows="6" style="width:100%; padding:12px; border-radius:12px; border:1px solid #e2e8f0;"></textarea>
-      <div class="modal-buttons">
-        <button id="saveMemoBtn" class="btn-primary">저장</button>
-        <button id="closeMemoBtn" class="btn-secondary">닫기</button>
-      </div>
-    </div>
-  </div>
 
-  <script type="module" src="js/home.js"></script>
+  <script type="module" src="js/payments.js"></script>
 </body>
 </html>
