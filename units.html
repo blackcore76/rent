@@ -54,13 +54,14 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .rc-num{font-size:18px;font-weight:900;color:var(--hdr)}
 .rc-sbadge{font-size:11px;font-weight:700;padding:3px 7px;border-radius:6px}
 .badge-rented{background:var(--blue-lt);color:var(--blue-t)}
-.badge-vacant{background:var(--indigo-lt);color:var(--indigo-t)}
+.badge-vacant{background:var(--red-lt);color:var(--red-t)}
 .badge-paid{background:var(--green-lt);color:var(--green-t)}
 .badge-unpaid{background:var(--red-lt);color:var(--red-t)}
 /* 카드 내 이름/연락처/금액 */
 .rc-names{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rc-phones{font-size:11px;color:var(--sub);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rc-rent{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px}
+.rc-rent{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:4px}
+.rc-memo{font-size:11px;color:var(--hint);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rc-paid{font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;display:inline-block}
 /* BOTTOM SHEET MODAL */
 .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:none;align-items:flex-end;justify-content:center}
@@ -293,7 +294,7 @@ document.addEventListener("click",e=>{if(!e.target.closest("#av-wrap")&&!e.targe
 
 function listenUnits(){
   uL=uRef.on("value",snap=>{
-    const val=snap.val()||{};ensureRooms(val);units=val;renderGrid();
+    const val=snap.val()||{};ensureRooms(val);units=val;renderGrid();checkURLParam();
   },()=>showToast("❗ 연결 오류"));
 }
 async function ensureRooms(ex){
@@ -315,6 +316,7 @@ function renderGrid(){
     const isR=u.status==="rented";
     const namesTxt=[u.tenantName,u.tenantName2].filter(Boolean).join(" / ")||"공실";
     const phonesTxt=[u.tenantPhone,u.tenantPhone2].filter(Boolean).join(" / ");
+    const memoTxt=u.memo?truncate(u.memo,22):"";
     const sBadge=`<span class="rc-sbadge ${isR?"badge-rented":"badge-vacant"}">${isR?"임대중":"공실"}</span>`;
     const rentTxt=isR&&u.monthlyRent?fmtWon(u.monthlyRent)+"/월":"—";
     const pBadge=isR?`<span class="rc-paid ${u.rentPaid?"badge-paid":"badge-unpaid"}">${u.rentPaid?"✅ 완납":"❌ 미납"}</span>`:"";
@@ -323,6 +325,7 @@ function renderGrid(){
       <div class="rc-names">${esc(namesTxt)}</div>
       ${phonesTxt?`<div class="rc-phones">📞 ${esc(phonesTxt)}</div>`:""}
       <div class="rc-rent">${rentTxt}</div>
+      ${memoTxt?`<div class="rc-memo">💬 ${esc(memoTxt)}</div>`:""}
       ${pBadge}
     </div>`;
   }).join("");
@@ -441,8 +444,17 @@ function showCM(title,msg,cb){
 }
 function closeCM(){document.getElementById("confirm-modal").classList.remove("show")}
 function fmtWon(v){if(!v)return"—";return(v*10000).toLocaleString("ko-KR")+"원"}
+function truncate(s,n){return s&&s.length>n?s.slice(0,n)+"…":s||""}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 let tTm;function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
+
+// URL 파라미터로 특정 호실 자동 오픈 (메인에서 클릭해서 온 경우)
+let _urlChecked=false;
+function checkURLParam(){
+  if(_urlChecked)return;_urlChecked=true;
+  const room=new URLSearchParams(location.search).get("room");
+  if(room&&units[room])openSheet(room);
+}
 </script>
 </body>
 </html>
