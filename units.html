@@ -225,12 +225,6 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <button class="tg-btn" id="tg-vacant" onclick="setStatus('vacant')">🔓 공실</button>
     </div>
 
-    <div class="tg-label">이달 납부</div>
-    <div class="toggle-group" id="paid-group">
-      <button class="tg-btn on-green" id="tg-paid" onclick="setPaid(true)">✅ 완납</button>
-      <button class="tg-btn" id="tg-unpaid" onclick="setPaid(false)">❌ 미납</button>
-    </div>
-
     <div class="divider"></div>
 
     <div class="section-label">👤 임차인 ①</div>
@@ -307,7 +301,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),storage=firebase.storage(),gProv=new firebase.auth.GoogleAuthProvider();
-let cu=null,uRef=null,hRef=null,uL=null,hL=null,units={},rentHistory={},curFloor=0,curRoom=null,mStatus="vacant",mPaid=true,curFilter="";
+let cu=null,uRef=null,hRef=null,uL=null,hL=null,units={},rentHistory={},curFloor=0,curRoom=null,mStatus="vacant",curFilter="";
 const ROOMS=[201,202,203,204,205,206,301,302,303,304,305,306,401,402,403,404,405,406];
 
 auth.onAuthStateChanged(user=>{
@@ -400,17 +394,11 @@ function toggleHistory(roomId,ym){
   const ref=hRef.child(`${roomId}/${ym}`);
   const op=nextData?ref.set(nextData):ref.remove();
   op.then(()=>{
-    // 로컬 즉시 반영
     if(!rentHistory[roomId])rentHistory[roomId]={};
     if(nextData)rentHistory[roomId][ym]=nextData;
     else delete rentHistory[roomId][ym];
     renderHistory(roomId);
-
-    // 이번 달이면 세대 카드 완납/미납도 동기화
-    if(ym===curYM()&&uRef&&nextData!==null){
-      uRef.child(`${roomId}/rentPaid`).set(nextData.paid);
-    }
-
+    renderGrid(); // 카드 납부 상태 즉시 갱신
     const statusMsg=nextData===null?"🗑 기록 삭제됨":nextData.paid?"✅ 완납 기록됨":"❌ 미납 기록됨";
     showToast(statusMsg);
   }).catch(()=>showToast("❗ 저장 실패"));
@@ -429,10 +417,9 @@ function setFloor(f,btn){
 
 function renderGrid(){
   let list=ROOMS.map(r=>units[r]).filter(u=>u&&(curFloor===0||u.floor===curFloor));
-  // 상태 필터 적용
   if(curFilter==="rented")   list=list.filter(u=>u.status==="rented");
   else if(curFilter==="vacant") list=list.filter(u=>u.status==="vacant");
-  else if(curFilter==="unpaid") list=list.filter(u=>u.status==="rented"&&!u.rentPaid);
+  else if(curFilter==="unpaid") list=list.filter(u=>u.status==="rented"&&computePaidStatus(u.room)===false);
   const el=document.getElementById("rooms-grid");
   el.innerHTML=list.map(u=>{
     const isR=u.status==="rented";
@@ -441,22 +428,24 @@ function renderGrid(){
     const memoTxt=u.memo?truncate(u.memo,22):"";
     const sBadge=`<span class="rc-sbadge ${isR?"badge-rented":"badge-vacant"}">${isR?"임대중":"공실"}</span>`;
     const rentTxt=isR&&u.monthlyRent?fmtWon(u.monthlyRent)+"/월":"—";
-    const pBadge=isR?`<span class="rc-paid ${u.rentPaid?"badge-paid":"badge-unpaid"}">${u.rentPaid?"✅ 완납":"❌ 미납"}</span>`:"";
+    // 납부 상태 → 이력에서 계산
+    let pBadge="";
+    if(isR){
+      const ps=computePaidStatus(u.room);
+      if(ps===false)       pBadge=`<span class="rc-paid badge-unpaid">❌ 미납</span>`;
+      else if(ps===true)   pBadge=`<span class="rc-paid badge-paid">✅ 완납</span>`;
+      else                 pBadge=`<span class="rc-paid" style="background:#F1F5F9;color:var(--hint)">— 이력없음</span>`;
+    }
     // D-day 계산
     let ddayHtml="";
     if(isR&&u.contractEnd){
       const today=new Date();today.setHours(0,0,0,0);
       const end=new Date(u.contractEnd);end.setHours(0,0,0,0);
       const diff=Math.ceil((end-today)/864e5);
-      if(diff<0){
-        ddayHtml=`<span class="rc-dday dday-expired">만료 ${Math.abs(diff)}일 초과</span>`;
-      }else if(diff<=7){
-        ddayHtml=`<span class="rc-dday dday-danger">D-${diff}</span>`;
-      }else if(diff<=30){
-        ddayHtml=`<span class="rc-dday dday-warn">D-${diff}</span>`;
-      }else{
-        ddayHtml=`<span class="rc-dday dday-safe">D-${diff}</span>`;
-      }
+      if(diff<0)       ddayHtml=`<span class="rc-dday dday-expired">만료 ${Math.abs(diff)}일 초과</span>`;
+      else if(diff<=7) ddayHtml=`<span class="rc-dday dday-danger">D-${diff}</span>`;
+      else if(diff<=30)ddayHtml=`<span class="rc-dday dday-warn">D-${diff}</span>`;
+      else             ddayHtml=`<span class="rc-dday dday-safe">D-${diff}</span>`;
     }
     return`<div class="room-card status-${u.status}" onclick="openSheet('${u.room}')">
       <div class="rc-top"><span class="rc-num">${u.room}호</span>${sBadge}</div>
@@ -476,7 +465,6 @@ function openSheet(roomId){
   document.getElementById("sheet-title").textContent=`${roomId}호`;
   document.getElementById("m-room").value=roomId;
   mStatus=u.status||"vacant";
-  mPaid=u.rentPaid!==false;
   document.getElementById("m-name").value=u.tenantName||"";
   document.getElementById("m-phone").value=u.tenantPhone||"";
   document.getElementById("m-name2").value=u.tenantName2||"";
@@ -492,22 +480,25 @@ function openSheet(roomId){
 function closeSheet(){document.getElementById("room-sheet").classList.remove("show");curRoom=null}
 
 function setStatus(s){mStatus=s;updateTgUI()}
-function setPaid(v){mPaid=v;updateTgUI()}
 function updateTgUI(){
   document.getElementById("tg-rented").className="tg-btn"+(mStatus==="rented"?" on-blue":"");
   document.getElementById("tg-vacant").className="tg-btn"+(mStatus==="vacant"?" on-gray":"");
-  const pg=document.getElementById("paid-group");
-  pg.style.opacity=mStatus==="rented"?"1":"0.4";
-  pg.style.pointerEvents=mStatus==="rented"?"":"none";
-  document.getElementById("tg-paid").className="tg-btn"+(mPaid?" on-green":"");
-  document.getElementById("tg-unpaid").className="tg-btn"+(!mPaid?" on-red":"");
+}
+
+// 납부 이력에서 상태 계산 (단 하나라도 미납 → false, 전부 완납 → true, 이력없음 → null)
+function computePaidStatus(roomId){
+  const h=rentHistory[roomId]||{};
+  const recs=Object.values(h);
+  if(!recs.length)return null;
+  if(recs.some(r=>!r.paid))return false;
+  return true;
 }
 
 function saveRoom(){
   if(!curRoom)return;
   const data={
     room:curRoom,floor:Math.floor(parseInt(curRoom)/100),
-    status:mStatus,rentPaid:mStatus==="rented"?mPaid:false,
+    status:mStatus,
     tenantName:document.getElementById("m-name").value.trim(),
     tenantName2:document.getElementById("m-name2").value.trim(),
     tenantPhone:document.getElementById("m-phone").value.trim(),
@@ -521,17 +512,7 @@ function saveRoom(){
   const ex=units[curRoom]||{};
   if(ex.photos)data.photos=ex.photos;
   uRef.child(curRoom).update(data)
-    .then(()=>{
-      // 임대중인 경우 이번 달 납부 이력 자동 기록
-      if(data.status==="rented"&&hRef){
-        const ym=curYM();
-        hRef.child(`${curRoom}/${ym}`).set({
-          room:curRoom,yearMonth:ym,paid:data.rentPaid,
-          amount:data.monthlyRent*10000,updatedAt:new Date().toISOString()
-        });
-      }
-      closeSheet();showToast("✅ 저장됨");renderGrid();
-    })
+    .then(()=>{closeSheet();showToast("✅ 저장됨");renderGrid()})
     .catch(()=>showToast("❗ 저장 실패"));
 }
 
