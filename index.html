@@ -21,170 +21,141 @@
   --blue:#0284C7;--blue-lt:#E0F2FE;--blue-t:#0C4A6E;
   --indigo:#4F46E5;--indigo-lt:#EEF2FF;--indigo-t:#3730A3;
   --amber:#D97706;--amber-lt:#FEF3C7;--amber-t:#92400E;
-  --sky:#0EA5E9;
-  --radius:14px;--shadow:0 2px 12px rgba(0,0,0,.08)
+  --sky:#0EA5E9;--radius:14px;--shadow:0 2px 12px rgba(0,0,0,.08)
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--text);overscroll-behavior:none}
-.hdr{position:fixed;top:0;left:0;right:0;z-index:200;
-  background:linear-gradient(135deg,var(--hdr) 0%,var(--hdr2) 100%);
-  box-shadow:0 3px 16px rgba(0,0,0,.25);padding:0 16px}
+/* HEADER */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,var(--hdr),var(--hdr2));box-shadow:0 3px 16px rgba(0,0,0,.25);padding:0 16px}
 .hdr-top{display:flex;align-items:center;justify-content:space-between;height:52px}
 .hdr-title{font-size:18px;font-weight:900;color:#fff;letter-spacing:-.5px;display:flex;align-items:center;gap:6px}
 .hdr-actions{display:flex;align-items:center;gap:8px;position:relative}
-.user-avatar{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);cursor:pointer;object-fit:cover}
-.user-avatar-fallback{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);
-  background:var(--sky);color:#fff;font-size:13px;font-weight:700;cursor:pointer;
-  display:flex;align-items:center;justify-content:center}
+.av-img{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);cursor:pointer;object-fit:cover}
+.av-txt{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);background:var(--sky);color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .nav{display:flex;border-top:1px solid rgba(255,255,255,.08)}
-.nav-tab{flex:1;padding:9px 4px 11px;text-align:center;font-size:12px;font-weight:500;
-  color:rgba(255,255,255,.4);border-bottom:3px solid transparent;cursor:pointer;
-  text-decoration:none;transition:all .2s;white-space:nowrap}
+.nav-tab{flex:1;padding:9px 2px 11px;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,.4);border-bottom:3px solid transparent;text-decoration:none;transition:all .2s;white-space:nowrap}
 .nav-tab.on{color:#fff;border-bottom-color:var(--sky);font-weight:700}
-.user-menu{position:fixed;top:56px;right:12px;background:#fff;border-radius:14px;
-  box-shadow:0 8px 32px rgba(0,0,0,.2);padding:16px;min-width:210px;z-index:300;
-  display:none;border:1px solid var(--border)}
+/* USER MENU */
+.user-menu{position:fixed;top:56px;right:12px;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:16px;min-width:210px;z-index:300;display:none;border:1px solid var(--border)}
 .user-menu.show{display:block}
 .um-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
 .um-email{font-size:12px;color:var(--hint);margin-bottom:12px;word-break:break-all}
-.logout-btn{width:100%;padding:9px;background:var(--red-lt);color:var(--red);border:none;
-  border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
-.content{margin-top:96px;padding:14px;min-height:calc(100vh - 96px)}
+.logout-btn{width:100%;padding:9px;background:var(--red-lt);color:var(--red);border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+/* CONTENT */
+.content{margin-top:100px;padding:14px;min-height:calc(100vh - 100px)}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
-.kpi{background:var(--card);border-radius:12px;padding:12px 6px;text-align:center;box-shadow:var(--shadow)}
-.kpi-val{font-size:24px;font-weight:900;line-height:1;margin-bottom:3px}
+.kpi{background:var(--card);border-radius:12px;padding:12px 4px;text-align:center;box-shadow:var(--shadow)}
+.kpi-val{font-size:22px;font-weight:900;line-height:1;margin-bottom:3px}
 .kpi-lbl{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.3px}
 .kpi.total .kpi-val{color:var(--text)}
 .kpi.rented .kpi-val{color:var(--blue)}
 .kpi.vacant .kpi-val{color:var(--indigo)}
 .kpi.unpaid .kpi-val{color:var(--red)}
 .card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
-.card-hd{font-size:13px;font-weight:700;color:var(--hdr2);margin-bottom:12px;
-  display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);padding-bottom:10px}
+.card-hd{font-size:13px;font-weight:700;color:var(--hdr2);margin-bottom:12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);padding-bottom:10px}
 .status-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border)}
 .status-row:last-child{border-bottom:none}
-.room-num{font-size:14px;font-weight:800;color:var(--hdr);min-width:38px}
+.room-num{font-size:14px;font-weight:800;color:var(--hdr);min-width:40px}
 .tenant-nm{flex:1;font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rent-amt{font-size:12px;font-weight:700;color:var(--sub);white-space:nowrap}
-.badge{display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap}
+.badge{display:inline-block;padding:3px 7px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap}
 .badge-rented{background:var(--blue-lt);color:var(--blue-t)}
 .badge-vacant{background:var(--indigo-lt);color:var(--indigo-t)}
 .badge-paid{background:var(--green-lt);color:var(--green-t)}
 .badge-unpaid{background:var(--red-lt);color:var(--red-t)}
 .badge-warning{background:var(--amber-lt);color:var(--amber-t)}
+/* NOTES */
 .note-input-row{display:flex;gap:8px;margin-bottom:12px}
-.note-ta{flex:1;border:2px solid var(--border);border-radius:10px;padding:10px 12px;
-  font-size:13px;font-family:inherit;resize:none;outline:none;color:var(--text);background:#FAFCFF}
+.note-ta{flex:1;border:2px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;resize:none;outline:none;color:var(--text);background:#FAFCFF}
 .note-ta:focus{border-color:var(--sky)}
-.btn-add{background:var(--hdr);color:#fff;border:none;border-radius:10px;padding:10px 14px;
-  font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
-.btn-add:active{opacity:.85}
+.btn-add{background:var(--hdr);color:#fff;border:none;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
 .note-item{background:#F8FAFC;border-radius:10px;padding:12px;margin-bottom:8px}
 .note-item:last-child{margin-bottom:0}
 .note-content{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:6px;white-space:pre-wrap;word-break:break-all}
 .note-footer{display:flex;align-items:center;justify-content:space-between}
 .note-date{font-size:11px;color:var(--hint)}
 .note-btns{display:flex;gap:4px}
-.note-btn{width:28px;height:28px;border:none;border-radius:7px;cursor:pointer;font-size:13px;
-  display:flex;align-items:center;justify-content:center}
+.note-btn{width:28px;height:28px;border:none;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
 .note-btn.edit{background:var(--blue-lt);color:var(--blue)}
 .note-btn.del{background:var(--red-lt);color:var(--red)}
 .empty-small{text-align:center;padding:20px;color:var(--hint);font-size:13px}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;
-  display:none;align-items:center;justify-content:center;padding:20px}
+.expiry-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border)}
+.expiry-row:last-child{border-bottom:none}
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-bg.show{display:flex}
-.modal{background:#fff;border-radius:20px;padding:24px;max-width:420px;width:100%;
-  box-shadow:0 8px 40px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto}
+.modal{background:#fff;border-radius:20px;padding:24px;max-width:420px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto}
 .modal h3{font-size:16px;font-weight:700;margin-bottom:14px;color:var(--hdr)}
 .modal p{font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.6;white-space:pre-line}
-.modal-btns{display:flex;gap:10px;justify-content:flex-end}
-.modal-btns button{padding:10px 20px;border-radius:10px;border:none;
-  font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:4px}
+.modal-btns button{padding:10px 20px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
 .btn-cancel{background:#F3F4F6;color:var(--sub)}
 .btn-confirm{background:var(--hdr);color:#fff}
 .btn-danger{background:var(--red-lt);color:var(--red)}
 .field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
 .field label{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px}
-.field textarea{border:2px solid var(--border);border-radius:10px;padding:10px 12px;
-  font-size:14px;font-family:inherit;resize:none;outline:none;color:var(--text);background:#FAFCFF;width:100%}
+.field textarea{border:2px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;resize:none;outline:none;color:var(--text);background:#FAFCFF;width:100%}
 .field textarea:focus{border-color:var(--sky)}
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
-  background:#1F2937;color:#fff;padding:11px 20px;border-radius:24px;font-size:14px;
-  z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;
-  box-shadow:0 4px 16px rgba(0,0,0,.3);pointer-events:none}
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1F2937;color:#fff;padding:11px 20px;border-radius:24px;font-size:14px;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.3);pointer-events:none}
 #toast.show{transform:translateX(-50%) translateY(0)}
-#loading-overlay{position:fixed;inset:0;background:rgba(30,45,61,.82);z-index:8000;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
-  transition:opacity .3s}
+/* LOADING */
+#loading-overlay{position:fixed;inset:0;background:rgba(30,45,61,.9);z-index:8000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .3s}
 #loading-overlay.hide{opacity:0;pointer-events:none}
-.spinner{width:44px;height:44px;border:5px solid rgba(255,255,255,.2);
-  border-top-color:#38BDF8;border-radius:50%;animation:spin .8s linear infinite}
+.spinner{width:44px;height:44px;border:5px solid rgba(255,255,255,.2);border-top-color:#38BDF8;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-txt{color:#fff;font-size:13px;font-weight:600}
-#login-screen{position:fixed;inset:0;
-  background:linear-gradient(160deg,#0F1C2D 0%,#1E2D3D 50%,#2A3F55 100%);
-  z-index:7000;display:flex;align-items:center;justify-content:center;padding:20px;
-  transition:opacity .4s}
-#login-screen.hide{opacity:0;pointer-events:none}
-.login-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
-  border-radius:24px;padding:36px 28px;max-width:320px;width:100%;text-align:center;
-  backdrop-filter:blur(16px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
-.login-logo{font-size:52px;margin-bottom:14px;line-height:1}
+/* LOGIN — display:none 으로 시작, auth 확인 후에만 표시 */
+#login-screen{position:fixed;inset:0;background:linear-gradient(160deg,#0F1C2D,#1E2D3D 50%,#2A3F55);z-index:7000;display:none;align-items:center;justify-content:center;padding:20px}
+.login-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:36px 28px;max-width:320px;width:100%;text-align:center;backdrop-filter:blur(16px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.login-logo{font-size:52px;margin-bottom:14px}
 .login-title{font-size:22px;font-weight:900;color:#fff;margin-bottom:6px;letter-spacing:-.5px}
 .login-sub{font-size:12px;color:rgba(255,255,255,.45);margin-bottom:28px;line-height:1.7}
-.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
-  padding:13px 20px;background:#fff;border:none;border-radius:12px;font-size:14px;
-  font-weight:700;color:#1F2937;cursor:pointer;font-family:inherit;
-  box-shadow:0 4px 16px rgba(0,0,0,.25);transition:all .2s}
-.google-btn:active{transform:scale(.98)}
-.google-icon{width:18px;height:18px;flex-shrink:0}
+.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 20px;background:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;color:#1F2937;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .15s}
+.google-btn:active{transform:scale(.97)}
+.g-icon{width:18px;height:18px;flex-shrink:0}
 .login-footer{font-size:10px;color:rgba(255,255,255,.25);margin-top:18px;line-height:1.7}
+/* SYNC */
 .sync-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px}
-.sync-ok{background:#4CAF50}.sync-err{background:#EF5350}
-.sync-ing{background:#FFA726;animation:blink 1s infinite}
+.s-ok{background:#4CAF50}.s-err{background:#EF5350}.s-ing{background:#FFA726;animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.expiry-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border)}
-.expiry-row:last-child{border-bottom:none}
-.exp-days{font-size:11px;font-weight:700;min-width:52px;text-align:right}
 </style>
 </head>
 <body>
 
+<!-- 로그인 화면: display:none 으로 시작 -->
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">🏠</div>
     <div class="login-title">월세 관리</div>
     <div class="login-sub">임대 현황을 한눈에 관리하세요<br>Google 계정으로 안전하게 로그인</div>
     <button class="google-btn" onclick="signInGoogle()">
-      <svg class="google-icon" viewBox="0 0 24 24">
-        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-      </svg>
+      <svg class="g-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Google로 로그인
     </button>
     <div class="login-footer">데이터는 본인 Google 계정에만 저장됩니다</div>
   </div>
 </div>
 
-<div id="loading-overlay" class="hide">
+<!-- 초기 로딩 오버레이 -->
+<div id="loading-overlay">
   <div class="spinner"></div>
-  <div class="loading-txt">데이터 로딩 중...</div>
+  <div class="loading-txt">로그인 확인 중...</div>
 </div>
 
-<div id="app" style="visibility:hidden">
+<div id="app" style="display:none">
   <div class="hdr">
     <div class="hdr-top">
-      <div class="hdr-title">🏠 월세 관리 <span id="sync-status" style="font-size:10px;margin-left:4px"></span></div>
+      <div class="hdr-title">🏠 월세 관리 <span id="sync-st" style="font-size:10px;margin-left:4px"></span></div>
       <div class="hdr-actions">
-        <div id="avatar-wrap" style="display:none" onclick="toggleUserMenu()"></div>
+        <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
     </div>
     <div class="nav">
       <a href="index.html" class="nav-tab on">📊 메인</a>
       <a href="units.html" class="nav-tab">🏠 세대</a>
-      <a href="management.html" class="nav-tab">💰 관리</a>
+      <a href="expense.html" class="nav-tab">💸 지출</a>
+      <a href="admin.html" class="nav-tab">🗂 관리</a>
     </div>
   </div>
   <div id="user-menu" class="user-menu">
@@ -195,10 +166,10 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 
   <div class="content">
     <div class="stats-grid">
-      <div class="kpi total"><div class="kpi-val" id="stat-total">—</div><div class="kpi-lbl">전체</div></div>
-      <div class="kpi rented"><div class="kpi-val" id="stat-rented">—</div><div class="kpi-lbl">임대중</div></div>
-      <div class="kpi vacant"><div class="kpi-val" id="stat-vacant">—</div><div class="kpi-lbl">공실</div></div>
-      <div class="kpi unpaid"><div class="kpi-val" id="stat-unpaid">—</div><div class="kpi-lbl">미납</div></div>
+      <div class="kpi total"><div class="kpi-val" id="s-total">—</div><div class="kpi-lbl">전체</div></div>
+      <div class="kpi rented"><div class="kpi-val" id="s-rented">—</div><div class="kpi-lbl">임대중</div></div>
+      <div class="kpi vacant"><div class="kpi-val" id="s-vacant">—</div><div class="kpi-lbl">공실</div></div>
+      <div class="kpi unpaid"><div class="kpi-val" id="s-unpaid">—</div><div class="kpi-lbl">미납</div></div>
     </div>
 
     <div class="card">
@@ -227,6 +198,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
   </div>
 </div>
 
+<!-- CONFIRM MODAL -->
 <div class="modal-bg" id="confirm-modal">
   <div class="modal">
     <h3 id="confirm-title">확인</h3>
@@ -238,6 +210,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
   </div>
 </div>
 
+<!-- EDIT NOTE MODAL -->
 <div class="modal-bg" id="edit-note-modal">
   <div class="modal">
     <h3>✏️ 메모 수정</h3>
@@ -259,111 +232,107 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),gProv=new firebase.auth.GoogleAuthProvider();
-let cu=null,uRef=null,nRef=null,uL=null,nL=null;
-let units={},notes={};
+let cu=null,uRef=null,nRef=null,uL=null,nL=null,units={},notes={};
 const ROOMS=[201,202,203,204,205,206,301,302,303,304,305,306,401,402,403,404,405,406];
 
+// ── AUTH STATE ── (탭 이동 시 flash 없음: login-screen은 display:none 시작)
 auth.onAuthStateChanged(user=>{
+  const lo=document.getElementById("loading-overlay");
+  const ls=document.getElementById("login-screen");
+  const app=document.getElementById("app");
   if(user){
     cu=user;
-    document.getElementById("app").style.visibility="visible";
-    document.getElementById("login-screen").classList.add("hide");
-    const w=document.getElementById("avatar-wrap");
-    w.innerHTML=user.photoURL?`<img class="user-avatar" src="${user.photoURL}">`:`<div class="user-avatar-fallback">${(user.displayName||"U")[0]}</div>`;
+    lo.classList.add("hide");
+    ls.style.display="none";
+    app.style.display="block";
+    const w=document.getElementById("av-wrap");
+    w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"U")[0]}</div>`;
     w.style.display="block";
     document.getElementById("um-name").textContent=user.displayName||"사용자";
     document.getElementById("um-email").textContent=user.email||"";
+    if(uL&&uRef)uRef.off("value",uL);
+    if(nL&&nRef)nRef.off("value",nL);
     uRef=db.ref(`rent_app/${user.uid}/units`);
     nRef=db.ref(`rent_app/${user.uid}/notes`);
     listenUnits();listenNotes();
   }else{
-    cu=null;
-    document.getElementById("app").style.visibility="hidden";
-    document.getElementById("login-screen").classList.remove("hide");
-    if(uL&&uRef)uRef.off("value",uL);
-    if(nL&&nRef)nRef.off("value",nL);
+    lo.classList.add("hide");
+    app.style.display="none";
+    ls.style.display="flex";
   }
 });
+
 function signInGoogle(){auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message))}
-function doSignOut(){closeUserMenu();auth.signOut()}
-function toggleUserMenu(){document.getElementById("user-menu").classList.toggle("show")}
-function closeUserMenu(){document.getElementById("user-menu").classList.remove("show")}
-document.addEventListener("click",e=>{if(!e.target.closest("#avatar-wrap")&&!e.target.closest("#user-menu"))closeUserMenu()});
+function doSignOut(){closeMenu();if(uL&&uRef)uRef.off("value",uL);if(nL&&nRef)nRef.off("value",nL);auth.signOut()}
+function toggleMenu(){document.getElementById("user-menu").classList.toggle("show")}
+function closeMenu(){document.getElementById("user-menu").classList.remove("show")}
+document.addEventListener("click",e=>{if(!e.target.closest("#av-wrap")&&!e.target.closest("#user-menu"))closeMenu()});
 
 function setSS(s){
-  const el=document.getElementById("sync-status");
-  const c=s==="ok"?"sync-ok":s==="ing"?"sync-ing":"sync-err";
-  const t=s==="ok"?"동기화됨":s==="ing"?"저장중":"오류";
-  el.innerHTML=`<span class="sync-dot ${c}"></span><span style="color:rgba(255,255,255,.5);font-size:10px">${t}</span>`;
+  const el=document.getElementById("sync-st");
+  const cls=s==="ok"?"s-ok":s==="ing"?"s-ing":"s-err";
+  const txt=s==="ok"?"동기화됨":s==="ing"?"저장중":"오류";
+  el.innerHTML=`<span class="sync-dot ${cls}"></span><span style="color:rgba(255,255,255,.5);font-size:10px">${txt}</span>`;
 }
 
 function listenUnits(){
-  showLoad(true);
   uL=uRef.on("value",snap=>{
     const val=snap.val()||{};
-    ensureRooms(val);
-    units=val;renderDash();setSS("ok");showLoad(false);
-  },()=>{showLoad(false);setSS("err");showToast("❗ 연결 오류")});
+    ensureRooms(val);units=val;renderDash();setSS("ok");
+  },()=>{setSS("err");showToast("❗ 연결 오류")});
 }
 function listenNotes(){
   nL=nRef.on("value",snap=>{notes=snap.val()||{};renderNotes()});
 }
-
 async function ensureRooms(ex){
-  const up={};
-  ROOMS.forEach(r=>{if(!ex[r])up[r]=defRoom(r)});
+  const up={};ROOMS.forEach(r=>{if(!ex[r])up[r]=defRoom(r)});
   if(Object.keys(up).length)await uRef.update(up);
 }
-function defRoom(n){return{room:String(n),floor:Math.floor(n/100),status:"vacant",tenantName:"",tenantPhone:"",depositAmount:0,monthlyRent:0,contractStart:"",contractEnd:"",rentPaid:false,memo:""}}
+function defRoom(n){return{room:String(n),floor:Math.floor(n/100),status:"vacant",tenantName:"",tenantName2:"",tenantPhone:"",tenantPhone2:"",depositAmount:0,monthlyRent:0,contractStart:"",contractEnd:"",rentPaid:false,memo:""}}
 
 function renderDash(){
   const list=ROOMS.map(r=>units[r]).filter(Boolean);
   const rented=list.filter(u=>u.status==="rented");
   const vacant=list.filter(u=>u.status==="vacant");
   const unpaid=rented.filter(u=>!u.rentPaid);
-  document.getElementById("stat-total").textContent=ROOMS.length;
-  document.getElementById("stat-rented").textContent=rented.length;
-  document.getElementById("stat-vacant").textContent=vacant.length;
-  document.getElementById("stat-unpaid").textContent=unpaid.length;
+  document.getElementById("s-total").textContent=ROOMS.length;
+  document.getElementById("s-rented").textContent=rented.length;
+  document.getElementById("s-vacant").textContent=vacant.length;
+  document.getElementById("s-unpaid").textContent=unpaid.length;
 
   const uEl=document.getElementById("unpaid-list");
-  if(!unpaid.length)uEl.innerHTML='<div class="empty-small">✅ 이달 미납 없음</div>';
-  else uEl.innerHTML=unpaid.map(u=>`<div class="status-row">
-    <span class="room-num">${u.room}호</span>
-    <span class="tenant-nm">${esc(u.tenantName)||"(미입력)"}</span>
-    <span class="rent-amt">₩${fmtN(u.monthlyRent)}</span>
-    <span class="badge badge-unpaid">미납</span>
-  </div>`).join("");
+  uEl.innerHTML=!unpaid.length?'<div class="empty-small">✅ 이달 미납 없음</div>':
+    unpaid.map(u=>`<div class="status-row">
+      <span class="room-num">${u.room}호</span>
+      <span class="tenant-nm">${esc(names(u))}</span>
+      <span class="rent-amt">${fmtWon(u.monthlyRent)}</span>
+      <span class="badge badge-unpaid">미납</span>
+    </div>`).join("");
 
   const vEl=document.getElementById("vacant-list");
-  if(!vacant.length)vEl.innerHTML='<div class="empty-small">🏠 공실 없음 — 전실 임대중</div>';
-  else vEl.innerHTML=vacant.map(u=>`<div class="status-row">
-    <span class="room-num">${u.room}호</span>
-    <span class="tenant-nm">${u.floor}층</span>
-    <span class="badge badge-vacant">공실</span>
-  </div>`).join("");
+  vEl.innerHTML=!vacant.length?'<div class="empty-small">🏠 공실 없음</div>':
+    vacant.map(u=>`<div class="status-row">
+      <span class="room-num">${u.room}호</span>
+      <span class="tenant-nm">${u.floor}층</span>
+      <span class="badge badge-vacant">공실</span>
+    </div>`).join("");
 
-  // 계약 만료 임박 (30일 이내)
   const today=new Date();today.setHours(0,0,0,0);
   const soon=rented.filter(u=>{
     if(!u.contractEnd)return false;
-    const end=new Date(u.contractEnd);end.setHours(0,0,0,0);
-    const diff=Math.ceil((end-today)/(1000*60*60*24));
+    const d=new Date(u.contractEnd);d.setHours(0,0,0,0);
+    const diff=Math.ceil((d-today)/864e5);
     return diff>=0&&diff<=30;
-  }).map(u=>{
-    const end=new Date(u.contractEnd);end.setHours(0,0,0,0);
-    const diff=Math.ceil((end-today)/(1000*60*60*24));
-    return{...u,daysLeft:diff};
-  }).sort((a,b)=>a.daysLeft-b.daysLeft);
+  }).map(u=>{const d=new Date(u.contractEnd);d.setHours(0,0,0,0);return{...u,dl:Math.ceil((d-today)/864e5)}}).sort((a,b)=>a.dl-b.dl);
 
   const eEl=document.getElementById("expiry-list");
-  if(!soon.length)eEl.innerHTML='<div class="empty-small">✅ 30일 내 만료 계약 없음</div>';
-  else eEl.innerHTML=soon.map(u=>`<div class="expiry-row">
-    <span class="room-num">${u.room}호</span>
-    <span class="tenant-nm">${esc(u.tenantName)||"(미입력)"}</span>
-    <span class="badge badge-warning">${u.contractEnd}</span>
-    <span class="exp-days" style="color:${u.daysLeft<=7?"var(--red)":"var(--amber)"}">${u.daysLeft}일 후</span>
-  </div>`).join("");
+  eEl.innerHTML=!soon.length?'<div class="empty-small">✅ 30일 내 만료 없음</div>':
+    soon.map(u=>`<div class="expiry-row">
+      <span class="room-num">${u.room}호</span>
+      <span class="tenant-nm">${esc(names(u))}</span>
+      <span class="badge badge-warning">${u.contractEnd}</span>
+      <span style="font-size:11px;font-weight:700;color:${u.dl<=7?"var(--red)":"var(--amber)"};min-width:40px;text-align:right">${u.dl}일 후</span>
+    </div>`).join("");
 }
 
 function renderNotes(){
@@ -375,21 +344,21 @@ function renderNotes(){
     <div class="note-footer">
       <span class="note-date">${fmtDt(n.createdAt)}</span>
       <div class="note-btns">
-        <button class="note-btn edit" onclick="startEditNote(${n.id})">✏️</button>
-        <button class="note-btn del" onclick="deleteNote(${n.id})">✕</button>
+        <button class="note-btn edit" onclick="startEdit(${n.id})">✏️</button>
+        <button class="note-btn del" onclick="delNote(${n.id})">✕</button>
       </div>
     </div>
   </div>`).join("");
 }
 function addNote(){
   const ta=document.getElementById("note-input"),c=ta.value.trim();
-  if(!c){showToast("❗ 메모 내용을 입력하세요");return}
+  if(!c){showToast("❗ 내용을 입력하세요");return}
   const id=Date.now();setSS("ing");
   nRef.child(String(id)).set({id,content:c,createdAt:new Date().toISOString()})
     .then(()=>{ta.value="";showToast("✅ 메모 추가됨");setSS("ok")})
     .catch(()=>{setSS("err");showToast("❗ 저장 실패")});
 }
-function startEditNote(id){
+function startEdit(id){
   const n=notes[id];if(!n)return;
   document.getElementById("edit-note-id").value=id;
   document.getElementById("edit-note-content").value=n.content;
@@ -401,19 +370,13 @@ function saveEditNote(){
   const c=document.getElementById("edit-note-content").value.trim();
   if(!c){showToast("❗ 내용을 입력하세요");return}
   setSS("ing");
-  nRef.child(String(id)).update({content:c})
-    .then(()=>{closeEditNote();showToast("✅ 수정됨");setSS("ok")})
-    .catch(()=>{setSS("err");showToast("❗ 수정 실패")});
+  nRef.child(String(id)).update({content:c}).then(()=>{closeEditNote();showToast("✅ 수정됨");setSS("ok")}).catch(()=>{setSS("err");showToast("❗ 실패")});
 }
-function deleteNote(id){
+function delNote(id){
   showConfirm("메모 삭제","이 메모를 삭제하시겠습니까?",()=>{
-    setSS("ing");
-    nRef.child(String(id)).remove()
-      .then(()=>{showToast("🗑 삭제됨");setSS("ok")})
-      .catch(()=>{setSS("err");showToast("❗ 삭제 실패")});
+    setSS("ing");nRef.child(String(id)).remove().then(()=>{showToast("🗑 삭제됨");setSS("ok")}).catch(()=>{setSS("err");showToast("❗ 실패")});
   });
 }
-
 function showConfirm(title,msg,cb){
   document.getElementById("confirm-title").textContent=title;
   document.getElementById("confirm-msg").textContent=msg;
@@ -421,12 +384,11 @@ function showConfirm(title,msg,cb){
   document.getElementById("confirm-modal").classList.add("show");
 }
 function closeConfirm(){document.getElementById("confirm-modal").classList.remove("show")}
-function showLoad(on){document.getElementById("loading-overlay").classList.toggle("hide",!on)}
-let tTm;
-function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
+function names(u){return[u.tenantName,u.tenantName2].filter(Boolean).join(" / ")||"(미입력)"}
+function fmtWon(v){if(!v)return"—";return(v*10000).toLocaleString("ko-KR")+"원"}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
-function fmtN(n){return(n||0).toLocaleString("ko-KR")}
 function fmtDt(iso){if(!iso)return"";const d=new Date(iso);return`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`}
+let tTm;function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
 </script>
 </body>
 </html>

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1E2D3D">
+<title>🏠 월세 관리 · 관리</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<style>
+:root{
+  --bg:#F0F4F8;--card:#fff;--border:#E2E8F0;--text:#1E293B;--sub:#64748B;--hint:#94A3B8;
+  --hdr:#1E2D3D;--hdr2:#2A3F55;
+  --green:#059669;--green-lt:#D1FAE5;--green-t:#065F46;
+  --red:#DC2626;--red-lt:#FEE2E2;--red-t:#991B1B;
+  --blue:#0284C7;--blue-lt:#E0F2FE;--blue-t:#0C4A6E;
+  --purple:#7C3AED;--purple-lt:#EDE9FE;--purple-t:#4C1D95;
+  --sky:#0EA5E9;--radius:14px;--shadow:0 2px 12px rgba(0,0,0,.08)
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--text);overscroll-behavior:none}
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,var(--hdr),var(--hdr2));box-shadow:0 3px 16px rgba(0,0,0,.25);padding:0 16px}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;height:52px}
+.hdr-title{font-size:18px;font-weight:900;color:#fff;letter-spacing:-.5px}
+.hdr-actions{display:flex;align-items:center;gap:8px;position:relative}
+.av-img{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);cursor:pointer;object-fit:cover}
+.av-txt{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);background:var(--sky);color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.nav{display:flex;border-top:1px solid rgba(255,255,255,.08)}
+.nav-tab{flex:1;padding:9px 2px 11px;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,.4);border-bottom:3px solid transparent;text-decoration:none;transition:all .2s;white-space:nowrap}
+.nav-tab.on{color:#fff;border-bottom-color:var(--sky);font-weight:700}
+.user-menu{position:fixed;top:56px;right:12px;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:16px;min-width:210px;z-index:300;display:none;border:1px solid var(--border)}
+.user-menu.show{display:block}
+.um-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
+.um-email{font-size:12px;color:var(--hint);margin-bottom:12px;word-break:break-all}
+.logout-btn{width:100%;padding:9px;background:var(--red-lt);color:var(--red);border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.content{margin-top:100px;padding:14px;min-height:calc(100vh - 100px)}
+/* SUB TABS */
+.sub-tabs{display:flex;background:var(--card);border-radius:12px;padding:4px;margin-bottom:14px;box-shadow:var(--shadow);gap:4px}
+.sub-tab{flex:1;padding:9px 8px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--sub);background:transparent;transition:all .2s}
+.sub-tab.on{background:var(--hdr);color:#fff}
+/* PAGE */
+.sub-page{display:none}
+.sub-page.on{display:block}
+/* PHONEBOOK */
+.search-bar{display:flex;gap:8px;margin-bottom:12px}
+.search-input{flex:1;border:2px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;font-family:inherit;outline:none;color:var(--text);background:#fff}
+.search-input:focus{border-color:var(--sky)}
+.btn-add{background:var(--hdr);color:#fff;border:none;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.contact-card{background:var(--card);border-radius:12px;padding:14px;margin-bottom:8px;box-shadow:var(--shadow)}
+.contact-top{display:flex;align-items:flex-start;gap:12px}
+.contact-avatar{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;flex-shrink:0}
+.contact-info{flex:1;min-width:0}
+.contact-name{font-size:15px;font-weight:800;color:var(--text);margin-bottom:2px}
+.contact-cat{font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;display:inline-block;margin-bottom:4px}
+.cat-tenant{background:var(--blue-lt);color:var(--blue-t)}
+.cat-vendor{background:var(--green-lt);color:var(--green-t)}
+.cat-agency{background:var(--purple-lt);color:var(--purple-t)}
+.cat-other{background:#F1F5F9;color:var(--sub)}
+.contact-phone{font-size:13px;color:var(--sub);margin-bottom:2px}
+.contact-memo{font-size:12px;color:var(--hint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.contact-btns{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.ic-btn{width:30px;height:30px;border:none;border-radius:8px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.ic-btn.edit{background:var(--blue-lt);color:var(--blue)}
+.ic-btn.del{background:var(--red-lt);color:var(--red)}
+/* CONTRACTS */
+.room-section{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.room-section-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.room-section-title{font-size:14px;font-weight:800;color:var(--hdr)}
+.room-section-sub{font-size:12px;color:var(--sub)}
+.photos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ph-wrap{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#F0F4F8}
+.ph-wrap img{width:100%;height:100%;object-fit:cover;cursor:pointer}
+.ph-del{position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ph-date{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:3px 5px;text-align:center}
+.upload-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border:2px dashed var(--border);border-radius:10px;background:#FAFCFF;color:var(--sub);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;margin-top:8px}
+.upload-btn:hover{border-color:var(--sky);color:var(--sky)}
+.upload-btn:disabled{opacity:.5;cursor:not-allowed}
+.prog-bar{height:3px;border-radius:2px;background:#E2E8F0;margin-top:6px;overflow:hidden;display:none}
+.prog-fill{height:100%;background:var(--sky);transition:width .3s;width:0%}
+.no-photos{font-size:12px;color:var(--hint);text-align:center;padding:12px 0}
+/* PHOTO VIEWER */
+#pv{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:900;display:none;align-items:center;justify-content:center}
+#pv.show{display:flex}
+#pv img{max-width:95%;max-height:90vh;border-radius:8px;object-fit:contain}
+#pv-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+/* SHEET */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.sheet-bg.show{display:flex}
+.sheet{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 36px;width:100%;max-width:520px;box-shadow:0 -4px 32px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto}
+.sheet-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sheet-hd h3{font-size:17px;font-weight:900;color:var(--hdr)}
+.sheet-close{width:32px;height:32px;border:none;background:#F3F4F6;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.field label{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select,.field textarea{border:2px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;outline:none;color:var(--text);background:#FAFCFF;width:100%;transition:border-color .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--sky);background:#fff}
+.field textarea{resize:none}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-save{width:100%;padding:15px;background:var(--hdr);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px}
+.btn-save:active{opacity:.85}
+.empty-st{text-align:center;padding:40px 20px;color:var(--hint)}
+.empty-st .ei{font-size:44px;margin-bottom:10px}
+.empty-st .et{font-size:13px}
+/* CONFIRM */
+.confirm-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
+.confirm-bg.show{display:flex}
+.confirm-box{background:#fff;border-radius:20px;padding:24px;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.confirm-box h3{font-size:15px;font-weight:700;color:var(--hdr);margin-bottom:10px}
+.confirm-box p{font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.6}
+.confirm-btns{display:flex;gap:10px;justify-content:flex-end}
+.confirm-btns button{padding:9px 18px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.fab{position:fixed;bottom:28px;right:20px;width:56px;height:56px;border-radius:50%;background:var(--hdr);color:#fff;border:none;font-size:28px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;z-index:100;transition:transform .15s}
+.fab:active{transform:scale(.92)}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1F2937;color:#fff;padding:11px 20px;border-radius:24px;font-size:14px;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.3);pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0)}
+#loading-overlay{position:fixed;inset:0;background:rgba(30,45,61,.9);z-index:8000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .3s}
+#loading-overlay.hide{opacity:0;pointer-events:none}
+.spinner{width:44px;height:44px;border:5px solid rgba(255,255,255,.2);border-top-color:#38BDF8;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{color:#fff;font-size:13px;font-weight:600}
+#login-screen{position:fixed;inset:0;background:linear-gradient(160deg,#0F1C2D,#1E2D3D 50%,#2A3F55);z-index:7000;display:none;align-items:center;justify-content:center;padding:20px}
+.login-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:36px 28px;max-width:320px;width:100%;text-align:center;backdrop-filter:blur(16px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.login-logo{font-size:52px;margin-bottom:14px}
+.login-title{font-size:22px;font-weight:900;color:#fff;margin-bottom:6px;letter-spacing:-.5px}
+.login-sub{font-size:12px;color:rgba(255,255,255,.45);margin-bottom:28px;line-height:1.7}
+.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 20px;background:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;color:#1F2937;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .15s}
+.google-btn:active{transform:scale(.97)}
+.g-icon{width:18px;height:18px;flex-shrink:0}
+.login-footer{font-size:10px;color:rgba(255,255,255,.25);margin-top:18px;line-height:1.7}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🏠</div>
+    <div class="login-title">월세 관리</div>
+    <div class="login-sub">임대 현황을 한눈에 관리하세요<br>Google 계정으로 안전하게 로그인</div>
+    <button class="google-btn" onclick="signInGoogle()">
+      <svg class="g-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Google로 로그인
+    </button>
+    <div class="login-footer">데이터는 본인 Google 계정에만 저장됩니다</div>
+  </div>
+</div>
+
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-txt">데이터 로딩 중...</div>
+</div>
+
+<div id="app" style="display:none">
+  <div class="hdr">
+    <div class="hdr-top">
+      <div class="hdr-title">🗂 관리</div>
+      <div class="hdr-actions"><div id="av-wrap" onclick="toggleMenu()" style="display:none"></div></div>
+    </div>
+    <div class="nav">
+      <a href="index.html" class="nav-tab">📊 메인</a>
+      <a href="units.html" class="nav-tab">🏠 세대</a>
+      <a href="expense.html" class="nav-tab">💸 지출</a>
+      <a href="admin.html" class="nav-tab on">🗂 관리</a>
+    </div>
+  </div>
+  <div id="user-menu" class="user-menu">
+    <div class="um-name" id="um-name">—</div>
+    <div class="um-email" id="um-email">—</div>
+    <button class="logout-btn" onclick="doSignOut()">🚪 로그아웃</button>
+  </div>
+
+  <div class="content">
+    <!-- 서브 탭 -->
+    <div class="sub-tabs">
+      <button class="sub-tab on" onclick="setSubTab(0,this)" id="st0">📞 전화번호부</button>
+      <button class="sub-tab" onclick="setSubTab(1,this)" id="st1">📷 계약서 관리</button>
+    </div>
+
+    <!-- 전화번호부 -->
+    <div class="sub-page on" id="sp0">
+      <div class="search-bar">
+        <input class="search-input" id="pb-search" placeholder="🔍 이름, 번호 검색..." oninput="renderPhonebook()">
+        <button class="btn-add" onclick="openAddContact()">+ 추가</button>
+      </div>
+      <div id="phonebook-list"></div>
+    </div>
+
+    <!-- 계약서 사진 관리 -->
+    <div class="sub-page" id="sp1">
+      <div id="contracts-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 연락처 추가/수정 SHEET -->
+<div class="sheet-bg" id="contact-sheet">
+  <div class="sheet">
+    <div class="sheet-hd">
+      <h3 id="contact-sheet-title">연락처 추가</h3>
+      <button class="sheet-close" onclick="closeContactSheet()">✕</button>
+    </div>
+    <input type="hidden" id="c-id">
+    <div class="field-row">
+      <div class="field">
+        <label>이름 *</label>
+        <input type="text" id="c-name" placeholder="홍길동">
+      </div>
+      <div class="field">
+        <label>카테고리</label>
+        <select id="c-cat">
+          <option value="tenant">세입자</option>
+          <option value="vendor">업체/수리</option>
+          <option value="agency">공인중개사</option>
+          <option value="other">기타</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>전화번호 ①</label>
+      <input type="tel" id="c-phone" placeholder="010-0000-0000">
+    </div>
+    <div class="field">
+      <label>전화번호 ②</label>
+      <input type="tel" id="c-phone2" placeholder="010-0000-0000 (선택)">
+    </div>
+    <div class="field">
+      <label>메모</label>
+      <textarea id="c-memo" rows="2" placeholder="호실, 담당 업무 등..."></textarea>
+    </div>
+    <button class="btn-save" onclick="saveContact()">💾 저장</button>
+  </div>
+</div>
+
+<!-- PHOTO VIEWER -->
+<div id="pv"><button id="pv-close" onclick="closePV()">✕</button><img id="pv-img" src="" alt=""></div>
+
+<!-- CONFIRM -->
+<div class="confirm-bg" id="confirm-modal">
+  <div class="confirm-box">
+    <h3 id="cm-title">확인</h3>
+    <p id="cm-msg"></p>
+    <div class="confirm-btns">
+      <button style="background:#F3F4F6;color:var(--sub)" onclick="closeCM()">취소</button>
+      <button style="background:var(--red-lt);color:var(--red)" id="cm-ok">삭제</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
+firebase.initializeApp(FC);
+const db=firebase.database(),auth=firebase.auth(),storage=firebase.storage(),gProv=new firebase.auth.GoogleAuthProvider();
+let cu=null,pbRef=null,uRef=null,pbL=null,uL=null;
+let contacts={},units={};
+const ROOMS=[201,202,203,204,205,206,301,302,303,304,305,306,401,402,403,404,405,406];
+const CAT_LABEL={tenant:"세입자",vendor:"업체/수리",agency:"공인중개사",other:"기타"};
+const CAT_COLOR={tenant:"cat-tenant",vendor:"cat-vendor",agency:"cat-agency",other:"cat-other"};
+const CAT_BG={tenant:"#1255A0",vendor:"#059669",agency:"#7C3AED",other:"#64748B"};
+
+auth.onAuthStateChanged(user=>{
+  const lo=document.getElementById("loading-overlay"),ls=document.getElementById("login-screen"),app=document.getElementById("app");
+  if(user){
+    cu=user;lo.classList.add("hide");ls.style.display="none";app.style.display="block";
+    const w=document.getElementById("av-wrap");
+    w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"U")[0]}</div>`;
+    w.style.display="block";
+    document.getElementById("um-name").textContent=user.displayName||"사용자";
+    document.getElementById("um-email").textContent=user.email||"";
+    if(pbL&&pbRef)pbRef.off("value",pbL);
+    if(uL&&uRef)uRef.off("value",uL);
+    pbRef=db.ref(`rent_app/${user.uid}/phonebook`);
+    uRef=db.ref(`rent_app/${user.uid}/units`);
+    listenPB();listenUnits();
+  }else{
+    cu=null;lo.classList.add("hide");app.style.display="none";ls.style.display="flex";
+    if(pbL&&pbRef)pbRef.off("value",pbL);
+    if(uL&&uRef)uRef.off("value",uL);
+  }
+});
+function signInGoogle(){auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message))}
+function doSignOut(){closeMenu();if(pbL&&pbRef)pbRef.off("value",pbL);if(uL&&uRef)uRef.off("value",uL);auth.signOut()}
+function toggleMenu(){document.getElementById("user-menu").classList.toggle("show")}
+function closeMenu(){document.getElementById("user-menu").classList.remove("show")}
+document.addEventListener("click",e=>{if(!e.target.closest("#av-wrap")&&!e.target.closest("#user-menu"))closeMenu()});
+
+// ── SUB TABS ──
+let curSub=0;
+function setSubTab(n,btn){
+  curSub=n;
+  document.querySelectorAll(".sub-tab").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on");
+  document.querySelectorAll(".sub-page").forEach((p,i)=>p.classList.toggle("on",i===n));
+  if(n===1)renderContracts();
+}
+
+// ── PHONEBOOK ──
+function listenPB(){
+  pbL=pbRef.on("value",snap=>{contacts=snap.val()||{};renderPhonebook()},()=>showToast("❗ 연결 오류"));
+}
+function renderPhonebook(){
+  const q=(document.getElementById("pb-search").value||"").toLowerCase();
+  let list=Object.values(contacts).sort((a,b)=>(a.name||"").localeCompare(b.name||"","ko"));
+  if(q)list=list.filter(c=>(c.name||"").toLowerCase().includes(q)||(c.phone||"").includes(q)||(c.phone2||"").includes(q));
+  const el=document.getElementById("phonebook-list");
+  if(!list.length){el.innerHTML='<div class="empty-st"><div class="ei">📞</div><div class="et">연락처가 없습니다<br>+ 추가 버튼으로 등록하세요</div></div>';return}
+  el.innerHTML=list.map(c=>{
+    const bg=CAT_BG[c.category||"other"];
+    const catCls=CAT_COLOR[c.category||"other"];
+    const catLbl=CAT_LABEL[c.category||"other"];
+    const init=(c.name||"?")[0];
+    const phones=[c.phone,c.phone2].filter(Boolean).join(" / ");
+    return`<div class="contact-card">
+      <div class="contact-top">
+        <div class="contact-avatar" style="background:${bg}">${esc(init)}</div>
+        <div class="contact-info">
+          <div class="contact-name">${esc(c.name)}</div>
+          <span class="contact-cat ${catCls}">${catLbl}</span>
+          ${phones?`<div class="contact-phone">📞 ${esc(phones)}</div>`:""}
+          ${c.memo?`<div class="contact-memo">💬 ${esc(c.memo)}</div>`:""}
+        </div>
+        <div class="contact-btns">
+          <button class="ic-btn edit" onclick="startEditContact('${c.id}')">✏️</button>
+          <button class="ic-btn del" onclick="delContact('${c.id}')">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+function openAddContact(){
+  document.getElementById("contact-sheet-title").textContent="연락처 추가";
+  document.getElementById("c-id").value="";
+  document.getElementById("c-name").value="";
+  document.getElementById("c-cat").value="tenant";
+  document.getElementById("c-phone").value="";
+  document.getElementById("c-phone2").value="";
+  document.getElementById("c-memo").value="";
+  document.getElementById("contact-sheet").classList.add("show");
+}
+function startEditContact(id){
+  const c=contacts[id];if(!c)return;
+  document.getElementById("contact-sheet-title").textContent="연락처 수정";
+  document.getElementById("c-id").value=id;
+  document.getElementById("c-name").value=c.name||"";
+  document.getElementById("c-cat").value=c.category||"other";
+  document.getElementById("c-phone").value=c.phone||"";
+  document.getElementById("c-phone2").value=c.phone2||"";
+  document.getElementById("c-memo").value=c.memo||"";
+  document.getElementById("contact-sheet").classList.add("show");
+}
+function closeContactSheet(){document.getElementById("contact-sheet").classList.remove("show")}
+function saveContact(){
+  const name=document.getElementById("c-name").value.trim();
+  if(!name){showToast("❗ 이름을 입력하세요");return}
+  const existId=document.getElementById("c-id").value;
+  const id=existId||String(Date.now());
+  const data={id,name,category:document.getElementById("c-cat").value,phone:document.getElementById("c-phone").value.trim(),phone2:document.getElementById("c-phone2").value.trim(),memo:document.getElementById("c-memo").value.trim(),updatedAt:new Date().toISOString()};
+  pbRef.child(id).set(data)
+    .then(()=>{closeContactSheet();showToast("✅ 저장됨")})
+    .catch(()=>showToast("❗ 저장 실패"));
+}
+function delContact(id){
+  showCM("연락처 삭제","이 연락처를 삭제하시겠습니까?",()=>{
+    pbRef.child(id).remove().then(()=>showToast("🗑 삭제됨")).catch(()=>showToast("❗ 실패"));
+  });
+}
+
+// ── CONTRACTS (계약서 사진 관리) ──
+function listenUnits(){
+  uL=uRef.on("value",snap=>{units=snap.val()||{};if(curSub===1)renderContracts()},()=>{});
+}
+function renderContracts(){
+  const el=document.getElementById("contracts-list");
+  const allEmpty=ROOMS.every(r=>!units[r]||!units[r].photos||!Object.keys(units[r].photos).length);
+  if(allEmpty){el.innerHTML='<div class="empty-st"><div class="ei">📷</div><div class="et">업로드된 계약서 사진이 없습니다<br>세대 탭에서 사진을 추가하세요</div></div>';return}
+  el.innerHTML=ROOMS.map(r=>{
+    const u=units[r];
+    const photos=u&&u.photos?Object.values(u.photos).sort((a,b)=>a.id-b.id):[];
+    const namesTxt=u?[u.tenantName,u.tenantName2].filter(Boolean).join(" / "):"공실";
+    return`<div class="room-section">
+      <div class="room-section-hd">
+        <span class="room-section-title">${r}호 <span style="font-size:12px;font-weight:500;color:var(--sub)">${esc(namesTxt)}</span></span>
+        <span class="room-section-sub">${photos.length}장</span>
+      </div>
+      ${photos.length?`
+        <div class="photos-grid">
+          ${photos.map(p=>`
+            <div class="ph-wrap">
+              <img src="${p.url}" onclick="openPV('${p.url}')" loading="lazy">
+              <button class="ph-del" onclick="delContractPhoto('${r}','${p.id}','${esc(p.storagePath||"")}')">✕</button>
+              <div class="ph-date">${fmtDate(p.uploadedAt)}</div>
+            </div>`).join("")}
+        </div>`:'<div class="no-photos">사진 없음</div>'}
+      <input type="file" id="fu-${r}" accept="image/*" multiple style="display:none" onchange="uploadContractPhoto('${r}',event)">
+      <button class="upload-btn" id="ub-${r}" onclick="document.getElementById('fu-${r}').click()">📷 사진 추가</button>
+      <div class="prog-bar" id="pb-${r}"><div class="prog-fill" id="pf-${r}"></div></div>
+    </div>`;
+  }).filter((html,i)=>{
+    const r=ROOMS[i];
+    const u=units[r];
+    const hasPhotos=u&&u.photos&&Object.keys(u.photos).length>0;
+    return hasPhotos;
+  }).join("")||'<div class="empty-st"><div class="ei">📷</div><div class="et">업로드된 계약서 사진이 없습니다</div></div>';
+
+  // 실제로는 모든 호실 표시 (사진 없는 것도 포함, 업로드 가능)
+  el.innerHTML=ROOMS.map(r=>{
+    const u=units[r];
+    const photos=u&&u.photos?Object.values(u.photos).sort((a,b)=>a.id-b.id):[];
+    const namesTxt=u?[u.tenantName,u.tenantName2].filter(Boolean).join(" / "):"";
+    const isRented=u&&u.status==="rented";
+    if(!isRented&&!photos.length)return""; // 공실이고 사진도 없으면 숨김
+    return`<div class="room-section">
+      <div class="room-section-hd">
+        <div>
+          <span class="room-section-title">${r}호</span>
+          ${namesTxt?`<span style="font-size:12px;color:var(--sub);margin-left:6px">${esc(namesTxt)}</span>`:""}
+        </div>
+        <span class="room-section-sub">${photos.length}장</span>
+      </div>
+      ${photos.length?`
+        <div class="photos-grid">
+          ${photos.map(p=>`
+            <div class="ph-wrap">
+              <img src="${p.url}" onclick="openPV('${p.url}')" loading="lazy">
+              <button class="ph-del" onclick="delContractPhoto('${r}','${p.id}','${esc(p.storagePath||"")}')">✕</button>
+              <div class="ph-date">${fmtDate(p.uploadedAt)}</div>
+            </div>`).join("")}
+        </div>`:'<div class="no-photos">사진 없음</div>'}
+      <input type="file" id="fu-${r}" accept="image/*" multiple style="display:none" onchange="uploadContractPhoto('${r}',event)">
+      <button class="upload-btn" id="ub-${r}" onclick="document.getElementById('fu-${r}').click()">📷 사진 추가</button>
+      <div class="prog-bar" id="pb-${r}"><div class="prog-fill" id="pf-${r}"></div></div>
+    </div>`;
+  }).filter(Boolean).join("")||'<div class="empty-st"><div class="ei">📷</div><div class="et">임대중인 세대가 없거나 사진이 없습니다</div></div>';
+}
+
+async function uploadContractPhoto(room,e){
+  const files=Array.from(e.target.files);
+  if(!files.length||!cu)return;
+  const btn=document.getElementById(`ub-${room}`);
+  const bar=document.getElementById(`pb-${room}`);
+  const fill=document.getElementById(`pf-${room}`);
+  if(!btn||!bar||!fill)return;
+  btn.disabled=true;bar.style.display="block";
+  for(let i=0;i<files.length;i++){
+    const file=files[i];
+    if(!file.type.startsWith("image/")){showToast("❗ 이미지만 가능");continue}
+    if(file.size>10*1024*1024){showToast("❗ 10MB 이하만 가능");continue}
+    const ts=Date.now();
+    const path=`rent_app/${cu.uid}/contracts/${room}/${ts}_${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
+    try{
+      const ref=storage.ref(path);
+      const task=ref.put(file);
+      await new Promise((res,rej)=>task.on("state_changed",s=>{fill.style.width=`${Math.round(s.bytesTransferred/s.totalBytes*100)}%`},rej,res));
+      const url=await ref.getDownloadURL();
+      const pid=String(ts+(i*10));
+      await db.ref(`rent_app/${cu.uid}/units/${room}/photos/${pid}`).set({id:pid,url,storagePath:path,uploadedAt:new Date().toISOString()});
+      showToast("✅ 업로드 완료");
+    }catch(err){showToast("❗ 업로드 실패: "+err.message)}
+  }
+  btn.disabled=false;bar.style.display="none";fill.style.width="0%";e.target.value="";
+}
+
+function delContractPhoto(room,pid,spath){
+  showCM("사진 삭제","이 계약서 사진을 삭제하시겠습니까?",async()=>{
+    try{
+      if(spath)await storage.ref(spath).delete().catch(()=>{});
+      await db.ref(`rent_app/${cu.uid}/units/${room}/photos/${pid}`).remove();
+      showToast("🗑 삭제됨");
+    }catch(e){showToast("❗ 삭제 실패")}
+  });
+}
+
+function openPV(url){document.getElementById("pv-img").src=url;document.getElementById("pv").classList.add("show")}
+function closePV(){document.getElementById("pv").classList.remove("show");document.getElementById("pv-img").src=""}
+
+function showCM(title,msg,cb){
+  document.getElementById("cm-title").textContent=title;
+  document.getElementById("cm-msg").textContent=msg;
+  document.getElementById("cm-ok").onclick=()=>{cb();closeCM()};
+  document.getElementById("confirm-modal").classList.add("show");
+}
+function closeCM(){document.getElementById("confirm-modal").classList.remove("show")}
+function fmtDate(iso){if(!iso)return"";const d=new Date(iso);return`${d.getMonth()+1}/${d.getDate()}`}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+let tTm;function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
+</script>
+</body>
+</html>
