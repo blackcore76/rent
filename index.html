@@ -53,14 +53,15 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .kpi.unpaid .kpi-val{color:var(--red)}
 .card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
 .card-hd{font-size:13px;font-weight:700;color:var(--hdr2);margin-bottom:12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);padding-bottom:10px}
-.status-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border)}
+.status-row{display:flex;align-items:center;gap:8px;padding:9px 4px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:8px;transition:background .12s}
 .status-row:last-child{border-bottom:none}
+.status-row:active{background:#F0F4F8}
 .room-num{font-size:14px;font-weight:800;color:var(--hdr);min-width:40px}
 .tenant-nm{flex:1;font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rent-amt{font-size:12px;font-weight:700;color:var(--sub);white-space:nowrap}
 .badge{display:inline-block;padding:3px 7px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap}
 .badge-rented{background:var(--blue-lt);color:var(--blue-t)}
-.badge-vacant{background:var(--indigo-lt);color:var(--indigo-t)}
+.badge-vacant{background:var(--red-lt);color:var(--red-t)}
 .badge-paid{background:var(--green-lt);color:var(--green-t)}
 .badge-unpaid{background:var(--red-lt);color:var(--red-t)}
 .badge-warning{background:var(--amber-lt);color:var(--amber-t)}
@@ -79,8 +80,9 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .note-btn.edit{background:var(--blue-lt);color:var(--blue)}
 .note-btn.del{background:var(--red-lt);color:var(--red)}
 .empty-small{text-align:center;padding:20px;color:var(--hint);font-size:13px}
-.expiry-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border)}
+.expiry-row{display:flex;align-items:center;gap:8px;padding:9px 4px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:8px;transition:background .12s}
 .expiry-row:last-child{border-bottom:none}
+.expiry-row:active{background:#F0F4F8}
 /* MODAL */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-bg.show{display:flex}
@@ -302,19 +304,21 @@ function renderDash(){
 
   const uEl=document.getElementById("unpaid-list");
   uEl.innerHTML=!unpaid.length?'<div class="empty-small">✅ 이달 미납 없음</div>':
-    unpaid.map(u=>`<div class="status-row">
+    unpaid.map(u=>`<div class="status-row" onclick="goToUnit('${u.room}')">
       <span class="room-num">${u.room}호</span>
       <span class="tenant-nm">${esc(names(u))}</span>
       <span class="rent-amt">${fmtWon(u.monthlyRent)}</span>
       <span class="badge badge-unpaid">미납</span>
+      <span style="font-size:14px;color:var(--hint)">›</span>
     </div>`).join("");
 
   const vEl=document.getElementById("vacant-list");
   vEl.innerHTML=!vacant.length?'<div class="empty-small">🏠 공실 없음</div>':
-    vacant.map(u=>`<div class="status-row">
+    vacant.map(u=>`<div class="status-row" onclick="goToUnit('${u.room}')">
       <span class="room-num">${u.room}호</span>
       <span class="tenant-nm">${u.floor}층</span>
       <span class="badge badge-vacant">공실</span>
+      <span style="font-size:14px;color:var(--hint)">›</span>
     </div>`).join("");
 
   const today=new Date();today.setHours(0,0,0,0);
@@ -327,11 +331,12 @@ function renderDash(){
 
   const eEl=document.getElementById("expiry-list");
   eEl.innerHTML=!soon.length?'<div class="empty-small">✅ 30일 내 만료 없음</div>':
-    soon.map(u=>`<div class="expiry-row">
+    soon.map(u=>`<div class="expiry-row" onclick="goToUnit('${u.room}')">
       <span class="room-num">${u.room}호</span>
       <span class="tenant-nm">${esc(names(u))}</span>
       <span class="badge badge-warning">${u.contractEnd}</span>
       <span style="font-size:11px;font-weight:700;color:${u.dl<=7?"var(--red)":"var(--amber)"};min-width:40px;text-align:right">${u.dl}일 후</span>
+      <span style="font-size:14px;color:var(--hint)">›</span>
     </div>`).join("");
 }
 
@@ -385,6 +390,7 @@ function showConfirm(title,msg,cb){
 }
 function closeConfirm(){document.getElementById("confirm-modal").classList.remove("show")}
 function names(u){return[u.tenantName,u.tenantName2].filter(Boolean).join(" / ")||"(미입력)"}
+function goToUnit(room){location.href=`units.html?room=${room}`}
 function fmtWon(v){if(!v)return"—";return(v*10000).toLocaleString("ko-KR")+"원"}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 function fmtDt(iso){if(!iso)return"";const d=new Date(iso);return`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`}
