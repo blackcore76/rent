@@ -235,7 +235,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),gProv=new firebase.auth.GoogleAuthProvider();
-let cu=null,uRef=null,nRef=null,uL=null,nL=null,units={},notes={};
+let cu=null,uRef=null,nRef=null,hRef=null,uL=null,nL=null,hL=null,units={},notes={},rentHistory={};
 const ROOMS=[201,202,203,204,205,206,301,302,303,304,305,306,401,402,403,404,405,406];
 
 // ── AUTH STATE ── (탭 이동 시 flash 없음: login-screen은 display:none 시작)
@@ -255,9 +255,11 @@ auth.onAuthStateChanged(user=>{
     document.getElementById("um-email").textContent=user.email||"";
     if(uL&&uRef)uRef.off("value",uL);
     if(nL&&nRef)nRef.off("value",nL);
+    if(hL&&hRef)hRef.off("value",hL);
     uRef=db.ref(`rent_app/${user.uid}/units`);
     nRef=db.ref(`rent_app/${user.uid}/notes`);
-    listenUnits();listenNotes();
+    hRef=db.ref(`rent_app/${user.uid}/rent_history`);
+    listenUnits();listenNotes();listenHistory();
   }else{
     lo.classList.add("hide");
     app.style.display="none";
@@ -266,7 +268,7 @@ auth.onAuthStateChanged(user=>{
 });
 
 function signInGoogle(){auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message))}
-function doSignOut(){closeMenu();if(uL&&uRef)uRef.off("value",uL);if(nL&&nRef)nRef.off("value",nL);auth.signOut()}
+function doSignOut(){closeMenu();if(uL&&uRef)uRef.off("value",uL);if(nL&&nRef)nRef.off("value",nL);if(hL&&hRef)hRef.off("value",hL);auth.signOut()}
 function toggleMenu(){document.getElementById("user-menu").classList.toggle("show")}
 function closeMenu(){document.getElementById("user-menu").classList.remove("show")}
 document.addEventListener("click",e=>{if(!e.target.closest("#av-wrap")&&!e.target.closest("#user-menu"))closeMenu()});
@@ -287,17 +289,27 @@ function listenUnits(){
 function listenNotes(){
   nL=nRef.on("value",snap=>{notes=snap.val()||{};renderNotes()});
 }
+function listenHistory(){
+  hL=hRef.on("value",snap=>{rentHistory=snap.val()||{};renderDash()});
+}
+function computePaidStatus(roomId){
+  const h=rentHistory[String(roomId)]||{};
+  const recs=Object.values(h);
+  if(!recs.length)return null;
+  if(recs.some(r=>!r.paid))return false;
+  return true;
+}
 async function ensureRooms(ex){
   const up={};ROOMS.forEach(r=>{if(!ex[r])up[r]=defRoom(r)});
   if(Object.keys(up).length)await uRef.update(up);
 }
-function defRoom(n){return{room:String(n),floor:Math.floor(n/100),status:"vacant",tenantName:"",tenantName2:"",tenantPhone:"",tenantPhone2:"",depositAmount:0,monthlyRent:0,contractStart:"",contractEnd:"",rentPaid:false,memo:""}}
+function defRoom(n){return{room:String(n),floor:Math.floor(n/100),status:"vacant",tenantName:"",tenantName2:"",tenantPhone:"",tenantPhone2:"",depositAmount:0,monthlyRent:0,contractStart:"",contractEnd:"",memo:""}}
 
 function renderDash(){
   const list=ROOMS.map(r=>units[r]).filter(Boolean);
   const rented=list.filter(u=>u.status==="rented");
   const vacant=list.filter(u=>u.status==="vacant");
-  const unpaid=rented.filter(u=>!u.rentPaid);
+  const unpaid=rented.filter(u=>computePaidStatus(u.room)===false);
   document.getElementById("s-total").textContent=ROOMS.length;
   document.getElementById("s-rented").textContent=rented.length;
   document.getElementById("s-vacant").textContent=vacant.length;
