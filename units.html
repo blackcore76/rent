@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1E2D3D">
+<title>🏠 월세 관리 · 세대</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<style>
+:root{
+  --bg:#F0F4F8;--card:#fff;--border:#E2E8F0;--text:#1E293B;--sub:#64748B;--hint:#94A3B8;
+  --hdr:#1E2D3D;--hdr2:#2A3F55;
+  --green:#059669;--green-lt:#D1FAE5;--green-t:#065F46;
+  --red:#DC2626;--red-lt:#FEE2E2;--red-t:#991B1B;
+  --blue:#0284C7;--blue-lt:#E0F2FE;--blue-t:#0C4A6E;
+  --indigo:#4F46E5;--indigo-lt:#EEF2FF;--indigo-t:#3730A3;
+  --sky:#0EA5E9;--radius:14px;--shadow:0 2px 12px rgba(0,0,0,.08)
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--text);overscroll-behavior:none}
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,var(--hdr),var(--hdr2));box-shadow:0 3px 16px rgba(0,0,0,.25);padding:0 16px}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;height:52px}
+.hdr-title{font-size:18px;font-weight:900;color:#fff;letter-spacing:-.5px}
+.hdr-actions{display:flex;align-items:center;gap:8px;position:relative}
+.av-img{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);cursor:pointer;object-fit:cover}
+.av-txt{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);background:var(--sky);color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.nav{display:flex;border-top:1px solid rgba(255,255,255,.08)}
+.nav-tab{flex:1;padding:9px 2px 11px;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,.4);border-bottom:3px solid transparent;text-decoration:none;transition:all .2s;white-space:nowrap}
+.nav-tab.on{color:#fff;border-bottom-color:var(--sky);font-weight:700}
+.user-menu{position:fixed;top:56px;right:12px;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:16px;min-width:210px;z-index:300;display:none;border:1px solid var(--border)}
+.user-menu.show{display:block}
+.um-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
+.um-email{font-size:12px;color:var(--hint);margin-bottom:12px;word-break:break-all}
+.logout-btn{width:100%;padding:9px;background:var(--red-lt);color:var(--red);border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.content{margin-top:100px;padding:14px;min-height:calc(100vh - 100px)}
+/* FLOOR TABS */
+.floor-tabs{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px}
+.floor-tab{padding:7px 16px;border-radius:20px;border:2px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.floor-tab.on{background:var(--hdr);color:#fff;border-color:var(--hdr)}
+/* ROOM GRID */
+.rooms-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:600px){.rooms-grid{grid-template-columns:repeat(3,1fr)}}
+.room-card{background:var(--card);border-radius:var(--radius);padding:14px 12px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s;border:2px solid transparent}
+.room-card:active{transform:scale(.97)}
+.room-card.status-vacant{border-color:var(--indigo-lt)}
+.room-card.status-rented{border-color:var(--blue-lt)}
+.rc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.rc-num{font-size:18px;font-weight:900;color:var(--hdr)}
+.rc-sbadge{font-size:11px;font-weight:700;padding:3px 7px;border-radius:6px}
+.badge-rented{background:var(--blue-lt);color:var(--blue-t)}
+.badge-vacant{background:var(--red-lt);color:var(--red-t)}
+.badge-paid{background:var(--green-lt);color:var(--green-t)}
+.badge-unpaid{background:var(--red-lt);color:var(--red-t)}
+/* 카드 내 이름/연락처/금액 */
+.rc-names{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-phones{font-size:11px;color:var(--sub);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-rent{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:4px}
+.rc-memo{font-size:11px;color:var(--hint);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-paid{font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;display:inline-block}
+/* BOTTOM SHEET MODAL */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.sheet-bg.show{display:flex}
+.sheet{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 36px;width:100%;max-width:540px;box-shadow:0 -4px 32px rgba(0,0,0,.2);max-height:94vh;overflow-y:auto}
+.sheet-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sheet-hd h3{font-size:17px;font-weight:900;color:var(--hdr)}
+.sheet-close{width:32px;height:32px;border:none;background:#F3F4F6;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+/* TOGGLE */
+.tg-label{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;margin-top:14px}
+.toggle-group{display:flex;border:2px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:2px}
+.tg-btn{flex:1;padding:10px 8px;border:none;background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--sub);transition:all .15s}
+.tg-btn.on-blue{background:var(--blue);color:#fff}
+.tg-btn.on-gray{background:var(--indigo);color:#fff}
+.tg-btn.on-green{background:var(--green);color:#fff}
+.tg-btn.on-red{background:var(--red);color:#fff}
+.divider{height:1px;background:var(--border);margin:16px 0}
+/* FIELDS */
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.field label{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px}
+.field input,.field textarea,.field select{border:2px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;outline:none;color:var(--text);background:#FAFCFF;width:100%;transition:border-color .2s}
+.field input:focus,.field textarea:focus{border-color:var(--sky);background:#fff}
+.field textarea{resize:none}
+.section-label{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:14px;display:flex;align-items:center;gap:4px}
+.btn-save{width:100%;padding:15px;background:var(--hdr);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px}
+.btn-save:active{opacity:.85}
+/* PHOTOS */
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+/* RENT HISTORY */
+.rent-hist-wrap{margin-bottom:4px}
+.rent-hist-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:6px}
+.rh-cell{border-radius:8px;padding:6px 2px;text-align:center;cursor:default}
+.rh-month{font-size:9px;font-weight:700;color:inherit;opacity:.7;margin-bottom:3px}
+.rh-icon{font-size:13px;line-height:1}
+.rh-paid{background:var(--green-lt);color:var(--green-t)}
+.rh-unpaid{background:var(--red-lt);color:var(--red-t)}
+.rh-none{background:#F1F5F9;color:var(--hint)}
+.rh-legend{display:flex;gap:10px;font-size:10px;color:var(--hint);margin-top:2px}
+/* D-DAY BADGE */
+.rc-dday{font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;display:inline-block;margin-bottom:4px}
+.dday-safe{background:#D1FAE5;color:#065F46}
+.dday-warn{background:#FEF3C7;color:#92400E}
+.dday-danger{background:#FEE2E2;color:#991B1B}
+.dday-expired{background:#F1F5F9;color:#64748B}
+/* FILTER BANNER */
+.filter-banner{display:flex;align-items:center;justify-content:space-between;
+  background:var(--hdr);color:#fff;border-radius:10px;padding:10px 14px;
+  margin-bottom:12px;font-size:13px;font-weight:600}
+.filter-clear{background:rgba(255,255,255,.2);border:none;color:#fff;
+  border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;
+  cursor:pointer;font-family:inherit}
+.ph-thumb{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#F0F4F8}
+.ph-thumb img{width:100%;height:100%;object-fit:cover;cursor:pointer}
+.ph-del{position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.upload-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px;border:2px dashed var(--border);border-radius:10px;background:#FAFCFF;color:var(--sub);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.upload-btn:hover{border-color:var(--sky);color:var(--sky)}
+.upload-btn:disabled{opacity:.5;cursor:not-allowed}
+.prog-bar{height:4px;border-radius:2px;background:#E2E8F0;margin-top:8px;overflow:hidden;display:none}
+.prog-fill{height:100%;background:var(--sky);transition:width .3s;width:0%}
+/* PHOTO VIEWER */
+#pv{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:900;display:none;align-items:center;justify-content:center}
+#pv.show{display:flex}
+#pv img{max-width:95%;max-height:90vh;border-radius:8px;object-fit:contain}
+#pv-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+/* CONFIRM MODAL */
+.confirm-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
+.confirm-bg.show{display:flex}
+.confirm-box{background:#fff;border-radius:20px;padding:24px;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.confirm-box h3{font-size:15px;font-weight:700;color:var(--hdr);margin-bottom:10px}
+.confirm-box p{font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.6}
+.confirm-btns{display:flex;gap:10px;justify-content:flex-end}
+.confirm-btns button{padding:9px 18px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+/* TOAST/LOAD/LOGIN */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1F2937;color:#fff;padding:11px 20px;border-radius:24px;font-size:14px;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.3);pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0)}
+#loading-overlay{position:fixed;inset:0;background:rgba(30,45,61,.9);z-index:8000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .3s}
+#loading-overlay.hide{opacity:0;pointer-events:none}
+.spinner{width:44px;height:44px;border:5px solid rgba(255,255,255,.2);border-top-color:#38BDF8;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{color:#fff;font-size:13px;font-weight:600}
+#login-screen{position:fixed;inset:0;background:linear-gradient(160deg,#0F1C2D,#1E2D3D 50%,#2A3F55);z-index:7000;display:none;align-items:center;justify-content:center;padding:20px}
+.login-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:36px 28px;max-width:320px;width:100%;text-align:center;backdrop-filter:blur(16px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.login-logo{font-size:52px;margin-bottom:14px}
+.login-title{font-size:22px;font-weight:900;color:#fff;margin-bottom:6px;letter-spacing:-.5px}
+.login-sub{font-size:12px;color:rgba(255,255,255,.45);margin-bottom:28px;line-height:1.7}
+.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 20px;background:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;color:#1F2937;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .15s}
+.google-btn:active{transform:scale(.97)}
+.g-icon{width:18px;height:18px;flex-shrink:0}
+.login-footer{font-size:10px;color:rgba(255,255,255,.25);margin-top:18px;line-height:1.7}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🏠</div>
+    <div class="login-title">월세 관리</div>
+    <div class="login-sub">임대 현황을 한눈에 관리하세요<br>Google 계정으로 안전하게 로그인</div>
+    <button class="google-btn" onclick="signInGoogle()">
+      <svg class="g-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Google로 로그인
+    </button>
+    <div class="login-footer">데이터는 본인 Google 계정에만 저장됩니다</div>
+  </div>
+</div>
+
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-txt">세대 정보 로딩 중...</div>
+</div>
+
+<div id="app" style="display:none">
+  <div class="hdr">
+    <div class="hdr-top">
+      <div class="hdr-title">🏠 세대 관리</div>
+      <div class="hdr-actions"><div id="av-wrap" onclick="toggleMenu()" style="display:none"></div></div>
+    </div>
+    <div class="nav">
+      <a href="index.html" class="nav-tab">📊 메인</a>
+      <a href="units.html" class="nav-tab on">🏠 세대</a>
+      <a href="expense.html" class="nav-tab">💸 지출</a>
+      <a href="admin.html" class="nav-tab">🗂 관리</a>
+    </div>
+  </div>
+  <div id="user-menu" class="user-menu">
+    <div class="um-name" id="um-name">—</div>
+    <div class="um-email" id="um-email">—</div>
+    <button class="logout-btn" onclick="doSignOut()">🚪 로그아웃</button>
+  </div>
+  <div class="content">
+    <div class="floor-tabs">
+      <button class="floor-tab on" onclick="setFloor(0,this)">전체</button>
+      <button class="floor-tab" onclick="setFloor(2,this)">2층</button>
+      <button class="floor-tab" onclick="setFloor(3,this)">3층</button>
+      <button class="floor-tab" onclick="setFloor(4,this)">4층</button>
+    </div>
+    <div id="filter-banner" style="display:none" class="filter-banner">
+      <span id="filter-banner-txt"></span>
+      <button class="filter-clear" onclick="clearFilter()">✕ 필터 해제</button>
+    </div>
+    <div class="rooms-grid" id="rooms-grid"></div>
+  </div>
+</div>
+
+<!-- ROOM SHEET -->
+<div class="sheet-bg" id="room-sheet">
+  <div class="sheet">
+    <div class="sheet-hd">
+      <h3 id="sheet-title">— 호</h3>
+      <button class="sheet-close" onclick="closeSheet()">✕</button>
+    </div>
+    <input type="hidden" id="m-room">
+
+    <div class="tg-label">임대 상태</div>
+    <div class="toggle-group">
+      <button class="tg-btn on-blue" id="tg-rented" onclick="setStatus('rented')">🏠 임대중</button>
+      <button class="tg-btn" id="tg-vacant" onclick="setStatus('vacant')">🔓 공실</button>
+    </div>
+
+    <div class="tg-label">이달 납부</div>
+    <div class="toggle-group" id="paid-group">
+      <button class="tg-btn on-green" id="tg-paid" onclick="setPaid(true)">✅ 완납</button>
+      <button class="tg-btn" id="tg-unpaid" onclick="setPaid(false)">❌ 미납</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-label">👤 임차인 ①</div>
+    <div class="field-row">
+      <div class="field"><label>이름</label><input type="text" id="m-name" placeholder="홍길동"></div>
+      <div class="field"><label>연락처</label><input type="tel" id="m-phone" placeholder="010-0000-0000"></div>
+    </div>
+
+    <div class="section-label">👤 임차인 ②</div>
+    <div class="field-row">
+      <div class="field"><label>이름</label><input type="text" id="m-name2" placeholder="홍길순 (선택)"></div>
+      <div class="field"><label>연락처</label><input type="tel" id="m-phone2" placeholder="010-0000-0000 (선택)"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-label">💰 계약 정보</div>
+    <div class="field-row">
+      <div class="field"><label>보증금 (만원)</label><input type="number" id="m-deposit" placeholder="0"></div>
+      <div class="field"><label>월세 (만원)</label><input type="number" id="m-rent" placeholder="0"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>계약 시작일</label><input type="date" id="m-start"></div>
+      <div class="field"><label>계약 종료일</label><input type="date" id="m-end"></div>
+    </div>
+    <div class="field"><label>특이사항 메모</label><textarea id="m-memo" rows="2" placeholder="수리 요청, 계약 관련 특이사항 등..."></textarea></div>
+
+    <div class="divider"></div>
+
+    <div class="section-label">📅 월세 납부 이력 <span style="font-size:10px;font-weight:400;color:var(--hint);margin-left:4px">최근 12개월</span></div>
+    <div class="rent-hist-wrap">
+      <div class="rent-hist-grid" id="rent-hist-grid"></div>
+      <div class="rh-legend">
+        <span>✅ 완납</span>
+        <span>❌ 미납</span>
+        <span style="opacity:.5">— 기록없음</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-label">📷 계약서 사진</div>
+    <div class="photo-grid" id="photo-grid"></div>
+    <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="onPhotos(event)">
+    <button class="upload-btn" id="upload-btn" onclick="document.getElementById('photo-input').click()">
+      📷 사진 추가 (계약서, 신분증 등)
+    </button>
+    <div class="prog-bar" id="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+
+    <div class="divider"></div>
+    <button class="btn-save" onclick="saveRoom()">💾 저장하기</button>
+  </div>
+</div>
+
+<!-- PHOTO VIEWER -->
+<div id="pv"><button id="pv-close" onclick="closePV()">✕</button><img id="pv-img" src="" alt=""></div>
+
+<!-- CONFIRM -->
+<div class="confirm-bg" id="confirm-modal">
+  <div class="confirm-box">
+    <h3 id="cm-title">확인</h3>
+    <p id="cm-msg"></p>
+    <div class="confirm-btns">
+      <button style="background:#F3F4F6;color:var(--sub)" onclick="closeCM()">취소</button>
+      <button style="background:var(--red-lt);color:var(--red)" id="cm-ok">삭제</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
+firebase.initializeApp(FC);
+const db=firebase.database(),auth=firebase.auth(),storage=firebase.storage(),gProv=new firebase.auth.GoogleAuthProvider();
+let cu=null,uRef=null,hRef=null,uL=null,hL=null,units={},rentHistory={},curFloor=0,curRoom=null,mStatus="vacant",mPaid=true,curFilter="";
+const ROOMS=[201,202,203,204,205,206,301,302,303,304,305,306,401,402,403,404,405,406];
+
+auth.onAuthStateChanged(user=>{
+  const lo=document.getElementById("loading-overlay");
+  const ls=document.getElementById("login-screen");
+  const app=document.getElementById("app");
+  if(user){
+    cu=user;lo.classList.add("hide");ls.style.display="none";app.style.display="block";
+    const w=document.getElementById("av-wrap");
+    w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"U")[0]}</div>`;
+    w.style.display="block";
+    document.getElementById("um-name").textContent=user.displayName||"사용자";
+    document.getElementById("um-email").textContent=user.email||"";
+    if(uL&&uRef)uRef.off("value",uL);
+    if(hL&&hRef)hRef.off("value",hL);
+    uRef=db.ref(`rent_app/${user.uid}/units`);
+    hRef=db.ref(`rent_app/${user.uid}/rent_history`);
+    listenUnits();listenHistory();
+  }else{
+    cu=null;lo.classList.add("hide");app.style.display="none";ls.style.display="flex";
+    if(uL&&uRef)uRef.off("value",uL);
+    if(hL&&hRef)hRef.off("value",hL);
+  }
+});
+function signInGoogle(){auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message))}
+function doSignOut(){closeMenu();if(uL&&uRef)uRef.off("value",uL);auth.signOut()}
+function toggleMenu(){document.getElementById("user-menu").classList.toggle("show")}
+function closeMenu(){document.getElementById("user-menu").classList.remove("show")}
+document.addEventListener("click",e=>{if(!e.target.closest("#av-wrap")&&!e.target.closest("#user-menu"))closeMenu()});
+
+function listenUnits(){
+  uL=uRef.on("value",snap=>{
+    const val=snap.val()||{};ensureRooms(val);units=val;renderGrid();checkURLParam();
+  },()=>showToast("❗ 연결 오류"));
+}
+function listenHistory(){
+  hL=hRef.on("value",snap=>{rentHistory=snap.val()||{}},()=>{});
+}
+
+// 납부 이력 헬퍼
+function curYM(){
+  const n=new Date();
+  return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`;
+}
+function getLastNMonths(n){
+  const res=[];const now=new Date();
+  for(let i=n-1;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    res.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`);
+  }
+  return res;
+}
+function renderHistory(roomId){
+  const months=getLastNMonths(12);
+  const roomH=rentHistory[roomId]||{};
+  const el=document.getElementById("rent-hist-grid");
+  if(!el)return;
+  el.innerHTML=months.map(ym=>{
+    const rec=roomH[ym];
+    const cls=rec?(rec.paid?"rh-paid":"rh-unpaid"):"rh-none";
+    const icon=rec?(rec.paid?"✅":"❌"):"—";
+    const mLabel=ym.split("-")[1]+"월";
+    return`<div class="rh-cell ${cls}" title="${ym}${rec&&rec.amount?" · "+rec.amount.toLocaleString()+"원":""}">
+      <div class="rh-month">${mLabel}</div>
+      <div class="rh-icon">${icon}</div>
+    </div>`;
+  }).join("");
+}
+async function ensureRooms(ex){
+  const up={};ROOMS.forEach(r=>{if(!ex[r])up[r]=defRoom(r)});
+  if(Object.keys(up).length)await uRef.update(up);
+}
+function defRoom(n){return{room:String(n),floor:Math.floor(n/100),status:"vacant",tenantName:"",tenantName2:"",tenantPhone:"",tenantPhone2:"",depositAmount:0,monthlyRent:0,contractStart:"",contractEnd:"",rentPaid:false,memo:""}}
+
+function setFloor(f,btn){
+  curFloor=f;
+  document.querySelectorAll(".floor-tab").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on");renderGrid();
+}
+
+function renderGrid(){
+  let list=ROOMS.map(r=>units[r]).filter(u=>u&&(curFloor===0||u.floor===curFloor));
+  // 상태 필터 적용
+  if(curFilter==="rented")   list=list.filter(u=>u.status==="rented");
+  else if(curFilter==="vacant") list=list.filter(u=>u.status==="vacant");
+  else if(curFilter==="unpaid") list=list.filter(u=>u.status==="rented"&&!u.rentPaid);
+  const el=document.getElementById("rooms-grid");
+  el.innerHTML=list.map(u=>{
+    const isR=u.status==="rented";
+    const namesTxt=[u.tenantName,u.tenantName2].filter(Boolean).join(" / ")||"공실";
+    const phonesTxt=[u.tenantPhone,u.tenantPhone2].filter(Boolean).join(" / ");
+    const memoTxt=u.memo?truncate(u.memo,22):"";
+    const sBadge=`<span class="rc-sbadge ${isR?"badge-rented":"badge-vacant"}">${isR?"임대중":"공실"}</span>`;
+    const rentTxt=isR&&u.monthlyRent?fmtWon(u.monthlyRent)+"/월":"—";
+    const pBadge=isR?`<span class="rc-paid ${u.rentPaid?"badge-paid":"badge-unpaid"}">${u.rentPaid?"✅ 완납":"❌ 미납"}</span>`:"";
+    // D-day 계산
+    let ddayHtml="";
+    if(isR&&u.contractEnd){
+      const today=new Date();today.setHours(0,0,0,0);
+      const end=new Date(u.contractEnd);end.setHours(0,0,0,0);
+      const diff=Math.ceil((end-today)/864e5);
+      if(diff<0){
+        ddayHtml=`<span class="rc-dday dday-expired">만료 ${Math.abs(diff)}일 초과</span>`;
+      }else if(diff<=7){
+        ddayHtml=`<span class="rc-dday dday-danger">D-${diff}</span>`;
+      }else if(diff<=30){
+        ddayHtml=`<span class="rc-dday dday-warn">D-${diff}</span>`;
+      }else{
+        ddayHtml=`<span class="rc-dday dday-safe">D-${diff}</span>`;
+      }
+    }
+    return`<div class="room-card status-${u.status}" onclick="openSheet('${u.room}')">
+      <div class="rc-top"><span class="rc-num">${u.room}호</span>${sBadge}</div>
+      <div class="rc-names">${esc(namesTxt)}</div>
+      ${phonesTxt?`<div class="rc-phones">📞 ${esc(phonesTxt)}</div>`:""}
+      <div class="rc-rent">${rentTxt}</div>
+      ${memoTxt?`<div class="rc-memo">💬 ${esc(memoTxt)}</div>`:""}
+      ${ddayHtml}
+      ${pBadge}
+    </div>`;
+  }).join("");
+}
+
+function openSheet(roomId){
+  const u=units[roomId];if(!u)return;
+  curRoom=roomId;
+  document.getElementById("sheet-title").textContent=`${roomId}호`;
+  document.getElementById("m-room").value=roomId;
+  mStatus=u.status||"vacant";
+  mPaid=u.rentPaid!==false;
+  document.getElementById("m-name").value=u.tenantName||"";
+  document.getElementById("m-phone").value=u.tenantPhone||"";
+  document.getElementById("m-name2").value=u.tenantName2||"";
+  document.getElementById("m-phone2").value=u.tenantPhone2||"";
+  document.getElementById("m-deposit").value=u.depositAmount||"";
+  document.getElementById("m-rent").value=u.monthlyRent||"";
+  document.getElementById("m-start").value=u.contractStart||"";
+  document.getElementById("m-end").value=u.contractEnd||"";
+  document.getElementById("m-memo").value=u.memo||"";
+  updateTgUI();renderPhotos(u.photos||{});renderHistory(roomId);
+  document.getElementById("room-sheet").classList.add("show");
+}
+function closeSheet(){document.getElementById("room-sheet").classList.remove("show");curRoom=null}
+
+function setStatus(s){mStatus=s;updateTgUI()}
+function setPaid(v){mPaid=v;updateTgUI()}
+function updateTgUI(){
+  document.getElementById("tg-rented").className="tg-btn"+(mStatus==="rented"?" on-blue":"");
+  document.getElementById("tg-vacant").className="tg-btn"+(mStatus==="vacant"?" on-gray":"");
+  const pg=document.getElementById("paid-group");
+  pg.style.opacity=mStatus==="rented"?"1":"0.4";
+  pg.style.pointerEvents=mStatus==="rented"?"":"none";
+  document.getElementById("tg-paid").className="tg-btn"+(mPaid?" on-green":"");
+  document.getElementById("tg-unpaid").className="tg-btn"+(!mPaid?" on-red":"");
+}
+
+function saveRoom(){
+  if(!curRoom)return;
+  const data={
+    room:curRoom,floor:Math.floor(parseInt(curRoom)/100),
+    status:mStatus,rentPaid:mStatus==="rented"?mPaid:false,
+    tenantName:document.getElementById("m-name").value.trim(),
+    tenantName2:document.getElementById("m-name2").value.trim(),
+    tenantPhone:document.getElementById("m-phone").value.trim(),
+    tenantPhone2:document.getElementById("m-phone2").value.trim(),
+    depositAmount:parseInt(document.getElementById("m-deposit").value)||0,
+    monthlyRent:parseInt(document.getElementById("m-rent").value)||0,
+    contractStart:document.getElementById("m-start").value,
+    contractEnd:document.getElementById("m-end").value,
+    memo:document.getElementById("m-memo").value.trim()
+  };
+  const ex=units[curRoom]||{};
+  if(ex.photos)data.photos=ex.photos;
+  uRef.child(curRoom).update(data)
+    .then(()=>{
+      // 임대중인 경우 이번 달 납부 이력 자동 기록
+      if(data.status==="rented"&&hRef){
+        const ym=curYM();
+        hRef.child(`${curRoom}/${ym}`).set({
+          room:curRoom,yearMonth:ym,paid:data.rentPaid,
+          amount:data.monthlyRent*10000,updatedAt:new Date().toISOString()
+        });
+      }
+      closeSheet();showToast("✅ 저장됨");renderGrid();
+    })
+    .catch(()=>showToast("❗ 저장 실패"));
+}
+
+// Photos
+function renderPhotos(photos){
+  const list=Object.values(photos||{}).sort((a,b)=>a.id-b.id);
+  document.getElementById("photo-grid").innerHTML=list.map(p=>`
+    <div class="ph-thumb">
+      <img src="${p.url}" onclick="openPV('${p.url}')" loading="lazy">
+      <button class="ph-del" onclick="delPhoto('${p.id}','${esc(p.storagePath)}')">✕</button>
+    </div>`).join("");
+}
+async function onPhotos(e){
+  const files=Array.from(e.target.files);
+  if(!files.length||!curRoom||!cu)return;
+  const btn=document.getElementById("upload-btn");
+  const bar=document.getElementById("prog-bar");
+  const fill=document.getElementById("prog-fill");
+  btn.disabled=true;bar.style.display="block";
+  for(let i=0;i<files.length;i++){
+    const file=files[i];
+    if(!file.type.startsWith("image/")){showToast("❗ 이미지만 가능");continue}
+    if(file.size>10*1024*1024){showToast("❗ 10MB 이하만 가능");continue}
+    const ts=Date.now();
+    const path=`rent_app/${cu.uid}/contracts/${curRoom}/${ts}_${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
+    try{
+      const ref=storage.ref(path);
+      const task=ref.put(file);
+      await new Promise((res,rej)=>task.on("state_changed",s=>{fill.style.width=`${Math.round(s.bytesTransferred/s.totalBytes*100)}%`},rej,res));
+      const url=await ref.getDownloadURL();
+      const pid=String(ts+(i*10));
+      await db.ref(`rent_app/${cu.uid}/units/${curRoom}/photos/${pid}`).set({id:pid,url,storagePath:path,uploadedAt:new Date().toISOString()});
+      if(!units[curRoom].photos)units[curRoom].photos={};
+      units[curRoom].photos[pid]={id:pid,url,storagePath:path};
+      renderPhotos(units[curRoom].photos);
+      showToast("✅ 업로드 완료");
+    }catch(err){showToast("❗ 업로드 실패: "+err.message)}
+  }
+  btn.disabled=false;bar.style.display="none";fill.style.width="0%";e.target.value="";
+}
+function delPhoto(pid,spath){
+  showCM("사진 삭제","이 사진을 삭제하시겠습니까?",async()=>{
+    try{
+      if(spath)await storage.ref(spath).delete().catch(()=>{});
+      await db.ref(`rent_app/${cu.uid}/units/${curRoom}/photos/${pid}`).remove();
+      if(units[curRoom]&&units[curRoom].photos)delete units[curRoom].photos[pid];
+      renderPhotos(units[curRoom]&&units[curRoom].photos||{});
+      showToast("🗑 삭제됨");
+    }catch(e){showToast("❗ 삭제 실패")}
+  });
+}
+function openPV(url){document.getElementById("pv-img").src=url;document.getElementById("pv").classList.add("show")}
+function closePV(){document.getElementById("pv").classList.remove("show");document.getElementById("pv-img").src=""}
+function showCM(title,msg,cb){
+  document.getElementById("cm-title").textContent=title;
+  document.getElementById("cm-msg").textContent=msg;
+  document.getElementById("cm-ok").onclick=()=>{cb();closeCM()};
+  document.getElementById("confirm-modal").classList.add("show");
+}
+function closeCM(){document.getElementById("confirm-modal").classList.remove("show")}
+function fmtWon(v){if(!v)return"—";return(v*10000).toLocaleString("ko-KR")+"원"}
+function truncate(s,n){return s&&s.length>n?s.slice(0,n)+"…":s||""}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+let tTm;function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
+
+// URL 파라미터로 특정 호실 자동 오픈 / 필터 적용 (메인에서 클릭해서 온 경우)
+let _urlChecked=false;
+function checkURLParam(){
+  if(_urlChecked)return;_urlChecked=true;
+  const params=new URLSearchParams(location.search);
+  const room=params.get("room");
+  const filter=params.get("filter");
+  if(filter){
+    curFilter=filter;
+    const labels={rented:"임대중만 보기",vacant:"공실만 보기",unpaid:"미납 세대만 보기"};
+    const banner=document.getElementById("filter-banner");
+    document.getElementById("filter-banner-txt").textContent="🔍 "+( labels[filter]||filter);
+    banner.style.display="flex";
+    renderGrid();
+  }
+  if(room&&units[room])openSheet(room);
+}
+function clearFilter(){
+  curFilter="";
+  document.getElementById("filter-banner").style.display="none";
+  history.replaceState({},"",location.pathname);
+  renderGrid();
+}
+</script>
+</body>
+</html>
