@@ -94,13 +94,16 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 /* RENT HISTORY */
 .rent-hist-wrap{margin-bottom:4px}
 .rent-hist-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:6px}
-.rh-cell{border-radius:8px;padding:6px 2px;text-align:center;cursor:default}
+.rh-cell{border-radius:8px;padding:6px 2px;text-align:center;cursor:pointer;
+  transition:transform .1s,opacity .1s;user-select:none;-webkit-user-select:none}
+.rh-cell:active{transform:scale(.92);opacity:.75}
 .rh-month{font-size:9px;font-weight:700;color:inherit;opacity:.7;margin-bottom:3px}
 .rh-icon{font-size:13px;line-height:1}
 .rh-paid{background:var(--green-lt);color:var(--green-t)}
 .rh-unpaid{background:var(--red-lt);color:var(--red-t)}
 .rh-none{background:#F1F5F9;color:var(--hint)}
-.rh-legend{display:flex;gap:10px;font-size:10px;color:var(--hint);margin-top:2px}
+.rh-legend{display:flex;gap:10px;font-size:10px;color:var(--hint);margin-top:2px;flex-wrap:wrap}
+.rh-tip{font-size:10px;color:var(--sky);margin-top:4px;text-align:center;font-weight:600}
 /* D-DAY BADGE */
 .rc-dday{font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;display:inline-block;margin-bottom:4px}
 .dday-safe{background:#D1FAE5;color:#065F46}
@@ -265,6 +268,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
         <span>❌ 미납</span>
         <span style="opacity:.5">— 기록없음</span>
       </div>
+      <div class="rh-tip">👆 셀을 탭하면 완납 → 미납 → 삭제 순으로 변경됩니다</div>
     </div>
 
     <div class="divider"></div>
@@ -366,11 +370,50 @@ function renderHistory(roomId){
     const cls=rec?(rec.paid?"rh-paid":"rh-unpaid"):"rh-none";
     const icon=rec?(rec.paid?"✅":"❌"):"—";
     const mLabel=ym.split("-")[1]+"월";
-    return`<div class="rh-cell ${cls}" title="${ym}${rec&&rec.amount?" · "+rec.amount.toLocaleString()+"원":""}">
+    const amtTitle=rec&&rec.amount?" · "+rec.amount.toLocaleString()+"원":"";
+    return`<div class="rh-cell ${cls}" onclick="toggleHistory('${roomId}','${ym}')" title="${ym}${amtTitle}">
       <div class="rh-month">${mLabel}</div>
       <div class="rh-icon">${icon}</div>
     </div>`;
   }).join("");
+}
+
+function toggleHistory(roomId,ym){
+  if(!hRef||!cu)return;
+  const roomH=rentHistory[roomId]||{};
+  const rec=roomH[ym];
+  const u=units[roomId];
+  const rentAmt=(u&&u.monthlyRent?u.monthlyRent:0)*10000;
+
+  let nextData=null;
+  if(!rec){
+    // 기록없음 → 완납
+    nextData={room:roomId,yearMonth:ym,paid:true,amount:rentAmt,updatedAt:new Date().toISOString()};
+  }else if(rec.paid){
+    // 완납 → 미납
+    nextData={room:roomId,yearMonth:ym,paid:false,amount:rentAmt,updatedAt:new Date().toISOString()};
+  }else{
+    // 미납 → 기록 삭제
+    nextData=null;
+  }
+
+  const ref=hRef.child(`${roomId}/${ym}`);
+  const op=nextData?ref.set(nextData):ref.remove();
+  op.then(()=>{
+    // 로컬 즉시 반영
+    if(!rentHistory[roomId])rentHistory[roomId]={};
+    if(nextData)rentHistory[roomId][ym]=nextData;
+    else delete rentHistory[roomId][ym];
+    renderHistory(roomId);
+
+    // 이번 달이면 세대 카드 완납/미납도 동기화
+    if(ym===curYM()&&uRef&&nextData!==null){
+      uRef.child(`${roomId}/rentPaid`).set(nextData.paid);
+    }
+
+    const statusMsg=nextData===null?"🗑 기록 삭제됨":nextData.paid?"✅ 완납 기록됨":"❌ 미납 기록됨";
+    showToast(statusMsg);
+  }).catch(()=>showToast("❗ 저장 실패"));
 }
 async function ensureRooms(ex){
   const up={};ROOMS.forEach(r=>{if(!ex[r])up[r]=defRoom(r)});
