@@ -332,16 +332,42 @@ function toggleMenu(){document.getElementById("user-menu").classList.toggle("sho
 function closeMenu(){document.getElementById("user-menu").classList.remove("show")}
 document.addEventListener("click",e=>{if(!e.target.closest("#av-wrap")&&!e.target.closest("#user-menu"))closeMenu()});
 
+let _unitsReady=false,_historyReady=false;
+
 function listenUnits(){
   uL=uRef.on("value",snap=>{
-    const val=snap.val()||{};ensureRooms(val);units=val;renderGrid();checkURLParam();
+    const val=snap.val()||{};ensureRooms(val);units=val;
+    _unitsReady=true;
+    renderGrid();
+    tryOpenURLParam(); // 둘 다 준비됐으면 모달 열기
   },()=>showToast("❗ 연결 오류"));
 }
 function listenHistory(){
   hL=hRef.on("value",snap=>{
     rentHistory=snap.val()||{};
+    _historyReady=true;
     renderGrid(); // 이력 로드 완료 후 카드 다시 그리기
+    tryOpenURLParam(); // 둘 다 준비됐으면 모달 열기
   },()=>{});
+}
+
+// units + history 둘 다 로드 완료 후 1회만 URL 파라미터 처리
+let _urlOpened=false;
+function tryOpenURLParam(){
+  if(_urlOpened||!_unitsReady||!_historyReady)return;
+  _urlOpened=true;
+  const params=new URLSearchParams(location.search);
+  const room=params.get("room");
+  const filter=params.get("filter");
+  if(filter){
+    curFilter=filter;
+    const labels={rented:"임대중만 보기",vacant:"공실만 보기",unpaid:"미납 세대만 보기"};
+    const banner=document.getElementById("filter-banner");
+    document.getElementById("filter-banner-txt").textContent="🔍 "+(labels[filter]||filter);
+    banner.style.display="flex";
+    renderGrid();
+  }
+  if(room&&units[room])openSheet(room);
 }
 
 // 납부 이력 헬퍼
@@ -581,23 +607,6 @@ function truncate(s,n){return s&&s.length>n?s.slice(0,n)+"…":s||""}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 let tTm;function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
 
-// URL 파라미터로 특정 호실 자동 오픈 / 필터 적용 (메인에서 클릭해서 온 경우)
-let _urlChecked=false;
-function checkURLParam(){
-  if(_urlChecked)return;_urlChecked=true;
-  const params=new URLSearchParams(location.search);
-  const room=params.get("room");
-  const filter=params.get("filter");
-  if(filter){
-    curFilter=filter;
-    const labels={rented:"임대중만 보기",vacant:"공실만 보기",unpaid:"미납 세대만 보기"};
-    const banner=document.getElementById("filter-banner");
-    document.getElementById("filter-banner-txt").textContent="🔍 "+( labels[filter]||filter);
-    banner.style.display="flex";
-    renderGrid();
-  }
-  if(room&&units[room])openSheet(room);
-}
 function clearFilter(){
   curFilter="";
   document.getElementById("filter-banner").style.display="none";
