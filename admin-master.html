@@ -1,59 +1,320 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전체 관리자 모드</title>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-    <style>
-        body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 500px; margin: auto; }
-        h2 { margin-top: 0; color: #1e2d3d; }
-        .input-group { margin-bottom: 20px; }
-        label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #64748b; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-        .btn { width: 100%; padding: 12px; background: #1e2d3d; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn:active { background: #334155; }
-        .info { font-size: 12px; color: #94a3b8; margin-top: 10px; line-height: 1.5; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0F1C2D">
+<title>🔧 마스터 관리자</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+:root{
+  --bg:#0F1C2D;--card:#1A2B3C;--border:rgba(255,255,255,.08);
+  --text:#F0F6FF;--sub:#94A3B8;--hint:#64748B;
+  --sky:#0EA5E9;--gold:#F59E0B;--green:#10B981;--red:#EF4444;
+  --radius:14px;--shadow:0 4px 20px rgba(0,0,0,.4)
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--text);overscroll-behavior:none}
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,#0A1628,#1A2B3C);border-bottom:1px solid rgba(245,158,11,.2);box-shadow:0 3px 20px rgba(0,0,0,.5);padding:0 16px}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;height:56px}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.back-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.hdr-title{font-size:17px;font-weight:900;color:var(--gold)}
+.hdr-badge{font-size:10px;font-weight:700;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:var(--gold);padding:3px 8px;border-radius:6px}
+.av-img{width:32px;height:32px;border-radius:50%;border:2px solid rgba(245,158,11,.4);object-fit:cover}
+.av-txt{width:32px;height:32px;border-radius:50%;background:var(--sky);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid rgba(245,158,11,.4)}
+.content{margin-top:56px;padding:16px;min-height:calc(100vh - 56px)}
+
+/* 열람 배너 */
+.viewing-banner{background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.25);border-radius:12px;padding:13px 14px;margin-bottom:14px;display:none}
+.vb-label{font-size:10px;font-weight:700;color:var(--sky);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.vb-name{font-size:15px;font-weight:700;color:var(--text)}
+.vb-uid{font-size:10px;color:var(--hint);margin-top:3px;word-break:break-all;font-family:monospace;background:rgba(0,0,0,.2);padding:4px 7px;border-radius:5px;display:inline-block;margin-top:6px}
+.vb-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.vb-btn{flex:1;min-width:80px;padding:9px 6px;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-sky{background:var(--sky);color:#fff}
+.btn-grn{background:var(--green);color:#fff}
+.btn-ghost{background:rgba(255,255,255,.06);color:var(--sub);border:1px solid var(--border)}
+
+/* 등록 카드 */
+.add-card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:14px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.sec-title{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.field label{font-size:11px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.5px}
+.field input{border:1.5px solid var(--border);border-radius:10px;padding:11px 13px;font-size:14px;font-family:inherit;outline:none;color:var(--text);background:rgba(255,255,255,.04);width:100%;transition:border-color .2s}
+.field input:focus{border-color:var(--sky)}
+.field input::placeholder{color:var(--hint)}
+.btn-add{width:100%;padding:13px;background:linear-gradient(135deg,var(--gold),#D97706);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-add:active{opacity:.85}
+
+/* 목록 */
+.users-list{display:flex;flex-direction:column;gap:10px}
+.user-card{background:var(--card);border-radius:var(--radius);padding:14px;border:1.5px solid var(--border);box-shadow:var(--shadow)}
+.user-card.active{border-color:var(--sky);background:rgba(14,165,233,.05)}
+.uc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.uc-name{font-size:15px;font-weight:700;color:var(--text)}
+.uc-num{font-size:11px;font-weight:700;background:rgba(255,255,255,.07);color:var(--sub);padding:2px 8px;border-radius:5px}
+.uc-desc{font-size:12px;color:var(--sub);margin-bottom:6px}
+.uc-uid{font-size:10px;color:var(--hint);word-break:break-all;background:rgba(0,0,0,.25);border-radius:6px;padding:5px 8px;font-family:monospace;margin-bottom:10px}
+.uc-actions{display:flex;gap:6px;flex-wrap:wrap}
+.uc-btn{flex:1;min-width:56px;padding:9px 4px;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.uc-btn:active{opacity:.7}
+.btn-sel{background:var(--sky);color:#fff}
+.btn-units{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.25)}
+.btn-main{background:rgba(14,165,233,.1);color:var(--sky);border:1px solid rgba(14,165,233,.25)}
+.btn-del{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+
+/* 빈 상태 */
+.empty-state{text-align:center;padding:48px 16px;color:var(--hint)}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-txt{font-size:14px;line-height:1.8}
+
+/* CONFIRM */
+.confirm-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
+.confirm-bg.show{display:flex}
+.confirm-box{background:#1A2B3C;border:1px solid var(--border);border-radius:20px;padding:24px;max-width:320px;width:100%;box-shadow:0 12px 48px rgba(0,0,0,.5)}
+.confirm-box h3{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px}
+.confirm-box p{font-size:13px;color:var(--sub);margin-bottom:18px;line-height:1.6;white-space:pre-line}
+.confirm-btns{display:flex;gap:10px;justify-content:flex-end}
+.confirm-btns button{padding:9px 18px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+
+/* TOAST / LOADING */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1F2937;color:#fff;padding:11px 20px;border-radius:24px;font-size:14px;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.4);pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0)}
+#loading-overlay{position:fixed;inset:0;background:rgba(10,22,40,.95);z-index:8000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .3s}
+#loading-overlay.hide{opacity:0;pointer-events:none}
+.spinner{width:44px;height:44px;border:5px solid rgba(255,255,255,.12);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{color:rgba(255,255,255,.5);font-size:13px}
+
+/* 접근 거부 */
+#access-denied{position:fixed;inset:0;background:linear-gradient(160deg,#0A1628,#1A2B3C);z-index:7500;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;gap:14px}
+.denied-icon{font-size:64px}
+.denied-title{font-size:20px;font-weight:900;color:var(--red)}
+.denied-sub{font-size:13px;color:var(--sub);line-height:1.7}
+.denied-btn{padding:12px 28px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--red);border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+</style>
 </head>
 <body>
 
-<div class="card">
-    <h2>전체 관리자 대시보드</h2>
-    <div class="input-group">
-        <label>관리할 사용자 UID 입력</label>
-        <input type="text" id="target-uid" placeholder="상대방의 UID를 입력하세요">
-    </div>
-    <button class="btn" onclick="goManage()">해당 사용자 세대 관리 이동</button>
-    
-    <div class="info">
-        * 관리자 계정(unGRVYWhmcMmEbYbWjAL8Y1pXVP2)으로 로그인된 상태에서만 작동합니다.<br>
-        * 이동 후 상단에 '관리자 모드' 바가 표시됩니다.
-    </div>
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-txt">인증 확인 중...</div>
 </div>
 
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",
-        authDomain: "rent-4d521.firebaseapp.com",
-        databaseURL: "https://rent-4d521-default-rtdb.firebaseio.com",
-        projectId: "rent-4d521",
-        storageBucket: "rent-4d521.firebasestorage.app",
-        messagingSenderId: "922087443394",
-        appId: "1:922087443394:web:ff78188fc5ab967287645b"
-    };
-    firebase.initializeApp(firebaseConfig);
+<div id="access-denied">
+  <div class="denied-icon">🚫</div>
+  <div class="denied-title">접근 권한 없음</div>
+  <div class="denied-sub">전체 관리자만 접근할 수 있는 페이지입니다.</div>
+  <button class="denied-btn" onclick="goBack()">← 돌아가기</button>
+</div>
 
-    function goManage() {
-        const uid = document.getElementById('target-uid').value.trim();
-        if(!uid) return alert('UID를 입력해주세요.');
-        
-        // units.html로 targetUid 파라미터를 붙여서 이동
-        location.href = `units.html?targetUid=${uid}`;
-    }
+<div id="app" style="display:none">
+  <div class="hdr">
+    <div class="hdr-top">
+      <div class="hdr-left">
+        <button class="back-btn" onclick="location.href='units.html'">←</button>
+        <div class="hdr-title">🔧 마스터 관리자</div>
+        <span class="hdr-badge">ADMIN ONLY</span>
+      </div>
+      <div id="av-wrap"></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- 현재 열람 중 배너 -->
+    <div class="viewing-banner" id="viewing-banner">
+      <div class="vb-label">👁 현재 열람 중</div>
+      <div class="vb-name" id="vb-name">—</div>
+      <div class="vb-uid" id="vb-uid">—</div>
+      <div class="vb-actions">
+        <button class="vb-btn btn-sky" onclick="goPage('units')">🏠 세대 관리</button>
+        <button class="vb-btn btn-grn" onclick="goPage('index')">📊 메인</button>
+        <button class="vb-btn btn-grn" onclick="goPage('expense')" style="background:#7C3AED">💸 지출</button>
+        <button class="vb-btn btn-ghost" onclick="clearViewing()">✕ 해제</button>
+      </div>
+    </div>
+
+    <!-- 사용자 등록 -->
+    <div class="add-card">
+      <div class="sec-title">➕ 사용자 등록</div>
+      <div class="field">
+        <label>표시 이름 (담당자 · 건물명)</label>
+        <input type="text" id="inp-name" placeholder="예: 홍길동 · 강남빌라">
+      </div>
+      <div class="field">
+        <label>Firebase UID</label>
+        <input type="text" id="inp-uid" placeholder="Authentication에서 복사한 UID">
+      </div>
+      <div class="field">
+        <label>메모 (선택)</label>
+        <input type="text" id="inp-memo" placeholder="연락처, 주소 등">
+      </div>
+      <button class="btn-add" onclick="addUser()">➕ 등록하기</button>
+    </div>
+
+    <!-- 사용자 목록 -->
+    <div class="sec-title" style="margin-bottom:10px">👥 관리 사용자 목록</div>
+    <div class="users-list" id="users-list"></div>
+
+  </div>
+</div>
+
+<div class="confirm-bg" id="confirm-modal">
+  <div class="confirm-box">
+    <h3 id="cm-title">확인</h3>
+    <p id="cm-msg"></p>
+    <div class="confirm-btns">
+      <button style="background:rgba(255,255,255,.07);color:var(--sub)" onclick="closeCM()">취소</button>
+      <button style="background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)" id="cm-ok">확인</button>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+const MASTER_UID='unGRVYWhmcMmEbYbWjAL8Y1pXVP2';
+const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
+firebase.initializeApp(FC);
+const db=firebase.database(),auth=firebase.auth(),gProv=new firebase.auth.GoogleAuthProvider();
+
+let usersRef=null,viewingUid=null,viewingName=null;
+
+// ── 인증 ──
+auth.onAuthStateChanged(user=>{
+  const lo=document.getElementById("loading-overlay");
+  const app=document.getElementById("app");
+  const denied=document.getElementById("access-denied");
+
+  if(!user){
+    auth.signInWithPopup(gProv)
+      .then(r=>{
+        if(r.user.uid!==MASTER_UID){
+          lo.classList.add("hide");denied.style.display="flex";
+          auth.signOut();
+        }
+      })
+      .catch(()=>location.href="units.html");
+    return;
+  }
+  if(user.uid!==MASTER_UID){
+    lo.classList.add("hide");denied.style.display="flex";
+    return;
+  }
+
+  lo.classList.add("hide");app.style.display="block";
+  const w=document.getElementById("av-wrap");
+  w.innerHTML=user.photoURL
+    ?`<img class="av-img" src="${user.photoURL}">`
+    :`<div class="av-txt">${(user.displayName||"A")[0]}</div>`;
+
+  usersRef=db.ref("master_admin/users");
+  usersRef.on("value",snap=>renderUsers(snap.val()||{}));
+});
+
+// ── 사용자 등록 ──
+function addUser(){
+  const name=document.getElementById("inp-name").value.trim();
+  const uid=document.getElementById("inp-uid").value.trim();
+  const memo=document.getElementById("inp-memo").value.trim();
+  if(!name){showToast("❗ 이름을 입력하세요");return}
+  if(!uid||uid.length<20){showToast("❗ 올바른 UID를 입력하세요");return}
+  usersRef.child(uid).set({uid,name,memo,createdAt:new Date().toISOString()})
+    .then(()=>{
+      document.getElementById("inp-name").value="";
+      document.getElementById("inp-uid").value="";
+      document.getElementById("inp-memo").value="";
+      showToast("✅ 등록됨: "+name);
+    })
+    .catch(()=>showToast("❗ 등록 실패"));
+}
+
+// ── 목록 렌더 ──
+function renderUsers(data){
+  const list=Object.values(data).sort((a,b)=>a.createdAt>b.createdAt?1:-1);
+  const el=document.getElementById("users-list");
+  if(!list.length){
+    el.innerHTML=`<div class="empty-state">
+      <div class="empty-icon">👥</div>
+      <div class="empty-txt">등록된 사용자가 없습니다<br>위에서 UID를 등록해보세요</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML=list.map((u,i)=>{
+    const isV=viewingUid===u.uid;
+    return`<div class="user-card${isV?" active":""}" id="uc-${esc(u.uid)}">
+      <div class="uc-top">
+        <div class="uc-name">${esc(u.name)}</div>
+        <div class="uc-num">#${i+1}</div>
+      </div>
+      ${u.memo?`<div class="uc-desc">📝 ${esc(u.memo)}</div>`:""}
+      <div class="uc-uid">${esc(u.uid)}</div>
+      <div class="uc-actions">
+        <button class="uc-btn btn-sel" onclick="setViewing('${esc(u.uid)}','${esc(u.name)}')">👁 선택</button>
+        <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(u.name)}','units')">🏠 세대</button>
+        <button class="uc-btn btn-main" onclick="quickGo('${esc(u.uid)}','${esc(u.name)}','index')">📊 메인</button>
+        <button class="uc-btn btn-del" onclick="delUser('${esc(u.uid)}','${esc(u.name)}')">🗑</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ── 사용자 선택 ──
+function setViewing(uid,name){
+  viewingUid=uid;viewingName=name;
+  sessionStorage.setItem("master_view_uid",uid);
+  sessionStorage.setItem("master_view_name",name);
+  document.getElementById("viewing-banner").style.display="block";
+  document.getElementById("vb-name").textContent=name;
+  document.getElementById("vb-uid").textContent=uid;
+  document.querySelectorAll(".user-card").forEach(c=>c.classList.remove("active"));
+  const el=document.getElementById("uc-"+uid);if(el)el.classList.add("active");
+  showToast("✅ 선택됨: "+name);
+}
+
+// ── 바로 이동 ──
+function quickGo(uid,name,page){
+  setViewing(uid,name);
+  setTimeout(()=>goPage(page),200);
+}
+function goPage(page){
+  if(!viewingUid){showToast("❗ 사용자를 먼저 선택하세요");return}
+  location.href=`${page}.html?master_uid=${encodeURIComponent(viewingUid)}&master_name=${encodeURIComponent(viewingName)}`;
+}
+function clearViewing(){
+  viewingUid=null;viewingName=null;
+  sessionStorage.removeItem("master_view_uid");
+  sessionStorage.removeItem("master_view_name");
+  document.getElementById("viewing-banner").style.display="none";
+  document.querySelectorAll(".user-card").forEach(c=>c.classList.remove("active"));
+  showToast("열람 해제됨");
+}
+
+// ── 삭제 ──
+function delUser(uid,name){
+  showCM("사용자 삭제",`"${name}" 을 목록에서 삭제할까요?\n(실제 데이터는 삭제되지 않습니다)`,()=>{
+    usersRef.child(uid).remove()
+      .then(()=>{if(viewingUid===uid)clearViewing();showToast("🗑 삭제됨: "+name)})
+      .catch(()=>showToast("❗ 삭제 실패"));
+  });
+}
+
+function goBack(){auth.signOut().then(()=>location.href="units.html")}
+function showCM(title,msg,cb){
+  document.getElementById("cm-title").textContent=title;
+  document.getElementById("cm-msg").textContent=msg;
+  document.getElementById("cm-ok").onclick=()=>{cb();closeCM()};
+  document.getElementById("confirm-modal").classList.add("show");
+}
+function closeCM(){document.getElementById("confirm-modal").classList.remove("show")}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+let tTm;function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
 </script>
 </body>
 </html>
