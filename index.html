@@ -32,6 +32,8 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .hdr-actions{display:flex;align-items:center;gap:8px;position:relative}
 .av-img{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);cursor:pointer;object-fit:cover}
 .av-txt{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);background:var(--sky);color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.guide-btn{padding:5px 10px;background:rgba(14,165,233,.15);border:1.5px solid rgba(14,165,233,.5);border-radius:8px;color:#7DD3FC;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:background .15s;text-decoration:none;display:flex;align-items:center;gap:3px}
+.guide-btn:active{background:rgba(14,165,233,.32)}
 .nav{display:flex;border-top:1px solid rgba(255,255,255,.08)}
 .nav-tab{flex:1;padding:9px 2px 11px;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,.4);border-bottom:3px solid transparent;text-decoration:none;transition:all .2s;white-space:nowrap}
 .nav-tab.on{color:#fff;border-bottom-color:var(--sky);font-weight:700}
@@ -152,6 +154,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
     <div class="hdr-top">
       <div class="hdr-title">🏠 <span id="hdr-aptname">월세 관리</span> <span id="sync-st" style="font-size:10px;margin-left:4px"></span></div>
       <div class="hdr-actions">
+        <a class="guide-btn" href="guide.html">❓ 도움말</a>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
     </div>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1E2D3D">
+<title>📖 사용 가이드 · 월세 관리</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F0F4F8;--card:#fff;--border:#E2E8F0;--text:#1E293B;--sub:#64748B;--hint:#94A3B8;
+  --hdr:#1E2D3D;--hdr2:#2A3F55;
+  --green:#059669;--green-lt:#D1FAE5;--green-t:#065F46;
+  --red:#DC2626;--red-lt:#FEE2E2;--red-t:#991B1B;
+  --blue:#0284C7;--blue-lt:#E0F2FE;--blue-t:#0C4A6E;
+  --sky:#0EA5E9;--sky-lt:#E0F7FF;
+  --amber:#D97706;--amber-lt:#FEF3C7;--amber-t:#92400E;
+  --indigo:#4F46E5;--indigo-lt:#EEF2FF;--indigo-t:#3730A3;
+  --radius:14px;--shadow:0 2px 12px rgba(0,0,0,.08)
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{font-family:'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--text);overscroll-behavior:none;min-height:100%}
+
+/* HEADER */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,var(--hdr),var(--hdr2));box-shadow:0 3px 16px rgba(0,0,0,.25);padding:0 16px}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;height:52px}
+.hdr-title{font-size:17px;font-weight:900;color:#fff;letter-spacing:-.5px}
+.back-btn{padding:6px 12px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);border-radius:8px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;display:flex;align-items:center;gap:4px}
+.back-btn:active{background:rgba(255,255,255,.22)}
+
+/* PAGE TABS */
+.page-tabs{display:flex;overflow-x:auto;border-top:1px solid rgba(255,255,255,.08);gap:0;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.page-tabs::-webkit-scrollbar{display:none}
+.ptab{flex-shrink:0;padding:9px 14px 11px;font-size:11px;font-weight:600;color:rgba(255,255,255,.45);border:none;border-bottom:3px solid transparent;background:transparent;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .2s}
+.ptab.on{color:#fff;border-bottom-color:var(--sky);font-weight:800}
+
+/* CONTENT */
+.content{margin-top:100px;padding:14px 14px 40px}
+.sec{display:none}
+.sec.on{display:block}
+
+/* HERO CARD */
+.hero{background:linear-gradient(135deg,var(--hdr),var(--hdr2));border-radius:var(--radius);padding:20px;margin-bottom:14px;color:#fff}
+.hero-icon{font-size:36px;margin-bottom:10px}
+.hero-title{font-size:18px;font-weight:900;margin-bottom:6px;letter-spacing:-.3px}
+.hero-desc{font-size:13px;color:rgba(255,255,255,.7);line-height:1.7}
+
+/* GUIDE CARD */
+.gcard{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:10px;box-shadow:var(--shadow)}
+.gcard-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.gcard-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.gcard-title{font-size:14px;font-weight:800;color:var(--hdr)}
+.gcard-sub{font-size:11px;color:var(--hint);margin-top:2px}
+
+/* STEP LIST */
+.step-list{display:flex;flex-direction:column;gap:10px}
+.step{display:flex;gap:12px;align-items:flex-start}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--hdr);color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-body{}
+.step-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.step-desc{font-size:12px;color:var(--sub);line-height:1.65}
+
+/* TIP BOX */
+.tip{background:var(--sky-lt);border-left:3px solid var(--sky);border-radius:0 10px 10px 0;padding:10px 12px;margin-top:10px}
+.tip-title{font-size:11px;font-weight:800;color:var(--blue-t);margin-bottom:3px}
+.tip-desc{font-size:12px;color:var(--blue-t);line-height:1.6}
+
+/* WARN BOX */
+.warn{background:var(--amber-lt);border-left:3px solid var(--amber);border-radius:0 10px 10px 0;padding:10px 12px;margin-top:10px}
+.warn-title{font-size:11px;font-weight:800;color:var(--amber-t);margin-bottom:3px}
+.warn-desc{font-size:12px;color:var(--amber-t);line-height:1.6}
+
+/* TAG ROW */
+.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.tag-blue{background:var(--blue-lt);color:var(--blue-t)}
+.tag-green{background:var(--green-lt);color:var(--green-t)}
+.tag-red{background:var(--red-lt);color:var(--red-t)}
+.tag-amber{background:var(--amber-lt);color:var(--amber-t)}
+.tag-indigo{background:var(--indigo-lt);color:var(--indigo-t)}
+.tag-gray{background:#F1F5F9;color:var(--sub)}
+
+/* SECTION LABEL */
+.slabel{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:12px 0}
+
+/* BADGE DEMO */
+.demo-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.demo-badge{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700}
+
+/* NAV SHORTCUT */
+.page-link{display:flex;align-items:center;gap:8px;padding:11px 14px;background:var(--card);border-radius:10px;box-shadow:var(--shadow);margin-bottom:8px;text-decoration:none;color:var(--text);transition:background .15s}
+.page-link:active{background:#F0F4F8}
+.page-link-icon{font-size:20px}
+.page-link-info{flex:1}
+.page-link-name{font-size:13px;font-weight:700;color:var(--hdr)}
+.page-link-desc{font-size:11px;color:var(--hint)}
+.page-link-arr{font-size:16px;color:var(--hint)}
+
+/* ICON BG PRESETS */
+.ibg-blue{background:var(--blue-lt)}
+.ibg-green{background:var(--green-lt)}
+.ibg-red{background:var(--red-lt)}
+.ibg-amber{background:var(--amber-lt)}
+.ibg-indigo{background:var(--indigo-lt)}
+.ibg-sky{background:var(--sky-lt)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="hdr-title">📖 사용 가이드</div>
+    <a class="back-btn" onclick="history.back()">← 돌아가기</a>
+  </div>
+  <div class="page-tabs">
+    <button class="ptab on" onclick="setTab(0,this)">📊 메인</button>
+    <button class="ptab" onclick="setTab(1,this)">🏠 세대</button>
+    <button class="ptab" onclick="setTab(2,this)">💸 지출</button>
+    <button class="ptab" onclick="setTab(3,this)">🗂 관리</button>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- ===== 메인 ===== -->
+  <div class="sec on" id="sec0">
+    <div class="hero">
+      <div class="hero-icon">📊</div>
+      <div class="hero-title">메인 페이지</div>
+      <div class="hero-desc">건물 전체 현황을 한눈에 확인하는 대시보드입니다.<br>미납·공실·만료 임박 세대를 빠르게 파악할 수 있어요.</div>
+    </div>
+
+    <div class="gcard">
+      <div class="gcard-hd">
+        <div class="gcard-icon ibg-blue">🔢</div>
+        <div><div class="gcard-title">상단 통계 카드</div><div class="gcard-sub">전체 현황을 숫자로 확인</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">전체</div><div class="step-desc">건물 내 전체 세대 수입니다. (2층~4층, 총 18세대)</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">임대중</div><div class="step-desc">현재 임차인이 있는 세대 수입니다. 탭하면 임대중 세대만 필터해서 봅니다.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">공실</div><div class="step-desc">비어있는 세대 수입니다. 탭하면 공실 세대만 필터해서 봅니다.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">미납</div><div class="step-desc">이번 달 월세를 아직 납부하지 않은 세대 수입니다. 탭하면 해당 세대만 봅니다.</div></div></div>
+      </div>
+    </div>
+
+    <div class="gcard">
+      <div class="gcard-hd">
+        <div class="gcard-icon ibg-red">🔴</div>
+        <div><div class="gcard-title">이달 미납 현황</div><div class="gcard-sub">이번 달 월세 미납 세대 목록</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">목록 확인</div><div class="step-desc">이번 달 기준으로 납부 기록이 '미납'으로 등록된 세대만 표시됩니다.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">세대 탭하기</div><div class="step-desc">목록에서 세대를 탭하면 해당 세대의 상세 입력 화면으로 바로 이동합니다.</div></div></div>
+      </div>
+      <div class="tip"><div class="tip-title">💡 납부 기록은 어디서 입력하나요?</div><div class="tip-desc">세대 페이지에서 세대를 탭한 뒤, 하단 '월세 납부 이력' 셀을 탭하면 완납/미납을 기록할 수 있어요.</div></div>
+    </div>
+
+    <div class="gcard">
+      <div class="gcard-hd">
+        <div class="gcard-icon ibg-amber">⚠️</div>
+        <div><div class="gcard-title">계약 만료 임박</div><div class="gcard-sub">30일 이내 계약 종료 예정 세대</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">임박 기준</div><div class="step-desc">계약 종료일까지 남은 날이 30일 이하인 세대가 자동으로 표시됩니다.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">색상 구분</div><div class="step-desc">7일 이내는 빨간색, 8~30일은 주황색으로 표시되어 긴급도를 구분합니다.</div></div></div>
+      </div>
+    </div>
+
+    <div class="gcard">
+      <div class="gcard-hd">
+        <div class="gcard-icon ibg-indigo">📝</div>
+        <div><div class="gcard-title">특이사항 메모</div><div class="gcard-sub">자유롭게 메모 작성</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">메모 작성</div><div class="step-desc">입력창에 내용을 쓰고 '추가' 버튼을 누르면 저장됩니다. 수리 요청, 공지사항 등을 기록하세요.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">수정/삭제</div><div class="step-desc">각 메모의 ✏️ 버튼으로 내용을 수정하고, ✕ 버튼으로 삭제합니다.</div></div></div>
+      </div>
+    </div>
+
+    <a class="page-link" href="index.html">
+      <div class="page-link-icon">📊</div>
+      <div class="page-link-info"><div class="page-link-name">메인 페이지로 이동</div><div class="page-link-desc">대시보드 바로가기</div></div>
+      <div class="page-link-arr">›</div>
+    </a>
+  </div>
+
+  <!-- ===== 세대 ===== -->
+  <div class="sec" id="sec1">
+    <div class="hero">
+      <div class="hero-icon">🏠</div>
+      <div class="hero-title">세대 페이지</div>
+      <div class="hero-desc">각 호실의 임차인 정보, 계약 내용, 월세 납부 이력을 관리하는 핵심 페이지입니다.</div>
+    </div>
+
+    <div class="gcard">
+      <div class="gcard-hd">
+        <div class="gcard-icon ibg-blue">🏢</div>
+        <div><div class="gcard-title">세대 목록 화면</div><div class="gcard-sub">층별 필터와 카드 현황</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">층별 필터</div><div class="step-desc">상단의 전체 / 2층 / 3층 / 4층 버튼으로 원하는 층만 볼 수 있습니다.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">세대 카드</div><div class="step-desc">각 카드에 호수, 상태(임대중/공실), 임차인 이름, 월세, 납부 상태, 계약 D-day가 표시됩니다.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">세대 탭하기</div><div class="step-desc">카드를 탭하면 해당 세대의 상세 입력 화면이 아래에서 열립니다.</div></div></div>
+      </div>
+      <div class="slabel">상태 배지 설명</div>
+      <div class="demo-row">
+        <span class="demo-badge" style="background:#E0F2FE;color:#0C4A6E">임대중</span>
+        <span class="demo-badge" style="background:#FEE2E2;color:#991B1B">공실</span>
+        <span class="demo-badge" style="background:#D1FAE5;color:#065F46">✅ 완납</span>
+        <span class="demo-badge" style="background:#FEE2E2;color:#991B1B">❌ 미납</span>
+        <span class="demo-badge" style="background:#FEE2E2;color:#991B1B">D-3</span>
+        <span class="demo-badge" style="background:#FEF3C7;color:#92400E">D-15</span>
+        <span class="demo-badge" style="background:#D1FAE5;color:#065F46">D-60</span>
+      </div>
+    </div>
+
+    <div class="gcard">
+      <div class="gcard-hd">
+        <div class="gcard-icon ibg-green">✏️</div>
+        <div><div class="gcard-title">세대 정보 입력하기</div><div class="gcard-sub">세대 탭 → 상세 입력 화면</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">임대 상태 선택</div><div class="step-desc">'임대중' 또는 '공실' 중 현재 상태를 선택합니다.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">임차인 정보 입력</div><div class="step-desc">임차인 이름과 연락처를 입력합니다. 2인 공동 거주 시 임차인 ②에도 추가 입력 가능합니다.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">계약 정보 입력</div><div class="step-desc">보증금, 월세(만원 단위), 계약 시작일과 종료일을 입력합니다.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">특이사항 메모</div><div class="step-desc">수리 요청, 계약 관련 특이사항 등 세대별 메모를 자유롭게 입력합니다.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">저장하기</div><div class="step-desc">하단 '💾 저장하기' 버튼을 누르면 모든 입력 내용이 저장됩니다.</div></div></div>
+      </div>
+      <div class="warn"><div class="warn-title">⚠️ 주의</div><div class="warn-desc">사진 업로드 중에는 저장 버튼을 누르지 마세요. 업로드가 완전히 끝난 후 저장해야 사진이 정상 저장됩니다.</div></div>
+    </div>
+
+    <div class="gcard">
+      <div class="gcard-hd">
+        <div class="gcard-icon ibg-sky">📅</div>
+        <div><div class="gcard-title">월세 납부 이력 관리</div><div class="gcard-sub">최근 12개월 납부 현황</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">이력 확인</div><div class="step-desc">세대 상세 화면 하단에서 최근 12개월의 납부 현황을 월별 셀로 확인합니다.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">셀 탭하여 변경</div><div class="step-desc">각 월 셀을 탭할 때마다 상태가 변경됩니다.<br>기록없음 → ✅ 완납 → ❌ 미납 → 🗑 삭제 순서로 순환합니다.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">자동 반영</div><div class="step-desc">변경한 내용은 바로 저장되며, 메인 페이지의 미납 현황에도 즉시 반영됩니다.</div></div></div>
+      </div>
+      <div class="tip"><div class="tip-title">💡 납부 기록 순서</div><div class="tip-desc">처음 탭 → 완납 기록<br>한 번 더 탭 → 미납으로 변경<br>한 번 더 탭 → 기록 삭제</div></div>
+    </div>
+
+    <div class="gcard">
+      <div class="gcard-hd">
+        <div class="gcard-icon ibg-amber">📷</div>
+        <div><div class="gcard-title">계약서 사진 추가</div><div class="gcard-sub">파일 선택 또는 카메라 직접 촬영</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">📁 파일에서 추가</div><div class="step-desc">스마트폰 갤러리나 파일함에서 이미 저장된 사진을 선택해 업로드합니다. 여러 장 동시 선택도 가능합니다.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">📸 카메라 촬영</div><div class="step-desc">버튼을 탭하면 바로 카메라가 열립니다. 계약서나 신분증을 그 자리에서 바로 찍어 업로드할 수 있습니다.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">업로드 대기</div><div class="step-desc">파란 진행 바에 퍼센트가 표시됩니다. '완료!'가 표시될 때까지 기다린 후 저장하세요.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">사진 확인 및 삭제</div><div class="step-desc">업로드된 사진을 탭하면 크게 볼 수 있고, 사진 위 ✕ 버튼으로 삭제할 수 있습니다.</div></div></div>
+      </div>
+      <div class="warn"><div class="warn-title">⚠️ 사진은 10MB 이하</div><div class="warn-desc">사진 한 장당 10MB 이하만 업로드 가능합니다. 고화질 사진은 스마트폰 카메라 설정에서 해상도를 낮추거나 압축 후 업로드하세요.</div></div>
+    </div>
+
+    <a class="page-link" href="units.html">
+      <div class="page-link-icon">🏠</div>
+      <div class="page-link-info"><div class="page-link-name">세대 페이지로 이동</div><div class="page-link-desc">세대 관리 바로가기</div></div>
+      <div class="page-link-arr">›</div>
+    </a>
+  </div>
+
+  <!-- ===== 지출 ===== -->
+  <div class="sec" id="sec2">
+    <div class="hero">
+      <div class="hero-icon">💸</div>
+      <div class="hero-title">수입·지출 페이지</div>
+      <div class="hero-desc">월세 수입, 수리비, 관리비 등 건물 관련 수입과 지출을 기록하고 월별로 정산합니다.</div>
+    </div>
+
+    <div class="gcard">
+      <div class="gcard-hd">
+        <div class="gcard-icon ibg-green">📈</div>
+        <div><div class="gcard-title">상단 요약 카드</div><div class="gcard-sub">이달 수입 / 지출 / 순수익</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">수입 (초록색)</div><div class="step-desc">선택한 월에 기록된 수입 합계입니다. (월세, 관리비, 보증금수입 등)</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">지출 (빨간색)</div><div class="step-desc">선택한 월에 기록된 지출 합계입니다. (수리비, 세금, 인건비 등)</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">순수익 (파란색)</div><div class="step-desc">수입에서 지출을 뺀 금액입니다. 마이너스면 빨간색으로 표시됩니다.</div></div></div>
+      </div>
+    </div>
+
+    <div class="gcard">
+      <div class="gcard-hd">
+        <div class="gcard-icon ibg-blue">➕</div>
+        <div><div class="gcard-title">내역 추가하기</div><div class="gcard-sub">우하단 + 버튼 탭</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">+ 버튼 탭</div><div class="step-desc">화면 우하단의 둥근 + 버튼을 탭하면 내역 추가 창이 아래에서 올라옵니다.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">수입/지출 선택</div><div class="step-desc">📈 수입 또는 📉 지출 중 해당하는 것을 선택합니다.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">카테고리 선택</div><div class="step-desc">수입: 월세, 관리비, 보증금수입, 기타수입<br>지출: 수리비, 청소비, 보험료, 세금/공과금, 인건비, 관리비지출, 기타지출</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">금액·날짜·메모 입력</div><div class="step-desc">금액은 원 단위로 입력합니다. (예: 500000) 날짜는 자동으로 오늘 날짜가 입력되며 수정 가능합니다.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">저장</div><div class="step-desc">'💾 저장' 버튼을 누르면 목록에 바로 추가됩니다.</div></div></div>
+      </div>
+      <div class="tip"><div class="tip-title">💡 월세 수입 입력 예시</div><div class="tip-desc">수입 선택 → 카테고리: 월세 → 금액: 350000 → 메모: "201호 5월 월세" → 저장</div></div>
+    </div>
+
+    <div class="gcard">
+      <div class="gcard-hd">
+        <div class="gcard-icon ibg-sky">🗓️</div>
+        <div><div class="gcard-title">월 선택 및 조회</div><div class="gcard-sub">원하는 월의 내역 확인</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">월 선택기</div><div class="step-desc">상단 월 입력 필드를 탭해서 원하는 연도와 월을 선택하면 해당 월의 내역만 표시됩니다.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">페이지 이동</div><div class="step-desc">내역이 10건을 넘으면 하단에 ◀ ▶ 버튼이 생겨 페이지를 넘길 수 있습니다.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">내역 삭제</div><div class="step-desc">각 내역의 ✕ 버튼을 탭하면 삭제 확인 후 삭제됩니다.</div></div></div>
+      </div>
+    </div>
+
+    <div class="gcard">
+      <div class="gcard-hd">
+        <div class="gcard-icon ibg-indigo">📥</div>
+        <div><div class="gcard-title">데이터 내보내기</div><div class="gcard-sub">CSV / JSON 파일 다운로드</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">CSV 내보내기</div><div class="step-desc">엑셀이나 구글 스프레드시트에서 열 수 있는 형식입니다. 회계 정리에 유용합니다.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">JSON 내보내기</div><div class="step-desc">데이터 백업용 형식입니다. 현재 조회 중인 월의 데이터만 내보내집니다.</div></div></div>
+      </div>
+    </div>
+
+    <a class="page-link" href="expense.html">
+      <div class="page-link-icon">💸</div>
+      <div class="page-link-info"><div class="page-link-name">지출 페이지로 이동</div><div class="page-link-desc">수입·지출 내역 바로가기</div></div>
+      <div class="page-link-arr">›</div>
+    </a>
+  </div>
+
+  <!-- ===== 관리 ===== -->
+  <div class="sec" id="sec3">
+    <div class="hero">
+      <div class="hero-icon">🗂</div>
+      <div class="hero-title">관리 페이지</div>
+      <div class="hero-desc">전화번호부와 계약서 사진을 한곳에서 관리합니다.<br>상단 탭으로 두 기능을 전환합니다.</div>
+    </div>
+
+    <div class="gcard">
+      <div class="gcard-hd">
+        <div class="gcard-icon ibg-blue">📞</div>
+        <div><div class="gcard-title">전화번호부</div><div class="gcard-sub">임차인·업체·중개사 연락처 관리</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">연락처 검색</div><div class="step-desc">상단 검색창에 이름이나 전화번호 일부를 입력하면 실시간으로 필터됩니다.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">연락처 추가</div><div class="step-desc">'+ 추가' 버튼을 탭해 이름, 카테고리, 전화번호, 메모를 입력하고 저장합니다.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">전화 연결</div><div class="step-desc">연락처 카드의 초록색 📞 버튼을 탭하면 바로 전화가 연결됩니다.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">수정/삭제</div><div class="step-desc">✏️ 버튼으로 정보를 수정하고, ✕ 버튼으로 연락처를 삭제합니다.</div></div></div>
+      </div>
+      <div class="slabel">카테고리 색상</div>
+      <div class="tag-row">
+        <span class="tag tag-blue">세입자</span>
+        <span class="tag tag-green">업체/수리</span>
+        <span class="tag tag-indigo">공인중개사</span>
+        <span class="tag tag-gray">기타</span>
+      </div>
+      <div class="tip"><div class="tip-title">💡 전화번호 2개 등록 가능</div><div class="tip-desc">한 연락처에 전화번호를 2개까지 등록할 수 있어요. 세입자의 본인/비상 연락처를 함께 관리하기 좋습니다.</div></div>
+    </div>
+
+    <div class="gcard">
+      <div class="gcard-hd">
+        <div class="gcard-icon ibg-amber">📷</div>
+        <div><div class="gcard-title">계약서 사진 관리</div><div class="gcard-sub">전체 세대의 계약서 사진 모아보기</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">사진 목록 확인</div><div class="step-desc">임대중이거나 사진이 있는 세대의 계약서 사진이 호실별로 정리되어 표시됩니다.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">크게 보기</div><div class="step-desc">사진을 탭하면 전체 화면으로 크게 볼 수 있습니다. ✕ 버튼으로 닫습니다.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">사진 추가</div><div class="step-desc">각 호실 카드 하단 '📷 사진 추가' 버튼으로 해당 세대에 사진을 바로 업로드할 수 있습니다.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">사진 삭제</div><div class="step-desc">각 사진 우상단의 ✕ 버튼을 탭하면 확인 후 삭제됩니다.</div></div></div>
+      </div>
+      <div class="tip"><div class="tip-title">💡 사진은 세대 페이지에서도 추가 가능</div><div class="tip-desc">세대(🏠) 탭에서 호실을 탭한 뒤 '📸 카메라 촬영' 또는 '📁 파일에서 추가' 버튼으로도 업로드할 수 있어요.</div></div>
+    </div>
+
+    <a class="page-link" href="admin.html">
+      <div class="page-link-icon">🗂</div>
+      <div class="page-link-info"><div class="page-link-name">관리 페이지로 이동</div><div class="page-link-desc">전화번호부 · 계약서 사진 바로가기</div></div>
+      <div class="page-link-arr">›</div>
+    </a>
+
+    <div class="divider"></div>
+    <div class="gcard">
+      <div class="gcard-hd">
+        <div class="gcard-icon ibg-sky">🔐</div>
+        <div><div class="gcard-title">로그인 · 데이터 안전</div><div class="gcard-sub">Google 계정 기반 보안</div></div>
+      </div>
+      <div class="step-list">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Google 로그인</div><div class="step-desc">모든 데이터는 본인 Google 계정에 연결된 Firebase에 저장됩니다. 다른 사람은 볼 수 없습니다.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">실시간 동기화</div><div class="step-desc">변경 사항은 인터넷이 연결된 모든 기기에서 실시간으로 동기화됩니다.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">로그아웃</div><div class="step-desc">헤더 우측 프로필 아이콘을 탭하면 계정 정보와 로그아웃 버튼이 나타납니다.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const TAB_MAP={sec0:0,sec1:1,sec2:2,sec3:3};
+function setTab(n,btn){
+  document.querySelectorAll(".ptab").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on");
+  document.querySelectorAll(".sec").forEach((s,i)=>s.classList.toggle("on",i===n));
+  window.scrollTo(0,0);
+}
+(function(){
+  const hash=location.hash.replace("#","");
+  const n=TAB_MAP[hash];
+  if(n!=null){
+    const tabs=document.querySelectorAll(".ptab");
+    setTab(n,tabs[n]);
+  }
+})();
+</script>
+</body>
+</html>
