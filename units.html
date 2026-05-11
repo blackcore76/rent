@@ -112,6 +112,9 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .upload-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px;border:2px dashed var(--border);border-radius:10px;background:#FAFCFF;color:var(--sub);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
 .upload-btn:hover{border-color:var(--sky);color:var(--sky)}
 .upload-btn:disabled{opacity:.5;cursor:not-allowed}
+.photo-btn-row{display:flex;gap:8px}
+.photo-btn-row .upload-btn{flex:1;width:auto;font-size:12px;padding:11px 6px;text-align:center}
+.camera-btn{border-color:var(--sky);color:var(--sky)}
 .prog-bar{height:4px;border-radius:2px;background:#E2E8F0;margin-top:8px;overflow:hidden;display:none}
 .prog-fill{height:100%;background:var(--sky);transition:width .3s;width:0%}
 #pv{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:900;display:none;align-items:center;justify-content:center}
@@ -246,7 +249,11 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
     <div class="section-label">📷 계약서 사진</div>
     <div class="photo-grid" id="photo-grid"></div>
     <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="onPhotos(event)">
-    <button class="upload-btn" id="upload-btn" onclick="document.getElementById('photo-input').click()">📷 사진 추가 (계약서, 신분증 등)</button>
+    <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none" onchange="onPhotos(event)">
+    <div class="photo-btn-row">
+      <button class="upload-btn" id="upload-btn" onclick="document.getElementById('photo-input').click()">📁 사진 추가<br><span style="font-size:10px;opacity:.7">(계약서, 신분증 등)</span></button>
+      <button class="upload-btn camera-btn" id="camera-btn" onclick="document.getElementById('camera-input').click()">📸 카메라 촬영<br><span style="font-size:10px;opacity:.7">(바로 찍기)</span></button>
+    </div>
     <div class="prog-bar" id="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
     <div class="divider"></div>
     <div class="sheet-btn-row">
@@ -487,8 +494,8 @@ function renderPhotos(photos){
 async function onPhotos(e){
   const files=Array.from(e.target.files);
   if(!files.length||!curRoom||!cu)return;
-  const btn=document.getElementById("upload-btn"),bar=document.getElementById("prog-bar"),fill=document.getElementById("prog-fill");
-  btn.disabled=true;bar.style.display="block";
+  const btn=document.getElementById("upload-btn"),camBtn=document.getElementById("camera-btn"),bar=document.getElementById("prog-bar"),fill=document.getElementById("prog-fill");
+  btn.disabled=true;camBtn.disabled=true;bar.style.display="block";
   for(let i=0;i<files.length;i++){
     const file=files[i];
     if(!file.type.startsWith("image/")){showToast("❗ 이미지만 가능");continue}
@@ -504,7 +511,7 @@ async function onPhotos(e){
       renderPhotos(units[curRoom].photos);showToast("✅ 업로드 완료");
     }catch(err){showToast("❗ 업로드 실패: "+err.message)}
   }
-  btn.disabled=false;bar.style.display="none";fill.style.width="0%";e.target.value="";
+  btn.disabled=false;camBtn.disabled=false;bar.style.display="none";fill.style.width="0%";e.target.value="";
 }
 function delPhoto(pid,spath){
   showCM("사진 삭제","이 사진을 삭제하시겠습니까?",async()=>{
