@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/style.css" />
+  <title>월세 관리 - 납부관리</title>
+  <style>
+    .payment-unit-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .payment-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+    .payment-paid { background: #dcfce7; color: #16a34a; }
+    .payment-unpaid { background: #fee2e2; color: #dc2626; }
+    .toggle-payment {
+      padding: 6px 12px;
+      border-radius: 10px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .toggle-payment:disabled { opacity: 0.5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="header">
+      <div class="login-box" id="loginBox">
+        <div class="login-status" id="loginStatus">
+          <span>🔓</span>
+          <span>로그인이 필요합니다</span>
+        </div>
+        <button class="small-login-btn" id="headerLoginBtn">로그인</button>
+      </div>
+      
+      <div class="building-input-wrapper">
+        <span class="building-icon">🏣</span>
+        <input type="text" id="buildingName" class="building-name" value="조아빌" maxlength="10" disabled>
+      </div>
+      <div class="top-controls">
+        <select id="monthPicker" class="month-picker"></select>
+        <button class="memo-btn" id="memoBtn" disabled>📝 메모</button>
+      </div>
+    </div>
+    
+    <!-- 납부 관리 컨테이너 -->
+    <div id="paymentContainer" style="flex: 1; overflow-y: auto; margin-bottom: 16px;"></div>
+    
+    <div class="nav">
+      <a href="index.html" class="nav-item">🏠 홈</a>
+      <a href="units.html" class="nav-item">🏢 세대</a>
+      <a href="calendar.html" class="nav-item">📅 일정</a>
+      <a href="payments.html" class="nav-item active">💰 납부관리</a>
+      <a href="settings.html" class="nav-item">⚙️ 설정</a>
+    </div>
+  </div>
+  
+  <!-- 로그인 모달 -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content" style="text-align: center;">
+      <div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
+      <h3 style="margin-bottom: 12px;">로그인이 필요합니다</h3>
+      <p style="color: #64748b; margin-bottom: 24px;">납부 정보를 관리하려면<br>로그인이 필요합니다</p>
+      <button id="googleLoginBtn" class="btn-primary" style="width: 100%;">🚀 Google 로그인</button>
+      <button id="closeLoginModal" class="btn-secondary" style="margin-top: 12px; width: 100%;">닫기</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/payments.js"></script>
+</body>
+</html>
