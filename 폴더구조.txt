@@ -1,18 +1,10 @@
 📁 rent/
 ├── index.html
 ├── units.html
-├── calendar.html
-├── payments.html
-├── settings.html
-├── css/
-│   └── style.css
-├── js/
-│   ├── firebase-config.js
-│   ├── common.js
-│   ├── auth.js
-│   ├── home.js
-│   ├── units.js
-│   ├── calendar.js
-│   ├── payments.js
-│   └── settings.js
+├── expense.html
+├── admin.html
+├── admin-master.html
+├── guide.html
 └── manifest.json
+
+management.html ??
