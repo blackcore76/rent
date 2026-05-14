@@ -47,7 +47,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .um-email{font-size:12px;color:var(--hint);margin-bottom:12px;word-break:break-all}
 .logout-btn{width:100%;padding:9px;background:var(--red-lt);color:var(--red);border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
 .content{margin-top:100px;padding:14px;min-height:calc(100vh - 100px)}
-.floor-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.floor-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;flex:1;min-width:0}
 .tabs-row{display:flex;align-items:center;gap:8px;margin-bottom:14px}
 .export-btn{padding:7px 12px;border-radius:20px;border:2px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;flex-shrink:0;transition:all .15s}
 .export-btn:active{background:var(--hdr);color:#fff;border-color:var(--hdr)}
@@ -589,23 +589,33 @@ let tTm;function showToast(m){const t=document.getElementById("toast");t.textCon
 function clearFilter(){curFilter="";document.getElementById("filter-banner").style.display="none";history.replaceState({},"",location.pathname);renderGrid()}
 function fmtDate(){const d=new Date();return`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`}
 function exportJSON(){
-  const data={exportedAt:new Date().toISOString(),units:ROOMS.map(r=>{
-    const u=units[r];if(!u)return null;
-    const {photos,...rest}=u;return rest;
-  }).filter(Boolean)};
+  const data={
+    exportedAt:new Date().toISOString(),
+    units:ROOMS.map(r=>{
+      const u=units[r];if(!u)return null;
+      const {photos,...rest}=u;return rest;
+    }).filter(Boolean),
+    rentHistory:rentHistory
+  };
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);
   a.download=`월세관리_세대_${fmtDate()}.json`;a.click();URL.revokeObjectURL(a.href);
   showToast("✅ JSON 내려받기 완료");
 }
 function exportCSV(){
-  const header=["호수","층","임대구조","임대상태","임차인①","연락처①","임차인②","연락처②","보증금(만원)","월세(만원)","계약시작","계약종료","메모"];
+  const months=getLastNMonths(12);
+  const header=["호수","층","임대구조","임대상태","임차인①","연락처①","임차인②","연락처②","보증금(만원)","월세(만원)","계약시작","계약종료","메모",...months];
   const rows=ROOMS.map(r=>{
     const u=units[r];if(!u)return null;
+    const hist=rentHistory[u.room]||{};
+    const mCols=months.map(ym=>{
+      const rec=hist[ym];
+      return rec?(rec.paid?"완납":"미납"):"";
+    });
     return[u.room,u.floor,RTYPE_LBL[u.roomType]||"",u.status==="rented"?"임대중":"공실",
       u.tenantName||"",u.tenantPhone||"",u.tenantName2||"",u.tenantPhone2||"",
       u.depositAmount||0,u.monthlyRent||0,u.contractStart||"",u.contractEnd||"",
-      (u.memo||"").replace(/\n/g," ")];
+      (u.memo||"").replace(/\n/g," "),...mCols];
   }).filter(Boolean);
   const csv=[header,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
   const blob=new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"});
