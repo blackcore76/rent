@@ -413,8 +413,8 @@ function renderDash(){
   uEl.innerHTML=!unpaid.length?'<div class="empty-small">✅ 이달 미납 없음</div>':
     unpaid.map(u=>`<div class="status-row" onclick="goToUnit('${u.room}')">
       <span class="room-num">${u.room}호</span>
-      <span class="tenant-nm">${esc(names(u))}</span>
       ${rtBadge(u)}
+      <span class="tenant-nm">${esc(names(u))}</span>
       <span class="rent-amt">${fmtWon(u.monthlyRent)}</span>
       <span class="badge badge-unpaid">미납</span>
       <span style="font-size:14px;color:var(--hint)">›</span>
@@ -424,8 +424,8 @@ function renderDash(){
   vEl.innerHTML=!vacant.length?'<div class="empty-small">🏠 공실 없음</div>':
     vacant.map(u=>`<div class="status-row" onclick="goToUnit('${u.room}')">
       <span class="room-num">${u.room}호</span>
-      <span class="tenant-nm">${u.floor}층</span>
       ${rtBadge(u)}
+      <span class="tenant-nm">${u.floor}층</span>
       <span class="badge badge-vacant">공실</span>
       <span style="font-size:14px;color:var(--hint)">›</span>
     </div>`).join("");
@@ -442,6 +442,7 @@ function renderDash(){
   eEl.innerHTML=!soon.length?'<div class="empty-small">✅ 30일 내 만료 없음</div>':
     soon.map(u=>`<div class="expiry-row" onclick="goToUnit('${u.room}')">
       <span class="room-num">${u.room}호</span>
+      ${rtBadge(u)}
       <span class="tenant-nm">${esc(names(u))}</span>
       <span class="badge badge-warning">${u.contractEnd}</span>
       <span style="font-size:11px;font-weight:700;color:${u.dl<=7?"var(--red)":"var(--amber)"};min-width:40px;text-align:right">${u.dl}일 후</span>
