@@ -457,7 +457,7 @@ function renderGrid(){
     const memoTxt=u.memo?truncate(u.memo,22):"";
     const sBadge=`<span class="rc-sbadge ${isR?"badge-rented":"badge-vacant"}">${isR?"임대중":"공실"}</span>`;
     const rtLbl=RTYPE_LBL[u.roomType]||"";
-    const rtBadge=rtLbl?`<span class="rc-sbadge ${RTYPE_CLS[u.roomType]||""}">${rtLbl}</span>`:""`;
+    const rtBadge=rtLbl?`<span class="rc-sbadge ${RTYPE_CLS[u.roomType]||""}">${rtLbl}</span>`:"";
     const rentTxt=isR&&u.monthlyRent?fmtWon(u.monthlyRent)+"/월":"—";
     let pBadge="";
     if(isR){const ps=computePaidStatus(u.room);
