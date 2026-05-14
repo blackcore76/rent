@@ -143,6 +143,21 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .google-btn:active{transform:scale(.97)}
 .g-icon{width:18px;height:18px;flex-shrink:0}
 .login-footer{font-size:10px;color:rgba(255,255,255,.25);margin-top:18px;line-height:1.7}
+/* BUILDINGS */
+.bldg-hd-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.bldg-card{background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:16px;margin-bottom:10px;box-shadow:0 4px 16px rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.06)}
+.bldg-card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.1)}
+.bldg-card-name{font-size:15px;font-weight:900;color:#fff}
+.bldg-card-btns{display:flex;gap:6px}
+.bldg-ic{width:28px;height:28px;border:none;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
+.bldg-ic.edit{background:rgba(255,255,255,.15);color:#fff}
+.bldg-ic.del{background:rgba(220,38,38,.3);color:#FCA5A5}
+.bldg-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px}
+.bldg-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.bldg-body{flex:1;min-width:0}
+.bldg-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px}
+.bldg-val{font-size:13px;font-weight:700;color:#4DD0E1;letter-spacing:.3px;word-break:break-all}
+.bldg-val-muted{font-size:13px;font-weight:600;color:rgba(255,255,255,.75);word-break:break-all}
 </style>
 </head>
 <body>
@@ -191,7 +206,8 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
     <!-- 서브 탭 -->
     <div class="sub-tabs">
       <button class="sub-tab on" onclick="setSubTab(0,this)" id="st0">📞 전화번호부</button>
-      <button class="sub-tab" onclick="setSubTab(1,this)" id="st1">📷 계약서 관리</button>
+      <button class="sub-tab" onclick="setSubTab(1,this)" id="st1">📷 계약서</button>
+      <button class="sub-tab" onclick="setSubTab(2,this)" id="st2">🏠 건물 정보</button>
     </div>
 
     <!-- 전화번호부 -->
@@ -206,6 +222,15 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
     <!-- 계약서 사진 관리 -->
     <div class="sub-page" id="sp1">
       <div id="contracts-list"></div>
+    </div>
+
+    <!-- 건물 정보 -->
+    <div class="sub-page" id="sp2">
+      <div class="bldg-hd-row">
+        <span style="font-size:14px;font-weight:800;color:var(--hdr)">🏠 건물 정보</span>
+        <button class="btn-add" onclick="openAddBuilding()">+ 추가</button>
+      </div>
+      <div id="buildings-list"></div>
     </div>
   </div>
 </div>
@@ -249,6 +274,38 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
   </div>
 </div>
 
+<!-- 건물 추가/수정 SHEET -->
+<div class="sheet-bg" id="building-sheet">
+  <div class="sheet">
+    <div class="sheet-hd">
+      <h3 id="bldg-sheet-title">건물 추가</h3>
+      <button class="sheet-close" onclick="closeBuildingSheet()">✕</button>
+    </div>
+    <input type="hidden" id="b-id">
+    <div class="field">
+      <label>건물명 *</label>
+      <input type="text" id="b-name" placeholder="조아빌">
+    </div>
+    <div class="field">
+      <label>주소</label>
+      <input type="text" id="b-addr" placeholder="충북 진천군 덕산읍...">
+    </div>
+    <div class="field">
+      <label>1층 현관 코드</label>
+      <input type="text" id="b-entrance" inputmode="text" placeholder="종 누르고 0244">
+    </div>
+    <div class="field">
+      <label>세대 마스터 코드</label>
+      <input type="text" id="b-master" inputmode="text" placeholder="32233*">
+    </div>
+    <div class="field">
+      <label>관리비 계좌</label>
+      <input type="text" id="b-fee" placeholder="국민은행 123-456-789012">
+    </div>
+    <button class="btn-save" onclick="saveBuilding()">💾 저장</button>
+  </div>
+</div>
+
 <!-- PHOTO VIEWER -->
 <div id="pv"><button id="pv-close" onclick="closePV()">✕</button><img id="pv-img" src="" alt=""></div>
 
@@ -270,8 +327,9 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),storage=firebase.storage(),gProv=new firebase.auth.GoogleAuthProvider();
-let cu=null,pbRef=null,uRef=null,pbL=null,uL=null;
-let contacts={},units={};
+const MASTER_UID='unGRVYWhmcMmEbYbWjAL8Y1pXVP2';
+let cu=null,pbRef=null,uRef=null,bldgRef=null,pbL=null,uL=null,bldgL=null;
+let contacts={},units={},buildings={};
 const ROOMS=[201,202,203,204,205,206,301,302,303,304,305,306,401,402,403,404,405,406];
 const CAT_LABEL={tenant:"세입자",vendor:"업체/수리",agency:"공인중개사",other:"기타"};
 const CAT_COLOR={tenant:"cat-tenant",vendor:"cat-vendor",agency:"cat-agency",other:"cat-other"};
@@ -288,17 +346,32 @@ auth.onAuthStateChanged(user=>{
     document.getElementById("um-email").textContent=user.email||"";
     if(pbL&&pbRef)pbRef.off("value",pbL);
     if(uL&&uRef)uRef.off("value",uL);
-    pbRef=db.ref(`rent_app/${user.uid}/phonebook`);
-    uRef=db.ref(`rent_app/${user.uid}/units`);
-    listenPB();listenUnits();
+    if(bldgL&&bldgRef)bldgRef.off("value",bldgL);
+    const params=new URLSearchParams(location.search);
+    const masterUid=params.get("master_uid");
+    const masterName=params.get("master_name");
+    const targetUid=(user.uid===MASTER_UID&&masterUid)?masterUid:user.uid;
+    if(user.uid===MASTER_UID&&masterUid){
+      const banner=document.createElement("div");
+      banner.id="master-view-banner";
+      banner.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(245,158,11,.05));border-bottom:1px solid rgba(245,158,11,.3);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
+      banner.innerHTML=`<span style="font-size:12px;font-weight:700;color:#F59E0B">🔧 열람 중: ${esc(masterName||masterUid)}</span><button onclick="location.href='admin-master.html'" style="font-size:11px;font-weight:700;background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#F59E0B;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit">← 관리자 페이지</button>`;
+      document.body.appendChild(banner);
+      document.querySelector(".content").style.marginTop="136px";
+    }
+    pbRef=db.ref(`rent_app/${targetUid}/phonebook`);
+    uRef=db.ref(`rent_app/${targetUid}/units`);
+    bldgRef=db.ref(`rent_app/${targetUid}/buildings`);
+    listenPB();listenUnits();listenBuildings();
   }else{
     cu=null;lo.classList.add("hide");app.style.display="none";ls.style.display="flex";
     if(pbL&&pbRef)pbRef.off("value",pbL);
     if(uL&&uRef)uRef.off("value",uL);
+    if(bldgL&&bldgRef)bldgRef.off("value",bldgL);
   }
 });
 function signInGoogle(){auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message))}
-function doSignOut(){closeMenu();if(pbL&&pbRef)pbRef.off("value",pbL);if(uL&&uRef)uRef.off("value",uL);auth.signOut()}
+function doSignOut(){closeMenu();if(pbL&&pbRef)pbRef.off("value",pbL);if(uL&&uRef)uRef.off("value",uL);if(bldgL&&bldgRef)bldgRef.off("value",bldgL);auth.signOut()}
 function toggleMenu(){document.getElementById("user-menu").classList.toggle("show")}
 function closeMenu(){document.getElementById("user-menu").classList.remove("show")}
 document.addEventListener("click",e=>{if(!e.target.closest("#av-wrap")&&!e.target.closest("#user-menu"))closeMenu()});
@@ -311,6 +384,71 @@ function setSubTab(n,btn){
   btn.classList.add("on");
   document.querySelectorAll(".sub-page").forEach((p,i)=>p.classList.toggle("on",i===n));
   if(n===1)renderContracts();
+  if(n===2)renderBuildings();
+}
+
+// ── BUILDINGS ──
+function listenBuildings(){
+  bldgL=bldgRef.on("value",snap=>{buildings=snap.val()||{};if(curSub===2)renderBuildings()},()=>showToast("❗ 연결 오류"));
+}
+function renderBuildings(){
+  const el=document.getElementById("buildings-list");if(!el)return;
+  const list=Object.values(buildings).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""));
+  if(!list.length){el.innerHTML='<div class="empty-st"><div class="ei">🏠</div><div class="et">등록된 건물이 없습니다<br>+ 추가 버튼으로 등록하세요</div></div>';return}
+  el.innerHTML=list.map(b=>`<div class="bldg-card">
+    <div class="bldg-card-hd">
+      <span class="bldg-card-name">🏠 ${esc(b.name)}</span>
+      <div class="bldg-card-btns">
+        <button class="bldg-ic edit" onclick="startEditBuilding('${b.id}')">✏️</button>
+        <button class="bldg-ic del" onclick="delBuilding('${b.id}')">✕</button>
+      </div>
+    </div>
+    ${b.entranceCode||b.masterCode?`<div style="display:grid;grid-template-columns:${b.entranceCode&&b.masterCode?"1fr 1fr":"1fr"};gap:12px;margin-bottom:8px">
+      ${b.entranceCode?`<div class="bldg-row" style="margin-bottom:0"><span class="bldg-icon">🔐</span><div class="bldg-body"><div class="bldg-lbl">1층 현관</div><div class="bldg-val">${esc(b.entranceCode)}</div></div></div>`:""}
+      ${b.masterCode?`<div class="bldg-row" style="margin-bottom:0"><span class="bldg-icon">🗝️</span><div class="bldg-body"><div class="bldg-lbl">세대 마스터</div><div class="bldg-val">${esc(b.masterCode)}</div></div></div>`:""}
+    </div>`:""}
+    ${b.manageFee?`<div class="bldg-row"><span class="bldg-icon">🏦</span><div class="bldg-body"><div class="bldg-lbl">관리비 계좌</div><div class="bldg-val-muted">${esc(b.manageFee)}</div></div></div>`:""}
+    ${b.address?`<div class="bldg-row" style="margin-bottom:0"><span class="bldg-icon">📍</span><div class="bldg-body"><div class="bldg-lbl">주소</div><div class="bldg-val-muted">${esc(b.address)}</div></div></div>`:""}
+  </div>`).join("");
+}
+function openAddBuilding(){
+  document.getElementById("bldg-sheet-title").textContent="건물 추가";
+  ["b-id","b-name","b-addr","b-entrance","b-master","b-fee"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("building-sheet").classList.add("show");
+}
+function startEditBuilding(id){
+  const b=buildings[id];if(!b)return;
+  document.getElementById("bldg-sheet-title").textContent="건물 수정";
+  document.getElementById("b-id").value=id;
+  document.getElementById("b-name").value=b.name||"";
+  document.getElementById("b-addr").value=b.address||"";
+  document.getElementById("b-entrance").value=b.entranceCode||"";
+  document.getElementById("b-master").value=b.masterCode||"";
+  document.getElementById("b-fee").value=b.manageFee||"";
+  document.getElementById("building-sheet").classList.add("show");
+}
+function closeBuildingSheet(){document.getElementById("building-sheet").classList.remove("show")}
+function saveBuilding(){
+  const name=document.getElementById("b-name").value.trim();
+  if(!name){showToast("❗ 건물명을 입력하세요");return}
+  const existId=document.getElementById("b-id").value;
+  const id=existId||String(Date.now());
+  const now=new Date().toISOString();
+  const data={id,name,
+    address:document.getElementById("b-addr").value.trim(),
+    entranceCode:document.getElementById("b-entrance").value.trim(),
+    masterCode:document.getElementById("b-master").value.trim(),
+    manageFee:document.getElementById("b-fee").value.trim(),
+    createdAt:existId?(buildings[existId]?.createdAt||now):now,
+    updatedAt:now};
+  bldgRef.child(id).set(data)
+    .then(()=>{closeBuildingSheet();showToast("✅ 저장됨")})
+    .catch(()=>showToast("❗ 저장 실패"));
+}
+function delBuilding(id){
+  showCM("건물 삭제","이 건물 정보를 삭제하시겠습니까?",()=>{
+    bldgRef.child(id).remove().then(()=>showToast("🗑 삭제됨")).catch(()=>showToast("❗ 실패"));
+  });
 }
 
 // ── PHONEBOOK ──

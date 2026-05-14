@@ -206,89 +206,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <div id="notes-list"></div>
     </div>
 
-    <!-- 건물 정보 카드 -->
-    <div style="
-      background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);
-      border-radius:14px;padding:18px 20px;margin-bottom:24px;
-      box-shadow:0 4px 16px rgba(0,0,0,.15);
-      border:1px solid rgba(255,255,255,.06)
-    ">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1)">
-        <span style="font-size:20px">🏠</span>
-        <span style="font-size:16px;font-weight:900;color:#fff;letter-spacing:-.3px"> 조 아 빌 </span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:12px">
-
-        <!-- 현관 + 마스터 한 줄 -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:16px">🔐</span>
-            <div>
-              <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">1층 현관</div>
-              <div style="font-size:16px;font-weight:900;color:#4DD0E1;letter-spacing:1px">종 누르고 0244</div>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:16px">🗝️</span>
-            <div>
-              <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">세대 마스터</div>
-              <div style="font-size:16px;font-weight:900;color:#4DD0E1;letter-spacing:1px">32233*</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 주소 -->
-        <div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)">
-          <span style="font-size:16px;flex-shrink:0">📍</span>
-          <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.75);line-height:1.6">
-            충북 진천군 덕산읍 합목3길 24-4번길 조아빌
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- 건물 정보 카드 2 -->
-    <div style="
-      background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);
-      border-radius:14px;padding:18px 20px;margin-bottom:24px;
-      box-shadow:0 4px 16px rgba(0,0,0,.15);
-      border:1px solid rgba(255,255,255,.06)
-    ">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1)">
-        <span style="font-size:20px">🏠</span>
-        <span style="font-size:16px;font-weight:900;color:#fff;letter-spacing:-.3px"> 조 은 빌 </span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:12px">
-
-        <!-- 현관 + 마스터 한 줄 -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:16px">🔐</span>
-            <div>
-              <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">1층 현관</div>
-              <div style="font-size:16px;font-weight:900;color:#4DD0E1;letter-spacing:1px">종 누르고 0243</div>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:16px">🗝️</span>
-            <div>
-              <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">세대 마스터</div>
-              <div style="font-size:16px;font-weight:900;color:#4DD0E1;letter-spacing:1px">32236*</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 주소 -->
-        <div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)">
-          <span style="font-size:16px;flex-shrink:0">📍</span>
-          <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.75);line-height:1.6">
-            충북 진천군 덕산읍 합목3길 24-3번길 조은빌
-          </div>
-        </div>
-
-      </div>
-    </div>
+    <div id="buildings-wrap"></div>
 
   </div>
 </div>
@@ -327,7 +245,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),gProv=new firebase.auth.GoogleAuthProvider();
-let cu=null,uRef=null,nRef=null,hRef=null,uL=null,nL=null,hL=null,units={},notes={},rentHistory={};
+let cu=null,uRef=null,nRef=null,hRef=null,bldgRef=null,uL=null,nL=null,hL=null,bldgL=null,units={},notes={},rentHistory={},buildings={};
 const ROOMS=[201,202,203,204,205,206,301,302,303,304,305,306,401,402,403,404,405,406];
 
 // ── 건물명 초기화 ──
@@ -369,10 +287,12 @@ auth.onAuthStateChanged(user=>{
     if(uL&&uRef)uRef.off("value",uL);
     if(nL&&nRef)nRef.off("value",nL);
     if(hL&&hRef)hRef.off("value",hL);
+    if(bldgL&&bldgRef)bldgRef.off("value",bldgL);
     uRef=db.ref(`rent_app/${user.uid}/units`);
     nRef=db.ref(`rent_app/${user.uid}/notes`);
     hRef=db.ref(`rent_app/${user.uid}/rent_history`);
-    listenUnits();listenNotes();listenHistory();
+    bldgRef=db.ref(`rent_app/${user.uid}/buildings`);
+    listenUnits();listenNotes();listenHistory();listenBuildings();
   }else{
     lo.classList.add("hide");
     app.style.display="none";
@@ -381,7 +301,7 @@ auth.onAuthStateChanged(user=>{
 });
 
 function signInGoogle(){auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message))}
-function doSignOut(){closeMenu();if(uL&&uRef)uRef.off("value",uL);if(nL&&nRef)nRef.off("value",nL);if(hL&&hRef)hRef.off("value",hL);auth.signOut()}
+function doSignOut(){closeMenu();if(uL&&uRef)uRef.off("value",uL);if(nL&&nRef)nRef.off("value",nL);if(hL&&hRef)hRef.off("value",hL);if(bldgL&&bldgRef)bldgRef.off("value",bldgL);auth.signOut()}
 function toggleMenu(){document.getElementById("user-menu").classList.toggle("show")}
 function closeMenu(){document.getElementById("user-menu").classList.remove("show")}
 document.addEventListener("click",e=>{if(!e.target.closest("#av-wrap")&&!e.target.closest("#user-menu"))closeMenu()});
@@ -393,6 +313,29 @@ function setSS(s){
   el.innerHTML=`<span class="sync-dot ${cls}"></span><span style="color:rgba(255,255,255,.5);font-size:10px">${txt}</span>`;
 }
 
+function listenBuildings(){
+  bldgL=bldgRef.on("value",snap=>{buildings=snap.val()||{};renderBuildingCards()});
+}
+function renderBuildingCards(){
+  const el=document.getElementById("buildings-wrap");if(!el)return;
+  const list=Object.values(buildings).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""));
+  if(!list.length){el.innerHTML="";return}
+  const hasBoth=b=>b.entranceCode&&b.masterCode;
+  el.innerHTML=list.map(b=>`<div style="background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:18px 20px;margin-bottom:24px;box-shadow:0 4px 16px rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.06)">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1)">
+      <span style="font-size:20px">🏠</span>
+      <span style="font-size:16px;font-weight:900;color:#fff;letter-spacing:-.3px">${esc(b.name)}</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      ${b.entranceCode||b.masterCode?`<div style="display:grid;grid-template-columns:${hasBoth(b)?"1fr 1fr":"1fr"};gap:12px">
+        ${b.entranceCode?`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">🔐</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">1층 현관</div><div style="font-size:15px;font-weight:900;color:#4DD0E1;letter-spacing:1px">${esc(b.entranceCode)}</div></div></div>`:""}
+        ${b.masterCode?`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">🗝️</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">세대 마스터</div><div style="font-size:15px;font-weight:900;color:#4DD0E1;letter-spacing:1px">${esc(b.masterCode)}</div></div></div>`:""}
+      </div>`:""}
+      ${b.manageFee?`<div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)"><span style="font-size:16px;flex-shrink:0">🏦</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">관리비 계좌</div><div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.85)">${esc(b.manageFee)}</div></div></div>`:""}
+      ${b.address?`<div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)"><span style="font-size:16px;flex-shrink:0">📍</span><div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.75);line-height:1.6">${esc(b.address)}</div></div>`:""}
+    </div>
+  </div>`).join("");
+}
 function listenUnits(){
   uL=uRef.on("value",snap=>{
     const val=snap.val()||{};
