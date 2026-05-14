@@ -71,6 +71,10 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .badge-paid{background:var(--green-lt);color:var(--green-t)}
 .badge-unpaid{background:var(--red-lt);color:var(--red-t)}
 .badge-warning{background:var(--amber-lt);color:var(--amber-t)}
+.badge-oneroom{background:#FEF3C7;color:#92400E}
+.badge-twobay{background:#F3E8FF;color:#6B21A8}
+.badge-tworoom{background:#CCFBF1;color:#0F766E}
+.badge-threeroom{background:#EEF2FF;color:#3730A3}
 /* NOTES */
 .note-input-row{display:flex;gap:8px;margin-bottom:12px}
 .note-ta{flex:1;border:2px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;resize:none;outline:none;color:var(--text);background:#FAFCFF}
@@ -410,6 +414,7 @@ function renderDash(){
     unpaid.map(u=>`<div class="status-row" onclick="goToUnit('${u.room}')">
       <span class="room-num">${u.room}호</span>
       <span class="tenant-nm">${esc(names(u))}</span>
+      ${rtBadge(u)}
       <span class="rent-amt">${fmtWon(u.monthlyRent)}</span>
       <span class="badge badge-unpaid">미납</span>
       <span style="font-size:14px;color:var(--hint)">›</span>
@@ -420,6 +425,7 @@ function renderDash(){
     vacant.map(u=>`<div class="status-row" onclick="goToUnit('${u.room}')">
       <span class="room-num">${u.room}호</span>
       <span class="tenant-nm">${u.floor}층</span>
+      ${rtBadge(u)}
       <span class="badge badge-vacant">공실</span>
       <span style="font-size:14px;color:var(--hint)">›</span>
     </div>`).join("");
@@ -493,6 +499,9 @@ function showConfirm(title,msg,cb){
 }
 function closeConfirm(){document.getElementById("confirm-modal").classList.remove("show")}
 function names(u){return[u.tenantName,u.tenantName2].filter(Boolean).join(" / ")||"(미입력)"}
+const RTYPE_LBL={oneroom:"원룸",twobay:"투베이",tworoom:"투룸",threeroom:"쓰리룸"};
+const RTYPE_CLS={oneroom:"badge-oneroom",twobay:"badge-twobay",tworoom:"badge-tworoom",threeroom:"badge-threeroom"};
+function rtBadge(u){const l=RTYPE_LBL[u.roomType];return l?`<span class="badge ${RTYPE_CLS[u.roomType]}">${l}</span>`:""}
 function mQs(){return mUid?`&master_uid=${encodeURIComponent(mUid)}&master_name=${encodeURIComponent(mName)}`:""}
 function goToUnit(room){location.href=`units.html?room=${room}${mQs()}`}
 function goUnits(filter){location.href=`units.html${filter?"?filter="+filter:""}${mUid?(filter?"&":"?")+"master_uid="+encodeURIComponent(mUid)+"&master_name="+encodeURIComponent(mName):""}`}
