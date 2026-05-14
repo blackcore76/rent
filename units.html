@@ -47,7 +47,15 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .um-email{font-size:12px;color:var(--hint);margin-bottom:12px;word-break:break-all}
 .logout-btn{width:100%;padding:9px;background:var(--red-lt);color:var(--red);border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
 .content{margin-top:100px;padding:14px;min-height:calc(100vh - 100px)}
-.floor-tabs{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px}
+.floor-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.tabs-row{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.export-btn{padding:7px 12px;border-radius:20px;border:2px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;flex-shrink:0;transition:all .15s}
+.export-btn:active{background:var(--hdr);color:#fff;border-color:var(--hdr)}
+.badge-oneroom{background:#FEF3C7;color:#92400E}
+.badge-twobay{background:#F3E8FF;color:#6B21A8}
+.badge-tworoom{background:#CCFBF1;color:#0F766E}
+.badge-threeroom{background:#EEF2FF;color:#3730A3}
+.tg-btn.on-rtype{background:var(--sky);color:#fff}
 .floor-tab{padding:7px 16px;border-radius:20px;border:2px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;transition:all .15s;flex-shrink:0}
 .floor-tab.on{background:var(--hdr);color:#fff;border-color:var(--hdr)}
 .rooms-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
@@ -196,11 +204,17 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
     <button class="logout-btn" onclick="doSignOut()">🚪 로그아웃</button>
   </div>
   <div class="content">
-    <div class="floor-tabs">
-      <button class="floor-tab on" onclick="setFloor(0,this)">전체</button>
-      <button class="floor-tab" onclick="setFloor(2,this)">2층</button>
-      <button class="floor-tab" onclick="setFloor(3,this)">3층</button>
-      <button class="floor-tab" onclick="setFloor(4,this)">4층</button>
+    <div class="tabs-row">
+      <div class="floor-tabs">
+        <button class="floor-tab on" onclick="setFloor(0,this)">전체</button>
+        <button class="floor-tab" onclick="setFloor(2,this)">2층</button>
+        <button class="floor-tab" onclick="setFloor(3,this)">3층</button>
+        <button class="floor-tab" onclick="setFloor(4,this)">4층</button>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="export-btn" onclick="exportJSON()">⬇ JSON</button>
+        <button class="export-btn" onclick="exportCSV()">⬇ CSV</button>
+      </div>
     </div>
     <div id="filter-banner" style="display:none" class="filter-banner">
       <span id="filter-banner-txt"></span>
@@ -218,7 +232,14 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <button class="sheet-close" onclick="closeSheet()">✕</button>
     </div>
     <input type="hidden" id="m-room">
-    <div class="tg-label">임대 상태</div>
+    <div class="tg-label">임대 구조</div>
+    <div class="toggle-group">
+      <button class="tg-btn on-rtype" id="tg-oneroom" onclick="setRoomType('oneroom')">원룸</button>
+      <button class="tg-btn" id="tg-twobay" onclick="setRoomType('twobay')">투베이</button>
+      <button class="tg-btn" id="tg-tworoom" onclick="setRoomType('tworoom')">투룸</button>
+      <button class="tg-btn" id="tg-threeroom" onclick="setRoomType('threeroom')">쓰리룸</button>
+    </div>
+    <div class="tg-label" style="margin-top:12px">임대 상태</div>
     <div class="toggle-group">
       <button class="tg-btn on-blue" id="tg-rented" onclick="setStatus('rented')">🏠 임대중</button>
       <button class="tg-btn" id="tg-vacant" onclick="setStatus('vacant')">🔓 공실</button>
@@ -294,7 +315,7 @@ const MASTER_UID='unGRVYWhmcMmEbYbWjAL8Y1pXVP2';
 const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),storage=firebase.storage(),gProv=new firebase.auth.GoogleAuthProvider();
-let cu=null,uRef=null,hRef=null,uL=null,hL=null,units={},rentHistory={},curFloor=0,curRoom=null,mStatus="vacant",curFilter="";
+let cu=null,uRef=null,hRef=null,uL=null,hL=null,units={},rentHistory={},curFloor=0,curRoom=null,mStatus="vacant",mRoomType="oneroom",curFilter="";
 const ROOMS=[201,202,203,204,205,206,301,302,303,304,305,306,401,402,403,404,405,406];
 
 auth.onAuthStateChanged(user=>{
@@ -412,7 +433,7 @@ async function ensureRooms(ex){
   const up={};ROOMS.forEach(r=>{if(!ex[r])up[r]=defRoom(r)});
   if(Object.keys(up).length)await uRef.update(up);
 }
-function defRoom(n){return{room:String(n),floor:Math.floor(n/100),status:"vacant",tenantName:"",tenantName2:"",tenantPhone:"",tenantPhone2:"",depositAmount:0,monthlyRent:0,contractStart:"",contractEnd:"",rentPaid:false,memo:""}}
+function defRoom(n){return{room:String(n),floor:Math.floor(n/100),status:"vacant",roomType:"oneroom",tenantName:"",tenantName2:"",tenantPhone:"",tenantPhone2:"",depositAmount:0,monthlyRent:0,contractStart:"",contractEnd:"",rentPaid:false,memo:""}}
 function setFloor(f,btn){
   curFloor=f;document.querySelectorAll(".floor-tab").forEach(b=>b.classList.remove("on"));
   btn.classList.add("on");renderGrid();
@@ -422,6 +443,8 @@ function computePaidStatus(roomId){
   if(!recs.length)return null;
   return recs.some(r=>!r.paid)?false:true;
 }
+const RTYPE_LBL={oneroom:"원룸",twobay:"투베이",tworoom:"투룸",threeroom:"쓰리룸"};
+const RTYPE_CLS={oneroom:"badge-oneroom",twobay:"badge-twobay",tworoom:"badge-tworoom",threeroom:"badge-threeroom"};
 function renderGrid(){
   let list=ROOMS.map(r=>units[r]).filter(u=>u&&(curFloor===0||u.floor===curFloor));
   if(curFilter==="rented") list=list.filter(u=>u.status==="rented");
@@ -433,6 +456,8 @@ function renderGrid(){
     const phonesTxt=[u.tenantPhone,u.tenantPhone2].filter(Boolean).join(" / ");
     const memoTxt=u.memo?truncate(u.memo,22):"";
     const sBadge=`<span class="rc-sbadge ${isR?"badge-rented":"badge-vacant"}">${isR?"임대중":"공실"}</span>`;
+    const rtLbl=RTYPE_LBL[u.roomType]||"";
+    const rtBadge=rtLbl?`<span class="rc-sbadge ${RTYPE_CLS[u.roomType]||""}">${rtLbl}</span>`:""`;
     const rentTxt=isR&&u.monthlyRent?fmtWon(u.monthlyRent)+"/월":"—";
     let pBadge="";
     if(isR){const ps=computePaidStatus(u.room);
@@ -449,7 +474,7 @@ function renderGrid(){
       else if(diff<=30) ddayHtml=`<span class="rc-dday dday-warn">D-${diff}</span>`;
       else ddayHtml=`<span class="rc-dday dday-safe">D-${diff}</span>`;}
     return`<div class="room-card status-${u.status}" onclick="openSheet('${u.room}')">
-      <div class="rc-top"><span class="rc-num">${u.room}호</span>${sBadge}</div>
+      <div class="rc-top"><span class="rc-num">${u.room}호</span><div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${rtBadge}${sBadge}</div></div>
       <div class="rc-names">${esc(namesTxt)}</div>
       ${phonesTxt?`<div class="rc-phones">📞 ${esc(phonesTxt)}</div>`:""}
       <div class="rc-rent">${rentTxt}</div>
@@ -463,6 +488,7 @@ function openSheet(roomId){
   document.getElementById("sheet-title").textContent=`${roomId}호`;
   document.getElementById("m-room").value=roomId;
   mStatus=u.status||"vacant";
+  mRoomType=u.roomType||"oneroom";
   document.getElementById("m-name").value=u.tenantName||"";
   document.getElementById("m-phone").value=u.tenantPhone||"";
   document.getElementById("m-name2").value=u.tenantName2||"";
@@ -472,7 +498,7 @@ function openSheet(roomId){
   document.getElementById("m-start").value=u.contractStart||"";
   document.getElementById("m-end").value=u.contractEnd||"";
   document.getElementById("m-memo").value=u.memo||"";
-  updateTgUI();renderPhotos(u.photos||{});renderHistory(roomId);
+  updateTgUI();updateRtypeUI();renderPhotos(u.photos||{});renderHistory(roomId);
   document.getElementById("room-sheet").classList.add("show");
 }
 function closeSheet(){document.getElementById("room-sheet").classList.remove("show");curRoom=null}
@@ -481,9 +507,16 @@ function updateTgUI(){
   document.getElementById("tg-rented").className="tg-btn"+(mStatus==="rented"?" on-blue":"");
   document.getElementById("tg-vacant").className="tg-btn"+(mStatus==="vacant"?" on-gray":"");
 }
+function setRoomType(t){mRoomType=t;updateRtypeUI()}
+function updateRtypeUI(){
+  ["oneroom","twobay","tworoom","threeroom"].forEach(t=>{
+    const el=document.getElementById("tg-"+t);
+    if(el)el.className="tg-btn"+(mRoomType===t?" on-rtype":"");
+  });
+}
 function saveRoom(){
   if(!curRoom)return;
-  const data={room:curRoom,floor:Math.floor(parseInt(curRoom)/100),status:mStatus,
+  const data={room:curRoom,floor:Math.floor(parseInt(curRoom)/100),status:mStatus,roomType:mRoomType,
     tenantName:document.getElementById("m-name").value.trim(),
     tenantName2:document.getElementById("m-name2").value.trim(),
     tenantPhone:document.getElementById("m-phone").value.trim(),
@@ -554,6 +587,32 @@ function truncate(s,n){return s&&s.length>n?s.slice(0,n)+"…":s||""}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 let tTm;function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
 function clearFilter(){curFilter="";document.getElementById("filter-banner").style.display="none";history.replaceState({},"",location.pathname);renderGrid()}
+function fmtDate(){const d=new Date();return`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`}
+function exportJSON(){
+  const data={exportedAt:new Date().toISOString(),units:ROOMS.map(r=>{
+    const u=units[r];if(!u)return null;
+    const {photos,...rest}=u;return rest;
+  }).filter(Boolean)};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download=`월세관리_세대_${fmtDate()}.json`;a.click();URL.revokeObjectURL(a.href);
+  showToast("✅ JSON 내려받기 완료");
+}
+function exportCSV(){
+  const header=["호수","층","임대구조","임대상태","임차인①","연락처①","임차인②","연락처②","보증금(만원)","월세(만원)","계약시작","계약종료","메모"];
+  const rows=ROOMS.map(r=>{
+    const u=units[r];if(!u)return null;
+    return[u.room,u.floor,RTYPE_LBL[u.roomType]||"",u.status==="rented"?"임대중":"공실",
+      u.tenantName||"",u.tenantPhone||"",u.tenantName2||"",u.tenantPhone2||"",
+      u.depositAmount||0,u.monthlyRent||0,u.contractStart||"",u.contractEnd||"",
+      (u.memo||"").replace(/\n/g," ")];
+  }).filter(Boolean);
+  const csv=[header,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob=new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download=`월세관리_세대_${fmtDate()}.csv`;a.click();URL.revokeObjectURL(a.href);
+  showToast("✅ CSV 내려받기 완료");
+}
 </script>
 </body>
 </html>
