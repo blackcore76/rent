@@ -127,6 +127,9 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .sync-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px}
 .s-ok{background:#4CAF50}.s-err{background:#EF5350}.s-ing{background:#FFA726;animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+/* ADMIN BTN */
+.admin-btn{padding:5px 10px;background:rgba(245,158,11,.15);border:1.5px solid rgba(245,158,11,.5);border-radius:8px;color:#FCD34D;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:background .15s;display:none}
+.admin-btn:active{background:rgba(245,158,11,.32)}
 </style>
 </head>
 <body>
@@ -157,6 +160,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
     <div class="hdr-top">
       <div class="hdr-title">🏠 <span id="hdr-aptname">월세 관리</span> <span id="sync-st" style="font-size:10px;margin-left:4px"></span></div>
       <div class="hdr-actions">
+        <button id="admin-btn" class="admin-btn" onclick="location.href='admin-master.html'">⚙️ 관리자</button>
         <a class="guide-btn" href="guide.html">❓ 도움말</a>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
@@ -176,10 +180,10 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 
   <div class="content">
     <div class="stats-grid">
-      <div class="kpi total" onclick="location.href='units.html'"><div class="kpi-val" id="s-total">—</div><div class="kpi-lbl">전체</div></div>
-      <div class="kpi rented" onclick="location.href='units.html?filter=rented'"><div class="kpi-val" id="s-rented">—</div><div class="kpi-lbl">임대중</div></div>
-      <div class="kpi vacant" onclick="location.href='units.html?filter=vacant'"><div class="kpi-val" id="s-vacant">—</div><div class="kpi-lbl">공실</div></div>
-      <div class="kpi unpaid" onclick="location.href='units.html?filter=unpaid'"><div class="kpi-val" id="s-unpaid">—</div><div class="kpi-lbl">미납</div></div>
+      <div class="kpi total" onclick="goUnits()"><div class="kpi-val" id="s-total">—</div><div class="kpi-lbl">전체</div></div>
+      <div class="kpi rented" onclick="goUnits('rented')"><div class="kpi-val" id="s-rented">—</div><div class="kpi-lbl">임대중</div></div>
+      <div class="kpi vacant" onclick="goUnits('vacant')"><div class="kpi-val" id="s-vacant">—</div><div class="kpi-lbl">공실</div></div>
+      <div class="kpi unpaid" onclick="goUnits('unpaid')"><div class="kpi-val" id="s-unpaid">—</div><div class="kpi-lbl">미납</div></div>
     </div>
 
     <div class="card">
@@ -245,7 +249,9 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),gProv=new firebase.auth.GoogleAuthProvider();
+const MASTER_UID="unGRVYWhmcMmEbYbWjAL8Y1pXVP2";
 let cu=null,uRef=null,nRef=null,hRef=null,bldgRef=null,uL=null,nL=null,hL=null,bldgL=null,units={},notes={},rentHistory={},buildings={};
+let mUid="",mName="";
 const ROOMS=[201,202,203,204,205,206,301,302,303,304,305,306,401,402,403,404,405,406];
 
 // ── 건물명 초기화 ──
@@ -284,14 +290,35 @@ auth.onAuthStateChanged(user=>{
     w.style.display="block";
     document.getElementById("um-name").textContent=user.displayName||"사용자";
     document.getElementById("um-email").textContent=user.email||"";
+    if(user.uid===MASTER_UID)document.getElementById("admin-btn").style.display="block";
     if(uL&&uRef)uRef.off("value",uL);
     if(nL&&nRef)nRef.off("value",nL);
     if(hL&&hRef)hRef.off("value",hL);
     if(bldgL&&bldgRef)bldgRef.off("value",bldgL);
-    uRef=db.ref(`rent_app/${user.uid}/units`);
-    nRef=db.ref(`rent_app/${user.uid}/notes`);
-    hRef=db.ref(`rent_app/${user.uid}/rent_history`);
-    bldgRef=db.ref(`rent_app/${user.uid}/buildings`);
+    const params=new URLSearchParams(location.search);
+    mUid=params.get("master_uid")||"";
+    mName=params.get("master_name")||"";
+    const targetUid=(user.uid===MASTER_UID&&mUid)?mUid:user.uid;
+    if(user.uid===MASTER_UID&&mUid){
+      if(!document.getElementById("master-view-banner")){
+        const banner=document.createElement("div");
+        banner.id="master-view-banner";
+        banner.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(245,158,11,.05));border-bottom:1px solid rgba(245,158,11,.3);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
+        banner.innerHTML=`<span style="font-size:12px;font-weight:700;color:#F59E0B">🔧 열람 중: ${esc(mName||mUid)}</span><button onclick="location.href='admin-master.html'" style="background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);border-radius:8px;padding:5px 12px;color:#F59E0B;font-size:11px;font-weight:700;cursor:pointer">← 관리자</button>`;
+        document.body.appendChild(banner);
+        document.querySelector(".content").style.marginTop="136px";
+        document.querySelectorAll(".nav-tab").forEach(a=>{
+          const u=new URL(a.href,location.href);
+          u.searchParams.set("master_uid",mUid);
+          u.searchParams.set("master_name",mName);
+          a.href=u.pathname+"?"+u.searchParams.toString();
+        });
+      }
+    }
+    uRef=db.ref(`rent_app/${targetUid}/units`);
+    nRef=db.ref(`rent_app/${targetUid}/notes`);
+    hRef=db.ref(`rent_app/${targetUid}/rent_history`);
+    bldgRef=db.ref(`rent_app/${targetUid}/buildings`);
     listenUnits();listenNotes();listenHistory();listenBuildings();
   }else{
     lo.classList.add("hide");
@@ -466,7 +493,9 @@ function showConfirm(title,msg,cb){
 }
 function closeConfirm(){document.getElementById("confirm-modal").classList.remove("show")}
 function names(u){return[u.tenantName,u.tenantName2].filter(Boolean).join(" / ")||"(미입력)"}
-function goToUnit(room){location.href=`units.html?room=${room}`}
+function mQs(){return mUid?`&master_uid=${encodeURIComponent(mUid)}&master_name=${encodeURIComponent(mName)}`:""}
+function goToUnit(room){location.href=`units.html?room=${room}${mQs()}`}
+function goUnits(filter){location.href=`units.html${filter?"?filter="+filter:""}${mUid?(filter?"&":"?")+"master_uid="+encodeURIComponent(mUid)+"&master_name="+encodeURIComponent(mName):""}`}
 function fmtWon(v){if(!v)return"—";return(v*10000).toLocaleString("ko-KR")+"원"}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 function fmtDt(iso){if(!iso)return"";const d=new Date(iso);return`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`}

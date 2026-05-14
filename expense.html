@@ -33,6 +33,8 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .av-txt{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);background:var(--sky);color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .guide-btn{padding:5px 10px;background:rgba(14,165,233,.15);border:1.5px solid rgba(14,165,233,.5);border-radius:8px;color:#7DD3FC;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:background .15s;text-decoration:none;display:flex;align-items:center;gap:3px}
 .guide-btn:active{background:rgba(14,165,233,.32)}
+.admin-btn{padding:5px 10px;background:rgba(255,200,0,.15);border:1.5px solid rgba(255,200,0,.5);border-radius:8px;color:#FFD700;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:none;letter-spacing:.3px;transition:background .15s}
+.admin-btn:active{background:rgba(255,200,0,.32)}
 .nav{display:flex;border-top:1px solid rgba(255,255,255,.08)}
 .nav-tab{flex:1;padding:9px 2px 11px;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,.4);border-bottom:3px solid transparent;text-decoration:none;transition:all .2s;white-space:nowrap}
 .nav-tab.on{color:#fff;border-bottom-color:var(--sky);font-weight:700}
@@ -147,6 +149,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <div class="hdr-title">💸 수입·지출</div>
       <div class="hdr-actions">
         <a class="guide-btn" href="guide.html">❓ 도움말</a>
+        <button class="admin-btn" id="admin-btn" onclick="location.href='admin-master.html'">🔧 관리자</button>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
     </div>
@@ -227,6 +230,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 
 <script>
 const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
+const MASTER_UID='unGRVYWhmcMmEbYbWjAL8Y1pXVP2';
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),gProv=new firebase.auth.GoogleAuthProvider();
 let cu=null,txRef=null,txL=null,allTx=[],curPage=1,filterMonth="",mTT="income";
@@ -244,8 +248,29 @@ auth.onAuthStateChanged(user=>{
     w.style.display="block";
     document.getElementById("um-name").textContent=user.displayName||"사용자";
     document.getElementById("um-email").textContent=user.email||"";
+    if(user.uid===MASTER_UID)document.getElementById("admin-btn").style.display="block";
     if(txL&&txRef)txRef.off("value",txL);
-    txRef=db.ref(`rent_app/${user.uid}/transactions`);listenTx();
+    const params=new URLSearchParams(location.search);
+    const masterUid=params.get("master_uid");
+    const masterName=params.get("master_name");
+    const targetUid=(user.uid===MASTER_UID&&masterUid)?masterUid:user.uid;
+    if(user.uid===MASTER_UID&&masterUid){
+      if(!document.getElementById("master-view-banner")){
+        const banner=document.createElement("div");
+        banner.id="master-view-banner";
+        banner.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(245,158,11,.05));border-bottom:1px solid rgba(245,158,11,.3);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
+        banner.innerHTML=`<span style="font-size:12px;font-weight:700;color:#F59E0B">🔧 열람 중: ${esc(masterName||masterUid)}</span><button onclick="location.href='admin-master.html'" style="font-size:11px;font-weight:700;background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#F59E0B;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit">← 관리자</button>`;
+        document.body.appendChild(banner);
+        document.querySelector(".content").style.marginTop="136px";
+        document.querySelectorAll(".nav-tab").forEach(a=>{
+          const u=new URL(a.href,location.href);
+          u.searchParams.set("master_uid",masterUid);
+          u.searchParams.set("master_name",masterName||"");
+          a.href=u.pathname+"?"+u.searchParams.toString();
+        });
+      }
+    }
+    txRef=db.ref(`rent_app/${targetUid}/transactions`);listenTx();
   }else{
     cu=null;lo.classList.add("hide");app.style.display="none";ls.style.display="flex";
     if(txL&&txRef)txRef.off("value",txL);

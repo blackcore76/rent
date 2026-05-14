@@ -121,7 +121,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
   <div class="hdr">
     <div class="hdr-top">
       <div class="hdr-left">
-        <button class="back-btn" onclick="location.href='units.html'">←</button>
+        <button class="back-btn" onclick="location.href='admin.html'">←</button>
         <div class="hdr-title">🔧 마스터 관리자</div>
         <span class="hdr-badge">ADMIN ONLY</span>
       </div>
@@ -137,9 +137,10 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <div class="vb-name" id="vb-name">—</div>
       <div class="vb-uid" id="vb-uid">—</div>
       <div class="vb-actions">
-        <button class="vb-btn btn-sky" onclick="goPage('units')">🏠 세대 관리</button>
-        <button class="vb-btn btn-grn" onclick="goPage('index')">📊 메인</button>
-        <button class="vb-btn btn-grn" onclick="goPage('expense')" style="background:#7C3AED">💸 지출</button>
+        <button class="vb-btn btn-sky" onclick="goPage('index')">📊 메인</button>
+        <button class="vb-btn btn-sky" onclick="goPage('units')">🏠 세대</button>
+        <button class="vb-btn btn-sky" onclick="goPage('expense')" style="background:#7C3AED">💸 지출</button>
+        <button class="vb-btn btn-sky" onclick="goPage('admin')" style="background:#059669">🗂 관리</button>
         <button class="vb-btn btn-ghost" onclick="clearViewing()">✕ 해제</button>
       </div>
     </div>
@@ -259,9 +260,10 @@ function renderUsers(data){
       ${u.memo?`<div class="uc-desc">📝 ${esc(u.memo)}</div>`:""}
       <div class="uc-uid">${esc(u.uid)}</div>
       <div class="uc-actions">
-        <button class="uc-btn btn-sel" onclick="setViewing('${esc(u.uid)}','${esc(u.name)}')">👁 선택</button>
-        <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(u.name)}','units')">🏠 세대</button>
         <button class="uc-btn btn-main" onclick="quickGo('${esc(u.uid)}','${esc(u.name)}','index')">📊 메인</button>
+        <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(u.name)}','units')">🏠 세대</button>
+        <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(u.name)}','expense')" style="background:rgba(124,58,237,.12);color:#7C3AED;border:1px solid rgba(124,58,237,.25)">💸 지출</button>
+        <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(u.name)}','admin')" style="background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.25)">🗂 관리</button>
         <button class="uc-btn btn-del" onclick="delUser('${esc(u.uid)}','${esc(u.name)}')">🗑</button>
       </div>
     </div>`;
@@ -308,7 +310,7 @@ function delUser(uid,name){
   });
 }
 
-function goBack(){auth.signOut().then(()=>location.href="units.html")}
+function goBack(){location.href="admin.html"}
 function showCM(title,msg,cb){
   document.getElementById("cm-title").textContent=title;
   document.getElementById("cm-msg").textContent=msg;
