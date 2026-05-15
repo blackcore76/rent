@@ -56,6 +56,11 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .toolbar input[type=month]:focus{border-color:var(--sky)}
 .spacer{flex:1}
 .btn-exp{background:#fff;border:2px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--sub)}
+.view-tabs{display:flex;gap:6px;margin-bottom:10px}
+.view-tab{padding:6px 14px;border-radius:20px;border:2px solid var(--border);background:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--sub);transition:all .15s}
+.view-tab.active{background:var(--hdr);color:#fff;border-color:var(--hdr)}
+.filter-year{border:2px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;background:#fff;font-family:inherit;outline:none;color:var(--text)}
+.filter-year:focus{border-color:var(--sky)}
 .fab{position:fixed;bottom:28px;right:20px;width:56px;height:56px;border-radius:50%;background:var(--hdr);color:#fff;border:none;font-size:28px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;z-index:100;transition:transform .15s}
 .fab:active{transform:scale(.92)}
 .card{background:var(--card);border-radius:var(--radius);margin-bottom:10px;box-shadow:var(--shadow);overflow:hidden}
@@ -171,8 +176,14 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <div class="kpi expense"><div class="kpi-val" id="s-ex">—</div><div class="kpi-lbl">지출</div></div>
       <div class="kpi net"><div class="kpi-val" id="s-net">—</div><div class="kpi-lbl">순수익</div></div>
     </div>
+    <div class="view-tabs">
+      <button class="view-tab active" data-mode="monthly" onclick="setViewMode('monthly')">📅 월별</button>
+      <button class="view-tab" data-mode="yearly" onclick="setViewMode('yearly')">📆 연간</button>
+      <button class="view-tab" data-mode="all" onclick="setViewMode('all')">📋 전체기간</button>
+    </div>
     <div class="toolbar">
-      <input type="month" id="filter-month" onchange="onMonthChange()">
+      <div id="month-sel"><input type="month" id="filter-month" onchange="onMonthChange()"></div>
+      <div id="year-sel" style="display:none"><select class="filter-year" id="filter-year" onchange="onYearChange()"></select></div>
       <div class="spacer"></div>
       <button class="btn-exp" onclick="exportCSV()">📥 CSV</button>
       <button class="btn-exp" onclick="exportJSON()">📦 JSON</button>
@@ -233,11 +244,11 @@ const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d52
 const MASTER_UID='unGRVYWhmcMmEbYbWjAL8Y1pXVP2';
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),gProv=new firebase.auth.GoogleAuthProvider();
-let cu=null,txRef=null,txL=null,allTx=[],curPage=1,filterMonth="",mTT="income";
+let cu=null,txRef=null,txL=null,allTx=[],curPage=1,filterMonth="",filterYear="",viewMode="monthly",mTT="income";
 const PS=10;
 const CATS={income:["월세","관리비","보증금수입","기타수입"],expense:["수리비","청소비","보험료","세금/공과금","인건비","관리비지출","기타지출"]};
 
-(function(){const n=new Date();document.getElementById("filter-month").value=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`;filterMonth=document.getElementById("filter-month").value})();
+(function(){const n=new Date();document.getElementById("filter-month").value=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`;filterMonth=document.getElementById("filter-month").value;filterYear=String(n.getFullYear())})();
 
 auth.onAuthStateChanged(user=>{
   const lo=document.getElementById("loading-overlay"),ls=document.getElementById("login-screen"),app=document.getElementById("app");
@@ -285,11 +296,39 @@ document.addEventListener("click",e=>{if(!e.target.closest("#av-wrap")&&!e.targe
 function listenTx(){
   txL=txRef.on("value",snap=>{
     allTx=Object.values(snap.val()||{}).sort((a,b)=>b.date.localeCompare(a.date)||(b.id-a.id));
+    if(viewMode==="yearly")buildYearSel();
     renderFeed();
   },()=>showToast("❗ 연결 오류"));
 }
+function setViewMode(mode){
+  viewMode=mode;curPage=1;
+  document.querySelectorAll(".view-tab").forEach(b=>b.classList.remove("active"));
+  document.querySelector(`.view-tab[data-mode="${mode}"]`).classList.add("active");
+  const ms=document.getElementById("month-sel"),ys=document.getElementById("year-sel");
+  if(mode==="monthly"){ms.style.display="";ys.style.display="none"}
+  else if(mode==="yearly"){ms.style.display="none";ys.style.display="";buildYearSel()}
+  else{ms.style.display="none";ys.style.display="none"}
+  renderFeed();
+}
+function buildYearSel(){
+  const years=[...new Set(allTx.map(t=>t.date&&t.date.slice(0,4)).filter(Boolean))].sort((a,b)=>b-a);
+  const cur=String(new Date().getFullYear());
+  if(!years.includes(cur))years.unshift(cur);
+  if(!filterYear||!years.includes(filterYear))filterYear=years[0]||cur;
+  document.getElementById("filter-year").innerHTML=years.map(y=>`<option value="${y}"${y===filterYear?" selected":""}>${y}년</option>`).join("");
+}
 function onMonthChange(){filterMonth=document.getElementById("filter-month").value;curPage=1;renderFeed()}
-function getFiltered(){return filterMonth?allTx.filter(t=>t.date&&t.date.startsWith(filterMonth)):allTx}
+function onYearChange(){filterYear=document.getElementById("filter-year").value;curPage=1;renderFeed()}
+function getFiltered(){
+  if(viewMode==="monthly")return filterMonth?allTx.filter(t=>t.date&&t.date.startsWith(filterMonth)):allTx;
+  if(viewMode==="yearly")return filterYear?allTx.filter(t=>t.date&&t.date.startsWith(filterYear)):allTx;
+  return allTx;
+}
+function getFilterLabel(){
+  if(viewMode==="monthly")return(filterMonth||"전체").replace("-","");
+  if(viewMode==="yearly")return(filterYear||"전체")+"년";
+  return"전체기간";
+}
 
 function renderFeed(){
   const list=getFiltered();
@@ -307,7 +346,8 @@ function renderFeed(){
   const page=list.slice((curPage-1)*PS,curPage*PS);
 
   const fc=document.getElementById("feed");
-  if(!total){fc.innerHTML='<div class="empty-st"><div class="ei">💰</div><div class="et">이 달에 기록된 내역이 없어요<br>+ 버튼으로 추가해 보세요</div></div>';document.getElementById("pagi").innerHTML="";return}
+  const emptyMsg=viewMode==="monthly"?"이 달에 기록된 내역이 없어요":viewMode==="yearly"?"이 해에 기록된 내역이 없어요":"기록된 내역이 없어요";
+  if(!total){fc.innerHTML=`<div class="empty-st"><div class="ei">💰</div><div class="et">${emptyMsg}<br>+ 버튼으로 추가해 보세요</div></div>`;document.getElementById("pagi").innerHTML="";return}
   fc.innerHTML=`<div class="card">${page.map(t=>`
     <div class="tx-item">
       <div class="tx-icon ${t.type}">${t.type==="income"?"📈":"📉"}</div>
@@ -365,17 +405,17 @@ function exportCSV(){
   const hdr="날짜,유형,카테고리,금액,메모\n";
   const rows=list.map(t=>`${t.date},${t.type==="income"?"수입":"지출"},${t.category||""},${t.amount||0},"${(t.memo||"").replace(/"/g,"'")}"`)
   const blob=new Blob(["\uFEFF"+hdr+rows.join("\n")],{type:"text/csv"});
-  dl(blob,"수지내역_"+(filterMonth||"전체").replace("-","")+".csv");showToast("📥 CSV 완료");
+  dl(blob,"수지내역_"+getFilterLabel()+".csv");showToast("📥 CSV 완료");
 }
 function exportJSON(){
   const list=getFiltered();if(!list.length){showToast("데이터 없음");return}
   const blob=new Blob([JSON.stringify(list,null,2)],{type:"application/json"});
-  dl(blob,"수지내역_"+(filterMonth||"전체").replace("-","")+".json");showToast("📦 JSON 완료");
+  dl(blob,"수지내역_"+getFilterLabel()+".json");showToast("📦 JSON 완료");
 }
 function dl(blob,name){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click()}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 function fmtN(n){return(n||0).toLocaleString("ko-KR")}
-function fmtD(d){if(!d)return"";const p=d.split("-");return`${p[1]}/${p[2]}`}
+function fmtD(d){if(!d)return"";const p=d.split("-");return viewMode==="all"?`${p[0].slice(2)}/${p[1]}/${p[2]}`:`${p[1]}/${p[2]}`}
 let tTm;function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
 </script>
 </body>
