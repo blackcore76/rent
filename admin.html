@@ -422,14 +422,16 @@ async function migrateToMultiBldg(uid){
     if(bs.exists()){const v=Object.values(bs.val());if(v.length&&v[0]?.name)bname=v[0].name}
   }catch(e){}
   const OLD=["units","rent_history","config","transactions","notes","buildings"];
-  const upd={};
   for(const p of OLD){
-    try{const s=await db.ref("rent_app/"+uid+"/"+p).once("value");
-      if(s.exists()){upd["rent_app/"+uid+"/main/"+p]=s.val();upd["rent_app/"+uid+"/"+p]=null}
+    try{
+      const s=await db.ref("rent_app/"+uid+"/"+p).once("value");
+      if(s.exists()){
+        await db.ref("rent_app/"+uid+"/main/"+p).set(s.val());
+        await db.ref("rent_app/"+uid+"/"+p).remove();
+      }
     }catch(e){}
   }
-  upd["rent_app/"+uid+"/_buildings/main"]={id:"main",name:bname,order:0,createdAt:new Date().toISOString()};
-  await db.ref("/").update(upd);
+  await db.ref("rent_app/"+uid+"/_buildings/main").set({id:"main",name:bname,order:0,createdAt:new Date().toISOString()});
 }
 
 // ── BUILDING SWITCHER UI ──
@@ -593,9 +595,17 @@ async function renderBldRegistry(){
       ${bids.length>1?`<button onclick="delBld('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:var(--red-lt);color:var(--red);cursor:pointer;font-family:inherit">삭제</button>`:""}
     </div>`;
   }).join("");
+  // Check for legacy flat-path data (pre-migration)
+  const legacySnap=await db.ref(`rent_app/${targetUid}/units`).once("value");
+  const legacyCnt=legacySnap.exists()?Object.keys(legacySnap.val()).length:0;
   const curCnt=counts[curBid]||0;
   const dataBuildings=bids.filter(b=>b!==curBid&&(counts[b]||0)>0);
-  if(curCnt===0&&dataBuildings.length>0){
+  if(legacyCnt>0){
+    html+=`<div style="background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:10px;padding:12px 14px;margin-top:6px;font-size:12px;color:#92400E;line-height:1.6">
+      ⚠️ 이전 방식으로 저장된 데이터 <b>${legacyCnt}개 호실</b>이 발견되었습니다.<br>현재 건물 <b>"${esc(bldgsData[curBid]?.name||"")}"</b>으로 가져올 수 있습니다.
+      <div style="margin-top:8px"><button onclick="importLegacyData()" style="padding:6px 14px;background:#F59E0B;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">이 건물로 데이터 가져오기</button></div>
+    </div>`;
+  }else if(curCnt===0&&dataBuildings.length>0){
     const srcBid=dataBuildings[0];
     const srcName=esc(bldgsData[srcBid]?.name||"다른 건물");
     html+=`<div style="background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:10px;padding:12px 14px;margin-top:6px;font-size:12px;color:#92400E;line-height:1.6">
@@ -606,19 +616,40 @@ async function renderBldRegistry(){
   }
   el.innerHTML=html;
 }
+async function importLegacyData(){
+  const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
+  const curName=bldgsData[curBid]?.name||curBid;
+  showCM("이전 데이터 가져오기",`이전 방식으로 저장된 데이터를 "${curName}" 건물로 가져옵니다.`,async()=>{
+    const OLD=["units","rent_history","config","transactions","notes","buildings"];
+    for(const p of OLD){
+      try{
+        const snap=await db.ref(`rent_app/${targetUid}/${p}`).once("value");
+        if(snap.exists()){
+          await db.ref(`rent_app/${targetUid}/${curBid}/${p}`).set(snap.val());
+          await db.ref(`rent_app/${targetUid}/${p}`).remove();
+        }
+      }catch(e){}
+    }
+    showToast("✅ 데이터 가져오기 완료");
+    renderBldRegistry();
+  });
+}
 async function mergeFromBld(srcBid){
   const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
   const srcName=bldgsData[srcBid]?.name||srcBid;
   const curName=bldgsData[curBid]?.name||curBid;
   showCM(`데이터 가져오기`,`"${srcName}" 건물의 호실·계약·이력 데이터를 "${curName}" 건물로 이관합니다.\n이관 후 "${srcName}" 건물은 삭제됩니다.`,async()=>{
     const PATHS=["units","rent_history","config","transactions","notes","buildings"];
-    const upd={};
     for(const p of PATHS){
-      const snap=await db.ref(`rent_app/${targetUid}/${srcBid}/${p}`).once("value");
-      if(snap.exists()){upd[`rent_app/${targetUid}/${curBid}/${p}`]=snap.val();upd[`rent_app/${targetUid}/${srcBid}/${p}`]=null;}
+      try{
+        const snap=await db.ref(`rent_app/${targetUid}/${srcBid}/${p}`).once("value");
+        if(snap.exists()){
+          await db.ref(`rent_app/${targetUid}/${curBid}/${p}`).set(snap.val());
+          await db.ref(`rent_app/${targetUid}/${srcBid}/${p}`).remove();
+        }
+      }catch(e){}
     }
-    upd[`rent_app/${targetUid}/_buildings/${srcBid}`]=null;
-    await db.ref("/").update(upd);
+    await db.ref(`rent_app/${targetUid}/_buildings/${srcBid}`).remove();
     showToast("✅ 데이터 이관 완료");
     renderBldRegistry();
   });

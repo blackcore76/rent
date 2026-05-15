@@ -282,14 +282,16 @@ async function migrateToMultiBldg(uid){
     if(bs.exists()){const v=Object.values(bs.val());if(v.length&&v[0]?.name)bname=v[0].name}
   }catch(e){}
   const OLD=["units","rent_history","config","transactions","notes","buildings"];
-  const upd={};
   for(const p of OLD){
-    try{const s=await db.ref("rent_app/"+uid+"/"+p).once("value");
-      if(s.exists()){upd["rent_app/"+uid+"/main/"+p]=s.val();upd["rent_app/"+uid+"/"+p]=null}
+    try{
+      const s=await db.ref("rent_app/"+uid+"/"+p).once("value");
+      if(s.exists()){
+        await db.ref("rent_app/"+uid+"/main/"+p).set(s.val());
+        await db.ref("rent_app/"+uid+"/"+p).remove();
+      }
     }catch(e){}
   }
-  upd["rent_app/"+uid+"/_buildings/main"]={id:"main",name:bname,order:0,createdAt:new Date().toISOString()};
-  await db.ref("/").update(upd);
+  await db.ref("rent_app/"+uid+"/_buildings/main").set({id:"main",name:bname,order:0,createdAt:new Date().toISOString()});
 }
 
 // ── BUILDING SWITCHER UI ──
