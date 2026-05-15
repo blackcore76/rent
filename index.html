@@ -113,12 +113,6 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 /* TOAST */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1F2937;color:#fff;padding:11px 20px;border-radius:24px;font-size:14px;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.3);pointer-events:none}
 #toast.show{transform:translateX(-50%) translateY(0)}
-/* LOADING */
-#loading-overlay{position:fixed;inset:0;background:rgba(30,45,61,.9);z-index:8000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .3s}
-#loading-overlay.hide{opacity:0;pointer-events:none}
-.spinner{width:44px;height:44px;border:5px solid rgba(255,255,255,.2);border-top-color:#38BDF8;border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-txt{color:#fff;font-size:13px;font-weight:600}
 /* LOGIN — display:none 으로 시작, auth 확인 후에만 표시 */
 #login-screen{position:fixed;inset:0;background:linear-gradient(160deg,#0F1C2D,#1E2D3D 50%,#2A3F55);z-index:7000;display:none;align-items:center;justify-content:center;padding:20px}
 .login-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:36px 28px;max-width:320px;width:100%;text-align:center;backdrop-filter:blur(16px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
@@ -166,11 +160,6 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
   </div>
 </div>
 
-<!-- 초기 로딩 오버레이 -->
-<div id="loading-overlay">
-  <div class="spinner"></div>
-  <div class="loading-txt">로그인 확인 중...</div>
-</div>
 
 <div id="app" style="display:none">
   <div class="hdr">
@@ -289,8 +278,9 @@ function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").
 
 // ── MIGRATION ──
 async function migrateToMultiBldg(uid){
+  if(localStorage.getItem("mig_"+uid))return;
   const snap=await db.ref("rent_app/"+uid+"/_buildings").once("value");
-  if(snap.exists())return;
+  if(snap.exists()){localStorage.setItem("mig_"+uid,"1");return;}
   let bname=localStorage.getItem("rent_aptname")||"내 건물";
   try{
     const bs=await db.ref("rent_app/"+uid+"/buildings").once("value");
@@ -307,6 +297,7 @@ async function migrateToMultiBldg(uid){
     }catch(e){}
   }
   await db.ref("rent_app/"+uid+"/_buildings/main").set({id:"main",name:bname,order:0,createdAt:new Date().toISOString()});
+  localStorage.setItem("mig_"+uid,"1");
 }
 
 // ── BUILDING SWITCHER UI ──
@@ -325,7 +316,6 @@ function goAddBld(){document.getElementById("bld-drop")?.classList.remove("show"
 
 // ── AUTH STATE ── (탭 이동 시 flash 없음: login-screen은 display:none 시작)
 auth.onAuthStateChanged(async user=>{
-  const lo=document.getElementById("loading-overlay");
   const ls=document.getElementById("login-screen");
   const app=document.getElementById("app");
   if(user){
@@ -363,7 +353,7 @@ auth.onAuthStateChanged(async user=>{
     }
     curBid=getCurBid(targetUid);
 
-    ls.style.display="none";app.style.display="block";lo.classList.add("hide");
+    ls.style.display="none";app.style.display="block";
 
     // Notes for current building
     if(nL&&nRef)nRef.off("value",nL);
@@ -386,7 +376,7 @@ auth.onAuthStateChanged(async user=>{
     setSS("ok");
   }else{
     cu=null;teardownAll();
-    lo.classList.add("hide");app.style.display="none";ls.style.display="flex";
+    app.style.display="none";ls.style.display="flex";
   }
 });
 
