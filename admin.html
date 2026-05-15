@@ -147,6 +147,13 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .login-footer{font-size:10px;color:rgba(255,255,255,.25);margin-top:18px;line-height:1.7}
 /* BUILDINGS */
 .bldg-hd-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+/* LAYOUT EDITOR */
+.layout-section{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.floor-edit-row{background:#F8FAFC;border:2px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.rooms-input{width:100%;border:2px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;outline:none;color:var(--text);background:#fff}
+.rooms-input:focus{border-color:var(--sky)}
+.gen-inp{border:2px solid var(--border);border-radius:8px;padding:8px 6px;font-size:13px;font-family:inherit;outline:none;color:var(--text);background:#fff;width:100%;text-align:center}
+.gen-inp:focus{border-color:var(--sky)}
 .bldg-card{background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:16px;margin-bottom:10px;box-shadow:0 4px 16px rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.06)}
 .bldg-card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.1)}
 .bldg-card-name{font-size:15px;font-weight:900;color:#fff}
@@ -230,8 +237,25 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 
     <!-- 건물 정보 -->
     <div class="sub-page" id="sp2">
+      <!-- 호실 구조 설정 -->
+      <div class="layout-section">
+        <div style="font-size:14px;font-weight:800;color:var(--hdr);margin-bottom:12px">🏢 호실 구조 설정</div>
+        <div style="background:#F0F9FF;border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid #BAE6FD">
+          <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">빠른 자동 생성</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+            <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">시작 층</div><input class="gen-inp" type="number" id="gen-from" value="2" min="1" max="30"></div>
+            <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">끝 층</div><input class="gen-inp" type="number" id="gen-to" value="4" min="1" max="30"></div>
+            <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">층당 호실 수</div><input class="gen-inp" type="number" id="gen-count" value="6" min="1" max="30"></div>
+          </div>
+          <button onclick="generateLayout()" style="width:100%;padding:9px;background:var(--sky);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">⚡ 자동 생성 (기존 설정 교체)</button>
+        </div>
+        <div id="floor-rows"></div>
+        <button onclick="addFloorRow()" style="width:100%;padding:9px;background:#F1F5F9;color:var(--sub);border:2px dashed var(--border);border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px">+ 층 추가</button>
+        <button onclick="saveRoomLayout()" class="btn-save" style="margin-top:0">💾 호실 구조 저장</button>
+      </div>
+      <!-- 건물정보카드 -->
       <div class="bldg-hd-row">
-        <span style="font-size:14px;font-weight:800;color:var(--hdr)">🏠 건물 정보</span>
+        <span style="font-size:14px;font-weight:800;color:var(--hdr)">🏠 건물정보카드</span>
         <button class="btn-add" onclick="openAddBuilding()">+ 추가</button>
       </div>
       <div id="buildings-list"></div>
@@ -332,9 +356,10 @@ const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d52
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),storage=firebase.storage(),gProv=new firebase.auth.GoogleAuthProvider();
 const MASTER_UID='unGRVYWhmcMmEbYbWjAL8Y1pXVP2';
-let cu=null,pbRef=null,uRef=null,bldgRef=null,pbL=null,uL=null,bldgL=null;
-let contacts={},units={},buildings={};
-const ROOMS=[201,202,203,204,205,206,301,302,303,304,305,306,401,402,403,404,405,406];
+let cu=null,pbRef=null,uRef=null,bldgRef=null,configRef=null,pbL=null,uL=null,bldgL=null,cL=null;
+let contacts={},units={},buildings={},roomLayout={};
+let ROOMS=[];
+const DEFAULT_LAYOUT={"2":["201","202","203","204","205","206"],"3":["301","302","303","304","305","306"],"4":["401","402","403","404","405","406"]};
 const CAT_LABEL={tenant:"세입자",vendor:"업체/수리",agency:"공인중개사",other:"기타"};
 const CAT_COLOR={tenant:"cat-tenant",vendor:"cat-vendor",agency:"cat-agency",other:"cat-other"};
 const CAT_BG={tenant:"#1255A0",vendor:"#059669",agency:"#7C3AED",other:"#64748B"};
@@ -373,7 +398,8 @@ auth.onAuthStateChanged(user=>{
     pbRef=db.ref(`rent_app/${targetUid}/phonebook`);
     uRef=db.ref(`rent_app/${targetUid}/units`);
     bldgRef=db.ref(`rent_app/${targetUid}/buildings`);
-    listenPB();listenUnits();listenBuildings();
+    configRef=db.ref(`rent_app/${targetUid}/config/roomLayout`);
+    listenPB();listenUnits();listenBuildings();listenConfig();
   }else{
     cu=null;lo.classList.add("hide");app.style.display="none";ls.style.display="flex";
     if(pbL&&pbRef)pbRef.off("value",pbL);
@@ -382,7 +408,7 @@ auth.onAuthStateChanged(user=>{
   }
 });
 function signInGoogle(){auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message))}
-function doSignOut(){closeMenu();if(pbL&&pbRef)pbRef.off("value",pbL);if(uL&&uRef)uRef.off("value",uL);if(bldgL&&bldgRef)bldgRef.off("value",bldgL);auth.signOut()}
+function doSignOut(){closeMenu();if(pbL&&pbRef)pbRef.off("value",pbL);if(uL&&uRef)uRef.off("value",uL);if(bldgL&&bldgRef)bldgRef.off("value",bldgL);if(cL&&configRef)configRef.off("value",cL);auth.signOut()}
 function toggleMenu(){document.getElementById("user-menu").classList.toggle("show")}
 function closeMenu(){document.getElementById("user-menu").classList.remove("show")}
 document.addEventListener("click",e=>{if(!e.target.closest("#av-wrap")&&!e.target.closest("#user-menu"))closeMenu()});
@@ -395,7 +421,62 @@ function setSubTab(n,btn){
   btn.classList.add("on");
   document.querySelectorAll(".sub-page").forEach((p,i)=>p.classList.toggle("on",i===n));
   if(n===1)renderContracts();
-  if(n===2)renderBuildings();
+  if(n===2){renderBuildings();renderRoomLayout();}
+}
+
+// ── ROOM LAYOUT ──
+function listenConfig(){
+  if(cL&&configRef)configRef.off("value",cL);
+  cL=configRef.on("value",snap=>{
+    roomLayout=snap.val()||DEFAULT_LAYOUT;
+    ROOMS=Object.values(roomLayout).flat().map(String);
+    if(curSub===2)renderRoomLayout();
+  },()=>{});
+}
+function renderRoomLayout(){
+  const el=document.getElementById("floor-rows");if(!el)return;
+  const floors=Object.keys(roomLayout).map(Number).sort((a,b)=>a-b);
+  el.innerHTML=floors.map(f=>`
+    <div class="floor-edit-row" data-floor="${f}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="font-size:13px;font-weight:700;color:var(--hdr)">${f}층</span>
+        <button class="bldg-ic del" onclick="removeFloorRow(this)" style="width:22px;height:22px;font-size:10px">✕</button>
+      </div>
+      <input class="rooms-input" type="text" value="${(roomLayout[String(f)]||[]).join(", ")}" placeholder="401, 402, 403">
+    </div>`).join("");
+}
+function addFloorRow(){
+  const existing=Object.keys(roomLayout).map(Number).sort((a,b)=>a-b);
+  const next=existing.length?existing[existing.length-1]+1:2;
+  const tmp={...roomLayout};tmp[String(next)]=[];roomLayout=tmp;
+  renderRoomLayout();
+}
+function removeFloorRow(btn){
+  const row=btn.closest(".floor-edit-row"),floor=row.dataset.floor;
+  const tmp={...roomLayout};delete tmp[floor];roomLayout=tmp;
+  renderRoomLayout();
+}
+function generateLayout(){
+  const from=parseInt(document.getElementById("gen-from").value)||2;
+  const to=parseInt(document.getElementById("gen-to").value)||4;
+  const cnt=parseInt(document.getElementById("gen-count").value)||6;
+  if(from>to){showToast("❗ 시작 층이 끝 층보다 큽니다");return}
+  const nl={};
+  for(let f=from;f<=to;f++)nl[String(f)]=Array.from({length:cnt},(_,i)=>String(f*100+i+1));
+  roomLayout=nl;renderRoomLayout();
+  showToast("⚡ 미리보기 생성됨 — 저장 버튼으로 확정하세요");
+}
+function saveRoomLayout(){
+  const rows=document.querySelectorAll(".floor-edit-row"),nl={};
+  rows.forEach(row=>{
+    const floor=row.dataset.floor,val=row.querySelector(".rooms-input").value;
+    const rooms=val.split(",").map(r=>r.trim()).filter(Boolean);
+    if(rooms.length)nl[floor]=rooms;
+  });
+  if(!Object.keys(nl).length){showToast("❗ 최소 1개 층 이상 설정하세요");return}
+  configRef.set(nl)
+    .then(()=>showToast("✅ 호실 구조 저장됨"))
+    .catch(()=>showToast("❗ 저장 실패"));
 }
 
 // ── BUILDINGS ──

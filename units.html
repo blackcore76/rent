@@ -200,11 +200,8 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
   </div>
   <div class="content">
     <div class="tabs-row">
-      <div class="floor-tabs">
-        <button class="floor-tab on" onclick="setFloor(0,this)">전체</button>
-        <button class="floor-tab" onclick="setFloor(2,this)">2층</button>
-        <button class="floor-tab" onclick="setFloor(3,this)">3층</button>
-        <button class="floor-tab" onclick="setFloor(4,this)">4층</button>
+      <div class="floor-tabs" id="floor-tabs">
+        <!-- 동적 생성 -->
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0;align-self:flex-start">
         <button class="export-btn" onclick="exportCSV()">📥 CSV</button>
@@ -310,8 +307,21 @@ const MASTER_UID='unGRVYWhmcMmEbYbWjAL8Y1pXVP2';
 const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),storage=firebase.storage(),gProv=new firebase.auth.GoogleAuthProvider();
-let cu=null,uRef=null,hRef=null,uL=null,hL=null,units={},rentHistory={},curFloor=0,curRoom=null,mStatus="vacant",mRoomType="oneroom",curFilter="";
-const ROOMS=[201,202,203,204,205,206,301,302,303,304,305,306,401,402,403,404,405,406];
+let cu=null,uRef=null,hRef=null,configRef=null,uL=null,hL=null,units={},rentHistory={},curFloor=0,curRoom=null,mStatus="vacant",mRoomType="oneroom",curFilter="";
+let ROOMS=[],FLOORS=[];
+const DEFAULT_LAYOUT={"2":["201","202","203","204","205","206"],"3":["301","302","303","304","305","306"],"4":["401","402","403","404","405","406"]};
+function applyLayout(layout){
+  ROOMS=[];FLOORS=[];
+  Object.keys(layout).sort((a,b)=>Number(a)-Number(b)).forEach(f=>{
+    FLOORS.push(Number(f));(layout[f]||[]).forEach(r=>ROOMS.push(String(r)));
+  });
+  renderFloorTabs();
+}
+function renderFloorTabs(){
+  const el=document.getElementById("floor-tabs");if(!el)return;
+  el.innerHTML=`<button class="floor-tab ${curFloor===0?"on":""}" onclick="setFloor(0,this)">전체</button>`+
+    FLOORS.map(f=>`<button class="floor-tab ${curFloor===f?"on":""}" onclick="setFloor(${f},this)">${f}층</button>`).join("");
+}
 
 auth.onAuthStateChanged(user=>{
   const lo=document.getElementById("loading-overlay");
@@ -349,9 +359,13 @@ auth.onAuthStateChanged(user=>{
       });
     }
 
+    configRef=db.ref(`rent_app/${targetUid}/config/roomLayout`);
     uRef=db.ref(`rent_app/${targetUid}/units`);
     hRef=db.ref(`rent_app/${targetUid}/rent_history`);
-    listenUnits();listenHistory();
+    configRef.once("value").then(snap=>{
+      applyLayout(snap.val()||DEFAULT_LAYOUT);
+      listenUnits();listenHistory();
+    }).catch(()=>{applyLayout(DEFAULT_LAYOUT);listenUnits();listenHistory();});
   }else{
     cu=null;lo.classList.add("hide");app.style.display="none";ls.style.display="flex";
     if(uL&&uRef)uRef.off("value",uL);
@@ -426,10 +440,10 @@ function toggleHistory(roomId,ym){
   }).catch(()=>showToast("❗ 저장 실패"));
 }
 async function ensureRooms(ex){
-  const up={};ROOMS.forEach(r=>{if(!ex[r])up[r]=defRoom(r)});
+  const up={};ROOMS.forEach(r=>{if(!ex[String(r)])up[String(r)]=defRoom(r)});
   if(Object.keys(up).length)await uRef.update(up);
 }
-function defRoom(n){return{room:String(n),floor:Math.floor(n/100),status:"vacant",roomType:"oneroom",tenantName:"",tenantName2:"",tenantPhone:"",tenantPhone2:"",depositAmount:0,monthlyRent:0,contractStart:"",contractEnd:"",rentPaid:false,memo:""}}
+function defRoom(r){return{room:String(r),floor:Math.floor(parseInt(r)/100),status:"vacant",roomType:"oneroom",tenantName:"",tenantName2:"",tenantPhone:"",tenantPhone2:"",depositAmount:0,monthlyRent:0,contractStart:"",contractEnd:"",rentPaid:false,memo:""}}
 function setFloor(f,btn){
   curFloor=f;document.querySelectorAll(".floor-tab").forEach(b=>b.classList.remove("on"));
   btn.classList.add("on");renderGrid();
@@ -442,7 +456,7 @@ function computePaidStatus(roomId){
 const RTYPE_LBL={oneroom:"원룸",twobay:"투베이",tworoom:"투룸",threeroom:"쓰리룸"};
 const RTYPE_CLS={oneroom:"badge-oneroom",twobay:"badge-twobay",tworoom:"badge-tworoom",threeroom:"badge-threeroom"};
 function renderGrid(){
-  let list=ROOMS.map(r=>units[r]).filter(u=>u&&(curFloor===0||u.floor===curFloor));
+  let list=ROOMS.map(r=>units[String(r)]).filter(u=>u&&(curFloor===0||u.floor===curFloor));
   if(curFilter==="rented") list=list.filter(u=>u.status==="rented");
   else if(curFilter==="vacant") list=list.filter(u=>u.status==="vacant");
   else if(curFilter==="unpaid") list=list.filter(u=>u.status==="rented"&&computePaidStatus(u.room)===false);
