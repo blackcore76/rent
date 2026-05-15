@@ -254,9 +254,16 @@ const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d52
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),gProv=new firebase.auth.GoogleAuthProvider();
 const MASTER_UID="unGRVYWhmcMmEbYbWjAL8Y1pXVP2";
-let cu=null,uRef=null,nRef=null,hRef=null,bldgRef=null,uL=null,nL=null,hL=null,bldgL=null,units={},notes={},rentHistory={},buildings={};
+let cu=null,uRef=null,nRef=null,hRef=null,bldgRef=null,configRef=null,uL=null,nL=null,hL=null,bldgL=null,units={},notes={},rentHistory={},buildings={};
 let mUid="",mName="";
-const ROOMS=[201,202,203,204,205,206,301,302,303,304,305,306,401,402,403,404,405,406];
+let ROOMS=[];
+const DEFAULT_LAYOUT={"2":["201","202","203","204","205","206"],"3":["301","302","303","304","305","306"],"4":["401","402","403","404","405","406"]};
+function applyLayout(layout){
+  ROOMS=[];
+  Object.keys(layout).sort((a,b)=>Number(a)-Number(b)).forEach(f=>{
+    (layout[f]||[]).forEach(r=>ROOMS.push(String(r)));
+  });
+}
 
 // ── 건물명 초기화 ──
 const APT_KEY="rent_aptname";
@@ -319,11 +326,15 @@ auth.onAuthStateChanged(user=>{
         });
       }
     }
+    configRef=db.ref(`rent_app/${targetUid}/config/roomLayout`);
     uRef=db.ref(`rent_app/${targetUid}/units`);
     nRef=db.ref(`rent_app/${targetUid}/notes`);
     hRef=db.ref(`rent_app/${targetUid}/rent_history`);
     bldgRef=db.ref(`rent_app/${targetUid}/buildings`);
-    listenUnits();listenNotes();listenHistory();listenBuildings();
+    configRef.once("value").then(snap=>{
+      applyLayout(snap.val()||DEFAULT_LAYOUT);
+      listenUnits();listenNotes();listenHistory();listenBuildings();
+    }).catch(()=>{applyLayout(DEFAULT_LAYOUT);listenUnits();listenNotes();listenHistory();listenBuildings();});
   }else{
     lo.classList.add("hide");
     app.style.display="none";
@@ -394,13 +405,13 @@ function computePaidStatus(roomId){
   return true;
 }
 async function ensureRooms(ex){
-  const up={};ROOMS.forEach(r=>{if(!ex[r])up[r]=defRoom(r)});
+  const up={};ROOMS.forEach(r=>{if(!ex[String(r)])up[String(r)]=defRoom(r)});
   if(Object.keys(up).length)await uRef.update(up);
 }
-function defRoom(n){return{room:String(n),floor:Math.floor(n/100),status:"vacant",tenantName:"",tenantName2:"",tenantPhone:"",tenantPhone2:"",depositAmount:0,monthlyRent:0,contractStart:"",contractEnd:"",memo:""}}
+function defRoom(r){return{room:String(r),floor:Math.floor(parseInt(r)/100),status:"vacant",tenantName:"",tenantName2:"",tenantPhone:"",tenantPhone2:"",depositAmount:0,monthlyRent:0,contractStart:"",contractEnd:"",memo:""}}
 
 function renderDash(){
-  const list=ROOMS.map(r=>units[r]).filter(Boolean);
+  const list=ROOMS.map(r=>units[String(r)]).filter(Boolean);
   const rented=list.filter(u=>u.status==="rented");
   const vacant=list.filter(u=>u.status==="vacant");
   const unpaid=rented.filter(u=>computePaidStatus(u.room)===false);
