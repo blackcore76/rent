@@ -84,6 +84,9 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .tg-btn{flex:1;padding:10px 8px;border:none;background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--sub);transition:all .15s}
 .tg-btn.on-blue{background:var(--blue);color:#fff}
 .tg-btn.on-gray{background:var(--indigo);color:#fff}
+.tg-btn.on-amber{background:#D97706;color:#fff}
+.badge-monthly{background:#FFF7ED;color:#C2410C}
+.badge-jeonse{background:#EDE9FE;color:#5B21B6}
 .divider{height:1px;background:var(--border);margin:16px 0}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
@@ -231,10 +234,21 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <button class="tg-btn" id="tg-tworoom" onclick="setRoomType('tworoom')">투룸</button>
       <button class="tg-btn" id="tg-threeroom" onclick="setRoomType('threeroom')">쓰리룸</button>
     </div>
-    <div class="tg-label" style="margin-top:12px">임대 상태</div>
-    <div class="toggle-group">
-      <button class="tg-btn on-blue" id="tg-rented" onclick="setStatus('rented')">🏠 임대중</button>
-      <button class="tg-btn" id="tg-vacant" onclick="setStatus('vacant')">🔓 공실</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div>
+        <div class="tg-label" style="margin-top:12px">임대 상태</div>
+        <div class="toggle-group">
+          <button class="tg-btn on-blue" id="tg-rented" onclick="setStatus('rented')">임대중</button>
+          <button class="tg-btn" id="tg-vacant" onclick="setStatus('vacant')">공실</button>
+        </div>
+      </div>
+      <div>
+        <div class="tg-label" style="margin-top:12px">임대 형태</div>
+        <div class="toggle-group">
+          <button class="tg-btn on-amber" id="tg-monthly" onclick="setRentType('monthly')">월세</button>
+          <button class="tg-btn" id="tg-jeonse" onclick="setRentType('jeonse')">전세</button>
+        </div>
+      </div>
     </div>
     <div class="divider"></div>
     <div class="section-label">👤 임차인 ①</div>
@@ -307,7 +321,7 @@ const MASTER_UID='unGRVYWhmcMmEbYbWjAL8Y1pXVP2';
 const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),storage=firebase.storage(),gProv=new firebase.auth.GoogleAuthProvider();
-let cu=null,uRef=null,hRef=null,configRef=null,uL=null,hL=null,units={},rentHistory={},curFloor=0,curRoom=null,mStatus="vacant",mRoomType="oneroom",curFilter="";
+let cu=null,uRef=null,hRef=null,configRef=null,uL=null,hL=null,units={},rentHistory={},curFloor=0,curRoom=null,mStatus="vacant",mRoomType="oneroom",mRentType="monthly",curFilter="";
 let ROOMS=[],FLOORS=[];
 const DEFAULT_LAYOUT={"2":["201","202","203","204","205","206"],"3":["301","302","303","304","305","306"],"4":["401","402","403","404","405","406"]};
 function applyLayout(layout){
@@ -443,7 +457,7 @@ async function ensureRooms(ex){
   const up={};ROOMS.forEach(r=>{if(!ex[String(r)])up[String(r)]=defRoom(r)});
   if(Object.keys(up).length)await uRef.update(up);
 }
-function defRoom(r){return{room:String(r),floor:Math.floor(parseInt(r)/100),status:"vacant",roomType:"oneroom",tenantName:"",tenantName2:"",tenantPhone:"",tenantPhone2:"",depositAmount:0,monthlyRent:0,contractStart:"",contractEnd:"",rentPaid:false,memo:""}}
+function defRoom(r){return{room:String(r),floor:Math.floor(parseInt(r)/100),status:"vacant",roomType:"oneroom",rentType:"monthly",tenantName:"",tenantName2:"",tenantPhone:"",tenantPhone2:"",depositAmount:0,monthlyRent:0,contractStart:"",contractEnd:"",rentPaid:false,memo:""}}
 function setFloor(f,btn){
   curFloor=f;document.querySelectorAll(".floor-tab").forEach(b=>b.classList.remove("on"));
   btn.classList.add("on");renderGrid();
@@ -455,6 +469,8 @@ function computePaidStatus(roomId){
 }
 const RTYPE_LBL={oneroom:"원룸",twobay:"투베이",tworoom:"투룸",threeroom:"쓰리룸"};
 const RTYPE_CLS={oneroom:"badge-oneroom",twobay:"badge-twobay",tworoom:"badge-tworoom",threeroom:"badge-threeroom"};
+const RENT_TYPE_LBL={monthly:"월세",jeonse:"전세"};
+const RENT_TYPE_CLS={monthly:"badge-monthly",jeonse:"badge-jeonse"};
 function renderGrid(){
   let list=ROOMS.map(r=>units[String(r)]).filter(u=>u&&(curFloor===0||u.floor===curFloor));
   if(curFilter==="rented") list=list.filter(u=>u.status==="rented");
@@ -468,6 +484,8 @@ function renderGrid(){
     const sBadge=`<span class="rc-sbadge ${isR?"badge-rented":"badge-vacant"}">${isR?"임대중":"공실"}</span>`;
     const rtLbl=RTYPE_LBL[u.roomType]||"";
     const rtBadge=rtLbl?`<span class="rc-sbadge ${RTYPE_CLS[u.roomType]||""}">${rtLbl}</span>`:"";
+    const rentTypeLbl=RENT_TYPE_LBL[u.rentType||"monthly"];
+    const rentTypeBadge=`<span class="rc-sbadge ${RENT_TYPE_CLS[u.rentType||"monthly"]}">${rentTypeLbl}</span>`;
     const rentTxt=isR&&u.monthlyRent?fmtWon(u.monthlyRent)+"/월":"—";
     let pBadge="";
     if(isR){const ps=computePaidStatus(u.room);
@@ -484,7 +502,7 @@ function renderGrid(){
       else if(diff<=30) ddayHtml=`<span class="rc-dday dday-warn">D-${diff}</span>`;
       else ddayHtml=`<span class="rc-dday dday-safe">D-${diff}</span>`;}
     return`<div class="room-card status-${u.status}" onclick="openSheet('${u.room}')">
-      <div class="rc-top"><span class="rc-num">${u.room}호</span><div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${rtBadge}${sBadge}</div></div>
+      <div class="rc-top"><span class="rc-num">${u.room}호</span><div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${rentTypeBadge}${rtBadge}${sBadge}</div></div>
       <div class="rc-names">${esc(namesTxt)}</div>
       ${phonesTxt?`<div class="rc-phones">📞 ${esc(phonesTxt)}</div>`:""}
       <div class="rc-rent">${rentTxt}</div>
@@ -499,6 +517,7 @@ function openSheet(roomId){
   document.getElementById("m-room").value=roomId;
   mStatus=u.status||"vacant";
   mRoomType=u.roomType||"oneroom";
+  mRentType=u.rentType||"monthly";
   document.getElementById("m-name").value=u.tenantName||"";
   document.getElementById("m-phone").value=u.tenantPhone||"";
   document.getElementById("m-name2").value=u.tenantName2||"";
@@ -508,7 +527,7 @@ function openSheet(roomId){
   document.getElementById("m-start").value=u.contractStart||"";
   document.getElementById("m-end").value=u.contractEnd||"";
   document.getElementById("m-memo").value=u.memo||"";
-  updateTgUI();updateRtypeUI();renderPhotos(u.photos||{});renderHistory(roomId);
+  updateTgUI();updateRtypeUI();updateRentTypeUI();renderPhotos(u.photos||{});renderHistory(roomId);
   document.getElementById("room-sheet").classList.add("show");
 }
 function closeSheet(){document.getElementById("room-sheet").classList.remove("show");curRoom=null}
@@ -516,6 +535,11 @@ function setStatus(s){mStatus=s;updateTgUI()}
 function updateTgUI(){
   document.getElementById("tg-rented").className="tg-btn"+(mStatus==="rented"?" on-blue":"");
   document.getElementById("tg-vacant").className="tg-btn"+(mStatus==="vacant"?" on-gray":"");
+}
+function setRentType(t){mRentType=t;updateRentTypeUI()}
+function updateRentTypeUI(){
+  document.getElementById("tg-monthly").className="tg-btn"+(mRentType==="monthly"?" on-amber":"");
+  document.getElementById("tg-jeonse").className="tg-btn"+(mRentType==="jeonse"?" on-gray":"");
 }
 function setRoomType(t){mRoomType=t;updateRtypeUI()}
 function updateRtypeUI(){
@@ -526,7 +550,7 @@ function updateRtypeUI(){
 }
 function saveRoom(){
   if(!curRoom)return;
-  const data={room:curRoom,floor:Math.floor(parseInt(curRoom)/100),status:mStatus,roomType:mRoomType,
+  const data={room:curRoom,floor:Math.floor(parseInt(curRoom)/100),status:mStatus,roomType:mRoomType,rentType:mRentType,
     tenantName:document.getElementById("m-name").value.trim(),
     tenantName2:document.getElementById("m-name2").value.trim(),
     tenantPhone:document.getElementById("m-phone").value.trim(),
