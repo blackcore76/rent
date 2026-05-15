@@ -167,6 +167,17 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .bldg-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px}
 .bldg-val{font-size:13px;font-weight:700;color:#4DD0E1;letter-spacing:.3px;word-break:break-all}
 .bldg-val-muted{font-size:13px;font-weight:600;color:rgba(255,255,255,.75);word-break:break-all}
+.bld-btn{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);border-radius:8px;padding:5px 10px;cursor:pointer;color:#fff;font-size:13px;font-weight:700;font-family:inherit;transition:background .15s;max-width:160px;min-width:0}
+.bld-btn:active{background:rgba(255,255,255,.22)}
+.bld-btn-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bld-drop{position:fixed;top:56px;left:12px;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:8px;min-width:190px;z-index:400;display:none;border:1px solid var(--border)}
+.bld-drop.show{display:block}
+.bld-item{display:flex;align-items:center;gap:6px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text);transition:background .12s}
+.bld-item:active{background:#F0F4F8}
+.bld-item.cur{color:var(--sky)}
+.bld-sep{height:1px;background:var(--border);margin:4px 0}
+.bld-subhd{font-size:11px;font-weight:800;color:var(--sub);padding:10px 4px 4px;letter-spacing:.5px;border-top:1px solid var(--border);margin-top:4px}
+.bld-subhd:first-child{border-top:none;padding-top:4px;margin-top:0}
 </style>
 </head>
 <body>
@@ -192,7 +203,13 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 <div id="app" style="display:none">
   <div class="hdr">
     <div class="hdr-top">
-      <div class="hdr-title">🗂 관리</div>
+      <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1">
+        <div class="hdr-title" style="flex-shrink:0">🗂</div>
+        <button class="bld-btn" id="bld-btn" onclick="toggleBldDrop(event)">
+          <span class="bld-btn-name" id="bld-name">—</span>
+          <span style="font-size:9px;opacity:.7;flex-shrink:0">▾</span>
+        </button>
+      </div>
       <div class="hdr-actions">
 
         <button class="admin-btn" id="admin-btn" onclick="location.href='admin-master.html'">🔧 관리자</button>
@@ -207,6 +224,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <a href="admin.html" class="nav-tab on">🗂 관리</a>
     </div>
   </div>
+  <div class="bld-drop" id="bld-drop"></div>
   <div id="user-menu" class="user-menu">
     <div class="um-name" id="um-name">—</div>
     <div class="um-email" id="um-email">—</div>
@@ -237,6 +255,14 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 
     <!-- 건물 정보 -->
     <div class="sub-page" id="sp2">
+      <!-- 건물 목록 관리 -->
+      <div class="layout-section" style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span style="font-size:14px;font-weight:800;color:var(--hdr)">🏢 임대 건물 목록</span>
+          <button class="btn-add" onclick="openAddBldSheet()">+ 건물 추가</button>
+        </div>
+        <div id="bld-registry-list"></div>
+      </div>
       <!-- 호실 구조 설정 -->
       <div class="layout-section">
         <div style="font-size:14px;font-weight:800;color:var(--hdr);margin-bottom:12px">🏢 호실 구조 설정</div>
@@ -260,6 +286,22 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       </div>
       <div id="buildings-list"></div>
     </div>
+  </div>
+</div>
+
+<!-- 건물 추가 SHEET -->
+<div class="sheet-bg" id="add-bld-sheet">
+  <div class="sheet">
+    <div class="sheet-hd">
+      <h3>🏢 건물 추가</h3>
+      <button class="sheet-close" onclick="closeAddBldSheet()">✕</button>
+    </div>
+    <div class="field">
+      <label>건물명 *</label>
+      <input type="text" id="add-bld-name" placeholder="조아빌, 행복한빌...">
+    </div>
+    <p style="font-size:12px;color:var(--hint);margin-bottom:12px;line-height:1.6">건물 추가 후 호실 구조 설정에서 층과 호실을 설정하세요.</p>
+    <button class="btn-save" onclick="saveNewBld()">✅ 추가하기</button>
   </div>
 </div>
 
@@ -356,18 +398,58 @@ const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d52
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),storage=firebase.storage(),gProv=new firebase.auth.GoogleAuthProvider();
 const MASTER_UID='unGRVYWhmcMmEbYbWjAL8Y1pXVP2';
-let cu=null,pbRef=null,uRef=null,bldgRef=null,configRef=null,pbL=null,uL=null,bldgL=null,cL=null;
-let contacts={},units={},buildings={},roomLayout={};
+let cu=null,pbRef=null,uRef=null,bldgDetailRef=null,configRef=null,bldgsRef=null;
+let pbL=null,uL=null,bldgDetailL=null,cL=null,bldgsL=null;
+let contacts={},units={},bldgDetails={},roomLayout={},bldgsData={},curBid="main",mUid="",mName="";
 let ROOMS=[];
 const DEFAULT_LAYOUT={"2":["201","202","203","204","205","206"],"3":["301","302","303","304","305","306"],"4":["401","402","403","404","405","406"]};
 const CAT_LABEL={tenant:"세입자",vendor:"업체/수리",agency:"공인중개사",other:"기타"};
 const CAT_COLOR={tenant:"cat-tenant",vendor:"cat-vendor",agency:"cat-agency",other:"cat-other"};
 const CAT_BG={tenant:"#1255A0",vendor:"#059669",agency:"#7C3AED",other:"#64748B"};
 
-auth.onAuthStateChanged(user=>{
+// ── BUILDING UTILS ──
+function getCurBid(uid){return localStorage.getItem("rbid_"+uid)||"main"}
+function setCurBid(uid,bid){localStorage.setItem("rbid_"+uid,bid)}
+function sortedBids(bd){return Object.keys(bd).sort((a,b)=>(bd[a]?.order||0)-(bd[b]?.order||0))}
+
+// ── MIGRATION ──
+async function migrateToMultiBldg(uid){
+  const snap=await db.ref("rent_app/"+uid+"/_buildings").once("value");
+  if(snap.exists())return;
+  let bname=localStorage.getItem("rent_aptname")||"내 건물";
+  try{
+    const bs=await db.ref("rent_app/"+uid+"/buildings").once("value");
+    if(bs.exists()){const v=Object.values(bs.val());if(v.length&&v[0]?.name)bname=v[0].name}
+  }catch(e){}
+  const OLD=["units","rent_history","config","transactions","notes","buildings"];
+  const upd={};
+  for(const p of OLD){
+    try{const s=await db.ref("rent_app/"+uid+"/"+p).once("value");
+      if(s.exists()){upd["rent_app/"+uid+"/main/"+p]=s.val();upd["rent_app/"+uid+"/"+p]=null}
+    }catch(e){}
+  }
+  upd["rent_app/"+uid+"/_buildings/main"]={id:"main",name:bname,order:0,createdAt:new Date().toISOString()};
+  await db.ref("/").update(upd);
+}
+
+// ── BUILDING SWITCHER UI ──
+function toggleBldDrop(e){e.stopPropagation();document.getElementById("bld-drop").classList.toggle("show")}
+document.addEventListener("click",e=>{if(!e.target.closest("#bld-drop")&&!e.target.closest("#bld-btn"))document.getElementById("bld-drop")?.classList.remove("show")});
+function renderBldDrop(bd,cur){
+  const nameEl=document.getElementById("bld-name");
+  if(nameEl)nameEl.textContent=bd[cur]?.name||"—";
+  const el=document.getElementById("bld-drop");if(!el)return;
+  const bids=sortedBids(bd);
+  el.innerHTML=bids.map(bid=>`<div class="bld-item ${bid===cur?"cur":""}" onclick="switchBld('${bid}')">
+    <span style="width:14px">${bid===cur?"✓":""}</span>${esc(bd[bid]?.name||"건물")}</div>`).join("")+
+    '<div class="bld-sep"></div><div class="bld-item" style="color:var(--sky)" onclick="goAddBld()">＋ 건물 추가</div>';
+}
+function goAddBld(){document.getElementById("bld-drop")?.classList.remove("show");openAddBldSheet()}
+
+auth.onAuthStateChanged(async user=>{
   const lo=document.getElementById("loading-overlay"),ls=document.getElementById("login-screen"),app=document.getElementById("app");
   if(user){
-    cu=user;lo.classList.add("hide");ls.style.display="none";app.style.display="block";
+    cu=user;
     const w=document.getElementById("av-wrap");
     w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"U")[0]}</div>`;
     w.style.display="block";
@@ -376,39 +458,100 @@ auth.onAuthStateChanged(user=>{
     if(user.uid===MASTER_UID)document.getElementById("admin-btn").style.display="block";
     if(pbL&&pbRef)pbRef.off("value",pbL);
     if(uL&&uRef)uRef.off("value",uL);
-    if(bldgL&&bldgRef)bldgRef.off("value",bldgL);
+    if(bldgDetailL&&bldgDetailRef)bldgDetailRef.off("value",bldgDetailL);
+    if(cL&&configRef)configRef.off("value",cL);
+    if(bldgsL&&bldgsRef)bldgsRef.off("value",bldgsL);
     const params=new URLSearchParams(location.search);
-    const masterUid=params.get("master_uid");
-    const masterName=params.get("master_name");
-    const targetUid=(user.uid===MASTER_UID&&masterUid)?masterUid:user.uid;
-    if(user.uid===MASTER_UID&&masterUid){
+    mUid=params.get("master_uid")||"";
+    mName=params.get("master_name")||"";
+    const targetUid=(user.uid===MASTER_UID&&mUid)?mUid:user.uid;
+    if(user.uid===MASTER_UID&&mUid){
       const banner=document.createElement("div");
       banner.id="master-view-banner";
       banner.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(245,158,11,.05));border-bottom:1px solid rgba(245,158,11,.3);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
-      banner.innerHTML=`<span style="font-size:12px;font-weight:700;color:#F59E0B">🔧 열람 중: ${esc(masterName||masterUid)}</span><button onclick="location.href='admin-master.html'" style="font-size:11px;font-weight:700;background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#F59E0B;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit">← 관리자 페이지</button>`;
+      banner.innerHTML=`<span style="font-size:12px;font-weight:700;color:#F59E0B">🔧 열람 중: ${esc(mName||mUid)}</span><button onclick="location.href='admin-master.html'" style="font-size:11px;font-weight:700;background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#F59E0B;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit">← 관리자 페이지</button>`;
       document.body.appendChild(banner);
       document.querySelector(".content").style.marginTop="136px";
       document.querySelectorAll(".nav-tab").forEach(a=>{
         const u=new URL(a.href,location.href);
-        u.searchParams.set("master_uid",masterUid);
-        u.searchParams.set("master_name",masterName||"");
+        u.searchParams.set("master_uid",mUid);
+        u.searchParams.set("master_name",mName||"");
         a.href=u.pathname+"?"+u.searchParams.toString();
       });
     }
-    pbRef=db.ref(`rent_app/${targetUid}/phonebook`);
-    uRef=db.ref(`rent_app/${targetUid}/units`);
-    bldgRef=db.ref(`rent_app/${targetUid}/buildings`);
-    configRef=db.ref(`rent_app/${targetUid}/config/roomLayout`);
-    listenPB();listenUnits();listenBuildings();listenConfig();
+
+    // Migration (only for own account)
+    if(user.uid===targetUid){
+      try{await migrateToMultiBldg(user.uid)}catch(e){}
+    }
+    curBid=getCurBid(targetUid);
+
+    lo.classList.add("hide");ls.style.display="none";app.style.display="block";
+
+    pbRef=db.ref(`rent_app/${targetUid}/phonebook`); // SHARED - no bid
+    bldgsRef=db.ref("rent_app/"+targetUid+"/_buildings");
+    bldgsL=bldgsRef.on("value",snap=>{
+      bldgsData=snap.val()||{};
+      const bids=sortedBids(bldgsData);
+      if(bids.length&&!bldgsData[curBid]){curBid=bids[0];setCurBid(targetUid,curBid)}
+      renderBldDrop(bldgsData,curBid);
+      if(curSub===2)renderBldRegistry();
+    });
+
+    // Load current building data
+    loadBldData(targetUid,curBid);
+    listenPB();
+
+    // Auto-open add building sheet if ?addBld=1
+    if(new URLSearchParams(location.search).get("addBld")==="1"){
+      setTimeout(()=>openAddBldSheet(),200);
+    }
   }else{
     cu=null;lo.classList.add("hide");app.style.display="none";ls.style.display="flex";
     if(pbL&&pbRef)pbRef.off("value",pbL);
     if(uL&&uRef)uRef.off("value",uL);
-    if(bldgL&&bldgRef)bldgRef.off("value",bldgL);
+    if(bldgDetailL&&bldgDetailRef)bldgDetailRef.off("value",bldgDetailL);
+    if(cL&&configRef)configRef.off("value",cL);
+    if(bldgsL&&bldgsRef)bldgsRef.off("value",bldgsL);
   }
 });
+function loadBldData(uid,bid){
+  if(uL&&uRef)uRef.off("value",uL);
+  if(bldgDetailL&&bldgDetailRef)bldgDetailRef.off("value",bldgDetailL);
+  if(cL&&configRef)configRef.off("value",cL);
+  uRef=db.ref(`rent_app/${uid}/${bid}/units`);
+  bldgDetailRef=db.ref(`rent_app/${uid}/${bid}/buildings`);
+  configRef=db.ref(`rent_app/${uid}/${bid}/config/roomLayout`);
+  uL=uRef.on("value",snap=>{units=snap.val()||{};if(curSub===1)renderContracts()},()=>{});
+  bldgDetailL=bldgDetailRef.on("value",snap=>{bldgDetails=snap.val()||{};if(curSub===2)renderBldDetails()},()=>showToast("❗ 연결 오류"));
+  cL=configRef.on("value",snap=>{
+    roomLayout=snap.val()||DEFAULT_LAYOUT;
+    ROOMS=Object.values(roomLayout).flat().map(String);
+    if(curSub===2)renderRoomLayout();
+    if(curSub===1)renderContracts();
+  },()=>{});
+}
+function switchBld(bid){
+  const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
+  curBid=bid;setCurBid(targetUid,bid);
+  document.getElementById("bld-drop").classList.remove("show");
+  renderBldDrop(bldgsData,curBid);
+  loadBldData(targetUid,bid);
+  if(curSub===2)renderBldRegistry();
+}
+function switchBldAndStay(bid){
+  switchBld(bid);
+}
 function signInGoogle(){auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message))}
-function doSignOut(){closeMenu();if(pbL&&pbRef)pbRef.off("value",pbL);if(uL&&uRef)uRef.off("value",uL);if(bldgL&&bldgRef)bldgRef.off("value",bldgL);if(cL&&configRef)configRef.off("value",cL);auth.signOut()}
+function doSignOut(){
+  closeMenu();
+  if(pbL&&pbRef)pbRef.off("value",pbL);
+  if(uL&&uRef)uRef.off("value",uL);
+  if(bldgDetailL&&bldgDetailRef)bldgDetailRef.off("value",bldgDetailL);
+  if(cL&&configRef)configRef.off("value",cL);
+  if(bldgsL&&bldgsRef)bldgsRef.off("value",bldgsL);
+  auth.signOut();
+}
 function toggleMenu(){document.getElementById("user-menu").classList.toggle("show")}
 function closeMenu(){document.getElementById("user-menu").classList.remove("show")}
 document.addEventListener("click",e=>{if(!e.target.closest("#av-wrap")&&!e.target.closest("#user-menu"))closeMenu()});
@@ -421,17 +564,58 @@ function setSubTab(n,btn){
   btn.classList.add("on");
   document.querySelectorAll(".sub-page").forEach((p,i)=>p.classList.toggle("on",i===n));
   if(n===1)renderContracts();
-  if(n===2){renderBuildings();renderRoomLayout();}
+  if(n===2){renderBldRegistry();renderRoomLayout();renderBldDetails();}
 }
 
-// ── ROOM LAYOUT ──
-function listenConfig(){
-  if(cL&&configRef)configRef.off("value",cL);
-  cL=configRef.on("value",snap=>{
-    roomLayout=snap.val()||DEFAULT_LAYOUT;
-    ROOMS=Object.values(roomLayout).flat().map(String);
-    if(curSub===2)renderRoomLayout();
-  },()=>{});
+// ── BUILDING REGISTRY ──
+function renderBldRegistry(){
+  const el=document.getElementById("bld-registry-list");if(!el)return;
+  const bids=sortedBids(bldgsData);
+  if(!bids.length){el.innerHTML='<div style="font-size:13px;color:var(--hint);text-align:center;padding:12px">등록된 건물이 없습니다</div>';return}
+  el.innerHTML=bids.map(bid=>{
+    const b=bldgsData[bid];
+    const isCur=bid===curBid;
+    return`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:${isCur?"var(--blue-lt)":"#F8FAFC"};border-radius:10px;margin-bottom:6px;border:2px solid ${isCur?"var(--blue)":"var(--border)"}">
+      <span style="font-size:13px;font-weight:700;flex:1;color:${isCur?"var(--blue-t)":"var(--text)"};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${isCur?"✓ ":""}${esc(b?.name||"건물")}</span>
+      <button onclick="switchBldAndStay('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:${isCur?"var(--blue)":"var(--hdr)"};color:#fff;cursor:pointer;font-family:inherit">전환</button>
+      <button onclick="openRenameBld('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:#F1F5F9;color:var(--sub);cursor:pointer;font-family:inherit">수정</button>
+      ${bids.length>1?`<button onclick="delBld('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:var(--red-lt);color:var(--red);cursor:pointer;font-family:inherit">삭제</button>`:""}
+    </div>`;
+  }).join("");
+}
+function openAddBldSheet(){
+  document.getElementById("add-bld-name").value="";
+  document.getElementById("add-bld-sheet").classList.add("show");
+}
+function closeAddBldSheet(){document.getElementById("add-bld-sheet").classList.remove("show")}
+function saveNewBld(){
+  const name=document.getElementById("add-bld-name").value.trim();
+  if(!name){showToast("❗ 건물명을 입력하세요");return}
+  const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
+  const bid=Date.now().toString(36);
+  const order=Object.keys(bldgsData).length;
+  db.ref("rent_app/"+targetUid+"/_buildings/"+bid).set({id:bid,name,order,createdAt:new Date().toISOString()})
+    .then(()=>{closeAddBldSheet();showToast("✅ 건물 추가됨");switchBld(bid)})
+    .catch(()=>showToast("❗ 저장 실패"));
+}
+function openRenameBld(bid){
+  const name=bldgsData[bid]?.name||"";
+  const newName=window.prompt("건물명 변경",name);
+  if(newName===null||!newName.trim())return;
+  const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
+  db.ref("rent_app/"+targetUid+"/_buildings/"+bid+"/name").set(newName.trim())
+    .then(()=>showToast("✅ 이름 변경됨"))
+    .catch(()=>showToast("❗ 실패"));
+}
+function delBld(bid){
+  showCM("건물 삭제","\""+(bldgsData[bid]?.name||"건물")+"\" 건물의 모든 호실, 계약, 이력 데이터가 삭제됩니다. 계속하시겠습니까?",async()=>{
+    const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
+    await db.ref("rent_app/"+targetUid+"/_buildings/"+bid).remove();
+    await db.ref("rent_app/"+targetUid+"/"+bid).remove();
+    showToast("🗑 건물 삭제됨");
+    const remaining=sortedBids(bldgsData).filter(b=>b!==bid);
+    if(remaining.length)switchBld(remaining[0]);
+  });
 }
 function renderRoomLayout(){
   const el=document.getElementById("floor-rows");if(!el)return;
@@ -479,14 +663,11 @@ function saveRoomLayout(){
     .catch(()=>showToast("❗ 저장 실패"));
 }
 
-// ── BUILDINGS ──
-function listenBuildings(){
-  bldgL=bldgRef.on("value",snap=>{buildings=snap.val()||{};if(curSub===2)renderBuildings()},()=>showToast("❗ 연결 오류"));
-}
-function renderBuildings(){
+// ── BUILDING DETAILS (info cards per current building) ──
+function renderBldDetails(){
   const el=document.getElementById("buildings-list");if(!el)return;
-  const list=Object.values(buildings).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""));
-  if(!list.length){el.innerHTML='<div class="empty-st"><div class="ei">🏠</div><div class="et">등록된 건물이 없습니다<br>+ 추가 버튼으로 등록하세요</div></div>';return}
+  const list=Object.values(bldgDetails).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""));
+  if(!list.length){el.innerHTML='<div class="empty-st"><div class="ei">🏠</div><div class="et">등록된 건물 정보가 없습니다<br>+ 추가 버튼으로 등록하세요</div></div>';return}
   el.innerHTML=list.map(b=>`<div class="bldg-card">
     <div class="bldg-card-hd">
       <span class="bldg-card-name">🏠 ${esc(b.name)}</span>
@@ -504,13 +685,15 @@ function renderBuildings(){
   </div>`).join("");
 }
 function openAddBuilding(){
-  document.getElementById("bldg-sheet-title").textContent="건물 추가";
+  document.getElementById("bldg-sheet-title").textContent="건물 정보 추가";
   ["b-id","b-name","b-addr","b-entrance","b-master","b-fee"].forEach(id=>document.getElementById(id).value="");
+  // Pre-fill with current building name
+  document.getElementById("b-name").value=bldgsData[curBid]?.name||"";
   document.getElementById("building-sheet").classList.add("show");
 }
 function startEditBuilding(id){
-  const b=buildings[id];if(!b)return;
-  document.getElementById("bldg-sheet-title").textContent="건물 수정";
+  const b=bldgDetails[id];if(!b)return;
+  document.getElementById("bldg-sheet-title").textContent="건물 정보 수정";
   document.getElementById("b-id").value=id;
   document.getElementById("b-name").value=b.name||"";
   document.getElementById("b-addr").value=b.address||"";
@@ -531,15 +714,15 @@ function saveBuilding(){
     entranceCode:document.getElementById("b-entrance").value.trim(),
     masterCode:document.getElementById("b-master").value.trim(),
     manageFee:document.getElementById("b-fee").value.trim(),
-    createdAt:existId?(buildings[existId]?.createdAt||now):now,
+    createdAt:existId?(bldgDetails[existId]?.createdAt||now):now,
     updatedAt:now};
-  bldgRef.child(id).set(data)
+  bldgDetailRef.child(id).set(data)
     .then(()=>{closeBuildingSheet();showToast("✅ 저장됨")})
     .catch(()=>showToast("❗ 저장 실패"));
 }
 function delBuilding(id){
-  showCM("건물 삭제","이 건물 정보를 삭제하시겠습니까?",()=>{
-    bldgRef.child(id).remove().then(()=>showToast("🗑 삭제됨")).catch(()=>showToast("❗ 실패"));
+  showCM("건물 정보 삭제","이 건물 정보를 삭제하시겠습니까?",()=>{
+    bldgDetailRef.child(id).remove().then(()=>showToast("🗑 삭제됨")).catch(()=>showToast("❗ 실패"));
   });
 }
 
@@ -618,9 +801,6 @@ function delContact(id){
 }
 
 // ── CONTRACTS (계약서 사진 관리) ──
-function listenUnits(){
-  uL=uRef.on("value",snap=>{units=snap.val()||{};if(curSub===1)renderContracts()},()=>{});
-}
 function renderContracts(){
   const el=document.getElementById("contracts-list");
   const allEmpty=ROOMS.every(r=>!units[r]||!units[r].photos||!Object.keys(units[r].photos).length);
@@ -705,7 +885,8 @@ async function uploadContractPhoto(room,e){
       await new Promise((res,rej)=>task.on("state_changed",s=>{fill.style.width=`${Math.round(s.bytesTransferred/s.totalBytes*100)}%`},rej,res));
       const url=await ref.getDownloadURL();
       const pid=String(ts+(i*10));
-      await db.ref(`rent_app/${cu.uid}/units/${room}/photos/${pid}`).set({id:pid,url,storagePath:path,uploadedAt:new Date().toISOString()});
+      const targetUid=(cu.uid===MASTER_UID&&mUid)?mUid:cu.uid;
+      await db.ref(`rent_app/${targetUid}/${curBid}/units/${room}/photos/${pid}`).set({id:pid,url,storagePath:path,uploadedAt:new Date().toISOString()});
       showToast("✅ 업로드 완료");
     }catch(err){showToast("❗ 업로드 실패: "+err.message)}
   }
@@ -716,7 +897,8 @@ function delContractPhoto(room,pid,spath){
   showCM("사진 삭제","이 계약서 사진을 삭제하시겠습니까?",async()=>{
     try{
       if(spath)await storage.ref(spath).delete().catch(()=>{});
-      await db.ref(`rent_app/${cu.uid}/units/${room}/photos/${pid}`).remove();
+      const targetUid=(cu.uid===MASTER_UID&&mUid)?mUid:cu.uid;
+      await db.ref(`rent_app/${targetUid}/${curBid}/units/${room}/photos/${pid}`).remove();
       showToast("🗑 삭제됨");
     }catch(e){showToast("❗ 삭제 실패")}
   });

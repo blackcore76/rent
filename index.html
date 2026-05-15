@@ -136,6 +136,17 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 /* ADMIN BTN */
 .admin-btn{padding:5px 10px;background:rgba(245,158,11,.15);border:1.5px solid rgba(245,158,11,.5);border-radius:8px;color:#FCD34D;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:background .15s;display:none}
 .admin-btn:active{background:rgba(245,158,11,.32)}
+.bld-btn{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);border-radius:8px;padding:5px 10px;cursor:pointer;color:#fff;font-size:13px;font-weight:700;font-family:inherit;transition:background .15s;max-width:160px;min-width:0}
+.bld-btn:active{background:rgba(255,255,255,.22)}
+.bld-btn-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bld-drop{position:fixed;top:56px;left:12px;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:8px;min-width:190px;z-index:400;display:none;border:1px solid var(--border)}
+.bld-drop.show{display:block}
+.bld-item{display:flex;align-items:center;gap:6px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text);transition:background .12s}
+.bld-item:active{background:#F0F4F8}
+.bld-item.cur{color:var(--sky)}
+.bld-sep{height:1px;background:var(--border);margin:4px 0}
+.bld-subhd{font-size:11px;font-weight:800;color:var(--sub);padding:10px 4px 4px;letter-spacing:.5px;border-top:1px solid var(--border);margin-top:4px}
+.bld-subhd:first-child{border-top:none;padding-top:4px;margin-top:0}
 </style>
 </head>
 <body>
@@ -164,8 +175,15 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 <div id="app" style="display:none">
   <div class="hdr">
     <div class="hdr-top">
-      <div class="hdr-title">🏠 <span id="hdr-aptname">월세 관리</span> <span id="sync-st" style="font-size:10px;margin-left:4px"></span></div>
+      <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1">
+        <div class="hdr-title" style="flex-shrink:0">🏠</div>
+        <button class="bld-btn" id="bld-btn" onclick="toggleBldDrop(event)">
+          <span class="bld-btn-name" id="bld-name">—</span>
+          <span style="font-size:9px;opacity:.7;flex-shrink:0">▾</span>
+        </button>
+      </div>
       <div class="hdr-actions">
+        <span id="sync-st" style="font-size:10px"></span>
         <button id="admin-btn" class="admin-btn" style="visibility:hidden">⚙️ 관리자</button>
         <a class="guide-btn" href="guide.html">❓ 도움말</a>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
@@ -178,6 +196,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <a href="admin.html" class="nav-tab">🗂 관리</a>
     </div>
   </div>
+  <div class="bld-drop" id="bld-drop"></div>
   <div id="user-menu" class="user-menu">
     <div class="um-name" id="um-name">—</div>
     <div class="um-email" id="um-email">—</div>
@@ -256,58 +275,65 @@ const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d52
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),gProv=new firebase.auth.GoogleAuthProvider();
 const MASTER_UID="unGRVYWhmcMmEbYbWjAL8Y1pXVP2";
-let cu=null,uRef=null,nRef=null,hRef=null,bldgRef=null,configRef=null,uL=null,nL=null,hL=null,bldgL=null,units={},notes={},rentHistory={},buildings={};
-let mUid="",mName="";
-let ROOMS=[];
-const DEFAULT_LAYOUT={"2":["201","202","203","204","205","206"],"3":["301","302","303","304","305","306"],"4":["401","402","403","404","405","406"]};
-function applyLayout(layout){
-  ROOMS=[];
-  Object.keys(layout).sort((a,b)=>Number(a)-Number(b)).forEach(f=>{
-    (layout[f]||[]).forEach(r=>ROOMS.push(String(r)));
-  });
+let cu=null,mUid="",mName="";
+let bldgsData={},curBid="main",bldgsRef=null,bldgsL=null;
+let allBldData={}; // {bid:{units:{},history:{},bldInfo:{}}}
+let bldListeners={}; // {bid:{uRef,hRef,biRef,uL,hL,biL}}
+let nRef=null,nL=null,notes={};
+
+// ── BUILDING UTILS ──
+function getCurBid(uid){return localStorage.getItem("rbid_"+uid)||"main"}
+function setCurBid(uid,bid){localStorage.setItem("rbid_"+uid,bid)}
+function sortedBids(bd){return Object.keys(bd).sort((a,b)=>(bd[a]?.order||0)-(bd[b]?.order||0))}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+
+// ── MIGRATION ──
+async function migrateToMultiBldg(uid){
+  const snap=await db.ref("rent_app/"+uid+"/_buildings").once("value");
+  if(snap.exists())return;
+  let bname=localStorage.getItem("rent_aptname")||"내 건물";
+  try{
+    const bs=await db.ref("rent_app/"+uid+"/buildings").once("value");
+    if(bs.exists()){const v=Object.values(bs.val());if(v.length&&v[0]?.name)bname=v[0].name}
+  }catch(e){}
+  const OLD=["units","rent_history","config","transactions","notes","buildings"];
+  const upd={};
+  for(const p of OLD){
+    try{const s=await db.ref("rent_app/"+uid+"/"+p).once("value");
+      if(s.exists()){upd["rent_app/"+uid+"/main/"+p]=s.val();upd["rent_app/"+uid+"/"+p]=null}
+    }catch(e){}
+  }
+  upd["rent_app/"+uid+"/_buildings/main"]={id:"main",name:bname,order:0,createdAt:new Date().toISOString()};
+  await db.ref("/").update(upd);
 }
 
-// ── 건물명 초기화 ──
-const APT_KEY="rent_aptname";
-(function initAptName(){
-  const urlApt=new URLSearchParams(location.search).get("apt");
-  if(urlApt)localStorage.setItem(APT_KEY,urlApt); // URL에 있으면 저장
-  const apt=localStorage.getItem(APT_KEY)||"";
-  if(apt){
-    // 로그인 화면
-    const el=document.getElementById("login-aptname");
-    el.textContent=apt;el.style.display="block";
-    // 헤더
-    document.getElementById("hdr-aptname").textContent=apt;
-    // 탭 링크에 apt 파라미터 유지
-    document.querySelectorAll(".nav-tab").forEach(a=>{
-      const url=new URL(a.href,location.href);
-      url.searchParams.set("apt",apt);
-      a.href=url.pathname+"?"+url.searchParams.toString();
-    });
-  }
-})();
+// ── BUILDING SWITCHER UI ──
+function toggleBldDrop(e){e.stopPropagation();document.getElementById("bld-drop").classList.toggle("show")}
+document.addEventListener("click",e=>{if(!e.target.closest("#bld-drop")&&!e.target.closest("#bld-btn"))document.getElementById("bld-drop")?.classList.remove("show")});
+function renderBldDrop(bd,cur){
+  const nameEl=document.getElementById("bld-name");
+  if(nameEl)nameEl.textContent=bd[cur]?.name||"—";
+  const el=document.getElementById("bld-drop");if(!el)return;
+  const bids=sortedBids(bd);
+  el.innerHTML=bids.map(bid=>`<div class="bld-item ${bid===cur?"cur":""}" onclick="switchBld('${bid}')">
+    <span style="width:14px">${bid===cur?"✓":""}</span>${esc(bd[bid]?.name||"건물")}</div>`).join("")+
+    '<div class="bld-sep"></div><div class="bld-item" style="color:var(--sky)" onclick="goAddBld()">＋ 건물 추가</div>';
+}
+function goAddBld(){document.getElementById("bld-drop")?.classList.remove("show");location.href="admin.html?addBld=1"+(mUid?"&master_uid="+encodeURIComponent(mUid)+"&master_name="+encodeURIComponent(mName):"")}
 
 // ── AUTH STATE ── (탭 이동 시 flash 없음: login-screen은 display:none 시작)
-auth.onAuthStateChanged(user=>{
+auth.onAuthStateChanged(async user=>{
   const lo=document.getElementById("loading-overlay");
   const ls=document.getElementById("login-screen");
   const app=document.getElementById("app");
   if(user){
     cu=user;
-    lo.classList.add("hide");
-    ls.style.display="none";
-    app.style.display="block";
     const w=document.getElementById("av-wrap");
     w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"U")[0]}</div>`;
     w.style.display="block";
     document.getElementById("um-name").textContent=user.displayName||"사용자";
     document.getElementById("um-email").textContent=user.email||"";
     if(user.uid===MASTER_UID)document.getElementById("admin-btn").style.display="block";
-    if(uL&&uRef)uRef.off("value",uL);
-    if(nL&&nRef)nRef.off("value",nL);
-    if(hL&&hRef)hRef.off("value",hL);
-    if(bldgL&&bldgRef)bldgRef.off("value",bldgL);
     const params=new URLSearchParams(location.search);
     mUid=params.get("master_uid")||"";
     mName=params.get("master_name")||"";
@@ -328,139 +354,185 @@ auth.onAuthStateChanged(user=>{
         });
       }
     }
-    configRef=db.ref(`rent_app/${targetUid}/config/roomLayout`);
-    uRef=db.ref(`rent_app/${targetUid}/units`);
-    nRef=db.ref(`rent_app/${targetUid}/notes`);
-    hRef=db.ref(`rent_app/${targetUid}/rent_history`);
-    bldgRef=db.ref(`rent_app/${targetUid}/buildings`);
-    configRef.once("value").then(snap=>{
-      applyLayout(snap.val()||DEFAULT_LAYOUT);
-      listenUnits();listenNotes();listenHistory();listenBuildings();
-    }).catch(()=>{applyLayout(DEFAULT_LAYOUT);listenUnits();listenNotes();listenHistory();listenBuildings();});
+
+    // Migration (only for own account)
+    if(user.uid===targetUid){
+      try{await migrateToMultiBldg(user.uid)}catch(e){}
+    }
+    curBid=getCurBid(targetUid);
+
+    ls.style.display="none";app.style.display="block";lo.classList.add("hide");
+
+    // Notes for current building
+    if(nL&&nRef)nRef.off("value",nL);
+    nRef=db.ref("rent_app/"+targetUid+"/"+curBid+"/notes");
+    nL=nRef.on("value",snap=>{notes=snap.val()||{};renderNotes()});
+
+    // Building registry listener
+    if(bldgsL&&bldgsRef)bldgsRef.off("value",bldgsL);
+    bldgsRef=db.ref("rent_app/"+targetUid+"/_buildings");
+    bldgsL=bldgsRef.on("value",snap=>{
+      bldgsData=snap.val()||{};
+      const bids=sortedBids(bldgsData);
+      if(bids.length&&!bldgsData[curBid]){curBid=bids[0];setCurBid(targetUid,curBid)}
+      renderBldDrop(bldgsData,curBid);
+      // Sync per-building listeners
+      bids.forEach(bid=>{if(!bldListeners[bid])setupBldListeners(targetUid,bid)});
+      Object.keys(bldListeners).forEach(bid=>{if(!bldgsData[bid])teardownBldListeners(bid)});
+      renderDash();renderBldCards();
+    });
+    setSS("ok");
   }else{
-    lo.classList.add("hide");
-    app.style.display="none";
-    ls.style.display="flex";
+    cu=null;teardownAll();
+    lo.classList.add("hide");app.style.display="none";ls.style.display="flex";
   }
 });
 
+function setupBldListeners(uid,bid){
+  if(bldListeners[bid])return;
+  if(!allBldData[bid])allBldData[bid]={};
+  const base=db.ref("rent_app/"+uid+"/"+bid);
+  const uRef=base.child("units"),hRef=base.child("rent_history"),biRef=base.child("buildings");
+  const uL=uRef.on("value",snap=>{allBldData[bid].units=snap.val()||{};renderDash();setSS("ok")},()=>setSS("err"));
+  const hL=hRef.on("value",snap=>{allBldData[bid].history=snap.val()||{};renderDash()});
+  const biL=biRef.on("value",snap=>{allBldData[bid].bldInfo=snap.val()||{};renderBldCards()});
+  bldListeners[bid]={uRef,hRef,biRef,uL,hL,biL};
+}
+function teardownBldListeners(bid){
+  const l=bldListeners[bid];if(!l)return;
+  if(l.uRef&&l.uL)l.uRef.off("value",l.uL);
+  if(l.hRef&&l.hL)l.hRef.off("value",l.hL);
+  if(l.biRef&&l.biL)l.biRef.off("value",l.biL);
+  delete bldListeners[bid];delete allBldData[bid];
+}
+function teardownAll(){
+  Object.keys(bldListeners).forEach(teardownBldListeners);
+  if(bldgsL&&bldgsRef)bldgsRef.off("value",bldgsL);
+  if(nL&&nRef)nRef.off("value",nL);
+}
+
+function switchBld(bid){
+  const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
+  curBid=bid;setCurBid(targetUid,bid);
+  document.getElementById("bld-drop").classList.remove("show");
+  renderBldDrop(bldgsData,curBid);
+  // Switch notes to new building
+  if(nL&&nRef)nRef.off("value",nL);
+  nRef=db.ref("rent_app/"+targetUid+"/"+bid+"/notes");
+  nL=nRef.on("value",snap=>{notes=snap.val()||{};renderNotes()});
+}
+
 function signInGoogle(){auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message))}
-function doSignOut(){closeMenu();if(uL&&uRef)uRef.off("value",uL);if(nL&&nRef)nRef.off("value",nL);if(hL&&hRef)hRef.off("value",hL);if(bldgL&&bldgRef)bldgRef.off("value",bldgL);auth.signOut()}
+function doSignOut(){closeMenu();teardownAll();auth.signOut()}
 function toggleMenu(){document.getElementById("user-menu").classList.toggle("show")}
 function closeMenu(){document.getElementById("user-menu").classList.remove("show")}
 document.addEventListener("click",e=>{if(!e.target.closest("#av-wrap")&&!e.target.closest("#user-menu"))closeMenu()});
 
 function setSS(s){
-  const el=document.getElementById("sync-st");
+  const el=document.getElementById("sync-st");if(!el)return;
   const cls=s==="ok"?"s-ok":s==="ing"?"s-ing":"s-err";
   const txt=s==="ok"?"동기화됨":s==="ing"?"저장중":"오류";
   el.innerHTML=`<span class="sync-dot ${cls}"></span><span style="color:rgba(255,255,255,.5);font-size:10px">${txt}</span>`;
 }
 
-function listenBuildings(){
-  bldgL=bldgRef.on("value",snap=>{buildings=snap.val()||{};renderBuildingCards()});
-}
-function renderBuildingCards(){
-  const el=document.getElementById("buildings-wrap");if(!el)return;
-  const list=Object.values(buildings).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""));
-  if(!list.length){el.innerHTML="";return}
-  const hasBoth=b=>b.entranceCode&&b.masterCode;
-  el.innerHTML=list.map(b=>`<div style="background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:18px 20px;margin-bottom:24px;box-shadow:0 4px 16px rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.06)">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1)">
-      <span style="font-size:20px">🏠</span>
-      <span style="font-size:16px;font-weight:900;color:#fff;letter-spacing:-.3px">${esc(b.name)}</span>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:12px">
-      ${b.entranceCode||b.masterCode?`<div style="display:grid;grid-template-columns:${hasBoth(b)?"1fr 1fr":"1fr"};gap:12px">
-        ${b.entranceCode?`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">🔐</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">1층 현관</div><div style="font-size:15px;font-weight:900;color:#4DD0E1;letter-spacing:1px">${esc(b.entranceCode)}</div></div></div>`:""}
-        ${b.masterCode?`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">🗝️</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">세대 마스터</div><div style="font-size:15px;font-weight:900;color:#4DD0E1;letter-spacing:1px">${esc(b.masterCode)}</div></div></div>`:""}
-      </div>`:""}
-      ${b.manageFee?`<div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)"><span style="font-size:16px;flex-shrink:0">🏦</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">관리비 계좌</div><div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.85)">${esc(b.manageFee)}</div></div></div>`:""}
-      ${b.address?`<div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)"><span style="font-size:16px;flex-shrink:0">📍</span><div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.75);line-height:1.6">${esc(b.address)}</div></div>`:""}
-    </div>
-  </div>`).join("");
-}
-function listenUnits(){
-  uL=uRef.on("value",snap=>{
-    const val=snap.val()||{};
-    ensureRooms(val);units=val;
-    if(historyReady)renderDash(); // 이력이 먼저 로드됐으면 바로 그리기
-    setSS("ok");
-  },()=>{setSS("err");showToast("❗ 연결 오류")});
-}
-function listenNotes(){
-  nL=nRef.on("value",snap=>{notes=snap.val()||{};renderNotes()});
-}
-let historyReady=false;
-function listenHistory(){
-  hL=hRef.on("value",snap=>{
-    rentHistory=snap.val()||{};
-    historyReady=true;
-    renderDash(); // 이력 로드 완료 → 항상 다시 그리기
-  });
-}
-function computePaidStatus(roomId){
-  const h=rentHistory[String(roomId)]||{};
+function computePaidStatus(bid,roomId){
+  const h=((allBldData[bid]||{}).history||{})[String(roomId)]||{};
   const recs=Object.values(h);
   if(!recs.length)return null;
-  if(recs.some(r=>!r.paid))return false;
-  return true;
+  return recs.some(r=>!r.paid)?false:true;
 }
-async function ensureRooms(ex){
-  const up={};ROOMS.forEach(r=>{if(!ex[String(r)])up[String(r)]=defRoom(r)});
-  if(Object.keys(up).length)await uRef.update(up);
-}
-function defRoom(r){return{room:String(r),floor:Math.floor(parseInt(r)/100),status:"vacant",tenantName:"",tenantName2:"",tenantPhone:"",tenantPhone2:"",depositAmount:0,monthlyRent:0,contractStart:"",contractEnd:"",memo:""}}
 
 function renderDash(){
-  const list=ROOMS.map(r=>units[String(r)]).filter(Boolean);
-  const rented=list.filter(u=>u.status==="rented");
-  const vacant=list.filter(u=>u.status==="vacant");
-  const unpaid=rented.filter(u=>computePaidStatus(u.room)===false);
-  document.getElementById("s-total").textContent=ROOMS.length;
-  document.getElementById("s-rented").textContent=rented.length;
-  document.getElementById("s-vacant").textContent=vacant.length;
-  document.getElementById("s-unpaid").textContent=unpaid.length;
+  const bids=sortedBids(bldgsData);
+  let tot=0,rented=0,vacant=0,unpaidCnt=0;
+  bids.forEach(bid=>{
+    const ul=Object.values((allBldData[bid]||{}).units||{});
+    tot+=ul.length;
+    const r=ul.filter(u=>u.status==="rented");
+    vacant+=ul.filter(u=>u.status==="vacant").length;
+    rented+=r.length;
+    unpaidCnt+=r.filter(u=>computePaidStatus(bid,u.room)===false).length;
+  });
+  document.getElementById("s-total").textContent=tot;
+  document.getElementById("s-rented").textContent=rented;
+  document.getElementById("s-vacant").textContent=vacant;
+  document.getElementById("s-unpaid").textContent=unpaidCnt;
 
-  const uEl=document.getElementById("unpaid-list");
-  uEl.innerHTML=!unpaid.length?'<div class="empty-small">✅ 이달 미납 없음</div>':
-    unpaid.map(u=>`<div class="status-row" onclick="goToUnit('${u.room}')">
-      <span class="room-num">${u.room}호</span>
-      ${rentTypeBadge(u)}${rtBadge(u)}
+  // Unpaid
+  let uHtml="";
+  bids.forEach(bid=>{
+    const ul=Object.values((allBldData[bid]||{}).units||{});
+    const up=ul.filter(u=>u.status==="rented"&&computePaidStatus(bid,u.room)===false)
+      .sort((a,b)=>String(a.room).localeCompare(String(b.room)));
+    if(!up.length)return;
+    uHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
+    uHtml+=up.map(u=>`<div class="status-row" onclick="goToUnit('${bid}','${u.room}')">
+      <span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}
       <span class="tenant-nm">${esc(names(u))}</span>
       <span class="rent-amt">${fmtWon(u.monthlyRent)}</span>
       <span class="badge badge-unpaid">미납</span>
-      <span style="font-size:14px;color:var(--hint)">›</span>
-    </div>`).join("");
+      <span style="font-size:14px;color:var(--hint)">›</span></div>`).join("");
+  });
+  document.getElementById("unpaid-list").innerHTML=uHtml||'<div class="empty-small">✅ 이달 미납 없음</div>';
 
-  const vEl=document.getElementById("vacant-list");
-  vEl.innerHTML=!vacant.length?'<div class="empty-small">🏠 공실 없음</div>':
-    vacant.map(u=>`<div class="status-row" onclick="goToUnit('${u.room}')">
-      <span class="room-num">${u.room}호</span>
-      ${rentTypeBadge(u)}${rtBadge(u)}
+  // Vacant
+  let vHtml="";
+  bids.forEach(bid=>{
+    const ul=Object.values((allBldData[bid]||{}).units||{});
+    const vac=ul.filter(u=>u.status==="vacant").sort((a,b)=>String(a.room).localeCompare(String(b.room)));
+    if(!vac.length)return;
+    vHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
+    vHtml+=vac.map(u=>`<div class="status-row" onclick="goToUnit('${bid}','${u.room}')">
+      <span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}
       <span class="tenant-nm">${u.floor}층</span>
       <span class="badge badge-vacant">공실</span>
-      <span style="font-size:14px;color:var(--hint)">›</span>
-    </div>`).join("");
+      <span style="font-size:14px;color:var(--hint)">›</span></div>`).join("");
+  });
+  document.getElementById("vacant-list").innerHTML=vHtml||'<div class="empty-small">🏠 공실 없음</div>';
 
+  // Expiry
   const today=new Date();today.setHours(0,0,0,0);
-  const soon=rented.filter(u=>{
-    if(!u.contractEnd)return false;
-    const d=new Date(u.contractEnd);d.setHours(0,0,0,0);
-    const diff=Math.ceil((d-today)/864e5);
-    return diff>=0&&diff<=30;
-  }).map(u=>{const d=new Date(u.contractEnd);d.setHours(0,0,0,0);return{...u,dl:Math.ceil((d-today)/864e5)}}).sort((a,b)=>a.dl-b.dl);
-
-  const eEl=document.getElementById("expiry-list");
-  eEl.innerHTML=!soon.length?'<div class="empty-small">✅ 30일 내 만료 없음</div>':
-    soon.map(u=>`<div class="expiry-row" onclick="goToUnit('${u.room}')">
-      <span class="room-num">${u.room}호</span>
-      ${rentTypeBadge(u)}${rtBadge(u)}
+  let eHtml="";
+  bids.forEach(bid=>{
+    const ul=Object.values((allBldData[bid]||{}).units||{});
+    const soon=ul.filter(u=>u.status==="rented"&&u.contractEnd).map(u=>{
+      const d=new Date(u.contractEnd);d.setHours(0,0,0,0);
+      return{...u,dl:Math.ceil((d-today)/864e5)};
+    }).filter(u=>u.dl>=0&&u.dl<=30).sort((a,b)=>a.dl-b.dl);
+    if(!soon.length)return;
+    eHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
+    eHtml+=soon.map(u=>`<div class="expiry-row" onclick="goToUnit('${bid}','${u.room}')">
+      <span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}
       <span class="tenant-nm">${esc(names(u))}</span>
       <span class="badge badge-warning">${u.contractEnd}</span>
       <span style="font-size:11px;font-weight:700;color:${u.dl<=7?"var(--red)":"var(--amber)"};min-width:40px;text-align:right">${u.dl}일 후</span>
-      <span style="font-size:14px;color:var(--hint)">›</span>
-    </div>`).join("");
+      <span style="font-size:14px;color:var(--hint)">›</span></div>`).join("");
+  });
+  document.getElementById("expiry-list").innerHTML=eHtml||'<div class="empty-small">✅ 30일 내 만료 없음</div>';
+}
+
+function renderBldCards(){
+  const el=document.getElementById("buildings-wrap");if(!el)return;
+  const bids=sortedBids(bldgsData);
+  const html=bids.flatMap(bid=>{
+    const bldInfo=(allBldData[bid]||{}).bldInfo||{};
+    return Object.values(bldInfo).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).map(b=>
+      `<div style="background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:18px 20px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.06)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1)">
+          <span style="font-size:20px">🏠</span>
+          <span style="font-size:16px;font-weight:900;color:#fff">${esc(b.name)}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          ${b.entranceCode||b.masterCode?`<div style="display:grid;grid-template-columns:${b.entranceCode&&b.masterCode?"1fr 1fr":"1fr"};gap:12px">
+            ${b.entranceCode?`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">🔐</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">1층 현관</div><div style="font-size:15px;font-weight:900;color:#4DD0E1;letter-spacing:1px">${esc(b.entranceCode)}</div></div></div>`:""}
+            ${b.masterCode?`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">🗝️</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">세대 마스터</div><div style="font-size:15px;font-weight:900;color:#4DD0E1;letter-spacing:1px">${esc(b.masterCode)}</div></div></div>`:""}
+          </div>`:""}
+          ${b.manageFee?`<div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)"><span style="font-size:16px;flex-shrink:0">🏦</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">관리비 계좌</div><div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.85)">${esc(b.manageFee)}</div></div></div>`:""}
+          ${b.address?`<div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)"><span style="font-size:16px;flex-shrink:0">📍</span><div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.75);line-height:1.6">${esc(b.address)}</div></div>`:""}
+        </div>
+      </div>`);
+  }).join("");
+  el.innerHTML=html;
 }
 
 function renderNotes(){
@@ -519,10 +591,15 @@ const RENT_TYPE_CLS={monthly:"badge-monthly",jeonse:"badge-jeonse"};
 function rtBadge(u){const l=RTYPE_LBL[u.roomType];return l?`<span class="badge ${RTYPE_CLS[u.roomType]}">${l}</span>`:""}
 function rentTypeBadge(u){const t=u.rentType||"monthly";return`<span class="badge ${RENT_TYPE_CLS[t]}">${t==="jeonse"?"전세":"월세"}</span>`}
 function mQs(){return mUid?`&master_uid=${encodeURIComponent(mUid)}&master_name=${encodeURIComponent(mName)}`:""}
-function goToUnit(room){location.href=`units.html?room=${room}${mQs()}`}
-function goUnits(filter){location.href=`units.html${filter?"?filter="+filter:""}${mUid?(filter?"&":"?")+"master_uid="+encodeURIComponent(mUid)+"&master_name="+encodeURIComponent(mName):""}`}
+function goToUnit(bid,room){
+  const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
+  setCurBid(targetUid,bid);
+  location.href=`units.html?room=${room}${mQs()}`;
+}
+function goUnits(filter){
+  location.href=`units.html${filter?"?filter="+filter:""}${mUid?(filter?"&":"?")+"master_uid="+encodeURIComponent(mUid)+"&master_name="+encodeURIComponent(mName):""}`;
+}
 function fmtWon(v){if(!v)return"—";return(v*10000).toLocaleString("ko-KR")+"원"}
-function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 function fmtDt(iso){if(!iso)return"";const d=new Date(iso);return`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`}
 let tTm;function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
 </script>
