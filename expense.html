@@ -121,11 +121,6 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .google-btn:active{transform:scale(.97)}
 .g-icon{width:18px;height:18px;flex-shrink:0}
 .login-footer{font-size:10px;color:rgba(255,255,255,.25);margin-top:18px;line-height:1.7}
-.bld-btn{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);border-radius:8px;padding:5px 10px;cursor:pointer;color:#fff;font-size:13px;font-weight:700;font-family:inherit;transition:background .15s;max-width:160px;min-width:0}
-.bld-btn:active{background:rgba(255,255,255,.22)}
-.bld-btn-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bld-drop{position:fixed;top:56px;left:12px;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:8px;min-width:190px;z-index:400;display:none;border:1px solid var(--border)}
-.bld-drop.show{display:block}
 .bld-item{display:flex;align-items:center;gap:6px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text);transition:background .12s}
 .bld-item:active{background:#F0F4F8}
 .bld-item.cur{color:var(--sky)}
@@ -157,10 +152,6 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
         <a href="index.html" style="flex-shrink:0;display:flex;align-items:center;line-height:0">
           <img src="logo.png" alt="PlusHome" style="height:40px;width:auto;image-rendering:-webkit-optimize-contrast">
         </a>
-        <button class="bld-btn" id="bld-btn" onclick="toggleBldDrop(event)">
-          <span class="bld-btn-name" id="bld-name">—</span>
-          <span style="font-size:9px;opacity:.7;flex-shrink:0">▾</span>
-        </button>
       </div>
       <div class="hdr-actions">
         <button class="admin-btn" id="admin-btn" style="visibility:hidden">🔧 관리자</button>
@@ -175,7 +166,6 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <a href="admin.html" class="nav-tab">🗂 관리</a>
     </div>
   </div>
-  <div class="bld-drop" id="bld-drop"></div>
   <div id="user-menu" class="user-menu">
     <div class="um-name" id="um-name">—</div>
     <div class="um-email" id="um-email">—</div>
@@ -289,19 +279,6 @@ async function migrateToMultiBldg(uid){
   localStorage.setItem("mig_"+uid,"1");
 }
 
-// ── BUILDING SWITCHER UI ──
-function toggleBldDrop(e){e.stopPropagation();document.getElementById("bld-drop").classList.toggle("show")}
-document.addEventListener("click",e=>{if(!e.target.closest("#bld-drop")&&!e.target.closest("#bld-btn"))document.getElementById("bld-drop")?.classList.remove("show")});
-function renderBldDrop(bd,cur){
-  const nameEl=document.getElementById("bld-name");
-  if(nameEl)nameEl.textContent=bd[cur]?.name||"—";
-  const el=document.getElementById("bld-drop");if(!el)return;
-  const bids=sortedBids(bd);
-  el.innerHTML=bids.map(bid=>`<div class="bld-item ${bid===cur?"cur":""}" onclick="switchBld('${bid}')">
-    <span style="width:14px">${bid===cur?"✓":""}</span>${esc(bd[bid]?.name||"건물")}</div>`).join("")+
-    '<div class="bld-sep"></div><div class="bld-item" style="color:var(--sky)" onclick="goAddBld()">＋ 건물 추가</div>';
-}
-function goAddBld(){document.getElementById("bld-drop")?.classList.remove("show");location.href="admin.html?addBld=1"+(mUid?"&master_uid="+encodeURIComponent(mUid)+"&master_name="+encodeURIComponent(mName):"")}
 
 (function(){const n=new Date();document.getElementById("filter-month").value=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`;filterMonth=document.getElementById("filter-month").value;filterYear=String(n.getFullYear())})();
 
@@ -351,7 +328,6 @@ auth.onAuthStateChanged(async user=>{
       bldgsData=snap.val()||{};
       const bids=sortedBids(bldgsData);
       if(bids.length&&!bldgsData[curBid]){curBid=bids[0];setCurBid(targetUid,curBid)}
-      renderBldDrop(bldgsData,curBid);
     });
 
     txRef=db.ref(`rent_app/${targetUid}/${curBid}/transactions`);listenTx();
@@ -361,15 +337,6 @@ auth.onAuthStateChanged(async user=>{
     if(bldgsL&&bldgsRef)bldgsRef.off("value",bldgsL);
   }
 });
-function switchBld(bid){
-  const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
-  curBid=bid;setCurBid(targetUid,bid);
-  document.getElementById("bld-drop").classList.remove("show");
-  renderBldDrop(bldgsData,curBid);
-  if(txL&&txRef)txRef.off("value",txL);
-  allTx=[];curPage=1;
-  txRef=db.ref(`rent_app/${targetUid}/${bid}/transactions`);listenTx();
-}
 function signInGoogle(){auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message))}
 function doSignOut(){
   closeMenu();

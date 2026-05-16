@@ -162,11 +162,6 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .bldg-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px}
 .bldg-val{font-size:13px;font-weight:700;color:#4DD0E1;letter-spacing:.3px;word-break:break-all}
 .bldg-val-muted{font-size:13px;font-weight:600;color:rgba(255,255,255,.75);word-break:break-all}
-.bld-btn{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);border-radius:8px;padding:5px 10px;cursor:pointer;color:#fff;font-size:13px;font-weight:700;font-family:inherit;transition:background .15s;max-width:160px;min-width:0}
-.bld-btn:active{background:rgba(255,255,255,.22)}
-.bld-btn-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bld-drop{position:fixed;top:56px;left:12px;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:8px;min-width:190px;z-index:400;display:none;border:1px solid var(--border)}
-.bld-drop.show{display:block}
 .bld-item{display:flex;align-items:center;gap:6px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text);transition:background .12s}
 .bld-item:active{background:#F0F4F8}
 .bld-item.cur{color:var(--sky)}
@@ -198,10 +193,6 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
         <a href="index.html" style="flex-shrink:0;display:flex;align-items:center;line-height:0">
           <img src="logo.png" alt="PlusHome" style="height:40px;width:auto;image-rendering:-webkit-optimize-contrast">
         </a>
-        <button class="bld-btn" id="bld-btn" onclick="toggleBldDrop(event)">
-          <span class="bld-btn-name" id="bld-name">—</span>
-          <span style="font-size:9px;opacity:.7;flex-shrink:0">▾</span>
-        </button>
       </div>
       <div class="hdr-actions">
 
@@ -217,7 +208,6 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <a href="admin.html" class="nav-tab on">🗂 관리</a>
     </div>
   </div>
-  <div class="bld-drop" id="bld-drop"></div>
   <div id="user-menu" class="user-menu">
     <div class="um-name" id="um-name">—</div>
     <div class="um-email" id="um-email">—</div>
@@ -259,18 +249,22 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <!-- 호실 구조 설정 -->
       <div class="layout-section">
         <div style="font-size:14px;font-weight:800;color:var(--hdr);margin-bottom:12px">🏢 호실 구조 설정</div>
-        <div style="background:#F0F9FF;border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid #BAE6FD">
-          <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">빠른 자동 생성</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
-            <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">시작 층</div><input class="gen-inp" type="number" id="gen-from" value="2" min="1" max="30"></div>
-            <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">끝 층</div><input class="gen-inp" type="number" id="gen-to" value="4" min="1" max="30"></div>
-            <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">층당 호실 수</div><input class="gen-inp" type="number" id="gen-count" value="6" min="1" max="30"></div>
+        <button id="struct-unlock-btn" onclick="toggleStructEdit()" style="width:100%;padding:9px 14px;background:#FEF3C7;color:#92400E;border:1.5px solid #FCD34D;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px;text-align:left">🔒 구조 수정 — 탭하여 잠금 해제</button>
+        <div id="struct-edit-panel" style="display:none">
+          <div style="background:#FFF7ED;border:1.5px solid #FCD34D;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#92400E;font-weight:600">⚠️ 저장 시 기존 호실 구조가 교체됩니다</div>
+          <div style="background:#F0F9FF;border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid #BAE6FD">
+            <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">빠른 자동 생성</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+              <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">시작 층</div><input class="gen-inp" type="number" id="gen-from" value="2" min="1" max="30"></div>
+              <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">끝 층</div><input class="gen-inp" type="number" id="gen-to" value="4" min="1" max="30"></div>
+              <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">층당 호실 수</div><input class="gen-inp" type="number" id="gen-count" value="6" min="1" max="30"></div>
+            </div>
+            <button onclick="generateLayout()" style="width:100%;padding:9px;background:var(--sky);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">⚡ 자동 생성 (기존 설정 교체)</button>
           </div>
-          <button onclick="generateLayout()" style="width:100%;padding:9px;background:var(--sky);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">⚡ 자동 생성 (기존 설정 교체)</button>
+          <div id="floor-rows"></div>
+          <button onclick="addFloorRow()" style="width:100%;padding:9px;background:#F1F5F9;color:var(--sub);border:2px dashed var(--border);border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px">+ 층 추가</button>
+          <button onclick="saveRoomLayout()" class="btn-save" style="margin-top:0">💾 호실 구조 저장</button>
         </div>
-        <div id="floor-rows"></div>
-        <button onclick="addFloorRow()" style="width:100%;padding:9px;background:#F1F5F9;color:var(--sub);border:2px dashed var(--border);border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px">+ 층 추가</button>
-        <button onclick="saveRoomLayout()" class="btn-save" style="margin-top:0">💾 호실 구조 저장</button>
       </div>
       <!-- 건물정보카드 -->
       <div class="bldg-hd-row">
@@ -429,19 +423,6 @@ async function migrateToMultiBldg(uid){
   localStorage.setItem("mig_"+uid,"1");
 }
 
-// ── BUILDING SWITCHER UI ──
-function toggleBldDrop(e){e.stopPropagation();document.getElementById("bld-drop").classList.toggle("show")}
-document.addEventListener("click",e=>{if(!e.target.closest("#bld-drop")&&!e.target.closest("#bld-btn"))document.getElementById("bld-drop")?.classList.remove("show")});
-function renderBldDrop(bd,cur){
-  const nameEl=document.getElementById("bld-name");
-  if(nameEl)nameEl.textContent=bd[cur]?.name||"—";
-  const el=document.getElementById("bld-drop");if(!el)return;
-  const bids=sortedBids(bd);
-  el.innerHTML=bids.map(bid=>`<div class="bld-item ${bid===cur?"cur":""}" onclick="switchBld('${bid}')">
-    <span style="width:14px">${bid===cur?"✓":""}</span>${esc(bd[bid]?.name||"건물")}</div>`).join("")+
-    '<div class="bld-sep"></div><div class="bld-item" style="color:var(--sky)" onclick="goAddBld()">＋ 건물 추가</div>';
-}
-function goAddBld(){document.getElementById("bld-drop")?.classList.remove("show");openAddBldSheet()}
 
 auth.onAuthStateChanged(async user=>{
   const ls=document.getElementById("login-screen"),app=document.getElementById("app");
@@ -492,7 +473,6 @@ auth.onAuthStateChanged(async user=>{
       bldgsData=snap.val()||{};
       const bids=sortedBids(bldgsData);
       if(bids.length&&!bldgsData[curBid]){curBid=bids[0];setCurBid(targetUid,curBid)}
-      renderBldDrop(bldgsData,curBid);
       if(curSub===2)renderBldRegistry();
     });
 
@@ -532,8 +512,6 @@ function loadBldData(uid,bid){
 function switchBld(bid){
   const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
   curBid=bid;setCurBid(targetUid,bid);
-  document.getElementById("bld-drop").classList.remove("show");
-  renderBldDrop(bldgsData,curBid);
   loadBldData(targetUid,bid);
   if(curSub===2)renderBldRegistry();
 }
@@ -694,6 +672,16 @@ function removeFloorRow(btn){
   const tmp={...roomLayout};delete tmp[floor];roomLayout=tmp;
   renderRoomLayout();
 }
+function toggleStructEdit(){
+  const panel=document.getElementById("struct-edit-panel");
+  const btn=document.getElementById("struct-unlock-btn");
+  const isOpen=panel.style.display!=="none";
+  panel.style.display=isOpen?"none":"block";
+  btn.textContent=isOpen?"🔒 구조 수정 — 탭하여 잠금 해제":"🔓 구조 수정 중 — 탭하여 잠금";
+  btn.style.background=isOpen?"#FEF3C7":"#FEE2E2";
+  btn.style.color=isOpen?"#92400E":"#991B1B";
+  btn.style.borderColor=isOpen?"#FCD34D":"#FCA5A5";
+}
 function generateLayout(){
   const from=parseInt(document.getElementById("gen-from").value)||2;
   const to=parseInt(document.getElementById("gen-to").value)||4;
@@ -713,7 +701,7 @@ function saveRoomLayout(){
   });
   if(!Object.keys(nl).length){showToast("❗ 최소 1개 층 이상 설정하세요");return}
   configRef.set(nl)
-    .then(()=>showToast("✅ 호실 구조 저장됨"))
+    .then(()=>{showToast("✅ 호실 구조 저장됨");toggleStructEdit()})
     .catch(()=>showToast("❗ 저장 실패"));
 }
 
