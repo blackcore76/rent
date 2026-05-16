@@ -266,6 +266,7 @@ const MASTER_UID="unGRVYWhmcMmEbYbWjAL8Y1pXVP2";
 let cu=null,mUid="",mName="",readOnly=false;
 let bldgsData={},curBid="main",bldgsRef=null,bldgsL=null;
 let allBldData={}; // {bid:{units:{},history:{},bldInfo:{}}}
+let _alertTimer=null;
 let bldListeners={}; // {bid:{uRef,hRef,biRef,uL,hL,biL}}
 let nRef=null,nL=null,notes={};
 
@@ -527,6 +528,45 @@ function renderDash(){
       <span style="font-size:14px;color:var(--hint)">›</span></div>`).join("");
   });
   document.getElementById("expiry-list").innerHTML=eHtml||'<div class="empty-small">✅ 30일 내 만료 없음</div>';
+  clearTimeout(_alertTimer);_alertTimer=setTimeout(checkContractAlerts,900);
+}
+
+function checkContractAlerts(){
+  const KEY="ca_cnt";
+  if(parseInt(sessionStorage.getItem(KEY)||"0")>=3)return;
+  const today=new Date();today.setHours(0,0,0,0);
+  const alerts=[];
+  sortedBids(bldgsData).forEach(bid=>{
+    const bldName=bldgsData[bid]?.name||"";
+    Object.values((allBldData[bid]||{}).units||{}).forEach(u=>{
+      if(!u?.contractEnd||u.status!=="rented")return;
+      const d=new Date(u.contractEnd);d.setHours(0,0,0,0);
+      const dl=Math.ceil((d-today)/864e5);
+      if(dl>=0&&dl<=30)alerts.push({room:u.room,name:u.tenantName||"",dl,bldName});
+    });
+  });
+  if(!alerts.length)return;
+  sessionStorage.setItem(KEY,parseInt(sessionStorage.getItem(KEY)||"0")+1);
+  showContractToasts(alerts.sort((a,b)=>a.dl-b.dl));
+}
+function showContractToasts(alerts){
+  const prev=document.getElementById("ca-wrap");if(prev)prev.remove();
+  const wrap=document.createElement("div");
+  wrap.id="ca-wrap";
+  wrap.style.cssText="position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none";
+  alerts.forEach((a,i)=>{
+    const el=document.createElement("div");
+    const room=a.bldName?`${a.bldName} ${a.room}호`:`${a.room}호`;
+    el.textContent=`⚠ ${room} · ${a.name} · D-${a.dl}`;
+    el.style.cssText="background:#e74c3c;color:#fff;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.25);white-space:nowrap;opacity:0;transition:opacity .3s";
+    wrap.appendChild(el);
+    setTimeout(()=>el.style.opacity="1",i*120);
+  });
+  document.body.appendChild(wrap);
+  setTimeout(()=>{
+    wrap.querySelectorAll("div").forEach(el=>el.style.opacity="0");
+    setTimeout(()=>wrap.remove(),400);
+  },3500);
 }
 
 function renderBldCards(){
