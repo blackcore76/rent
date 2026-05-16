@@ -340,7 +340,7 @@ function guardWrite(){if(!readOnly)return true;showToast("⏳ 승인 후 이용 
 function enterDemoMode(){
   readOnly=true;sessionStorage.setItem("guestDemo","1");
   bldgsData=DEMO.bldgsData;curBid="main";
-  allBldData["main"]={units:DEMO.units,history:DEMO.rentHistory,bldInfo:{}};
+  allBldData["main"]={units:DEMO.units,history:DEMO.rentHistory,bldInfo:DEMO.bldInfo};
   notes=DEMO.notes;
   document.getElementById("login-screen").style.display="none";
   document.getElementById("app").style.display="block";

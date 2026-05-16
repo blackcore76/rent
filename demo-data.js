@@ -100,5 +100,19 @@ const DEMO = {
     "pb008":{ id:"pb008", name:"조아빌 공인중개사", category:"agency", phone:"02-123-4567",  phone2:"010-1111-2222", memo:"공실 매물 의뢰 중" },
     "pb009":{ id:"pb009", name:"고려 수리센터",  category:"vendor", phone:"010-3333-4444", phone2:"",              memo:"배관·전기 전문" },
     "pb010":{ id:"pb010", name:"클린 청소서비스", category:"vendor", phone:"010-5555-6666", phone2:"",              memo:"공용부 청소 담당" }
+  },
+
+  // ── 건물정보카드 (index.html 메인 하단) ──
+  // 필드명: id, name, entranceCode, masterCode, manageFee, address, createdAt
+  bldInfo: {
+    "bi001": {
+      id:"bi001",
+      name:"나빌레라",
+      address:"서울시 마포구 와우산로 123",
+      entranceCode:"1234#",
+      masterCode:"9876*",
+      manageFee:"국민은행 123-456-789012 (예금주: 나빌레라)",
+      createdAt:"2024-01-01T00:00:00.000Z"
+    }
   }
 };
