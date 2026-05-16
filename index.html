@@ -532,8 +532,6 @@ function renderDash(){
 }
 
 function checkContractAlerts(){
-  const KEY="ca_cnt";
-  if(parseInt(sessionStorage.getItem(KEY)||"0")>=3)return;
   const today=new Date();today.setHours(0,0,0,0);
   const alerts=[];
   sortedBids(bldgsData).forEach(bid=>{
@@ -545,9 +543,18 @@ function checkContractAlerts(){
       if(dl>=0&&dl<=30)alerts.push({room:u.room,name:u.tenantName||"",dl,bldName});
     });
   });
-  if(!alerts.length)return;
+  if(alerts.length)sessionStorage.setItem("ca_alerts",JSON.stringify(alerts.sort((a,b)=>a.dl-b.dl)));
+  else sessionStorage.removeItem("ca_alerts");
+  maybeShowAlerts();
+}
+function maybeShowAlerts(){
+  if(readOnly)return;
+  const KEY="ca_cnt";
+  if(parseInt(sessionStorage.getItem(KEY)||"0")>=3)return;
+  let alerts;try{alerts=JSON.parse(sessionStorage.getItem("ca_alerts")||"null");}catch(e){return;}
+  if(!alerts?.length)return;
   sessionStorage.setItem(KEY,parseInt(sessionStorage.getItem(KEY)||"0")+1);
-  showContractToasts(alerts.sort((a,b)=>a.dl-b.dl));
+  showContractToasts(alerts);
 }
 function showContractToasts(alerts){
   const prev=document.getElementById("ca-wrap");if(prev)prev.remove();
