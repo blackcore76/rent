@@ -14,6 +14,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="demo-data.js"></script>
 <style>
 :root{
   --bg:#F0F4F8;--card:#fff;--border:#E2E8F0;--text:#1E293B;--sub:#64748B;--hint:#94A3B8;
@@ -248,7 +249,7 @@ const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d52
 const MASTER_UID='unGRVYWhmcMmEbYbWjAL8Y1pXVP2';
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),gProv=new firebase.auth.GoogleAuthProvider();
-let cu=null,txRef=null,txL=null,allTx=[],curPage=1,filterMonth="",filterYear="",viewMode="monthly",mTT="income";
+let cu=null,txRef=null,txL=null,allTx=[],curPage=1,filterMonth="",filterYear="",viewMode="monthly",mTT="income",readOnly=false;
 let curBid="main",bldgsData={},bldgsRef=null,bldgsL=null,mUid="",mName="";
 const PS=10;
 const CATS={income:["월세","관리비","보증금수입","기타수입"],expense:["수리비","청소비","보험료","세금/공과금","인건비","관리비지출","기타지출"]};
@@ -296,26 +297,33 @@ async function checkUserAccess(user){
     status=snap.val().status||"pending";
   }
   if(status==="active")return true;
-  const ss=document.getElementById("status-screen");
-  document.getElementById("ss-email").textContent=user.email||"";
   if(status==="rejected"){
+    const ss=document.getElementById("status-screen");
+    document.getElementById("ss-email").textContent=user.email||"";
     document.getElementById("ss-icon").textContent="🚫";
     document.getElementById("ss-title").textContent="사용 승인이 거부됐습니다";
     document.getElementById("ss-msg").textContent="자세한 사항은 관리자에게 문의하세요.";
-  }else{
-    document.getElementById("ss-icon").textContent="⏳";
-    document.getElementById("ss-title").textContent="승인 대기 중";
-    document.getElementById("ss-msg").textContent="관리자가 계정을 확인 후 승인합니다.\n승인 완료 후 다시 로그인해 주세요.";
+    ss.style.display="flex";
+    return false;
   }
-  ss.style.display="flex";
-  return false;
+  return "readonly";
 }
+function showDemoBanner(){
+  if(document.getElementById("demo-banner"))return;
+  const b=document.createElement("div");
+  b.id="demo-banner";
+  b.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(14,165,233,.18),rgba(14,165,233,.06));border-bottom:1px solid rgba(14,165,233,.35);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
+  b.innerHTML=`<span style="font-size:12px;font-weight:700;color:#0EA5E9">⏳ 구경 모드 · 데모 데이터 표시 중</span><button onclick="auth.signOut()" style="background:rgba(14,165,233,.2);border:1px solid rgba(14,165,233,.4);border-radius:8px;padding:5px 12px;color:#0EA5E9;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🚪 로그아웃</button>`;
+  document.body.appendChild(b);
+  document.querySelector(".content").style.marginTop="136px";
+}
+function guardWrite(){if(!readOnly)return true;showToast("⏳ 승인 후 이용 가능합니다");return false;}
 
 auth.onAuthStateChanged(async user=>{
   const ls=document.getElementById("login-screen"),app=document.getElementById("app");
   if(user){
     cu=user;
-    if(user.uid!==MASTER_UID){const ok=await checkUserAccess(user);if(!ok)return;}
+    if(user.uid!==MASTER_UID){const access=await checkUserAccess(user);if(access===false)return;if(access==="readonly")readOnly=true;}
     const w=document.getElementById("av-wrap");
     w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"U")[0]}</div>`;
     w.style.display="block";
@@ -350,6 +358,15 @@ auth.onAuthStateChanged(async user=>{
       try{await migrateToMultiBldg(user.uid)}catch(e){}
     }
     curBid=getCurBid(targetUid);
+
+    if(readOnly){
+      showDemoBanner();
+      bldgsData=DEMO.bldgsData;curBid="main";
+      allTx=[...DEMO.transactions].sort((a,b)=>b.date.localeCompare(a.date)||(b.id-a.id));
+      ls.style.display="none";app.style.display="block";
+      renderFeed();
+      return;
+    }
 
     ls.style.display="none";app.style.display="block";
 
@@ -467,6 +484,7 @@ function updateCats(){
   document.getElementById("m-cat").innerHTML=CATS[mTT].map(c=>`<option value="${c}">${c}</option>`).join("");
 }
 function saveTx(){
+  if(!guardWrite())return;
   const amt=parseInt(document.getElementById("m-amt").value)||0;
   const date=document.getElementById("m-date").value;
   if(!amt||amt<=0){showToast("❗ 금액을 입력하세요");return}
@@ -477,6 +495,7 @@ function saveTx(){
     .catch(()=>showToast("❗ 저장 실패"));
 }
 function delTx(id){
+  if(!guardWrite())return;
   document.getElementById("cm-ok").onclick=()=>{
     txRef.child(String(id)).remove().then(()=>showToast("🗑 삭제됨")).catch(()=>showToast("❗ 실패"));
     closeCM();

@@ -15,6 +15,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="demo-data.js"></script>
 <style>
 :root{
   --bg:#F0F4F8;--card:#fff;--border:#E2E8F0;--text:#1E293B;--sub:#64748B;--hint:#94A3B8;
@@ -408,7 +409,7 @@ const db=firebase.database(),auth=firebase.auth(),storage=firebase.storage(),gPr
 const MASTER_UID='unGRVYWhmcMmEbYbWjAL8Y1pXVP2';
 let cu=null,pbRef=null,uRef=null,bldgDetailRef=null,configRef=null,bldgsRef=null;
 let pbL=null,uL=null,bldgDetailL=null,cL=null,bldgsL=null;
-let contacts={},units={},bldgDetails={},roomLayout={},bldgsData={},curBid="main",mUid="",mName="";
+let contacts={},units={},bldgDetails={},roomLayout={},bldgsData={},curBid="main",mUid="",mName="",readOnly=false;
 let ROOMS=[];
 const DEFAULT_LAYOUT={"2":["201","202","203","204","205","206"],"3":["301","302","303","304","305","306"],"4":["401","402","403","404","405","406"]};
 const CAT_LABEL={tenant:"세입자",vendor:"업체/수리",agency:"공인중개사",other:"기타"};
@@ -456,26 +457,33 @@ async function checkUserAccess(user){
     status=snap.val().status||"pending";
   }
   if(status==="active")return true;
-  const ss=document.getElementById("status-screen");
-  document.getElementById("ss-email").textContent=user.email||"";
   if(status==="rejected"){
+    const ss=document.getElementById("status-screen");
+    document.getElementById("ss-email").textContent=user.email||"";
     document.getElementById("ss-icon").textContent="🚫";
     document.getElementById("ss-title").textContent="사용 승인이 거부됐습니다";
     document.getElementById("ss-msg").textContent="자세한 사항은 관리자에게 문의하세요.";
-  }else{
-    document.getElementById("ss-icon").textContent="⏳";
-    document.getElementById("ss-title").textContent="승인 대기 중";
-    document.getElementById("ss-msg").textContent="관리자가 계정을 확인 후 승인합니다.\n승인 완료 후 다시 로그인해 주세요.";
+    ss.style.display="flex";
+    return false;
   }
-  ss.style.display="flex";
-  return false;
+  return "readonly";
 }
+function showDemoBanner(){
+  if(document.getElementById("demo-banner"))return;
+  const b=document.createElement("div");
+  b.id="demo-banner";
+  b.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(14,165,233,.18),rgba(14,165,233,.06));border-bottom:1px solid rgba(14,165,233,.35);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
+  b.innerHTML=`<span style="font-size:12px;font-weight:700;color:#0EA5E9">⏳ 구경 모드 · 데모 데이터 표시 중</span><button onclick="auth.signOut()" style="background:rgba(14,165,233,.2);border:1px solid rgba(14,165,233,.4);border-radius:8px;padding:5px 12px;color:#0EA5E9;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🚪 로그아웃</button>`;
+  document.body.appendChild(b);
+  document.querySelector(".content").style.marginTop="136px";
+}
+function guardWrite(){if(!readOnly)return true;showToast("⏳ 승인 후 이용 가능합니다");return false;}
 
 auth.onAuthStateChanged(async user=>{
   const ls=document.getElementById("login-screen"),app=document.getElementById("app");
   if(user){
     cu=user;
-    if(user.uid!==MASTER_UID){const ok=await checkUserAccess(user);if(!ok)return;}
+    if(user.uid!==MASTER_UID){const access=await checkUserAccess(user);if(access===false)return;if(access==="readonly")readOnly=true;}
     const w=document.getElementById("av-wrap");
     w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"U")[0]}</div>`;
     w.style.display="block";
@@ -512,6 +520,17 @@ auth.onAuthStateChanged(async user=>{
       try{await cleanupLegacyPaths(user.uid)}catch(e){}
     }
     curBid=getCurBid(targetUid);
+
+    if(readOnly){
+      showDemoBanner();
+      bldgsData=DEMO.bldgsData;curBid="main";
+      contacts=DEMO.phonebook;
+      units=DEMO.units;
+      ROOMS=Object.values(DEMO.layout).flat().map(String);
+      ls.style.display="none";app.style.display="block";
+      renderPhonebook();
+      return;
+    }
 
     ls.style.display="none";app.style.display="block";
 
@@ -669,6 +688,7 @@ function openAddBldSheet(){
 }
 function closeAddBldSheet(){document.getElementById("add-bld-sheet").classList.remove("show")}
 function saveNewBld(){
+  if(!guardWrite())return;
   const name=document.getElementById("add-bld-name").value.trim();
   if(!name){showToast("❗ 건물명을 입력하세요");return}
   const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
@@ -679,6 +699,7 @@ function saveNewBld(){
     .catch(()=>showToast("❗ 저장 실패"));
 }
 function openRenameBld(bid){
+  if(!guardWrite())return;
   const name=bldgsData[bid]?.name||"";
   const newName=window.prompt("건물명 변경",name);
   if(newName===null||!newName.trim())return;
@@ -688,6 +709,7 @@ function openRenameBld(bid){
     .catch(()=>showToast("❗ 실패"));
 }
 function delBld(bid){
+  if(!guardWrite())return;
   showCM("건물 삭제","\""+(bldgsData[bid]?.name||"건물")+"\" 건물의 모든 호실, 계약, 이력 데이터가 삭제됩니다. 계속하시겠습니까?",async()=>{
     const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
     await db.ref("rent_app/"+targetUid+"/_buildings/"+bid).remove();
@@ -740,7 +762,7 @@ function generateLayout(){
   roomLayout=nl;renderRoomLayout();
   showToast("⚡ 미리보기 생성됨 — 저장 버튼으로 확정하세요");
 }
-function saveRoomLayout(){
+function saveRoomLayout(){if(!guardWrite())return;
   const rows=document.querySelectorAll(".floor-edit-row"),nl={};
   rows.forEach(row=>{
     const floor=row.dataset.floor,val=row.querySelector(".rooms-input").value;
@@ -793,7 +815,7 @@ function startEditBuilding(id){
   document.getElementById("building-sheet").classList.add("show");
 }
 function closeBuildingSheet(){document.getElementById("building-sheet").classList.remove("show")}
-function saveBuilding(){
+function saveBuilding(){if(!guardWrite())return;
   const name=document.getElementById("b-name").value.trim();
   if(!name){showToast("❗ 건물명을 입력하세요");return}
   const existId=document.getElementById("b-id").value;
@@ -811,6 +833,7 @@ function saveBuilding(){
     .catch(()=>showToast("❗ 저장 실패"));
 }
 function delBuilding(id){
+  if(!guardWrite())return;
   showCM("건물 정보 삭제","이 건물 정보를 삭제하시겠습니까?",()=>{
     bldgDetailRef.child(id).remove().then(()=>showToast("🗑 삭제됨")).catch(()=>showToast("❗ 실패"));
   });
@@ -875,6 +898,7 @@ function startEditContact(id){
 }
 function closeContactSheet(){document.getElementById("contact-sheet").classList.remove("show")}
 function saveContact(){
+  if(!guardWrite())return;
   const name=document.getElementById("c-name").value.trim();
   if(!name){showToast("❗ 이름을 입력하세요");return}
   const existId=document.getElementById("c-id").value;
@@ -885,6 +909,7 @@ function saveContact(){
     .catch(()=>showToast("❗ 저장 실패"));
 }
 function delContact(id){
+  if(!guardWrite())return;
   showCM("연락처 삭제","이 연락처를 삭제하시겠습니까?",()=>{
     pbRef.child(id).remove().then(()=>showToast("🗑 삭제됨")).catch(()=>showToast("❗ 실패"));
   });
@@ -956,6 +981,7 @@ function renderContracts(){
 }
 
 async function uploadContractPhoto(room,e){
+  if(!guardWrite()){e.target.value="";return;}
   const files=Array.from(e.target.files);
   if(!files.length||!cu)return;
   const btn=document.getElementById(`ub-${room}`);
@@ -984,6 +1010,7 @@ async function uploadContractPhoto(room,e){
 }
 
 function delContractPhoto(room,pid,spath){
+  if(!guardWrite())return;
   showCM("사진 삭제","이 계약서 사진을 삭제하시겠습니까?",async()=>{
     try{
       if(spath)await storage.ref(spath).delete().catch(()=>{});

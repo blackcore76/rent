@@ -15,6 +15,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="demo-data.js"></script>
 <style>
 :root{
   --bg:#F0F4F8;--card:#fff;--border:#E2E8F0;--text:#1E293B;--sub:#64748B;--hint:#94A3B8;
@@ -325,7 +326,7 @@ const MASTER_UID='unGRVYWhmcMmEbYbWjAL8Y1pXVP2';
 const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),storage=firebase.storage(),gProv=new firebase.auth.GoogleAuthProvider();
-let cu=null,uRef=null,hRef=null,configRef=null,bldgsRef=null,uL=null,hL=null,bldgsL=null;
+let cu=null,uRef=null,hRef=null,configRef=null,bldgsRef=null,uL=null,hL=null,bldgsL=null,readOnly=false;
 let units={},rentHistory={},curFloor=0,curRoom=null,mStatus="vacant",mRoomType="oneroom",mRentType="monthly",curFilter="";
 let ROOMS=[],FLOORS=[],bldgsData={},curBid="main",mUid="",mName="";
 const DEFAULT_LAYOUT={"2":["201","202","203","204","205","206"],"3":["301","302","303","304","305","306"],"4":["401","402","403","404","405","406"]};
@@ -383,27 +384,34 @@ async function checkUserAccess(user){
     status=snap.val().status||"pending";
   }
   if(status==="active")return true;
-  const ss=document.getElementById("status-screen");
-  document.getElementById("ss-email").textContent=user.email||"";
   if(status==="rejected"){
+    const ss=document.getElementById("status-screen");
+    document.getElementById("ss-email").textContent=user.email||"";
     document.getElementById("ss-icon").textContent="🚫";
     document.getElementById("ss-title").textContent="사용 승인이 거부됐습니다";
     document.getElementById("ss-msg").textContent="자세한 사항은 관리자에게 문의하세요.";
-  }else{
-    document.getElementById("ss-icon").textContent="⏳";
-    document.getElementById("ss-title").textContent="승인 대기 중";
-    document.getElementById("ss-msg").textContent="관리자가 계정을 확인 후 승인합니다.\n승인 완료 후 다시 로그인해 주세요.";
+    ss.style.display="flex";
+    return false;
   }
-  ss.style.display="flex";
-  return false;
+  return "readonly";
 }
+function showDemoBanner(){
+  if(document.getElementById("demo-banner"))return;
+  const b=document.createElement("div");
+  b.id="demo-banner";
+  b.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(14,165,233,.18),rgba(14,165,233,.06));border-bottom:1px solid rgba(14,165,233,.35);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
+  b.innerHTML=`<span style="font-size:12px;font-weight:700;color:#0EA5E9">⏳ 구경 모드 · 데모 데이터 표시 중</span><button onclick="auth.signOut()" style="background:rgba(14,165,233,.2);border:1px solid rgba(14,165,233,.4);border-radius:8px;padding:5px 12px;color:#0EA5E9;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🚪 로그아웃</button>`;
+  document.body.appendChild(b);
+  document.querySelector(".content").style.marginTop="136px";
+}
+function guardWrite(){if(!readOnly)return true;showToast("⏳ 승인 후 이용 가능합니다");return false;}
 
 auth.onAuthStateChanged(async user=>{
   const ls=document.getElementById("login-screen");
   const app=document.getElementById("app");
   if(user){
     cu=user;
-    if(user.uid!==MASTER_UID){const ok=await checkUserAccess(user);if(!ok)return;}
+    if(user.uid!==MASTER_UID){const access=await checkUserAccess(user);if(access===false)return;if(access==="readonly")readOnly=true;}
     const w=document.getElementById("av-wrap");
     w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"U")[0]}</div>`;
     w.style.display="block";
@@ -440,6 +448,17 @@ auth.onAuthStateChanged(async user=>{
       try{await migrateToMultiBldg(user.uid)}catch(e){}
     }
     curBid=getCurBid(targetUid);
+
+    if(readOnly){
+      showDemoBanner();
+      bldgsData=DEMO.bldgsData;curBid="main";
+      units=DEMO.units;rentHistory=DEMO.rentHistory;
+      applyLayout(DEMO.layout);
+      _unitsReady=true;_historyReady=true;
+      ls.style.display="none";app.style.display="block";
+      renderGrid();
+      return;
+    }
 
     ls.style.display="none";app.style.display="block";
 
@@ -524,6 +543,7 @@ function renderHistory(roomId){
   }).join("");
 }
 function toggleHistory(roomId,ym){
+  if(!guardWrite())return;
   if(!hRef||!cu)return;
   const rec=(rentHistory[roomId]||{})[ym],u=units[roomId];
   const rentAmt=(u&&u.monthlyRent?u.monthlyRent:0)*10000;
@@ -635,6 +655,7 @@ function updateRtypeUI(){
 }
 function saveRoom(){
   if(!curRoom)return;
+  if(!guardWrite())return;
   const data={room:curRoom,floor:Math.floor(parseInt(curRoom)/100),status:mStatus,roomType:mRoomType,rentType:mRentType,
     tenantName:document.getElementById("m-name").value.trim(),
     tenantName2:document.getElementById("m-name2").value.trim(),
@@ -657,6 +678,7 @@ function renderPhotos(photos){
     <button class="ph-del" onclick="delPhoto('${p.id}','${esc(p.storagePath)}')">✕</button></div>`).join("");
 }
 async function onPhotos(e){
+  if(!guardWrite()){e.target.value="";return;}
   const files=Array.from(e.target.files);
   if(!files.length||!curRoom||!cu)return;
   const btn=document.getElementById("upload-btn"),camBtn=document.getElementById("camera-btn"),bar=document.getElementById("prog-bar"),fill=document.getElementById("prog-fill"),pct=document.getElementById("prog-pct");
@@ -686,6 +708,7 @@ async function onPhotos(e){
   btn.disabled=false;camBtn.disabled=false;bar.style.display="none";fill.style.width="0%";pct.textContent="";e.target.value="";
 }
 function delPhoto(pid,spath){
+  if(!guardWrite())return;
   showCM("사진 삭제","이 사진을 삭제하시겠습니까?",async()=>{
     try{
       if(spath)await storage.ref(spath).delete().catch(()=>{});

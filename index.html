@@ -14,6 +14,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="demo-data.js"></script>
 <style>
 :root{
   --bg:#F0F4F8;--card:#fff;--border:#E2E8F0;
@@ -261,7 +262,7 @@ const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d52
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),gProv=new firebase.auth.GoogleAuthProvider();
 const MASTER_UID="unGRVYWhmcMmEbYbWjAL8Y1pXVP2";
-let cu=null,mUid="",mName="";
+let cu=null,mUid="",mName="",readOnly=false;
 let bldgsData={},curBid="main",bldgsRef=null,bldgsL=null;
 let allBldData={}; // {bid:{units:{},history:{},bldInfo:{}}}
 let bldListeners={}; // {bid:{uRef,hRef,biRef,uL,hL,biL}}
@@ -311,20 +312,27 @@ async function checkUserAccess(user){
     status=snap.val().status||"pending";
   }
   if(status==="active")return true;
-  const ss=document.getElementById("status-screen");
-  document.getElementById("ss-email").textContent=user.email||"";
   if(status==="rejected"){
+    const ss=document.getElementById("status-screen");
+    document.getElementById("ss-email").textContent=user.email||"";
     document.getElementById("ss-icon").textContent="🚫";
     document.getElementById("ss-title").textContent="사용 승인이 거부됐습니다";
     document.getElementById("ss-msg").textContent="자세한 사항은 관리자에게 문의하세요.";
-  }else{
-    document.getElementById("ss-icon").textContent="⏳";
-    document.getElementById("ss-title").textContent="승인 대기 중";
-    document.getElementById("ss-msg").textContent="관리자가 계정을 확인 후 승인합니다.\n승인 완료 후 다시 로그인해 주세요.";
+    ss.style.display="flex";
+    return false;
   }
-  ss.style.display="flex";
-  return false;
+  return "readonly";
 }
+function showDemoBanner(){
+  if(document.getElementById("demo-banner"))return;
+  const b=document.createElement("div");
+  b.id="demo-banner";
+  b.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(14,165,233,.18),rgba(14,165,233,.06));border-bottom:1px solid rgba(14,165,233,.35);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
+  b.innerHTML=`<span style="font-size:12px;font-weight:700;color:#0EA5E9">⏳ 구경 모드 · 데모 데이터 표시 중</span><button onclick="auth.signOut()" style="background:rgba(14,165,233,.2);border:1px solid rgba(14,165,233,.4);border-radius:8px;padding:5px 12px;color:#0EA5E9;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🚪 로그아웃</button>`;
+  document.body.appendChild(b);
+  document.querySelector(".content").style.marginTop="136px";
+}
+function guardWrite(){if(!readOnly)return true;showToast("⏳ 승인 후 이용 가능합니다");return false;}
 
 // ── AUTH STATE ── (탭 이동 시 flash 없음: login-screen은 display:none 시작)
 auth.onAuthStateChanged(async user=>{
@@ -332,7 +340,7 @@ auth.onAuthStateChanged(async user=>{
   const app=document.getElementById("app");
   if(user){
     cu=user;
-    if(user.uid!==MASTER_UID){const ok=await checkUserAccess(user);if(!ok)return;}
+    if(user.uid!==MASTER_UID){const access=await checkUserAccess(user);if(access===false)return;if(access==="readonly")readOnly=true;}
     const w=document.getElementById("av-wrap");
     w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"U")[0]}</div>`;
     w.style.display="block";
@@ -365,6 +373,16 @@ auth.onAuthStateChanged(async user=>{
       try{await migrateToMultiBldg(user.uid)}catch(e){}
     }
     curBid=getCurBid(targetUid);
+
+    if(readOnly){
+      showDemoBanner();
+      bldgsData=DEMO.bldgsData;curBid="main";
+      allBldData["main"]={units:DEMO.units,history:DEMO.rentHistory,bldInfo:{}};
+      notes=DEMO.notes;
+      ls.style.display="none";app.style.display="block";
+      renderDash();renderBldCards();renderNotes();setSS("ok");
+      return;
+    }
 
     ls.style.display="none";app.style.display="block";
 
@@ -545,6 +563,7 @@ function renderNotes(){
   </div>`).join("");
 }
 function addNote(){
+  if(!guardWrite())return;
   const ta=document.getElementById("note-input"),c=ta.value.trim();
   if(!c){showToast("❗ 내용을 입력하세요");return}
   const id=Date.now();setSS("ing");
@@ -559,7 +578,7 @@ function startEdit(id){
   document.getElementById("edit-note-modal").classList.add("show");
 }
 function closeEditNote(){document.getElementById("edit-note-modal").classList.remove("show")}
-function saveEditNote(){
+function saveEditNote(){if(!guardWrite())return;
   const id=document.getElementById("edit-note-id").value;
   const c=document.getElementById("edit-note-content").value.trim();
   if(!c){showToast("❗ 내용을 입력하세요");return}
@@ -567,6 +586,7 @@ function saveEditNote(){
   nRef.child(String(id)).update({content:c}).then(()=>{closeEditNote();showToast("✅ 수정됨");setSS("ok")}).catch(()=>{setSS("err");showToast("❗ 실패")});
 }
 function delNote(id){
+  if(!guardWrite())return;
   showConfirm("메모 삭제","이 메모를 삭제하시겠습니까?",()=>{
     setSS("ing");nRef.child(String(id)).remove().then(()=>{showToast("🗑 삭제됨");setSS("ok")}).catch(()=>{setSS("err");showToast("❗ 실패")});
   });
