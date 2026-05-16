@@ -77,6 +77,28 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .empty-icon{font-size:48px;margin-bottom:12px}
 .empty-txt{font-size:14px;line-height:1.8}
 
+/* 신규 사용자 승인 */
+.pending-card{background:rgba(245,158,11,.06);border:1.5px solid rgba(245,158,11,.2);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+.pending-card.card-rejected{background:rgba(239,68,68,.04);border-color:rgba(239,68,68,.2)}
+.pending-card.card-active{background:rgba(16,185,129,.04);border-color:rgba(16,185,129,.2)}
+.pc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.pc-name{font-size:14px;font-weight:700;color:var(--text)}
+.pc-badge{font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px}
+.badge-pending{background:rgba(245,158,11,.15);color:var(--gold)}
+.badge-rejected{background:rgba(239,68,68,.12);color:var(--red)}
+.badge-active{background:rgba(16,185,129,.12);color:var(--green)}
+.pc-email{font-size:12px;color:var(--sub);margin-bottom:2px}
+.pc-time{font-size:11px;color:var(--hint);margin-bottom:10px}
+.pc-memo-row{display:flex;gap:6px;margin-bottom:8px}
+.pc-memo-inp{flex:1;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit;color:var(--text);outline:none}
+.pc-memo-inp:focus{border-color:var(--sky)}
+.pc-btn-row{display:flex;gap:6px}
+.btn-approve{flex:1;padding:9px 4px;background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.3);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-reject{flex:1;padding:9px 4px;background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.filter-tabs{display:flex;gap:6px;margin-bottom:10px}
+.filter-tab{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--sub);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.filter-tab.on{background:var(--gold);color:#0F1C2D;border-color:var(--gold)}
+
 /* CONFIRM */
 .confirm-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
 .confirm-bg.show{display:flex}
@@ -147,6 +169,14 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       </div>
     </div>
 
+    <!-- 신규 사용자 승인 -->
+    <div class="sec-title" style="margin-bottom:8px">🔔 신규 사용자 승인</div>
+    <div class="filter-tabs">
+      <button class="filter-tab on" id="ft-pending" onclick="setFilter('pending')">⏳ 대기중</button>
+      <button class="filter-tab" id="ft-all" onclick="setFilter('all')">전체</button>
+    </div>
+    <div id="pending-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
+
     <!-- 사용자 등록 -->
     <div class="add-card">
       <div class="sec-title">➕ 사용자 등록</div>
@@ -190,7 +220,8 @@ const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d52
 firebase.initializeApp(FC);
 const db=firebase.database(),auth=firebase.auth(),gProv=new firebase.auth.GoogleAuthProvider();
 
-let usersRef=null,viewingUid=null,viewingName=null;
+let usersRef=null,pendingUsersRef=null,allUsersData={},pendingFilter="pending";
+let viewingUid=null,viewingName=null;
 
 // ── 인증 ──
 auth.onAuthStateChanged(user=>{
@@ -222,7 +253,71 @@ auth.onAuthStateChanged(user=>{
 
   usersRef=db.ref("master_admin/users");
   usersRef.on("value",snap=>renderUsers(snap.val()||{}));
+  pendingUsersRef=db.ref("_users");
+  pendingUsersRef.on("value",snap=>{allUsersData=snap.val()||{};renderPendingUsers()});
 });
+
+// ── 신규 승인 ──
+function setFilter(f){
+  pendingFilter=f;
+  document.getElementById("ft-pending").className="filter-tab"+(f==="pending"?" on":"");
+  document.getElementById("ft-all").className="filter-tab"+(f==="all"?" on":"");
+  renderPendingUsers();
+}
+function renderPendingUsers(){
+  const all=Object.values(allUsersData).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""));
+  const list=pendingFilter==="pending"?all.filter(u=>(u.status||"pending")==="pending"):all;
+  const el=document.getElementById("pending-list");
+  if(!list.length){
+    el.innerHTML=`<div class="empty-state" style="padding:20px 0"><div class="empty-icon" style="font-size:32px">✅</div><div class="empty-txt">${pendingFilter==="pending"?"대기 중인 신규 사용자 없음":"신규 사용자 없음"}</div></div>`;
+    return;
+  }
+  el.innerHTML=list.map(u=>{
+    const st=u.status||"pending";
+    const badgeCls=st==="active"?"badge-active":st==="rejected"?"badge-rejected":"badge-pending";
+    const badgeTxt=st==="active"?"✅ 활성":st==="rejected"?"🚫 거부":"⏳ 대기";
+    const cardCls=st==="active"?" card-active":st==="rejected"?" card-rejected":"";
+    const dt=u.createdAt?new Date(u.createdAt).toLocaleString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}):"";
+    return`<div class="pending-card${cardCls}">
+      <div class="pc-top"><div class="pc-name">${esc(u.displayName||"(이름없음)")}</div><span class="pc-badge ${badgeCls}">${badgeTxt}</span></div>
+      <div class="pc-email">📧 ${esc(u.email||"")}</div>
+      <div class="pc-time">🕐 신청: ${esc(dt)}</div>
+      <div class="pc-memo-row">
+        <input class="pc-memo-inp" id="pm-${esc(u.uid)}" type="text" value="${esc(u.memo||"")}" placeholder="메모 (결제일, 건물명 등)">
+        <button style="padding:8px 12px;background:rgba(14,165,233,.1);color:var(--sky);border:1px solid rgba(14,165,233,.25);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap" onclick="savePendingMemo('${esc(u.uid)}')">저장</button>
+      </div>
+      <div class="pc-btn-row">
+        ${st!=="active"?`<button class="btn-approve" onclick="approveUser('${esc(u.uid)}','${esc(u.displayName||"")}','${esc(u.email||"")}')">✅ 활성화</button>`:""}
+        ${st!=="rejected"?`<button class="btn-reject" onclick="rejectUser('${esc(u.uid)}')">🚫 거부</button>`:""}
+        ${st==="active"?`<button class="uc-btn btn-main" style="flex:1;padding:9px 4px" onclick="quickGo('${esc(u.uid)}','${esc(u.displayName||u.uid)}','index')">📊 열람</button>`:""}
+      </div>
+    </div>`;
+  }).join("");
+}
+async function approveUser(uid,displayName,email){
+  try{
+    await db.ref("_users/"+uid).update({status:"active"});
+    const snap=await db.ref("master_admin/users/"+uid).once("value");
+    if(!snap.exists()){
+      const memo=document.getElementById("pm-"+uid)?.value.trim()||"";
+      await db.ref("master_admin/users/"+uid).set({uid,name:displayName||email||uid,memo,createdAt:(allUsersData[uid]?.createdAt||new Date().toISOString())});
+    }
+    showToast("✅ 활성화됨: "+(displayName||email));
+  }catch(e){showToast("❗ 실패: "+e.message)}
+}
+async function rejectUser(uid){
+  try{
+    await db.ref("_users/"+uid).update({status:"rejected"});
+    showToast("🚫 거부됨");
+  }catch(e){showToast("❗ 실패")}
+}
+async function savePendingMemo(uid){
+  const val=document.getElementById("pm-"+uid)?.value.trim()||"";
+  try{
+    await db.ref("_users/"+uid).update({memo:val});
+    showToast("✅ 메모 저장됨");
+  }catch(e){showToast("❗ 실패")}
+}
 
 // ── 사용자 등록 ──
 function addUser(){
