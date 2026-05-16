@@ -191,8 +191,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <div id="month-sel"><input type="month" id="filter-month" onchange="onMonthChange()"></div>
       <div id="year-sel" style="display:none"><select class="filter-year" id="filter-year" onchange="onYearChange()"></select></div>
       <div class="spacer"></div>
-      <button class="btn-exp" onclick="exportCSV()">📥 CSV</button>
-      <button class="btn-exp" onclick="exportJSON()">📦 JSON</button>
+      <button class="btn-exp" id="bld-name-label" style="cursor:default"></button>
     </div>
     <div id="feed"></div>
     <div class="pagination" id="pagi"></div>
@@ -439,6 +438,7 @@ function getFilterLabel(){
 }
 
 function renderFeed(){
+  const lbl=document.getElementById("bld-name-label");if(lbl)lbl.textContent=bldgsData[curBid]?.name||"";
   const list=getFiltered();
   const inc=list.filter(t=>t.type==="income").reduce((a,t)=>a+(t.amount||0),0);
   const exc=list.filter(t=>t.type==="expense").reduce((a,t)=>a+(t.amount||0),0);

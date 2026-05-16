@@ -47,8 +47,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .content{margin-top:100px;padding:14px;min-height:calc(100vh - 100px)}
 .floor-tabs{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0}
 .tabs-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:14px}
-.export-btn{padding:7px 12px;border-radius:20px;border:2px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;flex-shrink:0;transition:all .15s}
-.export-btn:active{background:var(--hdr);color:#fff;border-color:var(--hdr)}
+.export-btn{padding:7px 12px;border-radius:8px;border:2px solid var(--border);font-size:12px;font-weight:600;cursor:default;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;flex-shrink:0}
 .badge-oneroom{background:#FEF3C7;color:#92400E}
 .badge-twobay{background:#F3E8FF;color:#6B21A8}
 .badge-tworoom{background:#CCFBF1;color:#0F766E}
@@ -212,10 +211,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <div class="floor-tabs" id="floor-tabs">
         <!-- 동적 생성 -->
       </div>
-      <div style="display:flex;gap:6px;flex-shrink:0;align-self:flex-start">
-        <button class="export-btn" onclick="exportCSV()">📥 CSV</button>
-        <button class="export-btn" onclick="exportJSON()">📦 JSON</button>
-      </div>
+      <button class="export-btn" id="bld-name-label"></button>
     </div>
     <div id="filter-banner" style="display:none" class="filter-banner">
       <span id="filter-banner-txt"></span>
@@ -582,6 +578,7 @@ const RTYPE_CLS={oneroom:"badge-oneroom",twobay:"badge-twobay",tworoom:"badge-tw
 const RENT_TYPE_LBL={monthly:"월세",jeonse:"전세"};
 const RENT_TYPE_CLS={monthly:"badge-monthly",jeonse:"badge-jeonse"};
 function renderGrid(){
+  const lbl=document.getElementById("bld-name-label");if(lbl)lbl.textContent=bldgsData[curBid]?.name||"";
   let list=ROOMS.map(r=>units[String(r)]).filter(u=>u&&(curFloor===0||u.floor===curFloor));
   if(curFilter==="rented") list=list.filter(u=>u.status==="rented");
   else if(curFilter==="vacant") list=list.filter(u=>u.status==="vacant");
