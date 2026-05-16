@@ -99,6 +99,17 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .filter-tab{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--sub);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
 .filter-tab.on{background:var(--gold);color:#0F1C2D;border-color:var(--gold)}
 
+/* 페이지네이션 */
+.page-btn{padding:8px 16px;border-radius:8px;border:1.5px solid var(--border);background:rgba(255,255,255,.04);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--sub);transition:background .15s}
+.page-btn:disabled{opacity:.3;cursor:not-allowed}
+.page-info{font-size:13px;color:var(--sub);font-weight:600}
+/* _users 메모 표시 */
+.uc-pending-memo{font-size:11px;color:var(--sky);margin-bottom:6px;line-height:1.5;word-break:break-all}
+.uc-memo-details{margin-bottom:6px}
+.uc-memo-summary{font-size:11px;color:var(--sky);cursor:pointer;list-style:none;display:flex;align-items:center;gap:4px;word-break:break-all}
+.uc-memo-summary::-webkit-details-marker{display:none}
+.uc-memo-full{font-size:11px;color:var(--sky);margin-top:6px;padding:7px 10px;background:rgba(14,165,233,.06);border-radius:7px;line-height:1.7;white-space:pre-wrap;word-break:break-all}
+
 /* CONFIRM */
 .confirm-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
 .confirm-bg.show{display:flex}
@@ -198,6 +209,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
     <!-- 사용자 목록 -->
     <div class="sec-title" style="margin-bottom:10px">👥 관리 사용자 목록</div>
     <div class="users-list" id="users-list"></div>
+    <div id="uc-pagination" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 0;margin-bottom:20px"></div>
 
   </div>
 </div>
@@ -222,6 +234,7 @@ const db=firebase.database(),auth=firebase.auth(),gProv=new firebase.auth.Google
 
 let usersRef=null,pendingUsersRef=null,allUsersData={},pendingFilter="pending";
 let viewingUid=null,viewingName=null;
+let ucTotalList=[],ucPage=1;
 
 // ── 인증 ──
 auth.onAuthStateChanged(user=>{
@@ -254,7 +267,7 @@ auth.onAuthStateChanged(user=>{
   usersRef=db.ref("master_admin/users");
   usersRef.on("value",snap=>renderUsers(snap.val()||{}));
   pendingUsersRef=db.ref("_users");
-  pendingUsersRef.on("value",snap=>{allUsersData=snap.val()||{};renderPendingUsers()});
+  pendingUsersRef.on("value",snap=>{allUsersData=snap.val()||{};renderPendingUsers();renderUsersPage()});
 });
 
 // ── 신규 승인 ──
@@ -285,6 +298,7 @@ function renderPendingUsers(){
       <div class="pc-memo-row">
         <input class="pc-memo-inp" id="pm-${esc(u.uid)}" type="text" value="${esc(u.memo||"")}" placeholder="메모 (결제일, 건물명 등)">
         <button style="padding:8px 12px;background:rgba(14,165,233,.1);color:var(--sky);border:1px solid rgba(14,165,233,.25);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap" onclick="savePendingMemo('${esc(u.uid)}')">저장</button>
+        <button style="padding:8px 10px;background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0" onclick="deletePendingMemo('${esc(u.uid)}')">🗑</button>
       </div>
       <div class="pc-btn-row">
         ${st!=="active"?`<button class="btn-approve" onclick="approveUser('${esc(u.uid)}','${esc(u.displayName||"")}','${esc(u.email||"")}')">✅ 활성화</button>`:""}
@@ -318,6 +332,14 @@ async function savePendingMemo(uid){
     showToast("✅ 메모 저장됨");
   }catch(e){showToast("❗ 실패")}
 }
+async function deletePendingMemo(uid){
+  try{
+    const inp=document.getElementById("pm-"+uid);
+    if(inp)inp.value="";
+    await db.ref("_users/"+uid+"/memo").remove();
+    showToast("🗑 메모 삭제됨");
+  }catch(e){showToast("❗ 실패")}
+}
 
 // ── 사용자 등록 ──
 function addUser(){
@@ -338,23 +360,32 @@ function addUser(){
 
 // ── 목록 렌더 ──
 function renderUsers(data){
-  const list=Object.values(data).sort((a,b)=>a.createdAt>b.createdAt?1:-1);
+  ucTotalList=Object.values(data).sort((a,b)=>a.createdAt>b.createdAt?1:-1);
+  ucPage=1;
+  renderUsersPage();
+}
+function renderUsersPage(){
   const el=document.getElementById("users-list");
-  if(!list.length){
-    el.innerHTML=`<div class="empty-state">
-      <div class="empty-icon">👥</div>
-      <div class="empty-txt">등록된 사용자가 없습니다<br>위에서 UID를 등록해보세요</div>
-    </div>`;
-    return;
+  const pgEl=document.getElementById("uc-pagination");
+  if(!ucTotalList.length){
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-txt">등록된 사용자가 없습니다<br>위에서 UID를 등록해보세요</div></div>`;
+    if(pgEl)pgEl.innerHTML="";return;
   }
-  el.innerHTML=list.map((u,i)=>{
+  const total=ucTotalList.length,totalPages=Math.ceil(total/10);
+  if(ucPage<1)ucPage=1;if(ucPage>totalPages)ucPage=totalPages;
+  const start=(ucPage-1)*10;
+  el.innerHTML=ucTotalList.slice(start,start+10).map((u,i)=>{
     const isV=viewingUid===u.uid;
+    const pm=allUsersData[u.uid]?.memo||"";
+    const memoHtml=pm
+      ?(pm.length<=25
+        ?`<div class="uc-pending-memo">💬 ${esc(pm)}</div>`
+        :`<details class="uc-memo-details"><summary class="uc-memo-summary">💬 ${esc(pm.slice(0,25))}…</summary><div class="uc-memo-full">${esc(pm)}</div></details>`)
+      :"";
     return`<div class="user-card${isV?" active":""}" id="uc-${esc(u.uid)}">
-      <div class="uc-top">
-        <div class="uc-name">${esc(u.name)}</div>
-        <div class="uc-num">#${i+1}</div>
-      </div>
-      ${u.memo?`<div class="uc-desc">📝 ${esc(u.memo)}</div>`:""}
+      <div class="uc-top"><div class="uc-name">${esc(u.name)}</div><div class="uc-num">#${start+i+1}</div></div>
+      ${memoHtml}
+      ${u.memo&&u.memo!==pm?`<div class="uc-desc">📝 ${esc(u.memo)}</div>`:""}
       <div class="uc-uid">${esc(u.uid)}</div>
       <div class="uc-actions">
         <button class="uc-btn btn-main" onclick="quickGo('${esc(u.uid)}','${esc(u.name)}','index')">📊 메인</button>
@@ -365,7 +396,11 @@ function renderUsers(data){
       </div>
     </div>`;
   }).join("");
+  if(!pgEl)return;
+  if(totalPages<=1){pgEl.innerHTML="";return;}
+  pgEl.innerHTML=`<button class="page-btn" onclick="ucSetPage(${ucPage-1})" ${ucPage<=1?"disabled":""}>◀</button><span class="page-info">${ucPage} / ${totalPages}</span><button class="page-btn" onclick="ucSetPage(${ucPage+1})" ${ucPage>=totalPages?"disabled":""}>▶</button>`;
 }
+function ucSetPage(p){ucPage=p;renderUsersPage()}
 
 // ── 사용자 선택 ──
 function setViewing(uid,name){
