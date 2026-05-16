@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1E2D3D">
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>🏠 월세 관리 · 백업 내보내기</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{
+  --bg:#F0F4F8;--card:#fff;--border:#E2E8F0;--text:#1E293B;--sub:#64748B;--hint:#94A3B8;
+  --hdr:#1E2D3D;--hdr2:#2A3F55;
+  --green:#059669;--green-lt:#D1FAE5;--green-t:#065F46;
+  --red:#DC2626;--red-lt:#FEE2E2;
+  --blue:#0284C7;--blue-lt:#E0F2FE;--blue-t:#0C4A6E;
+  --sky:#0EA5E9;--radius:14px
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--text);overscroll-behavior:none}
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,var(--hdr),var(--hdr2));box-shadow:0 3px 16px rgba(0,0,0,.25);padding:0 16px}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;height:52px}
+.hdr-actions{display:flex;align-items:center;gap:8px}
+.av-img{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);cursor:pointer;object-fit:cover}
+.av-txt{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);background:var(--sky);color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.back-btn{padding:6px 12px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;display:flex;align-items:center;gap:4px}
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:linear-gradient(160deg,#0F1C2D,#1E2D3D 50%,#2A3F55);z-index:7000;display:none;align-items:center;justify-content:center;padding:20px}
+.login-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:36px 28px;max-width:320px;width:100%;text-align:center;backdrop-filter:blur(16px)}
+.login-logo{font-size:52px;margin-bottom:14px}
+.login-title{font-size:22px;font-weight:900;color:#fff;margin-bottom:6px}
+.login-sub{font-size:12px;color:rgba(255,255,255,.45);margin-bottom:28px;line-height:1.7}
+.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 20px;background:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;color:#1F2937;cursor:pointer;font-family:inherit}
+/* CONTENT */
+.content{margin-top:52px;padding:16px;max-width:560px;margin-left:auto;margin-right:auto;padding-bottom:40px}
+.section-hd{font-size:11px;font-weight:800;color:var(--sub);letter-spacing:.8px;text-transform:uppercase;margin:20px 0 10px}
+.card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);border:1px solid var(--border);margin-bottom:12px}
+/* BUILDING INFO */
+.bld-row{display:flex;align-items:center;gap:10px;background:#EFF6FF;border:1.5px solid #BAE6FD;border-radius:12px;padding:12px 14px;margin-bottom:4px}
+/* STAT ROW */
+.stat-row{display:flex;gap:8px;margin-bottom:14px}
+.stat-box{flex:1;background:#F8FAFC;border-radius:10px;padding:10px 12px;text-align:center}
+.stat-val{font-size:20px;font-weight:900;color:var(--text)}
+.stat-lbl{font-size:10px;color:var(--hint);margin-top:2px;font-weight:600;text-transform:uppercase}
+/* EXPORT BUTTONS */
+.exp-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.exp-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:13px 10px;border:2px solid var(--border);border-radius:12px;background:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--sub);transition:all .15s}
+.exp-btn:active{background:var(--hdr);color:#fff;border-color:var(--hdr)}
+.exp-btn.blue{border-color:#BAE6FD;color:var(--blue);background:#EFF6FF}
+.exp-btn.blue:active{background:var(--blue);color:#fff}
+.exp-btn.green{border-color:#A7F3D0;color:var(--green-t);background:var(--green-lt)}
+.exp-btn.green:active{background:var(--green);color:#fff}
+/* PHOTO */
+.photo-count{font-size:28px;font-weight:900;color:var(--text);margin-bottom:2px}
+.photo-sub{font-size:12px;color:var(--sub)}
+.zip-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--hdr),var(--hdr2));color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:12px;transition:opacity .15s}
+.zip-btn:disabled{opacity:.4;cursor:not-allowed}
+.zip-btn:not(:disabled):active{opacity:.8}
+.prog-bar{background:#E2E8F0;border-radius:99px;height:8px;overflow:hidden;margin:10px 0 6px}
+.prog-fill{height:100%;background:var(--sky);border-radius:99px;transition:width .3s;width:0%}
+.prog-msg{font-size:12px;color:var(--sub);text-align:center}
+/* PHOTO GRID */
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.photo-thumb{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1;background:#F1F5F9}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-room-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:10px;font-weight:700;padding:3px 5px;text-align:center}
+/* LOADING */
+.loading-msg{text-align:center;padding:30px 20px;color:var(--hint);font-size:13px}
+/* TOAST */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:#1E293B;color:#fff;padding:11px 20px;border-radius:12px;font-size:14px;font-weight:600;z-index:9999;opacity:0;transition:all .25s;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">💾</div>
+    <div class="login-title">백업 내보내기</div>
+    <div class="login-sub">세대·수지 데이터 및 사진을 백업합니다<br>Google 계정으로 로그인하세요</div>
+    <button class="google-btn" onclick="signInGoogle()">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.7 2.3 30.2 0 24 0 14.7 0 6.7 5.4 2.8 13.3l7.8 6.1C12.5 13 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.9-2.2 5.4-4.7 7l7.3 5.7c4.3-4 6.7-9.9 6.7-16.7z"/><path fill="#FBBC05" d="M10.6 28.6A14.8 14.8 0 0 1 9.5 24c0-1.6.3-3.2.8-4.6L2.5 13.3A23.9 23.9 0 0 0 0 24c0 3.8.9 7.4 2.5 10.6l8.1-6z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.3-5.7c-2 1.4-4.6 2.2-7.9 2.2-6.2 0-11.5-4.2-13.4-9.9l-8 6.2C6.7 42.6 14.7 48 24 48z"/></svg>
+      Google로 로그인
+    </button>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <div class="hdr">
+    <div class="hdr-top">
+      <div style="display:flex;align-items:center;gap:10px">
+        <a href="admin.html" class="back-btn">← 관리</a>
+        <span style="font-size:15px;font-weight:900;color:#fff">백업 내보내기</span>
+      </div>
+      <div class="hdr-actions">
+        <div id="av-wrap" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div class="section-hd">현재 건물</div>
+    <div class="bld-row">
+      <span style="font-size:22px">🏢</span>
+      <div>
+        <div style="font-size:14px;font-weight:800;color:var(--blue-t)" id="cur-bld-name">로딩 중…</div>
+        <div style="font-size:11px;color:var(--sub);margin-top:2px">이 건물의 데이터를 내보냅니다</div>
+      </div>
+    </div>
+
+    <!-- 세대 데이터 -->
+    <div class="section-hd">🏠 세대 데이터</div>
+    <div class="card">
+      <div class="stat-row" id="units-stats">
+        <div class="stat-box"><div class="stat-val" id="s-total">—</div><div class="stat-lbl">전체 세대</div></div>
+        <div class="stat-box"><div class="stat-val" id="s-rented">—</div><div class="stat-lbl">임대중</div></div>
+        <div class="stat-box"><div class="stat-val" id="s-vacant">—</div><div class="stat-lbl">공실</div></div>
+      </div>
+      <div class="exp-row">
+        <button class="exp-btn blue" onclick="exportUnitsCSV()">📥 CSV</button>
+        <button class="exp-btn green" onclick="exportUnitsJSON()">📦 JSON</button>
+      </div>
+    </div>
+
+    <!-- 수지 데이터 -->
+    <div class="section-hd">💸 수지 데이터 (전체)</div>
+    <div class="card">
+      <div class="stat-row">
+        <div class="stat-box"><div class="stat-val" id="s-tx">—</div><div class="stat-lbl">총 건수</div></div>
+        <div class="stat-box"><div class="stat-val" id="s-income">—</div><div class="stat-lbl">수입 건</div></div>
+        <div class="stat-box"><div class="stat-val" id="s-expense">—</div><div class="stat-lbl">지출 건</div></div>
+      </div>
+      <div class="exp-row">
+        <button class="exp-btn blue" onclick="exportTxCSV()">📥 CSV</button>
+        <button class="exp-btn green" onclick="exportTxJSON()">📦 JSON</button>
+      </div>
+    </div>
+
+    <!-- 계약서 사진 -->
+    <div class="section-hd">📸 계약서 사진</div>
+    <div class="card">
+      <div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:4px">
+        <div>
+          <div class="photo-count" id="s-photos">—</div>
+          <div class="photo-sub">장의 사진이 저장되어 있습니다</div>
+        </div>
+        <div style="flex:1"></div>
+        <div style="font-size:11px;color:var(--hint);text-align:right;line-height:1.5">호실별 폴더로<br>ZIP 압축 다운로드</div>
+      </div>
+      <button class="zip-btn" id="zip-btn" onclick="downloadPhotosZip()" disabled>📦 사진 전체 ZIP 다운로드</button>
+      <div id="zip-prog" style="display:none">
+        <div class="prog-bar"><div class="prog-fill" id="zip-fill"></div></div>
+        <div class="prog-msg" id="zip-msg">준비 중…</div>
+      </div>
+      <div class="photo-grid" id="photo-grid"><div class="loading-msg">데이터 로딩 중…</div></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
+firebase.initializeApp(FC);
+const db=firebase.database(),auth=firebase.auth(),gProv=new firebase.auth.GoogleAuthProvider();
+const MASTER_UID='unGRVYWhmcMmEbYbWjAL8Y1pXVP2';
+let cu=null,curBid="main",mUid="",mName="";
+let unitsData={},rentHistory={},allTx=[],bldgsData={};
+let ROOMS=[];
+const RTYPE_LBL={oneroom:"원룸",twobay:"투베이",tworoom:"투룸",threeroom:"쓰리룸"};
+
+function getCurBid(uid){return localStorage.getItem("rbid_"+uid)||"main"}
+function sortedBids(bd){return Object.keys(bd).sort((a,b)=>(bd[a]?.order||0)-(bd[b]?.order||0))}
+function fmtDate(){const d=new Date();return`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`}
+function getLastNMonths(n){
+  const res=[],now=new Date();
+  for(let i=n-1;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    res.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`);
+  }
+  return res;
+}
+
+// ── AUTH ──
+auth.onAuthStateChanged(async user=>{
+  const ls=document.getElementById("login-screen"),app=document.getElementById("app");
+  if(user){
+    cu=user;
+    const w=document.getElementById("av-wrap");
+    w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"U")[0]}</div>`;
+    w.style.display="block";
+    const params=new URLSearchParams(location.search);
+    mUid=params.get("master_uid")||"";
+    mName=params.get("master_name")||"";
+    const targetUid=(user.uid===MASTER_UID&&mUid)?mUid:user.uid;
+    curBid=getCurBid(targetUid);
+    ls.style.display="none";app.style.display="block";
+    loadAll(targetUid);
+  }else{
+    cu=null;app.style.display="none";ls.style.display="flex";
+  }
+});
+function signInGoogle(){auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message))}
+
+// ── DATA LOAD ──
+function loadAll(uid){
+  // Building name
+  db.ref("rent_app/"+uid+"/_buildings").on("value",snap=>{
+    bldgsData=snap.val()||{};
+    const bids=sortedBids(bldgsData);
+    if(bids.length&&!bldgsData[curBid])curBid=bids[0];
+    document.getElementById("cur-bld-name").textContent=bldgsData[curBid]?.name||curBid;
+  });
+  // Room layout
+  db.ref(`rent_app/${uid}/${curBid}/config/roomLayout`).once("value").then(snap=>{
+    const layout=snap.val()||{};
+    ROOMS=Object.keys(layout).sort((a,b)=>Number(a)-Number(b)).flatMap(f=>layout[f]||[]).map(String);
+  });
+  // Units
+  db.ref(`rent_app/${uid}/${curBid}/units`).on("value",snap=>{
+    unitsData=snap.val()||{};
+    updateUnitsStats();
+    renderPhotoGrid();
+  });
+  // Rent history
+  db.ref(`rent_app/${uid}/${curBid}/rent_history`).on("value",snap=>{
+    rentHistory=snap.val()||{};
+  });
+  // Transactions
+  db.ref(`rent_app/${uid}/${curBid}/transactions`).on("value",snap=>{
+    allTx=Object.values(snap.val()||{}).sort((a,b)=>b.date.localeCompare(a.date));
+    updateTxStats();
+  });
+}
+
+function updateUnitsStats(){
+  const list=Object.values(unitsData);
+  document.getElementById("s-total").textContent=list.length;
+  document.getElementById("s-rented").textContent=list.filter(u=>u.status==="rented").length;
+  document.getElementById("s-vacant").textContent=list.filter(u=>u.status!=="rented").length;
+}
+function updateTxStats(){
+  document.getElementById("s-tx").textContent=allTx.length;
+  document.getElementById("s-income").textContent=allTx.filter(t=>t.type==="income").length;
+  document.getElementById("s-expense").textContent=allTx.filter(t=>t.type!=="income").length;
+}
+
+// ── PHOTO GRID ──
+function renderPhotoGrid(){
+  const photos=[];
+  Object.entries(unitsData).forEach(([room,u])=>{
+    Object.values(u.photos||{}).forEach(p=>photos.push({...p,room}));
+  });
+  document.getElementById("s-photos").textContent=photos.length;
+  const zipBtn=document.getElementById("zip-btn");
+  zipBtn.disabled=photos.length===0;
+  const grid=document.getElementById("photo-grid");
+  if(!photos.length){grid.innerHTML='<div class="loading-msg">등록된 사진이 없습니다</div>';return}
+  grid.innerHTML=photos.map(p=>`
+    <div class="photo-thumb">
+      <img src="${p.url}" loading="lazy" onclick="window.open('${p.url}')">
+      <div class="photo-room-label">${p.room}호</div>
+    </div>`).join("");
+}
+
+// ── UNITS EXPORT ──
+function exportUnitsJSON(){
+  const units=ROOMS.map(r=>{
+    const u=unitsData[r];if(!u)return null;
+    const {photos,...rest}=u;return rest;
+  }).filter(Boolean);
+  if(!units.length){showToast("❗ 세대 데이터 없음");return}
+  const data={exportedAt:new Date().toISOString(),units,rentHistory};
+  dlBlob(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),`월세관리_세대_${fmtDate()}.json`);
+  showToast("✅ 세대 JSON 내려받기 완료");
+}
+function exportUnitsCSV(){
+  const months=getLastNMonths(12);
+  const header=["호수","층","임대구조","임대상태","임차인①","연락처①","임차인②","연락처②","보증금(만원)","월세(만원)","계약시작","계약종료","메모",...months];
+  const rows=(ROOMS.length?ROOMS:Object.keys(unitsData)).map(r=>{
+    const u=unitsData[r];if(!u)return null;
+    const hist=rentHistory[u.room]||{};
+    const mCols=months.map(ym=>{const rec=hist[ym];return rec?(rec.paid?"완납":"미납"):""});
+    return[u.room,u.floor,RTYPE_LBL[u.roomType]||"",u.status==="rented"?"임대중":"공실",
+      u.tenantName||"",u.tenantPhone||"",u.tenantName2||"",u.tenantPhone2||"",
+      u.depositAmount||0,u.monthlyRent||0,u.contractStart||"",u.contractEnd||"",
+      (u.memo||"").replace(/\n/g," "),...mCols];
+  }).filter(Boolean);
+  if(!rows.length){showToast("❗ 세대 데이터 없음");return}
+  const csv=[header,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+  dlBlob(new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"}),`월세관리_세대_${fmtDate()}.csv`);
+  showToast("✅ 세대 CSV 내려받기 완료");
+}
+
+// ── TX EXPORT ──
+function exportTxJSON(){
+  if(!allTx.length){showToast("❗ 수지 데이터 없음");return}
+  dlBlob(new Blob([JSON.stringify(allTx,null,2)],{type:"application/json"}),`월세관리_수지전체_${fmtDate()}.json`);
+  showToast("✅ 수지 JSON 내려받기 완료");
+}
+function exportTxCSV(){
+  if(!allTx.length){showToast("❗ 수지 데이터 없음");return}
+  const hdr="날짜,유형,카테고리,금액,메모\n";
+  const rows=allTx.map(t=>`${t.date},${t.type==="income"?"수입":"지출"},${t.category||""},${t.amount||0},"${(t.memo||"").replace(/"/g,"'")}"`)
+  dlBlob(new Blob(["﻿"+hdr+rows.join("\n")],{type:"text/csv"}),`월세관리_수지전체_${fmtDate()}.csv`);
+  showToast("✅ 수지 CSV 내려받기 완료");
+}
+
+// ── PHOTO ZIP ──
+async function downloadPhotosZip(){
+  const photos=[];
+  Object.entries(unitsData).forEach(([room,u])=>{
+    Object.values(u.photos||{}).forEach(p=>photos.push({...p,room}));
+  });
+  if(!photos.length){showToast("❗ 사진이 없습니다");return}
+
+  const btn=document.getElementById("zip-btn");
+  const prog=document.getElementById("zip-prog");
+  const fill=document.getElementById("zip-fill");
+  const msg=document.getElementById("zip-msg");
+  btn.disabled=true;prog.style.display="block";
+
+  const zip=new JSZip();
+  const folder=zip.folder("계약서사진");
+  let done=0;
+
+  for(const p of photos){
+    msg.textContent=`다운로드 중… ${done+1}/${photos.length}`;
+    fill.style.width=`${Math.round((done/photos.length)*80)}%`;
+    try{
+      const res=await fetch(p.url);
+      const blob=await res.blob();
+      const ext=blob.type.includes("png")?"png":blob.type.includes("gif")?"gif":"jpg";
+      folder.file(`${p.room}호_${p.id}.${ext}`,blob);
+    }catch{
+      // skip failed photo
+    }
+    done++;
+  }
+
+  msg.textContent="ZIP 파일 생성 중…";fill.style.width="90%";
+  const zipBlob=await zip.generateAsync({type:"blob"});
+  fill.style.width="100%";msg.textContent="완료!";
+  dlBlob(zipBlob,`계약서사진_${fmtDate()}.zip`);
+  showToast(`✅ 사진 ${photos.length}장 ZIP 완료`);
+  btn.disabled=false;
+}
+
+function dlBlob(blob,name){
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);
+}
+
+let _toastTimer;
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("show");
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>t.classList.remove("show"),3000);
+}
+</script>
+</body>
+</html>
