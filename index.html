@@ -124,7 +124,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .g-icon{width:18px;height:18px;flex-shrink:0}
 .login-footer{font-size:10px;color:rgba(255,255,255,.25);margin-top:18px;line-height:1.7}
 /* SYNC */
-.sync-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px}
+.sync-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
 .s-ok{background:#4CAF50}.s-err{background:#EF5350}.s-ing{background:#FFA726;animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 /* ADMIN BTN */
@@ -166,7 +166,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       </div>
       <div class="hdr-actions">
         <span id="sync-st" style="font-size:10px"></span>
-        <button id="admin-btn" class="admin-btn" style="visibility:hidden">⚙️ 관리자</button>
+        <button id="admin-btn" class="admin-btn" style="visibility:hidden;padding:5px 8px">⚙️</button>
         <a class="guide-btn" href="guide.html">❓ 도움말</a>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
@@ -393,8 +393,7 @@ document.addEventListener("click",e=>{if(!e.target.closest("#av-wrap")&&!e.targe
 function setSS(s){
   const el=document.getElementById("sync-st");if(!el)return;
   const cls=s==="ok"?"s-ok":s==="ing"?"s-ing":"s-err";
-  const txt=s==="ok"?"동기화됨":s==="ing"?"저장중":"오류";
-  el.innerHTML=`<span class="sync-dot ${cls}"></span><span style="color:rgba(255,255,255,.5);font-size:10px">${txt}</span>`;
+  el.innerHTML=`<span class="sync-dot ${cls}" title="${s==="ok"?"동기화됨":s==="ing"?"저장중":"오류"}"></span>`;
 }
 
 function computePaidStatus(bid,roomId){
