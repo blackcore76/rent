@@ -5,7 +5,7 @@
 const DEMO = {
   // ── 건물 목록 ──
   bldgsData: {
-    main: { id:"main", name:"조아빌", order:0, createdAt:"2024-01-01T00:00:00.000Z" }
+    main: { id:"main", name:"나빌레라", order:0, createdAt:"2024-01-01T00:00:00.000Z" }
   },
 
   // ── 호실 레이아웃 ──
