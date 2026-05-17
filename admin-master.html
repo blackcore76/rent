@@ -128,6 +128,10 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-txt{color:rgba(255,255,255,.5);font-size:13px}
 
+/* 잠금 버튼 (실수 방지 블라인드) */
+.btn-armed{background:rgba(239,68,68,.4)!important;color:#fff!important;border:1.5px solid rgba(239,68,68,.8)!important;animation:arm-pulse .25s ease-out}
+@keyframes arm-pulse{0%{transform:scale(.94)}55%{transform:scale(1.06)}100%{transform:scale(1)}}
+
 /* 접근 거부 */
 #access-denied{position:fixed;inset:0;background:linear-gradient(160deg,#0A1628,#1A2B3C);z-index:7500;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;gap:14px}
 .denied-icon{font-size:64px}
@@ -302,7 +306,7 @@ function renderPendingUsers(){
       </div>
       <div class="pc-btn-row">
         ${st!=="active"?`<button class="btn-approve" onclick="approveUser('${esc(u.uid)}','${esc(u.displayName||"")}','${esc(u.email||"")}')">✅ 활성화</button>`:""}
-        ${st!=="rejected"?`<button class="btn-reject" onclick="rejectUser('${esc(u.uid)}')">🚫 거부</button>`:""}
+        ${st!=="rejected"?`<button class="btn-reject" onclick="armBtn(this,function(){rejectUser('${esc(u.uid)}')})">🚫 거부</button>`:""}
         ${st==="active"?`<button class="uc-btn btn-main" style="flex:1;padding:9px 4px" onclick="quickGo('${esc(u.uid)}','${esc(u.displayName||u.uid)}','index')">📊 열람</button>`:""}
       </div>
     </div>`;
@@ -392,7 +396,7 @@ function renderUsersPage(){
         <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(u.name)}','units')">🏠 세대</button>
         <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(u.name)}','expense')" style="background:rgba(124,58,237,.12);color:#7C3AED;border:1px solid rgba(124,58,237,.25)">💸 지출</button>
         <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(u.name)}','admin')" style="background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.25)">🗂 관리</button>
-        <button class="uc-btn btn-del" onclick="delUser('${esc(u.uid)}','${esc(u.name)}')">🗑</button>
+        <button class="uc-btn btn-del" onclick="armBtn(this,function(){delUser('${esc(u.uid)}','${esc(u.name)}')})">🗑</button>
       </div>
     </div>`;
   }).join("");
@@ -452,6 +456,23 @@ function showCM(title,msg,cb){
 function closeCM(){document.getElementById("confirm-modal").classList.remove("show")}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 let tTm;function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
+
+// 실수 방지 블라인드: 첫 탭 → 잠금해제, 두 번째 탭 → 실행 (2초 내)
+const _armMap=new WeakMap();
+function armBtn(btn,action){
+  if(_armMap.has(btn)){
+    const{timer,html}=_armMap.get(btn);
+    clearTimeout(timer);_armMap.delete(btn);
+    btn.classList.remove("btn-armed");btn.innerHTML=html;
+    action();return;
+  }
+  const html=btn.innerHTML;
+  btn.innerHTML="⚡ 한번 더!";btn.classList.add("btn-armed");
+  const timer=setTimeout(()=>{
+    if(_armMap.has(btn)){btn.classList.remove("btn-armed");btn.innerHTML=_armMap.get(btn).html;_armMap.delete(btn);}
+  },2000);
+  _armMap.set(btn,{timer,html});
+}
 </script>
 </body>
 </html>
