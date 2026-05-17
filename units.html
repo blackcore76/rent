@@ -697,7 +697,6 @@ function saveRoom(){
     contractStart:document.getElementById("m-start").value,
     contractEnd:document.getElementById("m-end").value,
     memo:document.getElementById("m-memo").value.trim()};
-  const ex=units[curRoom]||{};if(ex.photos)data.photos=ex.photos;
   uRef.child(curRoom).update(data)
     .then(()=>{closeSheet();showToast("✅ 저장됨");renderGrid()})
     .catch(()=>showToast("❗ 저장 실패"));
@@ -712,8 +711,8 @@ async function onPhotos(e){
   if(!guardWrite()){e.target.value="";return;}
   const files=Array.from(e.target.files);
   if(!files.length||!curRoom||!cu)return;
-  const btn=document.getElementById("upload-btn"),camBtn=document.getElementById("camera-btn"),bar=document.getElementById("prog-bar"),fill=document.getElementById("prog-fill"),pct=document.getElementById("prog-pct");
-  btn.disabled=true;camBtn.disabled=true;bar.style.display="block";
+  const btn=document.getElementById("upload-btn"),camBtn=document.getElementById("camera-btn"),bar=document.getElementById("prog-bar"),fill=document.getElementById("prog-fill"),pct=document.getElementById("prog-pct"),saveBtn=document.querySelector(".btn-save");
+  btn.disabled=true;camBtn.disabled=true;if(saveBtn)saveBtn.disabled=true;bar.style.display="block";
   for(let i=0;i<files.length;i++){
     const file=files[i];
     if(!file.type.startsWith("image/")){showToast("❗ 이미지만 가능");continue}
@@ -745,7 +744,7 @@ async function onPhotos(e){
       renderPhotos(units[curRoom].photos);showToast("✅ 업로드 완료");
     }catch(err){showToast("❗ 업로드 실패: "+err.message)}
   }
-  btn.disabled=false;camBtn.disabled=false;bar.style.display="none";fill.style.width="0%";pct.textContent="";e.target.value="";
+  btn.disabled=false;camBtn.disabled=false;if(saveBtn)saveBtn.disabled=false;bar.style.display="none";fill.style.width="0%";pct.textContent="";e.target.value="";
 }
 function delPhoto(pid,spath){
   if(!guardWrite())return;
