@@ -14,6 +14,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="shared.js"></script>
 <script src="demo-data.js"></script>
 <style>
 :root{
@@ -259,10 +260,6 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 <div id="toast"></div>
 
 <script>
-const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
-firebase.initializeApp(FC);
-const db=firebase.database(),auth=firebase.auth(),gProv=new firebase.auth.GoogleAuthProvider();
-const MASTER_UID="unGRVYWhmcMmEbYbWjAL8Y1pXVP2";
 let cu=null,mUid="",mName="",readOnly=false;
 let bldgsData={},curBid="main",bldgsRef=null,bldgsL=null;
 let allBldData={}; // {bid:{units:{},history:{},bldInfo:{}}}
@@ -270,74 +267,6 @@ let _alertTimer=null;
 let bldListeners={}; // {bid:{uRef,hRef,biRef,uL,hL,biL}}
 let nRef=null,nL=null,notes={};
 
-// ── BUILDING UTILS ──
-function getCurBid(uid){return localStorage.getItem("rbid_"+uid)||"main"}
-function setCurBid(uid,bid){localStorage.setItem("rbid_"+uid,bid)}
-function sortedBids(bd){return Object.keys(bd).sort((a,b)=>(bd[a]?.order||0)-(bd[b]?.order||0))}
-function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
-
-// ── MIGRATION ──
-async function migrateToMultiBldg(uid){
-  if(localStorage.getItem("mig_"+uid))return;
-  const snap=await db.ref("rent_app/"+uid+"/_buildings").once("value");
-  if(snap.exists()){localStorage.setItem("mig_"+uid,"1");return;}
-  let bname=localStorage.getItem("rent_aptname")||"내 건물";
-  try{
-    const bs=await db.ref("rent_app/"+uid+"/buildings").once("value");
-    if(bs.exists()){const v=Object.values(bs.val());if(v.length&&v[0]?.name)bname=v[0].name}
-  }catch(e){}
-  const OLD=["units","rent_history","config","transactions","notes","buildings"];
-  for(const p of OLD){
-    try{
-      const s=await db.ref("rent_app/"+uid+"/"+p).once("value");
-      if(s.exists()){
-        await db.ref("rent_app/"+uid+"/main/"+p).set(s.val());
-        await db.ref("rent_app/"+uid+"/"+p).remove();
-      }
-    }catch(e){}
-  }
-  await db.ref("rent_app/"+uid+"/_buildings/main").set({id:"main",name:bname,order:0,createdAt:new Date().toISOString()});
-  localStorage.setItem("mig_"+uid,"1");
-}
-
-
-
-// ── ACCESS CONTROL ──
-async function checkUserAccess(user){
-  const ref=db.ref("_users/"+user.uid);
-  const snap=await ref.once("value");
-  let status;
-  if(!snap.exists()){
-    await ref.set({uid:user.uid,displayName:user.displayName||"",email:user.email||"",photoURL:user.photoURL||"",status:"pending",createdAt:new Date().toISOString()});
-    status="pending";
-  }else{
-    status=snap.val().status||"pending";
-  }
-  if(status==="active")return true;
-  if(status==="rejected"){
-    const ss=document.getElementById("status-screen");
-    document.getElementById("ss-email").textContent=user.email||"";
-    document.getElementById("ss-icon").textContent="🚫";
-    document.getElementById("ss-title").textContent="사용 승인이 거부됐습니다";
-    document.getElementById("ss-msg").textContent="자세한 사항은 관리자에게 문의하세요.";
-    ss.style.display="flex";
-    return false;
-  }
-  return "readonly";
-}
-function showDemoBanner(){
-  if(document.getElementById("demo-banner"))return;
-  const b=document.createElement("div");
-  b.id="demo-banner";
-  b.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(14,165,233,.18),rgba(14,165,233,.06));border-bottom:1px solid rgba(14,165,233,.35);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
-  const btn=cu
-    ?`<button onclick="auth.signOut()" style="background:rgba(14,165,233,.2);border:1px solid rgba(14,165,233,.4);border-radius:8px;padding:5px 12px;color:#0EA5E9;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🚪 로그아웃</button>`
-    :`<button onclick="sessionStorage.removeItem('guestDemo');location.reload()" style="background:rgba(14,165,233,.2);border:1px solid rgba(14,165,233,.4);border-radius:8px;padding:5px 12px;color:#0EA5E9;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🔑 로그인</button>`;
-  b.innerHTML=`<span style="font-size:12px;font-weight:700;color:#0EA5E9">👀 구경 모드 · 데모 데이터 표시 중</span>${btn}`;
-  document.body.appendChild(b);
-  document.querySelector(".content").style.marginTop="136px";
-}
-function guardWrite(){if(!readOnly)return true;showToast("⏳ 승인 후 이용 가능합니다");return false;}
 function enterDemoMode(){
   readOnly=true;sessionStorage.setItem("guestDemo","1");
   bldgsData=DEMO.bldgsData;curBid="main";
@@ -442,11 +371,7 @@ function teardownAll(){
 
 
 
-function signInGoogle(){auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message))}
 function doSignOut(){closeMenu();teardownAll();auth.signOut()}
-function toggleMenu(){document.getElementById("user-menu").classList.toggle("show")}
-function closeMenu(){document.getElementById("user-menu").classList.remove("show")}
-document.addEventListener("click",e=>{if(!e.target.closest("#av-wrap")&&!e.target.closest("#user-menu"))closeMenu()});
 
 function setSS(s){
   const el=document.getElementById("sync-st");if(!el)return;
@@ -547,35 +472,6 @@ function checkContractAlerts(){
   else sessionStorage.removeItem("ca_alerts");
   maybeShowAlerts();
 }
-function maybeShowAlerts(){
-  if(readOnly)return;
-  const KEY="ca_cnt";
-  if(parseInt(sessionStorage.getItem(KEY)||"0")>=3)return;
-  let alerts;try{alerts=JSON.parse(sessionStorage.getItem("ca_alerts")||"null");}catch(e){return;}
-  if(!alerts?.length)return;
-  sessionStorage.setItem(KEY,parseInt(sessionStorage.getItem(KEY)||"0")+1);
-  showContractToasts(alerts);
-}
-function showContractToasts(alerts){
-  const prev=document.getElementById("ca-wrap");if(prev)prev.remove();
-  const wrap=document.createElement("div");
-  wrap.id="ca-wrap";
-  wrap.style.cssText="position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none";
-  alerts.forEach((a,i)=>{
-    const el=document.createElement("div");
-    const room=a.bldName?`${a.bldName} ${a.room}호`:`${a.room}호`;
-    el.textContent=`⚠ ${room} · ${a.name} · D-${a.dl}`;
-    el.style.cssText="background:#e74c3c;color:#fff;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.25);white-space:nowrap;opacity:0;transition:opacity .3s";
-    wrap.appendChild(el);
-    setTimeout(()=>el.style.opacity="1",i*120);
-  });
-  document.body.appendChild(wrap);
-  setTimeout(()=>{
-    wrap.querySelectorAll("div").forEach(el=>el.style.opacity="0");
-    setTimeout(()=>wrap.remove(),400);
-  },3500);
-}
-
 function renderBldCards(){
   const el=document.getElementById("buildings-wrap");if(!el)return;
   const bids=sortedBids(bldgsData);
@@ -666,9 +562,7 @@ function goToUnit(bid,room){
 function goUnits(filter){
   location.href=`units.html${filter?"?filter="+filter:""}${mUid?(filter?"&":"?")+"master_uid="+encodeURIComponent(mUid)+"&master_name="+encodeURIComponent(mName):""}`;
 }
-function fmtWon(v){if(!v)return"—";return(v*10000).toLocaleString("ko-KR")+"원"}
 function fmtDt(iso){if(!iso)return"";const d=new Date(iso);return`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`}
-let tTm;function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
 </script>
 </body>
 </html>

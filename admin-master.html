@@ -14,6 +14,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="shared.js"></script>
 <style>
 :root{
   --bg:#0F1C2D;--card:#1A2B3C;--border:rgba(255,255,255,.08);
@@ -232,11 +233,6 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 <div id="toast"></div>
 
 <script>
-const MASTER_UID='unGRVYWhmcMmEbYbWjAL8Y1pXVP2';
-const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
-firebase.initializeApp(FC);
-const db=firebase.database(),auth=firebase.auth(),gProv=new firebase.auth.GoogleAuthProvider();
-
 let usersRef=null,pendingUsersRef=null,allUsersData={},pendingFilter="pending";
 let viewingUid=null,viewingName=null;
 let ucTotalList=[],ucPage=1;
@@ -455,17 +451,6 @@ function showCM(title,msg,cb){
   document.getElementById("confirm-modal").classList.add("show");
 }
 function closeCM(){document.getElementById("confirm-modal").classList.remove("show")}
-function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
-let tTm;function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
-
-// 실수 방지 블라인드: 탭하면 덮개가 올라가고 2초 뒤 자동 복귀
-const _blindTimers=new WeakMap();
-function liftBlind(blind){
-  blind.classList.add("lifted");
-  const old=_blindTimers.get(blind);if(old)clearTimeout(old);
-  const t=setTimeout(()=>{blind.classList.remove("lifted");_blindTimers.delete(blind);},2200);
-  _blindTimers.set(blind,t);
-}
 </script>
 </body>
 </html>
