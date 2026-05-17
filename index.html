@@ -383,6 +383,7 @@ function computePaidStatus(bid,roomId){
   const h=((allBldData[bid]||{}).history||{})[String(roomId)]||{};
   const recs=Object.values(h);
   if(!recs.length)return null;
+  if(recs.some(r=>r.partial))return "partial";
   return recs.some(r=>!r.paid)?false:true;
 }
 
@@ -395,7 +396,7 @@ function renderDash(){
     const r=ul.filter(u=>u.status==="rented");
     vacant+=ul.filter(u=>u.status==="vacant").length;
     rented+=r.length;
-    unpaidCnt+=r.filter(u=>computePaidStatus(bid,u.room)===false).length;
+    unpaidCnt+=r.filter(u=>{const ps=computePaidStatus(bid,u.room);return ps===false||ps==="partial";}).length;
   });
   document.getElementById("s-total").textContent=tot;
   document.getElementById("s-rented").textContent=rented;
@@ -406,16 +407,18 @@ function renderDash(){
   let uHtml="";
   bids.forEach(bid=>{
     const ul=Object.values((allBldData[bid]||{}).units||{});
-    const up=ul.filter(u=>u.status==="rented"&&computePaidStatus(bid,u.room)===false)
+    const up=ul.filter(u=>{const ps=computePaidStatus(bid,u.room);return u.status==="rented"&&(ps===false||ps==="partial");})
       .sort((a,b)=>String(a.room).localeCompare(String(b.room)));
     if(!up.length)return;
     uHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
-    uHtml+=up.map(u=>`<div class="status-row" onclick="goToUnit('${bid}','${u.room}')">
+    uHtml+=up.map(u=>{
+      const ps=computePaidStatus(bid,u.room);
+      const pBadge=ps==="partial"?`<span class="badge" style="background:#FEF3C7;color:#92400E">🔶 부분납부</span>`:`<span class="badge badge-unpaid">❌ 미납</span>`;
+      return`<div class="status-row" onclick="goToUnit('${bid}','${u.room}')">
       <span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}
       <span class="tenant-nm">${esc(names(u))}</span>
       <span class="rent-amt">${fmtWon(u.monthlyRent)}</span>
-      <span class="badge badge-unpaid">미납</span>
-      <span style="font-size:14px;color:var(--hint)">›</span></div>`).join("");
+      ${pBadge}<span style="font-size:14px;color:var(--hint)">›</span></div>`;}).join("");
   });
   document.getElementById("unpaid-list").innerHTML=uHtml||'<div class="empty-small">✅ 이달 미납 없음</div>';
 

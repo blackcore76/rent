@@ -110,7 +110,14 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .rh-icon{font-size:13px;line-height:1}
 .rh-paid{background:var(--green-lt);color:var(--green-t)}
 .rh-unpaid{background:var(--red-lt);color:var(--red-t)}
+.rh-partial{background:#FEF3C7;color:#92400E}
 .rh-none{background:#F1F5F9;color:var(--hint)}
+.rh-drop{position:fixed;z-index:700;background:#fff;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.22);padding:6px;min-width:148px;border:1px solid #E2E8F0}
+.rh-dd-btn{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;border:none;background:none;font-size:13px;font-weight:600;cursor:pointer;border-radius:9px;text-align:left;font-family:inherit;color:var(--text)}
+.rh-dd-btn:active{background:#F1F5F9}
+.rh-partial-input{padding:8px;display:flex;flex-direction:column;gap:6px}
+.rh-partial-input input{padding:8px 10px;border:1.5px solid #E2E8F0;border-radius:9px;font-size:14px;font-family:inherit;width:100%}
+.rh-partial-input button{padding:9px;background:#F59E0B;color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
 .rh-legend{display:flex;gap:10px;font-size:10px;color:var(--hint);margin-top:2px;flex-wrap:wrap}
 .rh-tip{font-size:10px;color:var(--sky);margin-top:4px;text-align:center;font-weight:600}
 .rc-dday{font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;display:inline-block;margin-bottom:4px}
@@ -279,8 +286,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
     <div class="section-label">📅 월세 납부 이력 <span style="font-size:10px;font-weight:400;color:var(--hint);margin-left:4px">최근 12개월</span></div>
     <div class="rent-hist-wrap">
       <div class="rent-hist-grid" id="rent-hist-grid"></div>
-      <div class="rh-legend"><span>✅ 완납</span><span>❌ 미납</span><span style="opacity:.5">— 기록없음</span></div>
-      <div class="rh-tip">👆 셀을 탭하면 완납 → 미납 → 삭제 순으로 변경됩니다</div>
+      <div class="rh-legend"><span>✅ 완납</span><span>❌ 미납</span><span>🔶 부분납부</span><span style="opacity:.5">— 기록없음</span></div>
     </div>
     <div class="divider"></div>
     <div class="section-label">📷 계약서 사진</div>
@@ -467,27 +473,87 @@ function renderHistory(roomId){
   const months=getLastNMonths(12),roomH=rentHistory[roomId]||{};
   const el=document.getElementById("rent-hist-grid");if(!el)return;
   el.innerHTML=months.map(ym=>{
-    const rec=roomH[ym],cls=rec?(rec.paid?"rh-paid":"rh-unpaid"):"rh-none";
-    const icon=rec?(rec.paid?"✅":"❌"):"—",mLabel=ym.split("-")[1]+"월";
+    const rec=roomH[ym];
+    let cls,icon;
+    if(!rec){cls="rh-none";icon="—";}
+    else if(rec.paid){cls="rh-paid";icon="✅";}
+    else if(rec.partial){cls="rh-partial";icon="🔶";}
+    else{cls="rh-unpaid";icon="❌";}
+    const mLabel=ym.split("-")[1]+"월";
     const amtTitle=rec&&rec.amount?" · "+rec.amount.toLocaleString()+"원":"";
-    return`<div class="rh-cell ${cls}" onclick="toggleHistory('${roomId}','${ym}')" title="${ym}${amtTitle}">
+    return`<div class="rh-cell ${cls}" onclick="openHistDrop(event,'${roomId}','${ym}')" title="${ym}${amtTitle}">
       <div class="rh-month">${mLabel}</div><div class="rh-icon">${icon}</div></div>`;
   }).join("");
 }
-function toggleHistory(roomId,ym){
+
+let _rhDrop=null;
+function openHistDrop(e,roomId,ym){
   if(!guardWrite())return;
-  if(!hRef||!cu)return;
-  const rec=(rentHistory[roomId]||{})[ym],u=units[roomId];
+  e.stopPropagation();
+  if(_rhDrop){_rhDrop.remove();_rhDrop=null;}
+  const u=units[roomId];
   const rentAmt=(u&&u.monthlyRent?u.monthlyRent:0)*10000;
-  let nextData=null;
-  if(!rec) nextData={room:roomId,yearMonth:ym,paid:true,amount:rentAmt,updatedAt:new Date().toISOString()};
-  else if(rec.paid) nextData={room:roomId,yearMonth:ym,paid:false,amount:rentAmt,updatedAt:new Date().toISOString()};
+  const drop=document.createElement("div");
+  drop.className="rh-drop";
+  const opts=[
+    {label:"✅ 납부완료",status:"paid"},
+    {label:"❌ 미납",status:"unpaid"},
+    {label:"🔶 부분납부",status:"partial"},
+    {label:"— 기록없음",status:"none"},
+  ];
+  opts.forEach(opt=>{
+    const btn=document.createElement("button");
+    btn.className="rh-dd-btn";btn.textContent=opt.label;
+    if(opt.status==="partial"){
+      btn.onclick=()=>{
+        drop.innerHTML="";
+        const wrap=document.createElement("div");wrap.className="rh-partial-input";
+        const lbl=document.createElement("div");lbl.style.cssText="font-size:11px;font-weight:700;color:#92400E";lbl.textContent="🔶 부분납부 금액 (원)";
+        const inp=document.createElement("input");inp.type="number";inp.value=rentAmt;inp.min=0;
+        const cfm=document.createElement("button");cfm.textContent="확인";
+        cfm.onclick=()=>{
+          const amt=parseInt(inp.value)||0;
+          setHistStatus(roomId,ym,"partial",amt);
+          drop.remove();_rhDrop=null;
+        };
+        wrap.append(lbl,inp,cfm);drop.appendChild(wrap);
+        setTimeout(()=>inp.focus(),50);
+      };
+    } else {
+      btn.onclick=()=>{setHistStatus(roomId,ym,opt.status,rentAmt);drop.remove();_rhDrop=null;};
+    }
+    drop.appendChild(btn);
+  });
+  // 위치 계산 (화면 밖으로 나가지 않게)
+  const rect=e.currentTarget.getBoundingClientRect();
+  let top=rect.bottom+6,left=rect.left;
+  if(left+160>window.innerWidth)left=window.innerWidth-164;
+  if(top+180>window.innerHeight)top=rect.top-186;
+  drop.style.cssText+=`;top:${top}px;left:${left}px`;
+  document.body.appendChild(drop);_rhDrop=drop;
+}
+document.addEventListener("click",e=>{if(_rhDrop&&!_rhDrop.contains(e.target)){_rhDrop.remove();_rhDrop=null;}});
+
+function setHistStatus(roomId,ym,status,amount){
+  if(!hRef||!cu)return;
   const ref=hRef.child(`${roomId}/${ym}`);
-  (nextData?ref.set(nextData):ref.remove()).then(()=>{
+  if(status==="none"){
+    ref.remove().then(()=>{
+      if(rentHistory[roomId])delete rentHistory[roomId][ym];
+      renderHistory(roomId);renderGrid();showToast("🗑 기록 삭제됨");
+    }).catch(()=>showToast("❗ 저장 실패"));
+    return;
+  }
+  const data={room:roomId,yearMonth:ym,
+    paid:status==="paid",
+    partial:status==="partial",
+    amount:amount,
+    updatedAt:new Date().toISOString()};
+  ref.set(data).then(()=>{
     if(!rentHistory[roomId])rentHistory[roomId]={};
-    if(nextData)rentHistory[roomId][ym]=nextData;else delete rentHistory[roomId][ym];
+    rentHistory[roomId][ym]=data;
     renderHistory(roomId);renderGrid();
-    showToast(nextData===null?"🗑 기록 삭제됨":nextData.paid?"✅ 완납 기록됨":"❌ 미납 기록됨");
+    showToast({paid:"✅ 완납 기록됨",unpaid:"❌ 미납 기록됨",partial:"🔶 부분납부 기록됨"}[status]);
   }).catch(()=>showToast("❗ 저장 실패"));
 }
 async function ensureRooms(ex){
@@ -502,6 +568,7 @@ function setFloor(f,btn){
 function computePaidStatus(roomId){
   const recs=Object.values(rentHistory[roomId]||{});
   if(!recs.length)return null;
+  if(recs.some(r=>r.partial))return "partial";
   return recs.some(r=>!r.paid)?false:true;
 }
 const RTYPE_LBL={oneroom:"원룸",twobay:"투베이",tworoom:"투룸",threeroom:"쓰리룸"};
@@ -528,6 +595,7 @@ function renderGrid(){
     let pBadge="";
     if(isR){const ps=computePaidStatus(u.room);
       if(ps===false) pBadge=`<span class="rc-paid badge-unpaid">❌ 미납</span>`;
+      else if(ps==="partial") pBadge=`<span class="rc-paid" style="background:#FEF3C7;color:#92400E">🔶 부분납부</span>`;
       else if(ps===true) pBadge=`<span class="rc-paid badge-paid">✅ 완납</span>`;
       else pBadge=`<span class="rc-paid" style="background:#F1F5F9;color:var(--hint)">— 이력없음</span>`;}
     let ddayHtml="";
@@ -692,7 +760,7 @@ function exportCSV(){
     const hist=rentHistory[u.room]||{};
     const mCols=months.map(ym=>{
       const rec=hist[ym];
-      return rec?(rec.paid?"완납":"미납"):"";
+      return rec?(rec.paid?"완납":rec.partial?"부분납부":"미납"):"";
     });
     return[u.room,u.floor,RTYPE_LBL[u.roomType]||"",u.status==="rented"?"임대중":"공실",
       u.tenantName||"",u.tenantPhone||"",u.tenantName2||"",u.tenantPhone2||"",

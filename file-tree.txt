@@ -25,16 +25,4 @@ rent/  (월세 임대관리 — 사이트 파일 목록)
 │   ├── manifest.json       PWA 매니페스트
 │   └── CNAME               GitHub Pages 커스텀 도메인
 │
-└── [미사용 — 구버전 잔재 (삭제 검토)]
-    ├── css/
-    │   └── style.css
-    └── js/
-        ├── auth.js
-        ├── calendar.js
-        ├── common.js
-        ├── firebase-config.js
-        ├── home.js
-        ├── payments.js
-        ├── settings.js
-        ├── style.css
-        └── units.js
+└── 
