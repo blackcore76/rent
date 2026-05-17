@@ -1,0 +1,40 @@
+rent/  (월세 임대관리 — 사이트 파일 목록)
+│
+├── [HTML — 실제 사용 중]
+│   ├── index.html          메인 대시보드 (월세 현황, 계약 만료 알림)
+│   ├── units.html          호실 관리 (계약 입력, 사진 업로드)
+│   ├── expense.html        지출 관리
+│   ├── admin.html          관리자 (건물설정, 계약서사진, 전화번호부)
+│   ├── admin-master.html   마스터 관리자 (사용자 승인·거부)
+│   ├── guide.html          이용 안내
+│   ├── backup.html         데이터 백업 도구
+│   └── restore.html        데이터 복원 도구
+│
+├── [JS — 실제 사용 중]
+│   ├── shared.js           공통 유틸 (Firebase 초기화, auth, toast, blind 등)
+│   └── demo-data.js        데모 모드 샘플 데이터
+│
+├── [이미지]
+│   ├── favicon.png         브라우저 탭 아이콘
+│   ├── icon-192.png        PWA 아이콘 (소)
+│   ├── icon-512.png        PWA 아이콘 (대)
+│   ├── logo.png            로고
+│   └── logo.psd            로고 원본 (Photoshop 편집용)
+│
+├── [PWA / 배포]
+│   ├── manifest.json       PWA 매니페스트
+│   └── CNAME               GitHub Pages 커스텀 도메인
+│
+└── [미사용 — 구버전 잔재 (삭제 검토)]
+    ├── css/
+    │   └── style.css
+    └── js/
+        ├── auth.js
+        ├── calendar.js
+        ├── common.js
+        ├── firebase-config.js
+        ├── home.js
+        ├── payments.js
+        ├── settings.js
+        ├── style.css
+        └── units.js
