@@ -550,13 +550,15 @@ function openHistDrop(e,roomId,ym){
     const btn=document.createElement("button");
     btn.className="rh-dd-btn";btn.textContent=opt.label;
     if(opt.status==="partial"){
-      btn.onclick=()=>{
+      btn.onclick=(ev)=>{
+        ev.stopPropagation();
         drop.innerHTML="";
         const wrap=document.createElement("div");wrap.className="rh-partial-input";
         const lbl=document.createElement("div");lbl.style.cssText="font-size:11px;font-weight:700;color:#92400E";lbl.textContent="🔶 부분납부 금액 (원)";
         const inp=document.createElement("input");inp.type="number";inp.value=rentAmt;inp.min=0;
         const cfm=document.createElement("button");cfm.textContent="확인";
-        cfm.onclick=()=>{
+        cfm.onclick=(ev)=>{
+          ev.stopPropagation();
           const amt=parseInt(inp.value)||0;
           setHistStatus(roomId,ym,"partial",amt);
           drop.remove();_rhDrop=null;
