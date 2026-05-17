@@ -681,8 +681,8 @@ function openSheet(roomId){
   document.getElementById("m-end").value=u.contractEnd||"";
   document.getElementById("m-memo").value=u.memo||"";
   updateTgUI();updateRtypeUI();updateRentTypeUI();renderPhotos(u.photos||{});renderHistory(roomId);renderRentChanges(roomId);
-  const sheetEl=document.querySelector("#room-sheet .sheet");if(sheetEl)sheetEl.scrollTop=0;
   document.getElementById("room-sheet").classList.add("show");
+  requestAnimationFrame(()=>{const s=document.querySelector("#room-sheet .sheet");if(s)s.scrollTop=0;});
 }
 function closeSheet(){document.getElementById("room-sheet").classList.remove("show");curRoom=null}
 
@@ -699,7 +699,8 @@ function openRentChangeSheet(){
   document.getElementById("chg-date").value=new Date().toISOString().slice(0,10);
   document.getElementById("chg-reason").value="";
   document.getElementById("chg-bg").classList.add("show");
-  const cs=document.getElementById("chg-sheet");cs.scrollTop=0;cs.classList.add("show");
+  const cs=document.getElementById("chg-sheet");cs.classList.add("show");
+  requestAnimationFrame(()=>cs.scrollTop=0);
 }
 function closeRentChangeSheet(){
   document.getElementById("chg-bg").classList.remove("show");
