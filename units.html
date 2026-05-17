@@ -734,7 +734,7 @@ async function onPhotos(e){
             pct.textContent=`${label}업로드 중... ${p}%`;
           },rej,res));
           url=await ref.getDownloadURL();break;
-        }catch(e){if(attempt===1)throw e;pct.textContent=`${label}재시도 중...`;await new Promise(r=>setTimeout(r,1500));}
+        }catch(e){if(attempt===1)throw e;pct.textContent=`${label}❗ 실패 — 재시도 중...`;fill.style.width="0%";await new Promise(r=>setTimeout(r,1800));}
       }
       fill.style.width="100%";pct.textContent=`${label}완료!`;
       const pid=String(ts+(i*10));

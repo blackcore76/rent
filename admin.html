@@ -1043,7 +1043,7 @@ async function uploadContractPhoto(room,e){
           const task=ref.put(blob);
           await new Promise((res,rej)=>task.on("state_changed",s=>{fill.style.width=`${Math.round(s.bytesTransferred/s.totalBytes*100)||0}%`},rej,res));
           url=await ref.getDownloadURL();break;
-        }catch(e){if(attempt===1)throw e;showToast("🔄 재시도 중...");await new Promise(r=>setTimeout(r,1500));}
+        }catch(e){if(attempt===1)throw e;fill.style.width="0%";showToast("❗ 업로드 실패 — 재시도 중...");await new Promise(r=>setTimeout(r,1800));}
       }
       fill.style.width="100%";
       const pid=String(ts+(i*10));
