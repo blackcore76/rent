@@ -163,6 +163,10 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .bldg-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px}
 .bldg-val{font-size:13px;font-weight:700;color:#4DD0E1;letter-spacing:.3px;word-break:break-all}
 .bldg-val-muted{font-size:13px;font-weight:600;color:rgba(255,255,255,.75);word-break:break-all}
+/* 실수 방지 블라인드 덮개 */
+.btn-blind-wrap{position:relative;display:inline-flex}
+.btn-blind{position:absolute;inset:0;border-radius:6px;background:rgba(71,85,105,.32);border:1.5px solid rgba(100,116,139,.45);color:rgba(255,255,255,.55);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;z-index:2;font-family:inherit;transition:opacity .2s,transform .22s cubic-bezier(.4,0,.2,1);user-select:none}
+.btn-blind.lifted{opacity:0;transform:translateY(-7px);pointer-events:none}
 </style>
 </head>
 <body>
@@ -667,7 +671,7 @@ async function renderBldRegistry(){
       </div>
       <button onclick="switchBldAndStay('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:${isCur?"var(--blue)":"var(--hdr)"};color:#fff;cursor:pointer;font-family:inherit">전환</button>
       <button onclick="openRenameBld('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:#F1F5F9;color:var(--sub);cursor:pointer;font-family:inherit">수정</button>
-      ${bids.length>1?`<button onclick="delBld('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:var(--red-lt);color:var(--red);cursor:pointer;font-family:inherit">삭제</button>`:""}
+      ${bids.length>1?`<div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 삭제</div><button onclick="delBld('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:var(--red-lt);color:var(--red);cursor:pointer;font-family:inherit">삭제</button></div>`:""}
     </div>`;
   }).join("");
   const curCnt=counts[curBid]||0;
@@ -1068,6 +1072,8 @@ function closeCM(){document.getElementById("confirm-modal").classList.remove("sh
 function fmtDate(iso){if(!iso)return"";const d=new Date(iso);return`${d.getMonth()+1}/${d.getDate()}`}
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 let tTm;function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
+const _blindTimers=new WeakMap();
+function liftBlind(blind){blind.classList.add("lifted");const old=_blindTimers.get(blind);if(old)clearTimeout(old);const t=setTimeout(()=>{blind.classList.remove("lifted");_blindTimers.delete(blind);},2200);_blindTimers.set(blind,t);}
 </script>
 </body>
 </html>
