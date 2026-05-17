@@ -76,7 +76,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .rc-paid{font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;display:inline-block}
 .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:none;align-items:flex-end;justify-content:center}
 .sheet-bg.show{display:flex}
-.sheet{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 36px;width:100%;max-width:540px;box-shadow:0 -4px 32px rgba(0,0,0,.2);max-height:94vh;overflow-y:auto}
+.sheet{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 36px;width:100%;max-width:540px;box-shadow:0 -4px 32px rgba(0,0,0,.2);max-height:94vh;overflow-y:auto;overscroll-behavior:contain}
 .sheet-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .sheet-hd h3{font-size:17px;font-weight:900;color:var(--hdr)}
 .sheet-close{width:32px;height:32px;border:none;background:#F3F4F6;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -139,7 +139,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .rc-chg-del{width:24px;height:24px;border:none;background:#FEE2E2;color:#991B1B;border-radius:6px;font-size:11px;cursor:pointer;flex-shrink:0;font-family:inherit}
 .chg-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:640;display:none}
 .chg-bg.show{display:block}
-.chg-sheet{position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;background:#fff;border-radius:22px 22px 0 0;padding:20px 18px 36px;z-index:650;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:85vh;overflow-y:auto}
+.chg-sheet{position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;background:#fff;border-radius:22px 22px 0 0;padding:20px 18px 36px;z-index:650;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:85vh;overflow-y:auto;overscroll-behavior:contain}
 .chg-sheet.show{transform:translateY(0)}
 .chg-tg{display:flex;border:2px solid var(--border);border-radius:10px;overflow:hidden}
 .chg-tg-btn{flex:1;padding:10px;border:none;background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--sub);transition:all .15s}
@@ -681,6 +681,7 @@ function openSheet(roomId){
   document.getElementById("m-end").value=u.contractEnd||"";
   document.getElementById("m-memo").value=u.memo||"";
   updateTgUI();updateRtypeUI();updateRentTypeUI();renderPhotos(u.photos||{});renderHistory(roomId);renderRentChanges(roomId);
+  const sheetEl=document.querySelector("#room-sheet .sheet");if(sheetEl)sheetEl.scrollTop=0;
   document.getElementById("room-sheet").classList.add("show");
 }
 function closeSheet(){document.getElementById("room-sheet").classList.remove("show");curRoom=null}
@@ -698,7 +699,7 @@ function openRentChangeSheet(){
   document.getElementById("chg-date").value=new Date().toISOString().slice(0,10);
   document.getElementById("chg-reason").value="";
   document.getElementById("chg-bg").classList.add("show");
-  document.getElementById("chg-sheet").classList.add("show");
+  const cs=document.getElementById("chg-sheet");cs.scrollTop=0;cs.classList.add("show");
 }
 function closeRentChangeSheet(){
   document.getElementById("chg-bg").classList.remove("show");
