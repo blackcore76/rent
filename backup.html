@@ -274,7 +274,8 @@ function renderPhotoGrid(){
 
 // ── UNITS EXPORT ──
 function exportUnitsJSON(){
-  const units=ROOMS.map(r=>{
+  const roomList=ROOMS.length?ROOMS:Object.keys(unitsData).sort((a,b)=>Number(a)-Number(b));
+  const units=roomList.map(r=>{
     const u=unitsData[r];if(!u)return null;
     const {photos,...rest}=u;return rest;
   }).filter(Boolean);
