@@ -333,24 +333,11 @@ async function downloadPhotosZip(){
   const folder=zip.folder("계약서사진");
   let done=0;
 
-  // fetch()는 CORS 정책으로 Firebase Storage download URL을 직접 가져올 수 없으므로
-  // Firebase Auth ID 토큰을 사용해 Storage REST API로 인증 요청
-  const user=firebase.auth().currentUser;
-  const idToken=user?await user.getIdToken():null;
-  const bucket=FC.storageBucket;
-
   for(const p of photos){
     msg.textContent=`다운로드 중… ${done+1}/${photos.length}`;
     fill.style.width=`${Math.round((done/photos.length)*80)}%`;
     try{
-      let res;
-      if(idToken&&p.storagePath){
-        const encodedPath=encodeURIComponent(p.storagePath);
-        res=await fetch(`https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodedPath}?alt=media`,
-          {headers:{Authorization:`Firebase ${idToken}`}});
-      }else{
-        res=await fetch(p.url);
-      }
+      const res=await fetch(p.url);
       if(!res.ok)throw new Error(`HTTP ${res.status}`);
       const blob=await res.blob();
       const ext=blob.type.includes("png")?"png":blob.type.includes("gif")?"gif":"jpg";

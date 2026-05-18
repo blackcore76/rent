@@ -1,0 +1,7 @@
+node_modules/
+package.json
+package-lock.json
+sa-key.json
+set-cors.js
+cors.json
+.claude/settings.local.json
