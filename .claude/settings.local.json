@@ -4,7 +4,11 @@
       "Bash(dir *)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(gsutil version *)",
+      "Bash(gcloud --version)",
+      "Bash(firebase storage *)",
+      "Bash(firebase --version)"
     ]
   }
 }

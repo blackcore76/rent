@@ -6,3 +6,6 @@ set-cors.js
 cors.json
 .claude/settings.local.json
 .claude/settings.local.json
+.claude/settings.local.json
+.claude/settings.local.json
+/.claude

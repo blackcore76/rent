@@ -333,17 +333,25 @@ async function downloadPhotosZip(){
   const folder=zip.folder("계약서사진");
   let done=0;
 
+  let failed=0;
   for(const p of photos){
     msg.textContent=`다운로드 중… ${done+1}/${photos.length}`;
     fill.style.width=`${Math.round((done/photos.length)*80)}%`;
-    try{
-      const res=await fetch(p.url);
-      if(!res.ok)throw new Error(`HTTP ${res.status}`);
-      const blob=await res.blob();
+    let blob=null;
+    for(let attempt=0;attempt<3;attempt++){
+      try{
+        if(attempt>0)await new Promise(r=>setTimeout(r,1200*attempt));
+        const res=await fetch(p.url);
+        if(!res.ok)throw new Error(`HTTP ${res.status}`);
+        blob=await res.blob();
+        break;
+      }catch(e){
+        if(attempt===2){console.warn("사진 스킵:",p.id,e);failed++;}
+      }
+    }
+    if(blob){
       const ext=blob.type.includes("png")?"png":blob.type.includes("gif")?"gif":"jpg";
       folder.file(`${p.room}호_${p.id}.${ext}`,blob);
-    }catch(e){
-      console.warn("사진 스킵:",p.id,e);
     }
     done++;
   }
@@ -352,7 +360,8 @@ async function downloadPhotosZip(){
   const zipBlob=await zip.generateAsync({type:"blob"});
   fill.style.width="100%";msg.textContent="완료!";
   dlBlob(zipBlob,`계약서사진_${fmtDate()}.zip`);
-  showToast(`✅ 사진 ${photos.length}장 ZIP 완료`);
+  const okCount=photos.length-failed;
+  showToast(failed?`⚠️ ${okCount}/${photos.length}장 ZIP 완료 (${failed}장 실패)`:`✅ 사진 ${photos.length}장 ZIP 완료`);
   btn.disabled=false;
 }
 
