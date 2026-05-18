@@ -431,7 +431,7 @@ function renderDash(){
     vHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
     vHtml+=vac.map(u=>`<div class="status-row" onclick="goToUnit('${bid}','${u.room}')">
       <span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}
-      <span class="tenant-nm">${u.floor}층</span>
+      ${u.memo?`<span class="tenant-nm" style="color:var(--sub);font-size:12px">${esc(u.memo.split('\n')[0])}</span>`:''}
       <span class="badge badge-vacant">공실</span>
       <span style="font-size:14px;color:var(--hint)">›</span></div>`).join("");
   });
