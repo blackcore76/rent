@@ -107,7 +107,19 @@ function showDemoBanner(){
 function guardWrite(){if(!readOnly)return true;showToast("⏳ 승인 후 이용 가능합니다");return false;}
 
 // ── 인증 유틸 ──
-function signInGoogle(){auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message))}
+function isInAppBrowser(){
+  const ua=navigator.userAgent;
+  return /KAKAOTALK|NAVER|Line\/|Instagram|FBAN|FBAV|Twitter|NaverMailApp|Snapchat/i.test(ua)||
+         (/Android/.test(ua)&&/wv\b/.test(ua))||
+         (/iPhone|iPad/.test(ua)&&!/Safari\//.test(ua)&&/AppleWebKit/.test(ua));
+}
+function signInGoogle(){
+  if(isInAppBrowser()){
+    showToast("⚠️ 앱 내 브라우저에서는 구글 로그인 불가. Chrome 또는 Safari로 열어주세요.");
+    return;
+  }
+  auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message));
+}
 
 // ── 메뉴 유틸 ──
 function toggleMenu(){const el=document.getElementById("user-menu");if(el)el.classList.toggle("show")}
