@@ -118,7 +118,9 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 /* LOGIN — display:none 으로 시작, auth 확인 후에만 표시 */
 #login-screen{position:fixed;inset:0;background:linear-gradient(160deg,#0F1C2D,#1E2D3D 50%,#2A3F55);z-index:7000;display:none;align-items:center;justify-content:center;padding:20px}
 .login-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:36px 28px;max-width:320px;width:100%;text-align:center;backdrop-filter:blur(16px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
-.login-logo{font-size:52px;margin-bottom:14px}
+.login-logo{margin-bottom:18px}
+.login-logo img{width:84px;height:84px;border-radius:22px;object-fit:contain;filter:drop-shadow(0 6px 20px rgba(77,208,225,.35))}
+.login-brand{font-size:11px;font-weight:800;color:rgba(77,208,225,.7);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
 .login-title{font-size:22px;font-weight:900;color:#fff;margin-bottom:6px;letter-spacing:-.5px}
 .login-sub{font-size:12px;color:rgba(255,255,255,.45);margin-bottom:28px;line-height:1.7}
 .google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 20px;background:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;color:#1F2937;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .15s}
@@ -141,7 +143,8 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 <!-- 로그인 화면: display:none 으로 시작 -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo">🏠</div>
+    <div class="login-logo"><img src="logo.png" alt="PlusHome"></div>
+    <div class="login-brand">PlusHome</div>
     <div class="login-title">월세 관리</div>
     <div id="login-aptname" style="font-size:16px;font-weight:700;color:#4DD0E1;margin-bottom:4px;display:none"></div>
     <div class="login-sub">임대 현황을 한눈에 관리하세요<br>Google 계정으로 안전하게 로그인</div>
