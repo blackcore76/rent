@@ -133,7 +133,7 @@ function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").
 function fmtWon(v){if(!v)return"—";return(v*10000).toLocaleString("ko-KR")+"원"}
 
 // ── 토스트 ──
-let tTm;function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
+let tTm;function showToast(m){const t=document.getElementById("toast");t.innerHTML=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
 
 // ── 실수 방지 블라인드 덮개 ──
 const _blindTimers=new WeakMap();
