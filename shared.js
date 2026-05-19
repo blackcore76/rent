@@ -109,13 +109,15 @@ function guardWrite(){if(!readOnly)return true;showToast("⏳ 승인 후 이용 
 // ── 인증 유틸 ──
 function isInAppBrowser(){
   const ua=navigator.userAgent;
+  const isStandalone=window.navigator.standalone===true||window.matchMedia("(display-mode:standalone)").matches;
+  if(isStandalone)return false;
   return /KAKAOTALK|NAVER|Line\/|Instagram|FBAN|FBAV|Twitter|NaverMailApp|Snapchat/i.test(ua)||
          (/Android/.test(ua)&&/wv\b/.test(ua))||
          (/iPhone|iPad/.test(ua)&&!/Safari\//.test(ua)&&/AppleWebKit/.test(ua));
 }
 function signInGoogle(){
   if(isInAppBrowser()){
-    showToast("⚠️ 앱 내 브라우저에서는 구글 로그인 불가. Chrome 또는 Safari로 열어주세요.");
+    showToast("⚠️ 앱 내 브라우저에서는 구글 로그인이 차단됩니다.<br>Chrome 또는 Safari로 열어주세요.",5000);
     return;
   }
   auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message));
@@ -133,7 +135,7 @@ function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").
 function fmtWon(v){if(!v)return"—";return(v*10000).toLocaleString("ko-KR")+"원"}
 
 // ── 토스트 ──
-let tTm;function showToast(m){const t=document.getElementById("toast");t.innerHTML=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),2800)}
+let tTm;function showToast(m,dur=2800){const t=document.getElementById("toast");t.innerHTML=m;t.classList.add("show");clearTimeout(tTm);tTm=setTimeout(()=>t.classList.remove("show"),dur)}
 
 // ── 실수 방지 블라인드 덮개 ──
 const _blindTimers=new WeakMap();
