@@ -83,7 +83,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .prog-fill{height:100%;background:var(--sky);border-radius:99px;transition:width .4s;width:0%}
 .prog-msg{font-size:12px;color:var(--sub);text-align:center}
 /* TOAST */
-.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:#1E293B;color:#fff;padding:11px 20px;border-radius:12px;font-size:14px;font-weight:600;z-index:9999;opacity:0;transition:all .25s;white-space:nowrap;pointer-events:none}
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:#1E293B;color:#fff;padding:11px 20px;border-radius:12px;font-size:14px;font-weight:600;z-index:9999;opacity:0;transition:all .25s;max-width:calc(100vw - 48px);text-align:center;line-height:1.6;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 /* RESET */
 .reset-link{display:block;text-align:center;margin-top:16px;font-size:12px;color:var(--hint);cursor:pointer;text-decoration:underline}
