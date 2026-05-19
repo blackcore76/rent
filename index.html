@@ -130,9 +130,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .sync-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
 .s-ok{background:#4CAF50}.s-err{background:#EF5350}.s-ing{background:#FFA726;animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-/* ADMIN BTN */
-.admin-btn{padding:5px 10px;background:rgba(245,158,11,.15);border:1.5px solid rgba(245,158,11,.5);border-radius:8px;color:#FCD34D;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:background .15s;display:none}
-.admin-btn:active{background:rgba(245,158,11,.32)}
+
 .bld-subhd{font-size:11px;font-weight:800;color:var(--sub);padding:10px 4px 4px;letter-spacing:.5px;border-top:1px solid var(--border);margin-top:4px}
 .bld-subhd:first-child{border-top:none;padding-top:4px;margin-top:0}
 </style>
@@ -175,7 +173,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       </div>
       <div class="hdr-actions">
         <span id="sync-st" style="font-size:10px"></span>
-        <button id="admin-btn" class="admin-btn" style="padding:5px 8px">⚙️</button>
+
         <a class="guide-btn" href="guide.html">❓ 도움말</a>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
@@ -290,7 +288,7 @@ auth.onAuthStateChanged(async user=>{
     w.style.display="block";
     document.getElementById("um-name").textContent=user.displayName||"사용자";
     document.getElementById("um-email").textContent=user.email||"";
-    if(user.uid===MASTER_UID)document.getElementById("admin-btn").style.display="block";
+
     const params=new URLSearchParams(location.search);
     mUid=params.get("master_uid")||"";
     mName=params.get("master_name")||"";

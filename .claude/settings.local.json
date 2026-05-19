@@ -8,7 +8,12 @@
       "Bash(gsutil version *)",
       "Bash(gcloud --version)",
       "Bash(firebase storage *)",
-      "Bash(firebase --version)"
+      "Bash(firebase --version)",
+      "Bash(magick --version)",
+      "Bash(convert --version)",
+      "PowerShell(Get-Command *)",
+      "PowerShell(python -c \"import psd_tools; print\\('ok'\\)\" 2>&1)",
+      "PowerShell(pip install *)"
     ]
   }
 }
