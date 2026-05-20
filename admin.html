@@ -562,16 +562,21 @@ async function renderBldRegistry(){
   const bids=sortedBids(bldgsData);
   if(!bids.length){el.innerHTML='<div style="font-size:13px;color:var(--hint);text-align:center;padding:12px">등록된 건물이 없습니다</div>';return}
   const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
-  const counts={};
-  await Promise.all(bids.map(async bid=>{
-    const snap=await db.ref(`rent_app/${targetUid}/${bid}/units`).once("value");
-    counts[bid]=snap.exists()?Object.keys(snap.val()).length:0;
-  }));
+  const [unitSnaps,layoutSnaps]=await Promise.all([
+    Promise.all(bids.map(bid=>db.ref(`rent_app/${targetUid}/${bid}/units`).once("value"))),
+    Promise.all(bids.map(bid=>db.ref(`rent_app/${targetUid}/${bid}/config/roomLayout`).once("value")))
+  ]);
+  const counts={},roomCounts={};
+  bids.forEach((bid,i)=>{
+    counts[bid]=unitSnaps[i].exists()?Object.keys(unitSnaps[i].val()).length:0;
+    const layout=layoutSnaps[i].val()||{};
+    roomCounts[bid]=Object.values(layout).reduce((s,rooms)=>s+rooms.length,0);
+  });
   let html=bids.map(bid=>{
-    const b=bldgsData[bid];const isCur=bid===curBid;const cnt=counts[bid];
-    const cntBadge=cnt>0
-      ?`<span style="font-size:10px;font-weight:700;background:${isCur?"var(--blue)":"var(--hdr)"};color:#fff;padding:2px 7px;border-radius:20px">${cnt}호실</span>`
-      :`<span style="font-size:10px;font-weight:700;background:#F1F5F9;color:var(--hint);padding:2px 7px;border-radius:20px">비어있음</span>`;
+    const b=bldgsData[bid];const isCur=bid===curBid;const rc=roomCounts[bid];
+    const cntBadge=rc>0
+      ?`<span style="font-size:10px;font-weight:700;background:${isCur?"var(--blue)":"var(--hdr)"};color:#fff;padding:2px 7px;border-radius:20px">${rc}호실</span>`
+      :`<span style="font-size:10px;font-weight:700;background:#FEF3C7;color:#92400E;padding:2px 7px;border-radius:20px">호실 미설정</span>`;
     return`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:${isCur?"var(--blue-lt)":"#F8FAFC"};border-radius:10px;margin-bottom:6px;border:2px solid ${isCur?"var(--blue)":"var(--border)"}">
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:700;color:${isCur?"var(--blue-t)":"var(--text)"};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${isCur?"✓ ":""}${esc(b?.name||"건물")}</div>
@@ -588,7 +593,7 @@ async function renderBldRegistry(){
     const srcBid=dataBuildings[0];
     const srcName=esc(bldgsData[srcBid]?.name||"다른 건물");
     html+=`<div style="background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:10px;padding:12px 14px;margin-top:6px;font-size:12px;color:#92400E;line-height:1.6">
-      💡 <b>"${srcName}"</b>에 ${counts[srcBid]}개 호실 데이터가 있습니다.<br>
+      💡 <b>"${srcName}"</b>에 ${counts[srcBid]}개 세대 데이터가 있습니다.<br>
       현재 선택된 건물로 데이터를 가져올 수 있습니다.
       <div style="margin-top:8px"><button onclick="mergeFromBld('${srcBid}')" style="padding:6px 14px;background:#F59E0B;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">이 건물로 데이터 가져오기</button></div>
     </div>`;
@@ -710,6 +715,7 @@ async function saveEditBld(){
     await db.ref(`rent_app/${targetUid}/${editBid}/config/roomLayout`).set(nl);
     if(editBid===curBid){roomLayout=nl;ROOMS=Object.values(nl).flat().map(String);}
     closeEditBldSheet();showToast("✅ 저장됨");
+    renderBldRegistry();
   }catch(e){showToast("❗ 저장 실패");}
 }
 function delBld(bid){
