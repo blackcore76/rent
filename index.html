@@ -419,7 +419,7 @@ function renderDash(){
     const rlRooms=rl?new Set(Object.values(rl).flat().map(String)):null;
     const ul=Object.values((allBldData[bid]||{}).units||{});
     const up=(rlRooms?ul.filter(u=>rlRooms.has(String(u.room))):ul).filter(u=>{const ps=computePaidStatus(bid,u.room);return u.status==="rented"&&(ps===false||ps==="partial");})
-      .sort((a,b)=>String(a.room).localeCompare(String(b.room)));
+      .sort((a,b)=>{const na=parseInt(a.room),nb=parseInt(b.room);return(!isNaN(na)&&!isNaN(nb))?na-nb:String(a.room).localeCompare(String(b.room));});
     if(!up.length)return;
     uHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
     uHtml+=up.map(u=>{
@@ -448,7 +448,7 @@ function renderDash(){
     }else{
       ul.filter(u=>u.status==="vacant").forEach(u=>vacItems.push({room:String(u.room),unit:u}));
     }
-    vacItems.sort((a,b)=>String(a.room).localeCompare(String(b.room)));
+    vacItems.sort((a,b)=>{const na=parseInt(a.room),nb=parseInt(b.room);return(!isNaN(na)&&!isNaN(nb))?na-nb:String(a.room).localeCompare(String(b.room));});
     if(!vacItems.length)return;
     vHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
     vHtml+=vacItems.map(({room,unit})=>`<div class="status-row" onclick="goToUnit('${bid}','${room}')">
