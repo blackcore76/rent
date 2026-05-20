@@ -572,7 +572,7 @@ async function renderBldRegistry(){
       </div>
       <button onclick="switchBldAndStay('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:${isCur?"var(--blue)":"var(--hdr)"};color:#fff;cursor:pointer;font-family:inherit">전환</button>
       <button onclick="openRenameBld('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:#F1F5F9;color:var(--sub);cursor:pointer;font-family:inherit">수정</button>
-      ${bids.length>1?`<div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 삭제</div><button onclick="delBld('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:var(--red-lt);color:var(--red);cursor:pointer;font-family:inherit">삭제</button></div>`:""}
+      <div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 삭제</div><button onclick="delBld('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:var(--red-lt);color:var(--red);cursor:pointer;font-family:inherit">삭제</button></div>
     </div>`;
   }).join("");
   const curCnt=counts[curBid]||0;
@@ -653,9 +653,17 @@ function delBld(bid){
     const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
     await db.ref("rent_app/"+targetUid+"/_buildings/"+bid).remove();
     await db.ref("rent_app/"+targetUid+"/"+bid).remove();
-    showToast("🗑 건물 삭제됨");
     const remaining=sortedBids(bldgsData).filter(b=>b!==bid);
-    if(remaining.length)switchBld(remaining[0]);
+    if(remaining.length){
+      showToast("🗑 건물 삭제됨");
+      switchBld(remaining[0]);
+    }else{
+      // 마지막 건물 삭제 시 빈 건물 자동 생성
+      const newBid="main";
+      await db.ref("rent_app/"+targetUid+"/_buildings/"+newBid).set({id:newBid,name:"내 건물",order:0,createdAt:new Date().toISOString()});
+      showToast("🗑 삭제됨 — 새 건물이 생성됐습니다");
+      switchBld(newBid);
+    }
   });
 }
 function renderRoomLayout(){
