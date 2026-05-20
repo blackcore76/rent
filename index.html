@@ -393,13 +393,14 @@ function renderDash(){
   let tot=0,rented=0,vacant=0,unpaidCnt=0;
   bids.forEach(bid=>{
     const rl=allBldData[bid]?.roomLayout;
-    const rlCount=rl?Object.values(rl).reduce((s,rooms)=>s+rooms.length,0):null;
+    const rlRooms=rl?new Set(Object.values(rl).flat().map(String)):null;
+    const rlCount=rlRooms?rlRooms.size:null;
     const ul=Object.values((allBldData[bid]||{}).units||{});
-    const r=ul.filter(u=>u.status==="rented");
+    const r=(rlRooms?ul.filter(u=>rlRooms.has(String(u.room))):ul).filter(u=>u.status==="rented");
     rented+=r.length;
     if(rlCount!==null){
       tot+=rlCount;
-      vacant+=Math.max(0,rlCount-r.length);
+      vacant+=rlCount-r.length;
     }else{
       tot+=ul.length;
       vacant+=ul.filter(u=>u.status==="vacant").length;
@@ -414,8 +415,10 @@ function renderDash(){
   // Unpaid
   let uHtml="";
   bids.forEach(bid=>{
+    const rl=allBldData[bid]?.roomLayout;
+    const rlRooms=rl?new Set(Object.values(rl).flat().map(String)):null;
     const ul=Object.values((allBldData[bid]||{}).units||{});
-    const up=ul.filter(u=>{const ps=computePaidStatus(bid,u.room);return u.status==="rented"&&(ps===false||ps==="partial");})
+    const up=(rlRooms?ul.filter(u=>rlRooms.has(String(u.room))):ul).filter(u=>{const ps=computePaidStatus(bid,u.room);return u.status==="rented"&&(ps===false||ps==="partial");})
       .sort((a,b)=>String(a.room).localeCompare(String(b.room)));
     if(!up.length)return;
     uHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
@@ -460,8 +463,10 @@ function renderDash(){
   const today=new Date();today.setHours(0,0,0,0);
   let eHtml="";
   bids.forEach(bid=>{
+    const rl=allBldData[bid]?.roomLayout;
+    const rlRooms=rl?new Set(Object.values(rl).flat().map(String)):null;
     const ul=Object.values((allBldData[bid]||{}).units||{});
-    const soon=ul.filter(u=>u.status==="rented"&&u.contractEnd).map(u=>{
+    const soon=(rlRooms?ul.filter(u=>rlRooms.has(String(u.room))):ul).filter(u=>u.status==="rented"&&u.contractEnd).map(u=>{
       const d=new Date(u.contractEnd);d.setHours(0,0,0,0);
       return{...u,dl:Math.ceil((d-today)/864e5)};
     }).filter(u=>u.dl>=0&&u.dl<=30).sort((a,b)=>a.dl-b.dl);
