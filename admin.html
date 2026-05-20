@@ -491,7 +491,6 @@ auth.onAuthStateChanged(async user=>{
       bldgsData=snap.val()||{};
       const bids=sortedBids(bldgsData);
       if(bids.length&&!bldgsData[curBid]){curBid=bids[0];setCurBid(targetUid,curBid)}
-      if(curSub===2)renderBldRegistry();
     });
 
     // Load current building data

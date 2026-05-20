@@ -520,16 +520,18 @@ function switchBld(bid){
   renderGrid();
 }
 let _unitsReady=false,_historyReady=false;
+let _rgTm=null;
+function schedRenderGrid(){clearTimeout(_rgTm);_rgTm=setTimeout(()=>{renderGrid();tryOpenURLParam();},50);}
 function listenUnits(){
   uL=uRef.on("value",snap=>{
     const val=snap.val()||{};ensureRooms(val);units=val;
-    _unitsReady=true;renderGrid();tryOpenURLParam();
+    _unitsReady=true;schedRenderGrid();
   },()=>showToast("❗ 연결 오류"));
 }
 function listenHistory(){
   hL=hRef.on("value",snap=>{
     rentHistory=snap.val()||{};
-    _historyReady=true;renderGrid();tryOpenURLParam();
+    _historyReady=true;schedRenderGrid();
   },()=>{});
 }
 let _urlOpened=false;

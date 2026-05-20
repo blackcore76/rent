@@ -335,7 +335,7 @@ auth.onAuthStateChanged(async user=>{
       // Sync per-building listeners
       bids.forEach(bid=>{if(!bldListeners[bid])setupBldListeners(targetUid,bid)});
       Object.keys(bldListeners).forEach(bid=>{if(!bldgsData[bid])teardownBldListeners(bid)});
-      renderDash();renderBldCards();
+      schedRenderDash();schedRenderBldCards();
     });
     setSS("ok");
   }else{
@@ -345,15 +345,19 @@ auth.onAuthStateChanged(async user=>{
   }
 });
 
+let _rdTm=null,_rbTm=null;
+function schedRenderDash(){clearTimeout(_rdTm);_rdTm=setTimeout(renderDash,60);}
+function schedRenderBldCards(){clearTimeout(_rbTm);_rbTm=setTimeout(renderBldCards,60);}
+
 function setupBldListeners(uid,bid){
   if(bldListeners[bid])return;
   if(!allBldData[bid])allBldData[bid]={};
   const base=db.ref("rent_app/"+uid+"/"+bid);
   const uRef=base.child("units"),hRef=base.child("rent_history"),biRef=base.child("buildings"),rlRef=base.child("config/roomLayout");
-  const uL=uRef.on("value",snap=>{allBldData[bid].units=snap.val()||{};renderDash();setSS("ok")},()=>setSS("err"));
-  const hL=hRef.on("value",snap=>{allBldData[bid].history=snap.val()||{};renderDash()});
-  const biL=biRef.on("value",snap=>{allBldData[bid].bldInfo=snap.val()||{};renderBldCards()});
-  const rlL=rlRef.on("value",snap=>{allBldData[bid].roomLayout=snap.val()||null;renderDash()});
+  const uL=uRef.on("value",snap=>{allBldData[bid].units=snap.val()||{};schedRenderDash();setSS("ok")},()=>setSS("err"));
+  const hL=hRef.on("value",snap=>{allBldData[bid].history=snap.val()||{};schedRenderDash()});
+  const biL=biRef.on("value",snap=>{allBldData[bid].bldInfo=snap.val()||{};schedRenderBldCards()});
+  const rlL=rlRef.on("value",snap=>{allBldData[bid].roomLayout=snap.val()||null;schedRenderDash()});
   bldListeners[bid]={uRef,hRef,biRef,rlRef,uL,hL,biL,rlL};
 }
 function teardownBldListeners(bid){
