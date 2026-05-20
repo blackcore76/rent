@@ -586,10 +586,16 @@ function setHistStatus(roomId,ym,status,amount){
   if(!hRef||!cu)return;
   const ref=hRef.child(`${roomId}/${ym}`);
   if(status==="none"){
-    ref.remove().then(()=>{
-      if(rentHistory[roomId])delete rentHistory[roomId][ym];
-      renderHistory(roomId);renderGrid();showToast("🗑 기록 삭제됨");
-    }).catch(()=>showToast("❗ 저장 실패"));
+    const prev=(rentHistory[roomId]||{})[ym];
+    if(!rentHistory[roomId])rentHistory[roomId]={};
+    delete rentHistory[roomId][ym];
+    renderHistory(roomId);renderGrid();
+    ref.remove()
+      .then(()=>showToast("🗑 기록 삭제됨"))
+      .catch(()=>{
+        if(prev)rentHistory[roomId][ym]=prev;
+        renderHistory(roomId);renderGrid();showToast("❗ 저장 실패");
+      });
     return;
   }
   const data={room:roomId,yearMonth:ym,
@@ -597,12 +603,16 @@ function setHistStatus(roomId,ym,status,amount){
     partial:status==="partial",
     amount:amount,
     updatedAt:new Date().toISOString()};
-  ref.set(data).then(()=>{
-    if(!rentHistory[roomId])rentHistory[roomId]={};
-    rentHistory[roomId][ym]=data;
-    renderHistory(roomId);renderGrid();
-    showToast({paid:"✅ 완납 기록됨",unpaid:"❌ 미납 기록됨",partial:"🔶 부분납부 기록됨"}[status]);
-  }).catch(()=>showToast("❗ 저장 실패"));
+  if(!rentHistory[roomId])rentHistory[roomId]={};
+  const prev=rentHistory[roomId][ym];
+  rentHistory[roomId][ym]=data;
+  renderHistory(roomId);renderGrid();
+  showToast({paid:"✅ 완납 기록됨",unpaid:"❌ 미납 기록됨",partial:"🔶 부분납부 기록됨"}[status]);
+  ref.set(data).catch(()=>{
+    if(prev)rentHistory[roomId][ym]=prev;
+    else delete rentHistory[roomId][ym];
+    renderHistory(roomId);renderGrid();showToast("❗ 저장 실패 (되돌림)");
+  });
 }
 async function ensureRooms(ex){
   const up={};ROOMS.forEach(r=>{if(!ex[String(r)])up[String(r)]=defRoom(r)});
@@ -791,9 +801,13 @@ function saveRoom(){
     contractStart:document.getElementById("m-start").value,
     contractEnd:document.getElementById("m-end").value,
     memo:document.getElementById("m-memo").value.trim()};
-  uRef.child(curRoom).update(data)
-    .then(()=>{closeSheet();showToast("✅ 저장됨");renderGrid()})
-    .catch(()=>showToast("❗ 저장 실패"));
+  const prev=units[curRoom]?{...units[curRoom]}:null;
+  units[curRoom]={...(units[curRoom]||{}), ...data};
+  closeSheet();showToast("✅ 저장됨");renderGrid();
+  uRef.child(curRoom).update(data).catch(()=>{
+    if(prev)units[curRoom]=prev;else delete units[curRoom];
+    showToast("❗ 저장 실패");renderGrid();
+  });
 }
 function renderPhotos(photos){
   const list=Object.values(photos||{}).sort((a,b)=>a.id-b.id);
