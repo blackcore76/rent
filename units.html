@@ -49,6 +49,10 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .floor-tabs{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0}
 .tabs-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:14px}
 .export-btn{padding:7px 12px;border-radius:8px;border:2px solid var(--border);font-size:12px;font-weight:600;cursor:default;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;flex-shrink:0}
+.bld-drop{position:fixed;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.18);border:1px solid var(--border);z-index:600;min-width:140px;overflow:hidden}
+.bld-drop-item{display:block;width:100%;padding:11px 16px;border:none;background:transparent;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;text-align:left;color:var(--text);transition:background .12s}
+.bld-drop-item:active{background:var(--bg)}
+.bld-drop-item.active{color:var(--sky)}
 .badge-oneroom{background:#FEF3C7;color:#92400E}
 .badge-twobay{background:#F3E8FF;color:#6B21A8}
 .badge-tworoom{background:#CCFBF1;color:#0F766E}
@@ -480,6 +484,41 @@ function doSignOut(){
   auth.signOut();
 }
 
+let _bldDrop=null;
+function openBldDrop(e){
+  if(e)e.stopPropagation();
+  if(_bldDrop){_bldDrop.remove();_bldDrop=null;return;}
+  const bids=sortedBids(bldgsData);if(bids.length<=1)return;
+  const btn=document.getElementById("bld-name-label");
+  const drop=document.createElement("div");drop.className="bld-drop";
+  bids.forEach(bid=>{
+    const item=document.createElement("button");
+    item.className="bld-drop-item"+(bid===curBid?" active":"");
+    item.textContent=bldgsData[bid]?.name||bid;
+    item.onclick=(ev)=>{ev.stopPropagation();_bldDrop.remove();_bldDrop=null;switchBld(bid);};
+    drop.appendChild(item);
+  });
+  const r=btn.getBoundingClientRect();
+  drop.style.cssText=`top:${r.bottom+4}px;right:${window.innerWidth-r.right}px`;
+  document.body.appendChild(drop);_bldDrop=drop;
+}
+document.addEventListener("click",()=>{if(_bldDrop){_bldDrop.remove();_bldDrop=null;}});
+function switchBld(bid){
+  if(bid===curBid)return;
+  if(uL&&uRef)uRef.off("value",uL);
+  if(hL&&hRef)hRef.off("value",hL);
+  curBid=bid;
+  const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
+  setCurBid(targetUid,bid);
+  units={};rentHistory={};ROOMS=[];FLOORS=[];curFloor=0;
+  _unitsReady=false;_historyReady=false;
+  configRef=db.ref(`rent_app/${targetUid}/${bid}/config/roomLayout`);
+  uRef=db.ref(`rent_app/${targetUid}/${bid}/units`);
+  hRef=db.ref(`rent_app/${targetUid}/${bid}/rent_history`);
+  configRef.once("value").then(snap=>{applyLayout(snap.val()||DEFAULT_LAYOUT);listenUnits();listenHistory();})
+    .catch(()=>{applyLayout(DEFAULT_LAYOUT);listenUnits();listenHistory();});
+  renderGrid();
+}
 let _unitsReady=false,_historyReady=false;
 function listenUnits(){
   uL=uRef.on("value",snap=>{
@@ -633,8 +672,16 @@ const RTYPE_LBL={oneroom:"원룸",twobay:"투베이",tworoom:"투룸",threeroom:
 const RTYPE_CLS={oneroom:"badge-oneroom",twobay:"badge-twobay",tworoom:"badge-tworoom",threeroom:"badge-threeroom"};
 const RENT_TYPE_LBL={monthly:"월세",jeonse:"전세"};
 const RENT_TYPE_CLS={monthly:"badge-monthly",jeonse:"badge-jeonse"};
+function updateBldLabel(){
+  const lbl=document.getElementById("bld-name-label");if(!lbl)return;
+  const name=bldgsData[curBid]?.name||"";
+  const multi=sortedBids(bldgsData).length>1;
+  lbl.textContent=multi?name+" ▾":name;
+  lbl.style.cursor=multi?"pointer":"default";
+  lbl.onclick=multi?openBldDrop:null;
+}
 function renderGrid(){
-  const lbl=document.getElementById("bld-name-label");if(lbl)lbl.textContent=bldgsData[curBid]?.name||"";
+  updateBldLabel();
   let list=ROOMS.map(r=>units[String(r)]).filter(u=>u&&(curFloor===0||u.floor===curFloor));
   if(curFilter==="rented") list=list.filter(u=>u.status==="rented");
   else if(curFilter==="vacant") list=list.filter(u=>u.status==="vacant");

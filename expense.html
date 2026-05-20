@@ -58,6 +58,10 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .toolbar input[type=month]:focus{border-color:var(--sky)}
 .spacer{flex:1}
 .btn-exp{background:#fff;border:2px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--sub)}
+.bld-drop{position:fixed;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.18);border:1px solid var(--border);z-index:600;min-width:140px;overflow:hidden}
+.bld-drop-item{display:block;width:100%;padding:11px 16px;border:none;background:transparent;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;text-align:left;color:var(--text);transition:background .12s}
+.bld-drop-item:active{background:var(--bg)}
+.bld-drop-item.active{color:var(--sky)}
 .view-tabs{display:flex;gap:6px;margin-bottom:10px}
 .view-tab{padding:6px 14px;border-radius:20px;border:2px solid var(--border);background:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--sub);transition:all .15s}
 .view-tab.active{background:var(--hdr);color:#fff;border-color:var(--hdr)}
@@ -330,6 +334,35 @@ function doSignOut(){
   auth.signOut();
 }
 
+let _bldDrop=null;
+function openBldDrop(e){
+  if(e)e.stopPropagation();
+  if(_bldDrop){_bldDrop.remove();_bldDrop=null;return;}
+  const bids=sortedBids(bldgsData);if(bids.length<=1)return;
+  const btn=document.getElementById("bld-name-label");
+  const drop=document.createElement("div");drop.className="bld-drop";
+  bids.forEach(bid=>{
+    const item=document.createElement("button");
+    item.className="bld-drop-item"+(bid===curBid?" active":"");
+    item.textContent=bldgsData[bid]?.name||bid;
+    item.onclick=(ev)=>{ev.stopPropagation();_bldDrop.remove();_bldDrop=null;switchBld(bid);};
+    drop.appendChild(item);
+  });
+  const r=btn.getBoundingClientRect();
+  drop.style.cssText=`top:${r.bottom+4}px;right:${window.innerWidth-r.right}px`;
+  document.body.appendChild(drop);_bldDrop=drop;
+}
+document.addEventListener("click",()=>{if(_bldDrop){_bldDrop.remove();_bldDrop=null;}});
+function switchBld(bid){
+  if(bid===curBid)return;
+  if(txL&&txRef)txRef.off("value",txL);
+  curBid=bid;
+  const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
+  setCurBid(targetUid,bid);
+  allTx=[];
+  txRef=db.ref(`rent_app/${targetUid}/${bid}/transactions`);
+  listenTx();updateBldLabel();
+}
 function listenTx(){
   txL=txRef.on("value",snap=>{
     allTx=Object.values(snap.val()||{}).sort((a,b)=>b.date.localeCompare(a.date)||(b.id-a.id));
@@ -367,8 +400,16 @@ function getFilterLabel(){
   return"전체기간";
 }
 
+function updateBldLabel(){
+  const lbl=document.getElementById("bld-name-label");if(!lbl)return;
+  const name=bldgsData[curBid]?.name||"";
+  const multi=sortedBids(bldgsData).length>1;
+  lbl.textContent=multi?name+" ▾":name;
+  lbl.style.cursor=multi?"pointer":"default";
+  lbl.onclick=multi?openBldDrop:null;
+}
 function renderFeed(){
-  const lbl=document.getElementById("bld-name-label");if(lbl)lbl.textContent=bldgsData[curBid]?.name||"";
+  updateBldLabel();
   const list=getFiltered();
   const inc=list.filter(t=>t.type==="income").reduce((a,t)=>a+(t.amount||0),0);
   const exc=list.filter(t=>t.type==="expense").reduce((a,t)=>a+(t.amount||0),0);
