@@ -257,26 +257,6 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
         </div>
         <div id="bld-registry-list"></div>
       </div>
-      <!-- 호실 구조 설정 -->
-      <div class="layout-section">
-        <div style="font-size:14px;font-weight:800;color:var(--hdr);margin-bottom:12px">🏢 호실 구조 설정</div>
-        <button id="struct-unlock-btn" onclick="toggleStructEdit()" style="width:100%;padding:9px 14px;background:#FEF3C7;color:#92400E;border:1.5px solid #FCD34D;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px;text-align:left">🔒 구조 수정 — 탭하여 잠금 해제</button>
-        <div id="struct-edit-panel" style="display:none">
-          <div style="background:#FFF7ED;border:1.5px solid #FCD34D;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#92400E;font-weight:600">⚠️ 저장 시 기존 호실 구조가 교체됩니다</div>
-          <div style="background:#F0F9FF;border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid #BAE6FD">
-            <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">빠른 자동 생성</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
-              <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">시작 층</div><input class="gen-inp" type="number" id="gen-from" value="2" min="1" max="30"></div>
-              <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">끝 층</div><input class="gen-inp" type="number" id="gen-to" value="4" min="1" max="30"></div>
-              <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">층당 호실 수</div><input class="gen-inp" type="number" id="gen-count" value="6" min="1" max="30"></div>
-            </div>
-            <button onclick="generateLayout()" style="width:100%;padding:9px;background:var(--sky);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">⚡ 자동 생성 (기존 설정 교체)</button>
-          </div>
-          <div id="floor-rows"></div>
-          <button onclick="addFloorRow()" style="width:100%;padding:9px;background:#F1F5F9;color:var(--sub);border:2px dashed var(--border);border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px">+ 층 추가</button>
-          <button onclick="saveRoomLayout()" class="btn-save" style="margin-top:0">💾 호실 구조 저장</button>
-        </div>
-      </div>
       <!-- 백업 / 복구 -->
       <div style="font-size:11px;font-weight:800;color:var(--sub);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">💾 백업 / 복구</div>
       <a href="backup.html" style="display:flex;align-items:center;gap:10px;background:#F0FDF4;border:1.5px solid #A7F3D0;border-radius:12px;padding:12px 14px;margin-bottom:8px;text-decoration:none">
@@ -302,6 +282,34 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       </div>
       <div id="buildings-list"></div>
     </div>
+  </div>
+</div>
+
+<!-- 건물 수정 SHEET (건물명 + 호실 구조 통합) -->
+<div class="sheet-bg" id="edit-bld-sheet">
+  <div class="sheet">
+    <div class="sheet-hd">
+      <h3 id="edit-bld-sheet-title">🏢 건물 수정</h3>
+      <button class="sheet-close" onclick="closeEditBldSheet()">✕</button>
+    </div>
+    <div class="field">
+      <label>건물명 *</label>
+      <input type="text" id="edit-bld-name" placeholder="조아빌, 행복한빌...">
+    </div>
+    <div style="font-size:11px;font-weight:800;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">호실 구조</div>
+    <div style="background:#FFF7ED;border:1.5px solid #FCD34D;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#92400E;font-weight:600">⚠️ 저장 시 기존 호실 구조가 교체됩니다</div>
+    <div style="background:#F0F9FF;border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid #BAE6FD">
+      <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">빠른 자동 생성</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+        <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">시작 층</div><input class="gen-inp" type="number" id="edit-gen-from" value="2" min="1" max="30"></div>
+        <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">끝 층</div><input class="gen-inp" type="number" id="edit-gen-to" value="4" min="1" max="30"></div>
+        <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">층당 호실 수</div><input class="gen-inp" type="number" id="edit-gen-count" value="6" min="1" max="30"></div>
+      </div>
+      <button onclick="generateEditLayout()" style="width:100%;padding:9px;background:var(--sky);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">⚡ 자동 생성 (기존 설정 교체)</button>
+    </div>
+    <div id="edit-floor-rows"></div>
+    <button onclick="addEditFloorRow()" style="width:100%;padding:9px;background:#F1F5F9;color:var(--sub);border:2px dashed var(--border);border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:12px">+ 층 추가</button>
+    <button class="btn-save" onclick="saveEditBld()">💾 저장</button>
   </div>
 </div>
 
@@ -516,7 +524,6 @@ function loadBldData(uid,bid){
   cL=configRef.on("value",snap=>{
     roomLayout=snap.val()||DEFAULT_LAYOUT;
     ROOMS=Object.values(roomLayout).flat().map(String);
-    if(curSub===2)renderRoomLayout();
     if(curSub===1)renderContracts();
   },()=>{});
 }
@@ -546,7 +553,7 @@ function setSubTab(n,btn){
   btn.classList.add("on");
   document.querySelectorAll(".sub-page").forEach((p,i)=>p.classList.toggle("on",i===n));
   if(n===1)renderContracts();
-  if(n===2){renderBldRegistry();renderRoomLayout();renderBldDetails();}
+  if(n===2){renderBldRegistry();renderBldDetails();}
 }
 
 // ── BUILDING REGISTRY ──
@@ -571,7 +578,7 @@ async function renderBldRegistry(){
         <div style="margin-top:3px">${cntBadge}</div>
       </div>
       <button onclick="switchBldAndStay('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:${isCur?"var(--blue)":"var(--hdr)"};color:#fff;cursor:pointer;font-family:inherit">전환</button>
-      <button onclick="openRenameBld('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:#F1F5F9;color:var(--sub);cursor:pointer;font-family:inherit">수정</button>
+      <button onclick="openEditBldSheet('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:#F1F5F9;color:var(--sub);cursor:pointer;font-family:inherit">수정</button>
       <div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 삭제</div><button onclick="delBld('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:var(--red-lt);color:var(--red);cursor:pointer;font-family:inherit">삭제</button></div>
     </div>`;
   }).join("");
@@ -637,15 +644,73 @@ function saveNewBld(){
     .then(()=>{closeAddBldSheet();showToast("✅ 건물 추가됨");switchBld(bid)})
     .catch(()=>showToast("❗ 저장 실패"));
 }
-function openRenameBld(bid){
+let editBid=null,editRoomLayout={};
+async function openEditBldSheet(bid){
   if(!guardWrite())return;
-  const name=bldgsData[bid]?.name||"";
-  const newName=window.prompt("건물명 변경",name);
-  if(newName===null||!newName.trim())return;
+  editBid=bid;
+  document.getElementById("edit-bld-name").value=bldgsData[bid]?.name||"";
+  document.getElementById("edit-bld-sheet-title").textContent="🏢 "+esc(bldgsData[bid]?.name||"건물")+" 수정";
+  editRoomLayout={};
+  document.getElementById("edit-floor-rows").innerHTML='<div style="font-size:12px;color:var(--hint);text-align:center;padding:10px">불러오는 중...</div>';
+  document.getElementById("edit-bld-sheet").classList.add("show");
   const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
-  db.ref("rent_app/"+targetUid+"/_buildings/"+bid+"/name").set(newName.trim())
-    .then(()=>showToast("✅ 이름 변경됨"))
-    .catch(()=>showToast("❗ 실패"));
+  const snap=await db.ref(`rent_app/${targetUid}/${bid}/config/roomLayout`).once("value");
+  editRoomLayout=snap.val()||{};
+  renderEditFloorRows();
+}
+function closeEditBldSheet(){document.getElementById("edit-bld-sheet").classList.remove("show")}
+function renderEditFloorRows(){
+  const el=document.getElementById("edit-floor-rows");if(!el)return;
+  const floors=Object.keys(editRoomLayout).map(Number).sort((a,b)=>a-b);
+  if(!floors.length){el.innerHTML='<div style="font-size:12px;color:var(--hint);text-align:center;padding:12px 0">호실 없음 — 자동 생성하거나 층을 추가하세요</div>';return}
+  el.innerHTML=floors.map(f=>`
+    <div class="floor-edit-row" data-floor="${f}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="font-size:13px;font-weight:700;color:var(--hdr)">${f}층</span>
+        <button class="bldg-ic del" onclick="removeEditFloorRow(this)" style="width:22px;height:22px;font-size:10px">✕</button>
+      </div>
+      <input class="rooms-input" type="text" value="${(editRoomLayout[String(f)]||[]).join(", ")}" placeholder="401, 402, 403">
+    </div>`).join("");
+}
+function addEditFloorRow(){
+  const existing=Object.keys(editRoomLayout).map(Number).sort((a,b)=>a-b);
+  const next=existing.length?existing[existing.length-1]+1:2;
+  editRoomLayout={...editRoomLayout,[String(next)]:[]};
+  renderEditFloorRows();
+}
+function removeEditFloorRow(btn){
+  const row=btn.closest(".floor-edit-row"),floor=row.dataset.floor;
+  const tmp={...editRoomLayout};delete tmp[floor];editRoomLayout=tmp;
+  renderEditFloorRows();
+}
+function generateEditLayout(){
+  const from=parseInt(document.getElementById("edit-gen-from").value)||2;
+  const to=parseInt(document.getElementById("edit-gen-to").value)||4;
+  const cnt=parseInt(document.getElementById("edit-gen-count").value)||6;
+  if(from>to){showToast("❗ 시작 층이 끝 층보다 큽니다");return}
+  const nl={};
+  for(let f=from;f<=to;f++)nl[String(f)]=Array.from({length:cnt},(_,i)=>String(f*100+i+1));
+  editRoomLayout=nl;renderEditFloorRows();
+  showToast("⚡ 미리보기 생성됨 — 저장 버튼으로 확정하세요");
+}
+async function saveEditBld(){
+  if(!guardWrite())return;
+  const name=document.getElementById("edit-bld-name").value.trim();
+  if(!name){showToast("❗ 건물명을 입력하세요");return}
+  const rows=document.querySelectorAll("#edit-bld-sheet .floor-edit-row"),nl={};
+  rows.forEach(row=>{
+    const floor=row.dataset.floor,val=row.querySelector(".rooms-input").value;
+    const rooms=val.split(",").map(r=>r.trim()).filter(Boolean);
+    if(rooms.length)nl[floor]=rooms;
+  });
+  if(!Object.keys(nl).length){showToast("❗ 최소 1개 층 이상 설정하세요");return}
+  const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
+  try{
+    await db.ref("rent_app/"+targetUid+"/_buildings/"+editBid+"/name").set(name);
+    await db.ref(`rent_app/${targetUid}/${editBid}/config/roomLayout`).set(nl);
+    if(editBid===curBid){roomLayout=nl;ROOMS=Object.values(nl).flat().map(String);}
+    closeEditBldSheet();showToast("✅ 저장됨");
+  }catch(e){showToast("❗ 저장 실패");}
 }
 function delBld(bid){
   if(!guardWrite())return;
@@ -665,61 +730,6 @@ function delBld(bid){
       switchBld(newBid);
     }
   });
-}
-function renderRoomLayout(){
-  const el=document.getElementById("floor-rows");if(!el)return;
-  const floors=Object.keys(roomLayout).map(Number).sort((a,b)=>a-b);
-  el.innerHTML=floors.map(f=>`
-    <div class="floor-edit-row" data-floor="${f}">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-        <span style="font-size:13px;font-weight:700;color:var(--hdr)">${f}층</span>
-        <button class="bldg-ic del" onclick="removeFloorRow(this)" style="width:22px;height:22px;font-size:10px">✕</button>
-      </div>
-      <input class="rooms-input" type="text" value="${(roomLayout[String(f)]||[]).join(", ")}" placeholder="401, 402, 403">
-    </div>`).join("");
-}
-function addFloorRow(){
-  const existing=Object.keys(roomLayout).map(Number).sort((a,b)=>a-b);
-  const next=existing.length?existing[existing.length-1]+1:2;
-  const tmp={...roomLayout};tmp[String(next)]=[];roomLayout=tmp;
-  renderRoomLayout();
-}
-function removeFloorRow(btn){
-  const row=btn.closest(".floor-edit-row"),floor=row.dataset.floor;
-  const tmp={...roomLayout};delete tmp[floor];roomLayout=tmp;
-  renderRoomLayout();
-}
-function toggleStructEdit(){
-  const panel=document.getElementById("struct-edit-panel");
-  const btn=document.getElementById("struct-unlock-btn");
-  const isOpen=panel.style.display!=="none";
-  panel.style.display=isOpen?"none":"block";
-  btn.textContent=isOpen?"🔒 구조 수정 — 탭하여 잠금 해제":"🔓 구조 수정 중 — 탭하여 잠금";
-  btn.style.background=isOpen?"#FEF3C7":"#FEE2E2";
-  btn.style.color=isOpen?"#92400E":"#991B1B";
-  btn.style.borderColor=isOpen?"#FCD34D":"#FCA5A5";
-}
-function generateLayout(){
-  const from=parseInt(document.getElementById("gen-from").value)||2;
-  const to=parseInt(document.getElementById("gen-to").value)||4;
-  const cnt=parseInt(document.getElementById("gen-count").value)||6;
-  if(from>to){showToast("❗ 시작 층이 끝 층보다 큽니다");return}
-  const nl={};
-  for(let f=from;f<=to;f++)nl[String(f)]=Array.from({length:cnt},(_,i)=>String(f*100+i+1));
-  roomLayout=nl;renderRoomLayout();
-  showToast("⚡ 미리보기 생성됨 — 저장 버튼으로 확정하세요");
-}
-function saveRoomLayout(){if(!guardWrite())return;
-  const rows=document.querySelectorAll(".floor-edit-row"),nl={};
-  rows.forEach(row=>{
-    const floor=row.dataset.floor,val=row.querySelector(".rooms-input").value;
-    const rooms=val.split(",").map(r=>r.trim()).filter(Boolean);
-    if(rooms.length)nl[floor]=rooms;
-  });
-  if(!Object.keys(nl).length){showToast("❗ 최소 1개 층 이상 설정하세요");return}
-  configRef.set(nl)
-    .then(()=>{showToast("✅ 호실 구조 저장됨");toggleStructEdit()})
-    .catch(()=>showToast("❗ 저장 실패"));
 }
 
 // ── BUILDING DETAILS (info cards per current building) ──
