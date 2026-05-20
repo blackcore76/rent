@@ -349,17 +349,19 @@ function setupBldListeners(uid,bid){
   if(bldListeners[bid])return;
   if(!allBldData[bid])allBldData[bid]={};
   const base=db.ref("rent_app/"+uid+"/"+bid);
-  const uRef=base.child("units"),hRef=base.child("rent_history"),biRef=base.child("buildings");
+  const uRef=base.child("units"),hRef=base.child("rent_history"),biRef=base.child("buildings"),rlRef=base.child("config/roomLayout");
   const uL=uRef.on("value",snap=>{allBldData[bid].units=snap.val()||{};renderDash();setSS("ok")},()=>setSS("err"));
   const hL=hRef.on("value",snap=>{allBldData[bid].history=snap.val()||{};renderDash()});
   const biL=biRef.on("value",snap=>{allBldData[bid].bldInfo=snap.val()||{};renderBldCards()});
-  bldListeners[bid]={uRef,hRef,biRef,uL,hL,biL};
+  const rlL=rlRef.on("value",snap=>{allBldData[bid].roomLayout=snap.val()||null;renderDash()});
+  bldListeners[bid]={uRef,hRef,biRef,rlRef,uL,hL,biL,rlL};
 }
 function teardownBldListeners(bid){
   const l=bldListeners[bid];if(!l)return;
   if(l.uRef&&l.uL)l.uRef.off("value",l.uL);
   if(l.hRef&&l.hL)l.hRef.off("value",l.hL);
   if(l.biRef&&l.biL)l.biRef.off("value",l.biL);
+  if(l.rlRef&&l.rlL)l.rlRef.off("value",l.rlL);
   delete bldListeners[bid];delete allBldData[bid];
 }
 function teardownAll(){
@@ -390,11 +392,18 @@ function renderDash(){
   const bids=sortedBids(bldgsData);
   let tot=0,rented=0,vacant=0,unpaidCnt=0;
   bids.forEach(bid=>{
+    const rl=allBldData[bid]?.roomLayout;
+    const rlCount=rl?Object.values(rl).reduce((s,rooms)=>s+rooms.length,0):null;
     const ul=Object.values((allBldData[bid]||{}).units||{});
-    tot+=ul.length;
     const r=ul.filter(u=>u.status==="rented");
-    vacant+=ul.filter(u=>u.status==="vacant").length;
     rented+=r.length;
+    if(rlCount!==null){
+      tot+=rlCount;
+      vacant+=Math.max(0,rlCount-r.length);
+    }else{
+      tot+=ul.length;
+      vacant+=ul.filter(u=>u.status==="vacant").length;
+    }
     unpaidCnt+=r.filter(u=>{const ps=computePaidStatus(bid,u.room);return ps===false||ps==="partial";}).length;
   });
   document.getElementById("s-total").textContent=tot;
@@ -424,13 +433,24 @@ function renderDash(){
   // Vacant
   let vHtml="";
   bids.forEach(bid=>{
+    const rl=allBldData[bid]?.roomLayout;
     const ul=Object.values((allBldData[bid]||{}).units||{});
-    const vac=ul.filter(u=>u.status==="vacant").sort((a,b)=>String(a.room).localeCompare(String(b.room)));
-    if(!vac.length)return;
+    const unitMap=Object.fromEntries(ul.map(u=>[String(u.room),u]));
+    const rentedRooms=new Set(ul.filter(u=>u.status==="rented").map(u=>String(u.room)));
+    let vacItems=[];
+    if(rl){
+      Object.values(rl).flat().map(String).forEach(room=>{
+        if(!rentedRooms.has(room))vacItems.push({room,unit:unitMap[room]||null});
+      });
+    }else{
+      ul.filter(u=>u.status==="vacant").forEach(u=>vacItems.push({room:String(u.room),unit:u}));
+    }
+    vacItems.sort((a,b)=>String(a.room).localeCompare(String(b.room)));
+    if(!vacItems.length)return;
     vHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
-    vHtml+=vac.map(u=>`<div class="status-row" onclick="goToUnit('${bid}','${u.room}')">
-      <span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}
-      ${u.memo?`<span class="tenant-nm" style="color:var(--sub);font-size:12px">${esc(u.memo.split('\n')[0])}</span>`:''}
+    vHtml+=vacItems.map(({room,unit})=>`<div class="status-row" onclick="goToUnit('${bid}','${room}')">
+      <span class="room-num">${room}호</span>${unit?rentTypeBadge(unit):""}${unit?rtBadge(unit):""}
+      ${unit?.memo?`<span class="tenant-nm" style="color:var(--sub);font-size:12px">${esc(unit.memo.split('\n')[0])}</span>`:''}
       <span class="badge badge-vacant">공실</span>
       <span style="font-size:14px;color:var(--hint)">›</span></div>`).join("");
   });
