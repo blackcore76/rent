@@ -224,6 +224,7 @@ function loadAll(uid){
   db.ref(`rent_app/${uid}/${curBid}/config/roomLayout`).once("value").then(snap=>{
     const layout=snap.val()||{};
     ROOMS=Object.keys(layout).sort((a,b)=>Number(a)-Number(b)).flatMap(f=>layout[f]||[]).map(String);
+    updateUnitsStats();
   });
   // Units
   db.ref(`rent_app/${uid}/${curBid}/units`).on("value",snap=>{
@@ -243,7 +244,8 @@ function loadAll(uid){
 }
 
 function updateUnitsStats(){
-  const list=Object.values(unitsData);
+  const rooms=ROOMS.length?ROOMS:Object.keys(unitsData).sort((a,b)=>Number(a)-Number(b));
+  const list=rooms.map(r=>unitsData[r]).filter(Boolean);
   document.getElementById("s-total").textContent=list.length;
   document.getElementById("s-rented").textContent=list.filter(u=>u.status==="rented").length;
   document.getElementById("s-vacant").textContent=list.filter(u=>u.status!=="rented").length;
