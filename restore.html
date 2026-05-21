@@ -33,13 +33,26 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .back-btn{padding:6px 12px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;display:flex;align-items:center;gap:4px}
 /* LOGIN */
 #login-screen{position:fixed;inset:0;background:linear-gradient(160deg,#0F1C2D,#1E2D3D 50%,#2A3F55);z-index:7000;display:none;align-items:center;justify-content:center;padding:20px}
-.login-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:36px 28px;max-width:320px;width:100%;text-align:center;backdrop-filter:blur(16px)}
-.login-logo{font-size:52px;margin-bottom:14px}
-.login-title{font-size:22px;font-weight:900;color:#fff;margin-bottom:6px}
+.login-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:36px 28px;max-width:320px;width:100%;text-align:center;backdrop-filter:blur(16px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.login-logo{margin-bottom:22px}.login-logo img{width:180px;height:auto;filter:drop-shadow(0 4px 16px rgba(77,208,225,.4))}
+.login-title{font-size:22px;font-weight:900;color:#fff;margin-bottom:6px;letter-spacing:-.5px}
 .login-sub{font-size:12px;color:rgba(255,255,255,.45);margin-bottom:28px;line-height:1.7}
-.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 20px;background:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;color:#1F2937;cursor:pointer;font-family:inherit}
+.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 20px;background:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;color:#1F2937;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .15s}
+.google-btn:active{transform:scale(.97)}.g-icon{width:18px;height:18px;flex-shrink:0}
+/* NAV */
+.guide-btn{padding:5px 10px;background:rgba(14,165,233,.15);border:1.5px solid rgba(14,165,233,.5);border-radius:8px;color:#7DD3FC;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:background .15s;text-decoration:none;display:flex;align-items:center;gap:3px}
+.guide-btn:active{background:rgba(14,165,233,.32)}
+.nav{display:flex;border-top:1px solid rgba(255,255,255,.08)}
+.nav-tab{flex:1;padding:9px 2px 11px;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,.4);border-bottom:3px solid transparent;text-decoration:none;transition:all .2s;white-space:nowrap}
+.nav-tab.on{color:#fff;border-bottom-color:var(--sky);font-weight:700}
+/* USER MENU */
+.user-menu{position:fixed;top:56px;right:12px;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:16px;min-width:210px;z-index:300;display:none;border:1px solid var(--border)}
+.user-menu.show{display:block}
+.um-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
+.um-email{font-size:12px;color:var(--hint);margin-bottom:12px;word-break:break-all}
+.logout-btn{width:100%;padding:9px;background:var(--red-lt);color:var(--red);border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
 /* CONTENT */
-.content{margin-top:52px;padding:16px;max-width:560px;margin-left:auto;margin-right:auto}
+.content{margin-top:100px;padding:14px;min-height:calc(100vh - 100px)}
 .section-hd{font-size:11px;font-weight:800;color:var(--sub);letter-spacing:.8px;text-transform:uppercase;margin:20px 0 10px}
 .card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);border:1px solid var(--border);margin-bottom:12px}
 /* BUILDING INFO */
@@ -83,8 +96,8 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .prog-fill{height:100%;background:var(--sky);border-radius:99px;transition:width .4s;width:0%}
 .prog-msg{font-size:12px;color:var(--sub);text-align:center}
 /* TOAST */
-.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:#1E293B;color:#fff;padding:11px 20px;border-radius:12px;font-size:14px;font-weight:600;z-index:9999;opacity:0;transition:all .25s;max-width:calc(100vw - 48px);text-align:center;line-height:1.6;pointer-events:none}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1F2937;color:#fff;padding:11px 20px;border-radius:24px;font-size:14px;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);max-width:calc(100vw - 48px);text-align:center;line-height:1.6;box-shadow:0 4px 16px rgba(0,0,0,.3);pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0)}
 /* RESET */
 .reset-link{display:block;text-align:center;margin-top:16px;font-size:12px;color:var(--hint);cursor:pointer;text-decoration:underline}
 </style>
@@ -93,11 +106,11 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo">🔄</div>
-    <div class="login-title">데이터 복구</div>
-    <div class="login-sub">JSON 백업 파일로 데이터를 복구합니다<br>Google 계정으로 로그인하세요</div>
+    <div class="login-logo"><img src="logo.png" alt="PlusHome"></div>
+    <div class="login-title">월세 관리</div>
+    <div class="login-sub">임대 현황을 한눈에 관리하세요<br>Google 계정으로 안전하게 로그인</div>
     <button class="google-btn" onclick="signInGoogle()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.7 2.3 30.2 0 24 0 14.7 0 6.7 5.4 2.8 13.3l7.8 6.1C12.5 13 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.9-2.2 5.4-4.7 7l7.3 5.7c4.3-4 6.7-9.9 6.7-16.7z"/><path fill="#FBBC05" d="M10.6 28.6A14.8 14.8 0 0 1 9.5 24c0-1.6.3-3.2.8-4.6L2.5 13.3A23.9 23.9 0 0 0 0 24c0 3.8.9 7.4 2.5 10.6l8.1-6z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.3-5.7c-2 1.4-4.6 2.2-7.9 2.2-6.2 0-11.5-4.2-13.4-9.9l-8 6.2C6.7 42.6 14.7 48 24 48z"/></svg>
+      <svg class="g-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Google로 로그인
     </button>
   </div>
@@ -106,14 +119,27 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 <div id="app" style="display:none">
   <div class="hdr">
     <div class="hdr-top">
-      <div style="display:flex;align-items:center;gap:10px">
-        <a href="admin.html" class="back-btn">← 관리</a>
-        <span style="font-size:15px;font-weight:900;color:#fff">데이터 복구</span>
+      <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1">
+        <a href="index.html" style="flex-shrink:0;display:flex;align-items:center;line-height:0">
+          <img src="logo.png" alt="PlusHome" style="height:40px;width:auto;image-rendering:-webkit-optimize-contrast">
+        </a>
       </div>
       <div class="hdr-actions">
-        <div id="av-wrap" style="display:none"></div>
+        <a class="guide-btn" href="guide.html">❓ 도움말</a>
+        <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
     </div>
+    <div class="nav">
+      <a href="index.html" class="nav-tab">📊 메인</a>
+      <a href="units.html" class="nav-tab">🏠 세대</a>
+      <a href="expense.html" class="nav-tab">💸 지출</a>
+      <a href="admin.html" class="nav-tab on">🗂 관리</a>
+    </div>
+  </div>
+  <div id="user-menu" class="user-menu">
+    <div class="um-name" id="um-name">—</div>
+    <div class="um-email" id="um-email">—</div>
+    <button class="logout-btn" onclick="auth.signOut().then(()=>location.reload())">🚪 로그아웃</button>
   </div>
 
   <div class="content">
@@ -213,6 +239,8 @@ auth.onAuthStateChanged(user=>{
       const name=bldgsData[curBid]?.name||curBid;
       document.getElementById("cur-bld-name").textContent=name;
     });
+    document.getElementById("um-name").textContent=user.displayName||"사용자";
+    document.getElementById("um-email").textContent=user.email||"";
     ls.style.display="none";app.style.display="block";
   }else{
     cu=null;
@@ -221,6 +249,8 @@ auth.onAuthStateChanged(user=>{
 });
 
 function signInGoogle(){auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message))}
+function toggleMenu(){document.getElementById("user-menu").classList.toggle("show")}
+document.addEventListener("click",e=>{const m=document.getElementById("user-menu");if(m&&m.classList.contains("show")&&!m.contains(e.target)&&!document.getElementById("av-wrap").contains(e.target))m.classList.remove("show")})
 
 // ── FILE HANDLING ──
 function onDragOver(e){e.preventDefault();document.getElementById("drop-zone").classList.add("over")}
