@@ -137,14 +137,14 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 #cm-overlay{position:fixed;inset:0;background:transparent;z-index:800;display:none}
 #cm-overlay.show{display:block}
 #cm-marks{position:absolute;inset:0;pointer-events:none}
-.cm-mark{position:fixed;left:18px;right:18px;background:rgba(255,255,255,.97);border-radius:14px;padding:13px 16px;border-left:5px solid #22C55E;box-shadow:0 4px 22px rgba(0,0,0,.22),0 1px 6px rgba(0,0,0,.14);pointer-events:none}
-.cm-mtitle{font-size:11px;font-weight:800;color:#14532D;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px}
-.cm-mbody{font-size:13px;color:#1E293B;line-height:1.68}
-.cm-mbody b{color:#14532D}
+.cm-mark{position:fixed;left:18px;right:18px;background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:13px 16px;border-left:5px solid #22C55E;box-shadow:0 6px 28px rgba(0,0,0,.35),0 1px 6px rgba(0,0,0,.2);pointer-events:none}
+.cm-mtitle{font-size:11px;font-weight:800;color:#4DD0E1;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px}
+.cm-mbody{font-size:13px;color:rgba(255,255,255,.88);line-height:1.68}
+.cm-mbody b{color:#7DD3FC}
 #cm-footer{position:fixed;bottom:0;left:0;right:0;padding:12px 24px 36px;display:flex;flex-direction:column;align-items:center;gap:5px}
-#cm-close{padding:12px 36px;background:#1E2D3D;border:none;border-radius:24px;font-size:14px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(0,0,0,.3);letter-spacing:-.2px}
-#cm-close:active{opacity:.8}
-#cm-hint{font-size:11px;color:var(--hint)}
+#cm-close{padding:12px 36px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:24px;font-size:14px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(0,0,0,.25);letter-spacing:-.2px}
+#cm-close:active{opacity:.7}
+#cm-hint{font-size:11px;color:rgba(255,255,255,.45)}
 </style>
 </head>
 <body>
@@ -622,7 +622,8 @@ const CM_DATA={
   'card-unpaid':{title:'이달 미납 현황',body:'이번 달 월세를 납부하지 않은 세대 목록입니다.<br>세대를 탭하면 <b>해당 세대 입력 화면</b>으로 바로 이동합니다.'},
   'card-vacant':{title:'공실 현황',body:'현재 비어있는 세대 목록입니다.<br>세대를 탭하면 <b>해당 세대 입력 화면</b>으로 이동합니다.'},
   'card-expiry':{title:'계약 만료 임박',body:'<b>30일 이내</b> 계약이 종료되는 세대 목록입니다.<br>7일 이내 🔴 빨간색, 8~30일 🟠 주황색으로 긴급도를 구분합니다.'},
-  'card-notes':{title:'특이사항 메모',body:'수리 요청·공지사항 등 건물 관련 메모를 남깁니다.<br>✏️ 버튼으로 수정, ✕ 버튼으로 삭제할 수 있습니다.'}
+  'card-notes':{title:'특이사항 메모',body:'수리 요청·공지사항 등 건물 관련 메모를 남깁니다.<br>✏️ 버튼으로 수정, ✕ 버튼으로 삭제할 수 있습니다.'},
+  'buildings-wrap':{title:'관리 — 건물정보 카드',body:'현관 비밀번호·관리비 계좌·주소 등 건물 정보를 확인합니다.<br>정보 수정은 상단 탭 <b>관리</b> → <b>건물정보</b>에서 입력하세요.'}
 };
 function openHelp(){
   const HDR=108,BTN=80,vh=window.innerHeight;
@@ -632,6 +633,7 @@ function openHelp(){
     {key:'card-vacant',el:document.getElementById('card-vacant')},
     {key:'card-expiry',el:document.getElementById('card-expiry')},
     {key:'card-notes',el:document.getElementById('card-notes')},
+    {key:'buildings-wrap',el:document.getElementById('buildings-wrap')},
   ];
   const vis=defs.filter(s=>{
     if(!s.el)return false;
