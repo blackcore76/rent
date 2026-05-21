@@ -473,7 +473,7 @@ function renderDash(){
     const soon=(rlRooms?ul.filter(u=>rlRooms.has(String(u.room))):ul).filter(u=>u.status==="rented"&&u.contractEnd).map(u=>{
       const d=new Date(u.contractEnd);d.setHours(0,0,0,0);
       return{...u,dl:Math.ceil((d-today)/864e5)};
-    }).filter(u=>u.dl>=0&&u.dl<=30).sort((a,b)=>a.dl-b.dl);
+    }).filter(u=>u.dl>=0&&u.dl<=30).sort((a,b)=>{if(a.dl!==b.dl)return a.dl-b.dl;const na=parseInt(a.room),nb=parseInt(b.room);return(!isNaN(na)&&!isNaN(nb))?na-nb:String(a.room).localeCompare(String(b.room));});
     if(!soon.length)return;
     eHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
     eHtml+=soon.map(u=>`<div class="expiry-row" onclick="goToUnit('${bid}','${u.room}')">
