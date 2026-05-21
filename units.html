@@ -145,9 +145,12 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .chg-bg.show{display:block}
 .chg-sheet{position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;background:#fff;border-radius:22px 22px 0 0;padding:20px 18px 36px;z-index:650;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:85vh;overflow-y:auto;overscroll-behavior:contain}
 .chg-sheet.show{transform:translateY(0)}
-.chg-tg{display:flex;border:2px solid var(--border);border-radius:10px;overflow:hidden}
-.chg-tg-btn{flex:1;padding:10px;border:none;background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--sub);transition:all .15s}
-.chg-tg-btn.on{background:var(--hdr);color:#fff}
+.chg-cols{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:12px;border:2px solid var(--border);border-radius:12px;overflow:hidden}
+.chg-col{padding:12px}
+.chg-col-dep{border-right:1px solid var(--border)}
+.chg-col-hd{font-size:12px;font-weight:800;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:8px}
+.chg-col-dep .chg-col-hd{background:#EEF2FF;color:#3730A3}
+.chg-col-mon .chg-col-hd{background:#D1FAE5;color:#065F46}
 .filter-clear{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
 .ph-thumb{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#F0F4F8}
 .ph-thumb img{width:100%;height:100%;object-fit:cover;cursor:pointer}
@@ -347,14 +350,17 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
     <h3 class="chg-sheet-title" style="font-size:16px;font-weight:900">📋 임대 조건 변경</h3>
     <button class="sheet-close" onclick="closeRentChangeSheet()">✕</button>
   </div>
-  <div class="tg-label">변경 항목</div>
-  <div class="chg-tg">
-    <button class="chg-tg-btn on" id="chg-tg-deposit" onclick="setChgType('deposit')">보증금</button>
-    <button class="chg-tg-btn" id="chg-tg-monthly" onclick="setChgType('monthly')">월세</button>
-  </div>
-  <div class="field-row" style="margin-top:12px">
-    <div class="field"><label>기존 금액 (만원)</label><input type="number" id="chg-old" readonly style="background:#F8FAFC;color:var(--hint)"></div>
-    <div class="field"><label>변경 금액 (만원)</label><input type="number" id="chg-new" placeholder="0"></div>
+  <div class="chg-cols">
+    <div class="chg-col chg-col-dep">
+      <div class="chg-col-hd">보증금</div>
+      <div class="field"><label>기존 (만원)</label><input type="number" id="chg-dep-old" readonly style="background:#F8FAFC;color:var(--hint)"></div>
+      <div class="field" style="margin-top:8px"><label>변경 (만원)</label><input type="number" id="chg-dep-new" placeholder="미변경 시 빈칸"></div>
+    </div>
+    <div class="chg-col chg-col-mon">
+      <div class="chg-col-hd">월세</div>
+      <div class="field"><label>기존 (만원)</label><input type="number" id="chg-mon-old" readonly style="background:#F8FAFC;color:var(--hint)"></div>
+      <div class="field" style="margin-top:8px"><label>변경 (만원)</label><input type="number" id="chg-mon-new" placeholder="미변경 시 빈칸"></div>
+    </div>
   </div>
   <div class="field" style="margin-top:10px"><label>적용일</label><input type="date" id="chg-date"></div>
   <div class="field" style="margin-top:10px"><label>변경 사유 <span style="font-size:10px;font-weight:400;color:var(--hint)">(선택)</span></label><input type="text" id="chg-reason" placeholder="예: 재계약, 협의 인상, 인하 등"></div>
@@ -746,16 +752,16 @@ function openSheet(roomId){
 }
 function closeSheet(){document.getElementById("room-sheet").classList.remove("show");curRoom=null}
 
-let _chgType="deposit",_chgRoomId=null;
+let _chgRoomId=null;
 function openRentChangeSheet(){
   if(!guardWrite())return;
   const roomId=document.getElementById("m-room").value;if(!roomId)return;
-  _chgRoomId=roomId;_chgType="deposit";
+  _chgRoomId=roomId;
   const u=units[roomId]||{};
-  document.getElementById("chg-tg-deposit").classList.add("on");
-  document.getElementById("chg-tg-monthly").classList.remove("on");
-  document.getElementById("chg-old").value=u.depositAmount||0;
-  document.getElementById("chg-new").value="";
+  document.getElementById("chg-dep-old").value=u.depositAmount||0;
+  document.getElementById("chg-mon-old").value=u.monthlyRent||0;
+  document.getElementById("chg-dep-new").value="";
+  document.getElementById("chg-mon-new").value="";
   document.getElementById("chg-date").value=new Date().toISOString().slice(0,10);
   document.getElementById("chg-reason").value="";
   document.getElementById("chg-bg").classList.add("show");
@@ -766,30 +772,35 @@ function closeRentChangeSheet(){
   document.getElementById("chg-bg").classList.remove("show");
   document.getElementById("chg-sheet").classList.remove("show");
 }
-function setChgType(type){
-  _chgType=type;
-  document.getElementById("chg-tg-deposit").classList.toggle("on",type==="deposit");
-  document.getElementById("chg-tg-monthly").classList.toggle("on",type==="monthly");
-  const u=units[_chgRoomId]||{};
-  document.getElementById("chg-old").value=type==="deposit"?(u.depositAmount||0):(u.monthlyRent||0);
-}
 async function saveRentChange(){
   if(!guardWrite())return;
-  const newValStr=document.getElementById("chg-new").value;
-  if(newValStr===""||isNaN(parseInt(newValStr))){showToast("❗ 변경 금액을 입력하세요");return;}
+  const depNewStr=document.getElementById("chg-dep-new").value;
+  const monNewStr=document.getElementById("chg-mon-new").value;
+  const depFilled=depNewStr!==""&&!isNaN(parseInt(depNewStr));
+  const monFilled=monNewStr!==""&&!isNaN(parseInt(monNewStr));
+  if(!depFilled&&!monFilled){showToast("❗ 보증금 또는 월세 변경 금액을 입력하세요");return;}
   const date=document.getElementById("chg-date").value;
   if(!date){showToast("❗ 적용일을 선택하세요");return;}
   const u=units[_chgRoomId]||{};
-  const oldVal=_chgType==="deposit"?(u.depositAmount||0):(u.monthlyRent||0);
-  const newVal=parseInt(newValStr);
-  const id=String(Date.now());
-  const data={id,type:_chgType,oldVal,newVal,effectiveDate:date,reason:document.getElementById("chg-reason").value.trim(),createdAt:new Date().toISOString()};
+  const reason=document.getElementById("chg-reason").value.trim();
+  const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
+  const ts=Date.now();
+  const saves=[];
+  if(depFilled){
+    const id="dep_"+ts;
+    const data={id,type:"deposit",oldVal:u.depositAmount||0,newVal:parseInt(depNewStr),effectiveDate:date,reason,createdAt:new Date().toISOString()};
+    saves.push({id,data});
+  }
+  if(monFilled){
+    const id="mon_"+ts;
+    const data={id,type:"monthly",oldVal:u.monthlyRent||0,newVal:parseInt(monNewStr),effectiveDate:date,reason,createdAt:new Date().toISOString()};
+    saves.push({id,data});
+  }
   try{
-    const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
-    await db.ref(`rent_app/${targetUid}/${curBid}/units/${_chgRoomId}/rentChanges/${id}`).set(data);
+    await Promise.all(saves.map(({id,data})=>db.ref(`rent_app/${targetUid}/${curBid}/units/${_chgRoomId}/rentChanges/${id}`).set(data)));
     if(!units[_chgRoomId])units[_chgRoomId]={};
     if(!units[_chgRoomId].rentChanges)units[_chgRoomId].rentChanges={};
-    units[_chgRoomId].rentChanges[id]=data;
+    saves.forEach(({id,data})=>{units[_chgRoomId].rentChanges[id]=data;});
     showToast("✅ 변동 이력 기록됨");
     closeRentChangeSheet();
     renderRentChanges(_chgRoomId);

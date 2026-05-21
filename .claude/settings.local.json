@@ -14,7 +14,9 @@
       "PowerShell(Get-Command *)",
       "PowerShell(python -c \"import psd_tools; print\\('ok'\\)\" 2>&1)",
       "PowerShell(pip install *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(manifest)",
+      "Bash(sw\")"
     ]
   }
 }
