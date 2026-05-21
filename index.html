@@ -134,17 +134,17 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .bld-subhd{font-size:11px;font-weight:800;color:var(--sub);padding:10px 4px 4px;letter-spacing:.5px;border-top:1px solid var(--border);margin-top:4px}
 .bld-subhd:first-child{border-top:none;padding-top:4px;margin-top:0}
 /* ── COACH MARK ── */
-#cm-overlay{position:fixed;inset:0;background:rgba(12,22,35,.82);z-index:800;display:none;backdrop-filter:blur(1.5px);-webkit-backdrop-filter:blur(1.5px)}
+#cm-overlay{position:fixed;inset:0;background:transparent;z-index:800;display:none}
 #cm-overlay.show{display:block}
 #cm-marks{position:absolute;inset:0;pointer-events:none}
-.cm-mark{position:fixed;left:18px;right:18px;background:rgba(255,255,255,.97);border-radius:14px;padding:13px 16px;border-left:5px solid #22C55E;box-shadow:0 6px 24px rgba(0,0,0,.35);pointer-events:none}
+.cm-mark{position:fixed;left:18px;right:18px;background:rgba(255,255,255,.97);border-radius:14px;padding:13px 16px;border-left:5px solid #22C55E;box-shadow:0 4px 22px rgba(0,0,0,.22),0 1px 6px rgba(0,0,0,.14);pointer-events:none}
 .cm-mtitle{font-size:11px;font-weight:800;color:#14532D;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px}
 .cm-mbody{font-size:13px;color:#1E293B;line-height:1.68}
 .cm-mbody b{color:#14532D}
 #cm-footer{position:fixed;bottom:0;left:0;right:0;padding:12px 24px 36px;display:flex;flex-direction:column;align-items:center;gap:5px}
-#cm-close{padding:12px 36px;background:#fff;border:none;border-radius:24px;font-size:14px;font-weight:700;color:#1E293B;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(0,0,0,.4);letter-spacing:-.2px}
+#cm-close{padding:12px 36px;background:#1E2D3D;border:none;border-radius:24px;font-size:14px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(0,0,0,.3);letter-spacing:-.2px}
 #cm-close:active{opacity:.8}
-#cm-hint{font-size:11px;color:rgba(255,255,255,.4)}
+#cm-hint{font-size:11px;color:var(--hint)}
 </style>
 </head>
 <body>
@@ -642,19 +642,26 @@ function openHelp(){
   if(!vis.length)vis.push(defs[0]);
   const wrap=document.getElementById('cm-marks');
   wrap.innerHTML='';
-  let floor=HDR+8;
   vis.forEach(s=>{
     const d=CM_DATA[s.key];if(!d)return;
     const r=s.el.getBoundingClientRect();
-    const top=Math.max(r.top+10,floor);
     const mark=document.createElement('div');
     mark.className='cm-mark';
-    mark.style.top=top+'px';
+    mark.style.top=Math.max(r.top+10,HDR+8)+'px';
     mark.innerHTML=`<div class="cm-mtitle">${d.title}</div><div class="cm-mbody">${d.body}</div>`;
     wrap.appendChild(mark);
-    floor=top+90;
   });
   document.getElementById('cm-overlay').classList.add('show');
+  // 2패스: 렌더 후 실제 높이로 겹침 보정
+  requestAnimationFrame(()=>{
+    let floor=HDR+8;
+    wrap.querySelectorAll('.cm-mark').forEach(m=>{
+      let top=parseFloat(m.style.top);
+      if(top<floor)top=floor;
+      m.style.top=top+'px';
+      floor=top+m.getBoundingClientRect().height+10;
+    });
+  });
 }
 function closeHelp(){document.getElementById('cm-overlay').classList.remove('show')}
 </script>
