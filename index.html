@@ -133,6 +133,18 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 
 .bld-subhd{font-size:11px;font-weight:800;color:var(--sub);padding:10px 4px 4px;letter-spacing:.5px;border-top:1px solid var(--border);margin-top:4px}
 .bld-subhd:first-child{border-top:none;padding-top:4px;margin-top:0}
+/* ── COACH MARK ── */
+#cm-overlay{position:fixed;inset:0;background:rgba(12,22,35,.82);z-index:800;display:none;backdrop-filter:blur(1.5px);-webkit-backdrop-filter:blur(1.5px)}
+#cm-overlay.show{display:block}
+#cm-marks{position:absolute;inset:0;pointer-events:none}
+.cm-mark{position:fixed;left:18px;right:18px;background:rgba(255,255,255,.97);border-radius:14px;padding:13px 16px;border-left:5px solid #22C55E;box-shadow:0 6px 24px rgba(0,0,0,.35);pointer-events:none}
+.cm-mtitle{font-size:11px;font-weight:800;color:#14532D;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px}
+.cm-mbody{font-size:13px;color:#1E293B;line-height:1.68}
+.cm-mbody b{color:#14532D}
+#cm-footer{position:fixed;bottom:0;left:0;right:0;padding:12px 24px 36px;display:flex;flex-direction:column;align-items:center;gap:5px}
+#cm-close{padding:12px 36px;background:#fff;border:none;border-radius:24px;font-size:14px;font-weight:700;color:#1E293B;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(0,0,0,.4);letter-spacing:-.2px}
+#cm-close:active{opacity:.8}
+#cm-hint{font-size:11px;color:rgba(255,255,255,.4)}
 </style>
 </head>
 <body>
@@ -174,7 +186,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <div class="hdr-actions">
         <span id="sync-st" style="font-size:10px"></span>
 
-        <a class="guide-btn" href="guide.html">❓ 도움말</a>
+        <button class="guide-btn" onclick="openHelp()">❓ 도움말</button>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
     </div>
@@ -199,22 +211,22 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <div class="kpi unpaid" onclick="goUnits('unpaid')"><div class="kpi-val" id="s-unpaid">—</div><div class="kpi-lbl">미납</div></div>
     </div>
 
-    <div class="card">
+    <div class="card" id="card-unpaid">
       <div class="card-hd">🔴 이달 미납 현황</div>
       <div id="unpaid-list"><div class="empty-small">로딩 중...</div></div>
     </div>
 
-    <div class="card">
+    <div class="card" id="card-vacant">
       <div class="card-hd">🟣 공실 현황</div>
       <div id="vacant-list"><div class="empty-small">로딩 중...</div></div>
     </div>
 
-    <div class="card">
+    <div class="card" id="card-expiry">
       <div class="card-hd">⚠️ 계약 만료 임박 (30일 이내)</div>
       <div id="expiry-list"><div class="empty-small">로딩 중...</div></div>
     </div>
 
-    <div class="card">
+    <div class="card" id="card-notes">
       <div class="card-hd">📝 특이사항 메모</div>
       <div class="note-input-row">
         <textarea class="note-ta" id="note-input" rows="2" placeholder="임차인 요청사항, 수리 필요 사항 등..."></textarea>
@@ -253,6 +265,15 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <button class="btn-cancel" onclick="closeEditNote()">취소</button>
       <button class="btn-confirm" onclick="saveEditNote()">저장</button>
     </div>
+  </div>
+</div>
+
+<!-- COACH MARK OVERLAY -->
+<div id="cm-overlay" onclick="closeHelp()">
+  <div id="cm-marks"></div>
+  <div id="cm-footer">
+    <button id="cm-close" onclick="closeHelp()">✕ 닫기</button>
+    <span id="cm-hint">아무 곳이나 탭해도 닫힙니다</span>
   </div>
 </div>
 
@@ -594,6 +615,48 @@ function goUnits(filter){
   location.href=`units.html${filter?"?filter="+filter:""}${mUid?(filter?"&":"?")+"master_uid="+encodeURIComponent(mUid)+"&master_name="+encodeURIComponent(mName):""}`;
 }
 function fmtDt(iso){if(!iso)return"";const d=new Date(iso);return`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`}
+
+// ── COACH MARK HELP ──
+const CM_DATA={
+  stats:{title:'현황 통계 카드',body:'<b>전체·임대중·공실·미납</b> 세대 수를 한눈에 확인합니다.<br>각 카드를 탭하면 해당 상태 세대만 필터해서 세대 목록으로 이동합니다.'},
+  'card-unpaid':{title:'이달 미납 현황',body:'이번 달 월세를 납부하지 않은 세대 목록입니다.<br>세대를 탭하면 <b>해당 세대 입력 화면</b>으로 바로 이동합니다.'},
+  'card-vacant':{title:'공실 현황',body:'현재 비어있는 세대 목록입니다.<br>세대를 탭하면 <b>해당 세대 입력 화면</b>으로 이동합니다.'},
+  'card-expiry':{title:'계약 만료 임박',body:'<b>30일 이내</b> 계약이 종료되는 세대 목록입니다.<br>7일 이내 🔴 빨간색, 8~30일 🟠 주황색으로 긴급도를 구분합니다.'},
+  'card-notes':{title:'특이사항 메모',body:'수리 요청·공지사항 등 건물 관련 메모를 남깁니다.<br>✏️ 버튼으로 수정, ✕ 버튼으로 삭제할 수 있습니다.'}
+};
+function openHelp(){
+  const HDR=108,BTN=80,vh=window.innerHeight;
+  const defs=[
+    {key:'stats',el:document.querySelector('.stats-grid')},
+    {key:'card-unpaid',el:document.getElementById('card-unpaid')},
+    {key:'card-vacant',el:document.getElementById('card-vacant')},
+    {key:'card-expiry',el:document.getElementById('card-expiry')},
+    {key:'card-notes',el:document.getElementById('card-notes')},
+  ];
+  const vis=defs.filter(s=>{
+    if(!s.el)return false;
+    const r=s.el.getBoundingClientRect();
+    const h=Math.min(r.bottom,vh-BTN)-Math.max(r.top,HDR);
+    return h>0&&h/r.height>=0.5;
+  });
+  if(!vis.length)vis.push(defs[0]);
+  const wrap=document.getElementById('cm-marks');
+  wrap.innerHTML='';
+  let floor=HDR+8;
+  vis.forEach(s=>{
+    const d=CM_DATA[s.key];if(!d)return;
+    const r=s.el.getBoundingClientRect();
+    const top=Math.max(r.top+10,floor);
+    const mark=document.createElement('div');
+    mark.className='cm-mark';
+    mark.style.top=top+'px';
+    mark.innerHTML=`<div class="cm-mtitle">${d.title}</div><div class="cm-mbody">${d.body}</div>`;
+    wrap.appendChild(mark);
+    floor=top+90;
+  });
+  document.getElementById('cm-overlay').classList.add('show');
+}
+function closeHelp(){document.getElementById('cm-overlay').classList.remove('show')}
 </script>
 </body>
 </html>
