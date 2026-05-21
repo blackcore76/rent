@@ -169,6 +169,18 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .btn-blind-wrap{position:relative;display:inline-flex}
 .btn-blind{position:absolute;inset:0;border-radius:6px;background:rgba(71,85,105,.32);border:1.5px solid rgba(100,116,139,.45);color:rgba(255,255,255,.55);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;z-index:2;font-family:inherit;transition:opacity .2s,transform .22s cubic-bezier(.4,0,.2,1);user-select:none}
 .btn-blind.lifted{opacity:0;transform:translateY(-7px);pointer-events:none}
+/* ── COACH MARK ── */
+#cm-overlay{position:fixed;inset:0;background:transparent;z-index:800;display:none}
+#cm-overlay.show{display:block}
+#cm-marks{position:absolute;inset:0;pointer-events:none}
+.cm-mark{position:fixed;left:18px;right:18px;background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:13px 16px;border-left:5px solid #22C55E;box-shadow:0 6px 28px rgba(0,0,0,.35),0 1px 6px rgba(0,0,0,.2);pointer-events:none}
+.cm-mtitle{font-size:11px;font-weight:800;color:#4DD0E1;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px}
+.cm-mbody{font-size:13px;color:rgba(255,255,255,.88);line-height:1.68}
+.cm-mbody b{color:#7DD3FC}
+#cm-footer{position:fixed;bottom:0;left:0;right:0;padding:12px 24px 36px;display:flex;flex-direction:column;align-items:center;gap:5px}
+#cm-close{padding:12px 36px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:24px;font-size:14px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(0,0,0,.25);letter-spacing:-.2px}
+#cm-close:active{opacity:.7}
+#cm-hint{font-size:11px;color:rgba(255,255,255,.45)}
 </style>
 </head>
 <body>
@@ -208,7 +220,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <div class="hdr-actions">
 
         <button class="admin-btn" id="admin-btn" onclick="location.href='admin-master.html'" style="padding:5px 8px">🔧</button>
-        <a class="guide-btn" href="guide.html">❓ 도움말</a>
+        <button class="guide-btn" onclick="openHelp()">❓ 도움말</button>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
     </div>
@@ -416,6 +428,15 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 </div>
 
 <div id="toast"></div>
+
+<!-- COACH MARK OVERLAY -->
+<div id="cm-overlay" onclick="closeHelp()">
+  <div id="cm-marks"></div>
+  <div id="cm-footer">
+    <button id="cm-close" onclick="closeHelp()">✕ 닫기</button>
+    <span id="cm-hint">아무 곳이나 탭해도 닫힙니다</span>
+  </div>
+</div>
 
 <script>
 const storage=firebase.storage();
@@ -993,6 +1014,53 @@ function delContractPhoto(room,pid,spath){
 
 function openPV(url){document.getElementById("pv-img").src=url;document.getElementById("pv").classList.add("show")}
 function closePV(){document.getElementById("pv").classList.remove("show");document.getElementById("pv-img").src=""}
+
+// ── COACH MARK HELP ──
+const CM_DATA={
+  'sub-tabs':{title:'관리 메뉴 탭',body:'<b>전화번호부·계약서·건물정보</b> 탭으로 전환합니다.'},
+  'sp0':{title:'전화번호부',body:'세입자·업체 연락처를 저장합니다.<br>우측 <b>+ 추가</b> 버튼으로 새 연락처를 등록하세요.'},
+  'sp1':{title:'계약서 사진 관리',body:'세대별 계약서 사진을 보관합니다.<br>세대 입력 화면에서 사진을 업로드할 수 있습니다.'},
+  'sp2':{title:'건물정보 / 백업',body:'건물 이름·현관 비밀번호·관리비 계좌를 관리합니다.<br>하단에서 <b>백업 내보내기·데이터 복구</b>로 이동할 수 있습니다.'}
+};
+function openHelp(){
+  const HDR=108,BTN=80,vh=window.innerHeight;
+  const defs=[
+    {key:'sub-tabs',el:document.querySelector('.sub-tabs')},
+    {key:'sp0',el:document.getElementById('sp0')},
+    {key:'sp1',el:document.getElementById('sp1')},
+    {key:'sp2',el:document.getElementById('sp2')},
+  ];
+  const vis=defs.filter(s=>{
+    if(!s.el)return false;
+    const r=s.el.getBoundingClientRect();
+    if(!r.height)return false;
+    const h=Math.min(r.bottom,vh-BTN)-Math.max(r.top,HDR);
+    return h>0&&h/r.height>=0.5;
+  });
+  if(!vis.length)vis.push(defs[0]);
+  const wrap=document.getElementById('cm-marks');
+  wrap.innerHTML='';
+  vis.forEach(s=>{
+    const d=CM_DATA[s.key];if(!d)return;
+    const r=s.el.getBoundingClientRect();
+    const mark=document.createElement('div');
+    mark.className='cm-mark';
+    mark.style.top=Math.max(r.top+10,HDR+8)+'px';
+    mark.innerHTML=`<div class="cm-mtitle">${d.title}</div><div class="cm-mbody">${d.body}</div>`;
+    wrap.appendChild(mark);
+  });
+  document.getElementById('cm-overlay').classList.add('show');
+  requestAnimationFrame(()=>{
+    let floor=HDR+8;
+    wrap.querySelectorAll('.cm-mark').forEach(m=>{
+      let top=parseFloat(m.style.top);
+      if(top<floor)top=floor;
+      m.style.top=top+'px';
+      floor=top+m.getBoundingClientRect().height+10;
+    });
+  });
+}
+function closeHelp(){document.getElementById('cm-overlay').classList.remove('show')}
 
 function showCM(title,msg,cb){
   document.getElementById("cm-title").textContent=title;

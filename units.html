@@ -187,6 +187,18 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .google-btn:active{transform:scale(.97)}
 .g-icon{width:18px;height:18px;flex-shrink:0}
 .login-footer{font-size:10px;color:rgba(255,255,255,.25);margin-top:18px;line-height:1.7}
+/* ── COACH MARK ── */
+#cm-overlay{position:fixed;inset:0;background:transparent;z-index:800;display:none}
+#cm-overlay.show{display:block}
+#cm-marks{position:absolute;inset:0;pointer-events:none}
+.cm-mark{position:fixed;left:18px;right:18px;background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:13px 16px;border-left:5px solid #22C55E;box-shadow:0 6px 28px rgba(0,0,0,.35),0 1px 6px rgba(0,0,0,.2);pointer-events:none}
+.cm-mtitle{font-size:11px;font-weight:800;color:#4DD0E1;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px}
+.cm-mbody{font-size:13px;color:rgba(255,255,255,.88);line-height:1.68}
+.cm-mbody b{color:#7DD3FC}
+#cm-footer{position:fixed;bottom:0;left:0;right:0;padding:12px 24px 36px;display:flex;flex-direction:column;align-items:center;gap:5px}
+#cm-close{padding:12px 36px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:24px;font-size:14px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(0,0,0,.25);letter-spacing:-.2px}
+#cm-close:active{opacity:.7}
+#cm-hint{font-size:11px;color:rgba(255,255,255,.45)}
 </style>
 </head>
 <body>
@@ -224,7 +236,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
         </a>
       </div>
       <div class="hdr-actions">
-        <a class="guide-btn" href="guide.html#sec1">❓ 도움말</a>
+        <button class="guide-btn" onclick="openHelp()">❓ 도움말</button>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
     </div>
@@ -380,6 +392,15 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
   </div>
 </div>
 <div id="toast"></div>
+
+<!-- COACH MARK OVERLAY -->
+<div id="cm-overlay" onclick="closeHelp()">
+  <div id="cm-marks"></div>
+  <div id="cm-footer">
+    <button id="cm-close" onclick="closeHelp()">✕ 닫기</button>
+    <span id="cm-hint">아무 곳이나 탭해도 닫힙니다</span>
+  </div>
+</div>
 
 <script>
 const storage=firebase.storage();
@@ -991,6 +1012,48 @@ function exportCSV(){
   a.download=`월세관리_세대_${fmtDate()}.csv`;a.click();URL.revokeObjectURL(a.href);
   showToast("✅ CSV 내려받기 완료");
 }
+
+// ── COACH MARK HELP ──
+const CM_DATA={
+  'floor-tabs':{title:'층별 · 유형 필터',body:'층 번호 또는 <b>원룸·투룸</b> 등 구조로 세대를 필터링합니다.<br>탭을 탭하면 해당 조건의 세대만 표시됩니다.'},
+  'rooms-grid':{title:'세대 카드 목록',body:'각 카드를 탭하면 <b>세대 입력 화면</b>이 열립니다.<br>임대중·공실·납부 여부가 색상으로 구분됩니다.<br>우상단 <b>건물명</b>을 탭하면 건물을 전환할 수 있습니다.'}
+};
+function openHelp(){
+  const HDR=108,BTN=80,vh=window.innerHeight;
+  const defs=[
+    {key:'floor-tabs',el:document.getElementById('floor-tabs')},
+    {key:'rooms-grid',el:document.getElementById('rooms-grid')},
+  ];
+  const vis=defs.filter(s=>{
+    if(!s.el)return false;
+    const r=s.el.getBoundingClientRect();
+    const h=Math.min(r.bottom,vh-BTN)-Math.max(r.top,HDR);
+    return h>0&&h/r.height>=0.5;
+  });
+  if(!vis.length)vis.push(defs[0]);
+  const wrap=document.getElementById('cm-marks');
+  wrap.innerHTML='';
+  vis.forEach(s=>{
+    const d=CM_DATA[s.key];if(!d)return;
+    const r=s.el.getBoundingClientRect();
+    const mark=document.createElement('div');
+    mark.className='cm-mark';
+    mark.style.top=Math.max(r.top+10,HDR+8)+'px';
+    mark.innerHTML=`<div class="cm-mtitle">${d.title}</div><div class="cm-mbody">${d.body}</div>`;
+    wrap.appendChild(mark);
+  });
+  document.getElementById('cm-overlay').classList.add('show');
+  requestAnimationFrame(()=>{
+    let floor=HDR+8;
+    wrap.querySelectorAll('.cm-mark').forEach(m=>{
+      let top=parseFloat(m.style.top);
+      if(top<floor)top=floor;
+      m.style.top=top+'px';
+      floor=top+m.getBoundingClientRect().height+10;
+    });
+  });
+}
+function closeHelp(){document.getElementById('cm-overlay').classList.remove('show')}
 </script>
 </body>
 </html>
