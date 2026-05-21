@@ -870,7 +870,8 @@ function updateRtypeUI(){
 function saveRoom(){
   if(!curRoom)return;
   if(!guardWrite())return;
-  const data={room:curRoom,floor:Math.floor(parseInt(curRoom)/100),status:mStatus,roomType:mRoomType,rentType:mRentType,
+  const roomId=curRoom;
+  const data={room:roomId,floor:Math.floor(parseInt(roomId)/100),status:mStatus,roomType:mRoomType,rentType:mRentType,
     tenantName:document.getElementById("m-name").value.trim(),
     tenantName2:document.getElementById("m-name2").value.trim(),
     tenantPhone:document.getElementById("m-phone").value.trim(),
@@ -880,11 +881,11 @@ function saveRoom(){
     contractStart:document.getElementById("m-start").value,
     contractEnd:document.getElementById("m-end").value,
     memo:document.getElementById("m-memo").value.trim()};
-  const prev=units[curRoom]?{...units[curRoom]}:null;
-  units[curRoom]={...(units[curRoom]||{}), ...data};
+  const prev=units[roomId]?{...units[roomId]}:null;
+  units[roomId]={...(units[roomId]||{}), ...data};
   closeSheet();showToast("✅ 저장됨");renderGrid();
-  uRef.child(curRoom).update(data).catch(()=>{
-    if(prev)units[curRoom]=prev;else delete units[curRoom];
+  uRef.child(roomId).update(data).catch(()=>{
+    if(prev)units[roomId]=prev;else delete units[roomId];
     showToast("❗ 저장 실패");renderGrid();
   });
 }
