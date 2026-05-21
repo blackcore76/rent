@@ -531,6 +531,14 @@ function schedRenderGrid(){clearTimeout(_rgTm);_rgTm=setTimeout(()=>{renderGrid(
 function listenUnits(){
   uL=uRef.on("value",snap=>{
     const val=snap.val()||{};ensureRooms(val);units=val;
+    if(curRoom&&units[curRoom]){
+      const f=(id)=>document.getElementById(id);
+      if(f("m-memo"))   units[curRoom].memo          = f("m-memo").value;
+      if(f("m-deposit"))units[curRoom].depositAmount = parseInt(f("m-deposit").value)||0;
+      if(f("m-rent"))   units[curRoom].monthlyRent   = parseInt(f("m-rent").value)||0;
+      if(f("m-name"))   units[curRoom].tenantName    = f("m-name").value;
+      if(f("m-phone"))  units[curRoom].tenantPhone   = f("m-phone").value;
+    }
     _unitsReady=true;schedRenderGrid();
   },()=>showToast("❗ 연결 오류"));
 }
@@ -797,13 +805,24 @@ async function saveRentChange(){
     saves.push({id,data});
   }
   try{
-    await Promise.all(saves.map(({id,data})=>db.ref(`rent_app/${targetUid}/${curBid}/units/${_chgRoomId}/rentChanges/${id}`).set(data)));
+    const mpath={};
+    saves.forEach(({id,data})=>{mpath[`${_chgRoomId}/rentChanges/${id}`]=data;});
+    if(depFilled) mpath[`${_chgRoomId}/depositAmount`]=parseInt(depNewStr);
+    if(monFilled) mpath[`${_chgRoomId}/monthlyRent`]=parseInt(monNewStr);
+    await db.ref(`rent_app/${targetUid}/${curBid}/units`).update(mpath);
     if(!units[_chgRoomId])units[_chgRoomId]={};
     if(!units[_chgRoomId].rentChanges)units[_chgRoomId].rentChanges={};
     saves.forEach(({id,data})=>{units[_chgRoomId].rentChanges[id]=data;});
+    if(depFilled) units[_chgRoomId].depositAmount=parseInt(depNewStr);
+    if(monFilled) units[_chgRoomId].monthlyRent=parseInt(monNewStr);
+    if(curRoom===_chgRoomId){
+      if(depFilled) document.getElementById("m-deposit").value=parseInt(depNewStr);
+      if(monFilled) document.getElementById("m-rent").value=parseInt(monNewStr);
+    }
     showToast("✅ 변동 이력 기록됨");
     closeRentChangeSheet();
     renderRentChanges(_chgRoomId);
+    renderGrid();
   }catch(e){showToast("❗ 저장 실패");}
 }
 function deleteRentChange(roomId,id){
