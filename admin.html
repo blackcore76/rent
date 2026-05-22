@@ -104,9 +104,9 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 #pv img{max-width:95%;max-height:90vh;border-radius:8px;object-fit:contain}
 #pv-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 /* SHEET */
-.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.sheet-bg{position:fixed;top:100px;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:500;display:none;align-items:flex-end;justify-content:center}
 .sheet-bg.show{display:flex}
-.sheet{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 36px;width:100%;max-width:520px;box-shadow:0 -4px 32px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto}
+.sheet{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 36px;width:100%;max-width:520px;box-shadow:0 -4px 32px rgba(0,0,0,.2);max-height:calc(100vh - 100px);overflow-y:auto}
 .sheet-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .sheet-hd h3{font-size:17px;font-weight:900;color:var(--hdr)}
 .sheet-close{width:32px;height:32px;border:none;background:#F3F4F6;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -262,7 +262,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
     <!-- 건물 정보 -->
     <div class="sub-page" id="sp2">
       <!-- 건물 목록 관리 -->
-      <div class="layout-section" style="margin-bottom:12px">
+      <div class="layout-section" id="sp2-registry" style="margin-bottom:12px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <span style="font-size:14px;font-weight:800;color:var(--hdr)">🏢 임대 건물 목록</span>
           <button class="btn-add" onclick="openAddBldSheet()">+ 건물 추가</button>
@@ -270,6 +270,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
         <div id="bld-registry-list"></div>
       </div>
       <!-- 백업 / 복구 -->
+      <div id="sp2-backup">
       <div style="font-size:11px;font-weight:800;color:var(--sub);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">💾 백업 / 복구</div>
       <a href="backup.html" style="display:flex;align-items:center;gap:10px;background:#F0FDF4;border:1.5px solid #A7F3D0;border-radius:12px;padding:12px 14px;margin-bottom:8px;text-decoration:none">
         <span style="font-size:22px">💾</span>
@@ -279,7 +280,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
         </div>
         <span style="color:#A7F3D0;font-size:16px">›</span>
       </a>
-      <a href="restore.html" style="display:flex;align-items:center;gap:10px;background:#EFF6FF;border:1.5px solid #BAE6FD;border-radius:12px;padding:12px 14px;margin-bottom:14px;text-decoration:none">
+      <a href="restore.html" style="display:flex;align-items:center;gap:10px;background:#EFF6FF;border:1.5px solid #BAE6FD;border-radius:12px;padding:12px 14px;margin-bottom:8px;text-decoration:none">
         <span style="font-size:22px">🔄</span>
         <div style="flex:1">
           <div style="font-size:13px;font-weight:800;color:#0C4A6E">데이터 복구</div>
@@ -287,6 +288,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
         </div>
         <span style="color:#BAE6FD;font-size:16px">›</span>
       </a>
+      </div><!-- /sp2-backup -->
       <!-- 건물정보카드 -->
       <div class="bldg-hd-row">
         <span style="font-size:14px;font-weight:800;color:var(--hdr)">🏠 건물정보카드(메인화면 하단에 표시하는 건물정보카드입니다)</span>
@@ -304,13 +306,13 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <h3 id="edit-bld-sheet-title">🏢 건물 수정</h3>
       <button class="sheet-close" onclick="closeEditBldSheet()">✕</button>
     </div>
-    <div class="field">
+    <div class="field" id="edit-bld-name-field">
       <label>건물명 *</label>
       <input type="text" id="edit-bld-name" placeholder="조아빌, 행복한빌...">
     </div>
     <div style="font-size:11px;font-weight:800;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">호실 구조</div>
     <div style="background:#FFF7ED;border:1.5px solid #FCD34D;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#92400E;font-weight:600">⚠️ 저장 시 기존 호실 구조가 교체됩니다</div>
-    <div style="background:#F0F9FF;border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid #BAE6FD">
+    <div id="edit-gen-box" style="background:#F0F9FF;border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid #BAE6FD">
       <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">빠른 자동 생성</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
         <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">시작 층</div><input class="gen-inp" type="number" id="edit-gen-from" value="2" min="1" max="30"></div>
@@ -1020,16 +1022,39 @@ const CM_DATA={
   'sub-tabs':{title:'관리 메뉴 탭',body:'<b>전화번호부·계약서·건물정보</b> 탭으로 전환합니다.'},
   'sp0':{title:'전화번호부',body:'세입자·업체 연락처를 저장합니다.<br>우측 <b>+ 추가</b> 버튼으로 새 연락처를 등록하세요.'},
   'sp1':{title:'계약서 사진 관리',body:'세대별 계약서 사진을 보관합니다.<br>세대 입력 화면에서 사진을 업로드할 수 있습니다.'},
-  'sp2':{title:'건물정보 / 백업',body:'건물 이름·현관 비밀번호·관리비 계좌를 관리합니다.<br>하단에서 <b>백업 내보내기·데이터 복구</b>로 이동할 수 있습니다.'}
+  'sp2-registry':{title:'임대 건물 목록',body:'관리 중인 건물을 추가·수정·삭제합니다.<br>✏️ 버튼으로 건물명과 <b>호실 구조</b>를 수정할 수 있습니다.'},
+  'sp2-backup':{title:'백업 / 복구',body:'세대·지출 데이터를 CSV·JSON으로 내보내거나<br>백업 파일로 데이터를 복구합니다.'},
+  'edit-bld-name-field':{title:'건물명 입력',body:'관리할 건물의 이름을 입력합니다.'},
+  'edit-gen-box':{title:'호실 자동 생성',body:'시작층·끝층·층당 호실 수를 입력하고 ⚡ 자동 생성을 탭합니다.<br>예: 2~4층, 층당 6호실 → 201~206, 301~306, 401~406'},
+  'edit-floor-rows':{title:'호실 구조 편집',body:'각 층의 호실 번호를 쉼표로 직접 입력합니다.<br>✕ 버튼으로 층 삭제, <b>+ 층 추가</b>로 새 층을 추가합니다.'}
 };
 function openHelp(){
   const HDR=108,BTN=80,vh=window.innerHeight;
-  const defs=[
-    {key:'sub-tabs',el:document.querySelector('.sub-tabs')},
-    {key:'sp0',el:document.getElementById('sp0')},
-    {key:'sp1',el:document.getElementById('sp1')},
-    {key:'sp2',el:document.getElementById('sp2')},
-  ];
+  const editSheetOpen=document.getElementById('edit-bld-sheet').classList.contains('show');
+  let defs;
+  if(editSheetOpen){
+    defs=[
+      {key:'edit-bld-name-field',el:document.getElementById('edit-bld-name-field')},
+      {key:'edit-gen-box',el:document.getElementById('edit-gen-box')},
+      {key:'edit-floor-rows',el:document.getElementById('edit-floor-rows')},
+    ];
+  } else {
+    const activeId=document.querySelector('.sub-page.on')?.id;
+    if(activeId==='sp2'){
+      defs=[
+        {key:'sub-tabs',el:document.querySelector('.sub-tabs')},
+        {key:'sp2-registry',el:document.getElementById('sp2-registry')},
+        {key:'sp2-backup',el:document.getElementById('sp2-backup')},
+      ];
+    } else {
+      defs=[
+        {key:'sub-tabs',el:document.querySelector('.sub-tabs')},
+        {key:'sp0',el:document.getElementById('sp0')},
+        {key:'sp1',el:document.getElementById('sp1')},
+        {key:'sp2-registry',el:document.getElementById('sp2-registry')},
+      ];
+    }
+  }
   const vis=defs.filter(s=>{
     if(!s.el)return false;
     const r=s.el.getBoundingClientRect();

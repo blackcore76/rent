@@ -98,6 +98,18 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 /* TOAST */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1F2937;color:#fff;padding:11px 20px;border-radius:24px;font-size:14px;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);max-width:calc(100vw - 48px);text-align:center;line-height:1.6;box-shadow:0 4px 16px rgba(0,0,0,.3);pointer-events:none}
 #toast.show{transform:translateX(-50%) translateY(0)}
+/* ── COACH MARK ── */
+#cm-overlay{position:fixed;inset:0;background:transparent;z-index:800;display:none}
+#cm-overlay.show{display:block}
+#cm-marks{position:absolute;inset:0;pointer-events:none}
+.cm-mark{position:fixed;left:18px;right:18px;background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:13px 16px;border-left:5px solid #22C55E;box-shadow:0 6px 28px rgba(0,0,0,.35),0 1px 6px rgba(0,0,0,.2);pointer-events:none}
+.cm-mtitle{font-size:11px;font-weight:800;color:#4DD0E1;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px}
+.cm-mbody{font-size:13px;color:rgba(255,255,255,.88);line-height:1.68}
+.cm-mbody b{color:#7DD3FC}
+#cm-footer{position:fixed;bottom:0;left:0;right:0;padding:12px 24px 36px;display:flex;flex-direction:column;align-items:center;gap:5px}
+#cm-close{padding:12px 36px;background:rgba(255,255,255,.92);border:1.5px solid rgba(30,45,61,.15);border-radius:24px;font-size:14px;font-weight:700;color:#1E2D3D;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(0,0,0,.25);letter-spacing:-.2px}
+#cm-close:active{opacity:.7}
+#cm-hint{font-size:11px;color:#475569}
 /* RESET */
 .reset-link{display:block;text-align:center;margin-top:16px;font-size:12px;color:var(--hint);cursor:pointer;text-decoration:underline}
 </style>
@@ -125,7 +137,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
         </a>
       </div>
       <div class="hdr-actions">
-        <a class="guide-btn" href="guide.html">❓ 도움말</a>
+        <button class="guide-btn" onclick="openHelp()">❓ 도움말</button>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
     </div>
@@ -203,6 +215,15 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- COACH MARK OVERLAY -->
+<div id="cm-overlay" onclick="closeHelp()">
+  <div id="cm-marks"></div>
+  <div id="cm-footer">
+    <button id="cm-close" onclick="closeHelp()">✕ 닫기</button>
+    <span id="cm-hint">아무 곳이나 탭해도 닫힙니다</span>
+  </div>
+</div>
 
 <script>
 const FC={apiKey:"AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",authDomain:"rent-4d521.firebaseapp.com",databaseURL:"https://rent-4d521-default-rtdb.firebaseio.com",projectId:"rent-4d521",storageBucket:"rent-4d521.firebasestorage.app",messagingSenderId:"922087443394",appId:"1:922087443394:web:ff78188fc5ab967287645b"};
@@ -429,6 +450,50 @@ function resetAll(){
 }
 
 function fmtN(n){return(n||0).toLocaleString("ko-KR")}
+
+// ── COACH MARK HELP ──
+const CM_DATA={
+  'drop-zone':{title:'JSON 파일 업로드',body:'백업에서 내보낸 <b>세대 JSON</b> 또는 <b>수지 JSON</b> 파일을 선택합니다.<br>파일 유형은 자동으로 감지됩니다.'},
+  'preview-card':{title:'복구 설정',body:'파일 내용을 미리 확인하고 적용 방식을 선택합니다.<br><b>병합</b>: 기존 데이터 유지 후 추가 / <b>전체 교체</b>: 기존 삭제 후 교체'}
+};
+function openHelp(){
+  const HDR=108,BTN=80,vh=window.innerHeight;
+  const defs=[
+    {key:'drop-zone',el:document.getElementById('drop-zone')},
+    {key:'preview-card',el:document.getElementById('preview-card')},
+  ];
+  const vis=defs.filter(s=>{
+    if(!s.el)return false;
+    const r=s.el.getBoundingClientRect();
+    if(!r.height)return false;
+    const h=Math.min(r.bottom,vh-BTN)-Math.max(r.top,HDR);
+    return h>0&&h/r.height>=0.5;
+  });
+  if(!vis.length)vis.push(defs[0]);
+  const wrap=document.getElementById('cm-marks');
+  wrap.innerHTML='';
+  vis.forEach(s=>{
+    const d=CM_DATA[s.key];if(!d)return;
+    const r=s.el.getBoundingClientRect();
+    const mark=document.createElement('div');
+    mark.className='cm-mark';
+    mark.style.top=Math.max(r.top+10,HDR+8)+'px';
+    mark.innerHTML=`<div class="cm-mtitle">${d.title}</div><div class="cm-mbody">${d.body}</div>`;
+    wrap.appendChild(mark);
+  });
+  document.getElementById('cm-overlay').classList.add('show');
+  requestAnimationFrame(()=>{
+    let floor=HDR+8;
+    wrap.querySelectorAll('.cm-mark').forEach(m=>{
+      let top=parseFloat(m.style.top);
+      if(top<floor)top=floor;
+      m.style.top=top+'px';
+      floor=top+m.getBoundingClientRect().height+10;
+    });
+  });
+}
+function closeHelp(){document.getElementById('cm-overlay').classList.remove('show')}
+
 let _toastTimer;
 function showToast(msg){
   const t=document.getElementById("toast");

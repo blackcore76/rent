@@ -78,9 +78,9 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .rc-rent{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:4px}
 .rc-memo{font-size:11px;color:var(--hint);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rc-paid{font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;display:inline-block}
-.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:none;align-items:flex-end;justify-content:center;padding-top:56px;overflow:hidden}
+.sheet-bg{position:fixed;top:100px;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:500;display:none;align-items:flex-end;justify-content:center;overflow:hidden}
 .sheet-bg.show{display:flex}
-.sheet{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 36px;width:100%;max-width:540px;box-shadow:0 -4px 32px rgba(0,0,0,.2);max-height:calc(100vh - 60px);max-height:calc(100dvh - 60px);overflow-y:auto;overscroll-behavior:contain}
+.sheet{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 36px;width:100%;max-width:540px;box-shadow:0 -4px 32px rgba(0,0,0,.2);max-height:calc(100vh - 100px);max-height:calc(100dvh - 100px);overflow-y:auto;overscroll-behavior:contain}
 .sheet-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
 .sheet-hd h3{font-size:17px;font-weight:900;color:var(--hdr)}
 .sheet-close{width:32px;height:32px;border:none;background:#F3F4F6;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -275,6 +275,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <button class="sheet-close" onclick="closeSheet()">✕</button>
     </div>
     <input type="hidden" id="m-room">
+    <div id="m-sect-tg">
     <div class="tg-label">임대 구조</div>
     <div class="toggle-group">
       <button class="tg-btn on-rtype" id="tg-oneroom" onclick="setRoomType('oneroom')">원룸</button>
@@ -298,6 +299,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
         </div>
       </div>
     </div>
+    </div><!-- /m-sect-tg -->
     <div class="divider"></div>
     <div class="section-label">👤 임차인 ①</div>
     <div class="field-row">
@@ -319,14 +321,14 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <div class="field"><label>계약 시작일</label><input type="date" id="m-start"></div>
       <div class="field"><label>계약 종료일</label><input type="date" id="m-end"></div>
     </div>
-    <div style="margin-top:10px">
+    <div id="m-sect-chg" style="margin-top:10px">
       <button class="upload-btn" onclick="openRentChangeSheet()" style="border-style:solid;border-color:#C7D2FE;color:var(--indigo);background:#F5F3FF;font-size:13px">📋 임대 조건 변경 기록하기</button>
       <div class="rc-chg-wrap" id="rc-chg-list"></div>
     </div>
     <div class="field"><label>특이사항 메모</label><textarea id="m-memo" rows="2" placeholder="수리 요청, 계약 관련 특이사항 등..."></textarea></div>
     <div class="divider"></div>
     <div class="section-label">📅 월세 납부 이력 <span style="font-size:10px;font-weight:400;color:var(--hint);margin-left:4px">최근 12개월</span></div>
-    <div class="rent-hist-wrap">
+    <div class="rent-hist-wrap" id="m-sect-hist">
       <div class="rent-hist-grid" id="rent-hist-grid"></div>
       <div class="rh-legend"><span>✅ 완납</span><span>❌ 미납</span><span>🔶 부분납부</span><span style="opacity:.5">— 기록없음</span></div>
     </div>
@@ -335,7 +337,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
     <div class="photo-grid" id="photo-grid"></div>
     <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="onPhotos(event)">
     <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none" onchange="onPhotos(event)">
-    <div class="photo-btn-row">
+    <div class="photo-btn-row" id="m-sect-photo">
       <button class="upload-btn" id="upload-btn" onclick="document.getElementById('photo-input').click()">📁 사진 추가<br><span style="font-size:10px;opacity:.7">(계약서, 신분증 등)</span></button>
       <button class="upload-btn camera-btn" id="camera-btn" onclick="document.getElementById('camera-input').click()">📸 카메라 촬영<br><span style="font-size:10px;opacity:.7">(바로 찍기)</span></button>
     </div>
@@ -1016,17 +1018,28 @@ function exportCSV(){
 // ── COACH MARK HELP ──
 const CM_DATA={
   'floor-tabs':{title:'층별 · 유형 필터',body:'층 번호 또는 <b>원룸·투룸</b> 등 구조로 세대를 필터링합니다.<br>탭을 탭하면 해당 조건의 세대만 표시됩니다.'},
-  'rooms-grid':{title:'세대 카드 목록',body:'각 카드를 탭하면 <b>세대 입력 화면</b>이 열립니다.<br>임대중·공실·납부 여부가 색상으로 구분됩니다.<br>우상단 <b>건물명</b>을 탭하면 건물을 전환할 수 있습니다.'}
+  'rooms-grid':{title:'세대 카드 목록',body:'각 카드를 탭하면 <b>세대 입력 화면</b>이 열립니다.<br>임대중·공실·납부 여부가 색상으로 구분됩니다.<br>우상단 <b>건물명</b>을 탭하면 건물을 전환할 수 있습니다.'},
+  'sheet-tg':{title:'임대 구조 · 상태 · 형태',body:'<b>원룸·투베이·투룸·쓰리룸</b> 구조와 임대중·공실 상태,<br>월세·전세 임대 형태를 선택합니다.'},
+  'sheet-chg':{title:'임대조건 변경 기록',body:'보증금·월세 변경 시 이력을 남깁니다.<br>변경 사유와 날짜가 기록되어 계약 이력 추적이 쉬워집니다.'},
+  'sheet-hist':{title:'월세 납부 이력',body:'최근 12개월 납부 현황을 확인합니다.<br>각 월 셀을 탭하면 <b>완납·미납·부분납부</b>를 기록할 수 있습니다.'},
+  'sheet-photo':{title:'계약서 사진',body:'계약서·신분증 등을 사진으로 보관합니다.<br>📁 사진 추가 또는 📸 카메라로 바로 촬영하여 저장하세요.'}
 };
 function openHelp(){
   const HDR=108,BTN=80,vh=window.innerHeight;
-  const defs=[
+  const sheetOpen=document.getElementById('room-sheet').classList.contains('show');
+  const defs=sheetOpen?[
+    {key:'sheet-tg',el:document.getElementById('m-sect-tg')},
+    {key:'sheet-chg',el:document.getElementById('m-sect-chg')},
+    {key:'sheet-hist',el:document.getElementById('m-sect-hist')},
+    {key:'sheet-photo',el:document.getElementById('m-sect-photo')},
+  ]:[
     {key:'floor-tabs',el:document.getElementById('floor-tabs')},
     {key:'rooms-grid',el:document.getElementById('rooms-grid')},
   ];
   const vis=defs.filter(s=>{
     if(!s.el)return false;
     const r=s.el.getBoundingClientRect();
+    if(!r.height)return false;
     const h=Math.min(r.bottom,vh-BTN)-Math.max(r.top,HDR);
     return h>0&&h/r.height>=0.5;
   });
