@@ -46,7 +46,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .um-email{font-size:12px;color:var(--hint);margin-bottom:12px;word-break:break-all}
 .logout-btn{width:100%;padding:9px;background:var(--red-lt);color:var(--red);border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
 .content{margin-top:100px;padding:14px;min-height:calc(100vh - 100px)}
-.floor-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.floor-tabs{display:flex;gap:4px;flex-wrap:wrap}
 .tabs-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .floor-tabs-wrap{margin-bottom:14px}
 .export-btn{padding:7px 12px;border-radius:8px;border:2px solid var(--border);font-size:12px;font-weight:600;cursor:default;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;flex-shrink:0}
@@ -433,8 +433,7 @@ function applyLayout(layout){
 }
 function renderFloorTabs(){
   const el=document.getElementById("floor-tabs");if(!el)return;
-  el.innerHTML=`<button class="floor-tab ${curFloor===0?"on":""}" onclick="setFloor(0,this)">전층보기</button>`+
-    FLOORS.map(f=>`<button class="floor-tab ${curFloor===f?"on":""}" onclick="setFloor(${f},this)">${f}층</button>`).join("");
+  el.innerHTML=FLOORS.map(f=>`<button class="floor-tab ${curFloor===f?"on":""}" onclick="setFloor(${f},this)">${f}층</button>`).join("");
 }
 
 function enterDemoMode(){
@@ -720,6 +719,7 @@ function setFloor(f,btn){
 }
 function setStatusFilter(val){
   curFilter=val;
+  if(!val){curFloor=0;document.querySelectorAll(".floor-tab").forEach(b=>b.classList.remove("on"));}
   document.querySelectorAll(".status-tab").forEach(b=>b.classList.toggle("on",b.dataset.status===val));
   document.getElementById("filter-banner").style.display="none";
   history.replaceState({},"",location.pathname);
