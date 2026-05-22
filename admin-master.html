@@ -378,22 +378,25 @@ function renderUsersPage(){
   el.innerHTML=ucTotalList.slice(start,start+10).map((u,i)=>{
     const isV=viewingUid===u.uid;
     const pm=allUsersData[u.uid]?.memo||"";
+    const googleName=allUsersData[u.uid]?.displayName||"";
+    const showName=googleName||u.name;
+    const alias=(googleName&&googleName!==u.name)?u.name:"";
     const memoHtml=pm
       ?(pm.length<=25
         ?`<div class="uc-pending-memo">💬 ${esc(pm)}</div>`
         :`<details class="uc-memo-details"><summary class="uc-memo-summary">💬 ${esc(pm.slice(0,25))}…</summary><div class="uc-memo-full">${esc(pm)}</div></details>`)
       :"";
     return`<div class="user-card${isV?" active":""}" id="uc-${esc(u.uid)}">
-      <div class="uc-top"><div class="uc-name">${esc(u.name)}</div><div class="uc-num">#${start+i+1}</div></div>
+      <div class="uc-top"><div class="uc-name">${esc(showName)}${alias?`<span style="font-size:11px;color:var(--sub);font-weight:400;margin-left:6px">(${esc(alias)})</span>`:""}</div><div class="uc-num">#${start+i+1}</div></div>
       ${memoHtml}
       ${u.memo&&u.memo!==pm?`<div class="uc-desc">📝 ${esc(u.memo)}</div>`:""}
       <div class="uc-uid">${esc(u.uid)}</div>
       <div class="uc-actions">
-        <button class="uc-btn btn-main" onclick="quickGo('${esc(u.uid)}','${esc(u.name)}','index')">📊 메인</button>
-        <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(u.name)}','units')">🏠 세대</button>
-        <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(u.name)}','expense')" style="background:rgba(124,58,237,.12);color:#7C3AED;border:1px solid rgba(124,58,237,.25)">💸 지출</button>
-        <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(u.name)}','admin')" style="background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.25)">🗂 관리</button>
-        <div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 🗑</div><button class="uc-btn btn-del" style="width:100%" onclick="delUser('${esc(u.uid)}','${esc(u.name)}')">🗑</button></div>
+        <button class="uc-btn btn-main" onclick="quickGo('${esc(u.uid)}','${esc(showName)}','index')">📊 메인</button>
+        <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(showName)}','units')">🏠 세대</button>
+        <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(showName)}','expense')" style="background:rgba(124,58,237,.12);color:#7C3AED;border:1px solid rgba(124,58,237,.25)">💸 지출</button>
+        <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(showName)}','admin')" style="background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.25)">🗂 관리</button>
+        <div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 🗑</div><button class="uc-btn btn-del" style="width:100%" onclick="delUser('${esc(u.uid)}','${esc(showName)}')">🗑</button></div>
       </div>
     </div>`;
   }).join("");
