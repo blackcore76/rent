@@ -29,7 +29,7 @@
   --sky:#0EA5E9;--radius:14px;--shadow:0 2px 12px rgba(0,0,0,.08)
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--text);overscroll-behavior:none}
+html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--text)}
 .hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,var(--hdr),var(--hdr2));box-shadow:0 3px 16px rgba(0,0,0,.25);padding:0 16px}
 .hdr-top{display:flex;align-items:center;justify-content:space-between;height:52px}
 .hdr-title{font-size:18px;font-weight:900;color:#fff;letter-spacing:-.5px}
@@ -673,7 +673,7 @@ function saveNewBld(){
     .catch(()=>showToast("❗ 저장 실패"));
 }
 let editBid=null,editRoomLayout={};
-async function openEditBldSheet(bid){
+async function openEditBldSheet(bid){document.body.style.overscrollBehavior='none';
   if(!guardWrite())return;
   editBid=bid;
   document.getElementById("edit-bld-name").value=bldgsData[bid]?.name||"";
@@ -686,7 +686,7 @@ async function openEditBldSheet(bid){
   editRoomLayout=snap.val()||{};
   renderEditFloorRows();
 }
-function closeEditBldSheet(){document.getElementById("edit-bld-sheet").classList.remove("show")}
+function closeEditBldSheet(){document.getElementById("edit-bld-sheet").classList.remove("show");document.body.style.overscrollBehavior='auto';}
 function renderEditFloorRows(){
   const el=document.getElementById("edit-floor-rows");if(!el)return;
   const floors=Object.keys(editRoomLayout).map(Number).sort((a,b)=>a-b);
