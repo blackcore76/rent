@@ -405,15 +405,8 @@ function listenRentData(){
   if(!_tUid)return;
   if(rhL&&rhRef)rhRef.off("value",rhL);
   if(auL&&auRef)auRef.off("value",auL);
-  const rhPath=`rent_app/${_tUid}/${curBid}/rent_history`;
-  const auPath=`rent_app/${_tUid}/${curBid}/units`;
-  console.log('[expense] listenRentData paths:', rhPath, auPath);
-  rhRef=db.ref(rhPath);
-  rhL=rhRef.on("value",snap=>{
-    rentHistData=snap.val()||{};
-    console.log('[expense] rentHistData keys:', Object.keys(rentHistData), 'filterMonth:', filterMonth);
-    renderFeed();
-  });
+  rhRef=db.ref(`rent_app/${_tUid}/${curBid}/rent_history`);
+  rhL=rhRef.on("value",snap=>{rentHistData=snap.val()||{};renderFeed();});
   auRef=db.ref(auPath);
   auL=auRef.on("value",snap=>{unitsData=snap.val()||{};renderFeed();});
 }
@@ -425,7 +418,6 @@ function getAutoRentItems(){
       const rec=roomH[filterMonth];
       if(!rec||(!rec.paid&&!rec.partial))return;
       const amt=rec.amount||(unitsData[roomId]?.monthlyRent||0)*10000;
-      console.log('[expense] autoItem:', roomId, filterMonth, 'paid:', rec.paid, 'partial:', rec.partial, 'amount:', rec.amount, 'amt:', amt);
       if(!amt)return;
       items.push({type:"income",category:"월세수입",amount:amt,
         memo:`${roomId}호 ${rec.paid?"완납":"부분납부"}`,
