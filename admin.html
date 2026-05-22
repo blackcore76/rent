@@ -732,9 +732,17 @@ async function saveEditBld(){
   });
   if(!Object.keys(nl).length){showToast("❗ 최소 1개 층 이상 설정하세요");return}
   const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
+  const oldRooms=Object.values(editRoomLayout).flat().map(String);
+  const newRooms=Object.values(nl).flat().map(String);
+  const deletedRooms=oldRooms.filter(r=>!newRooms.includes(r));
   try{
     await db.ref("rent_app/"+targetUid+"/_buildings/"+editBid+"/name").set(name);
     await db.ref(`rent_app/${targetUid}/${editBid}/config/roomLayout`).set(nl);
+    if(deletedRooms.length){
+      await Promise.all(deletedRooms.map(r=>
+        db.ref(`rent_app/${targetUid}/${editBid}/rent_history/${r}`).remove().catch(()=>{})
+      ));
+    }
     if(editBid===curBid){roomLayout=nl;ROOMS=Object.values(nl).flat().map(String);}
     closeEditBldSheet();showToast("✅ 저장됨");
     renderBldRegistry();
