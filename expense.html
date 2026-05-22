@@ -414,8 +414,9 @@ function getAutoRentItems(){
   if(viewMode==="monthly"){
     if(!filterMonth)return[];
     const items=[];
+    const unitsLoaded=Object.keys(unitsData).length>0;
     Object.entries(rentHistData).forEach(([roomId,roomH])=>{
-      if(!unitsData[roomId])return;
+      if(unitsLoaded&&!unitsData[roomId])return;
       const rec=roomH[filterMonth];
       if(!rec||(!rec.paid&&!rec.partial))return;
       const amt=rec.amount||(unitsData[roomId]?.monthlyRent||0)*10000;
@@ -427,8 +428,9 @@ function getAutoRentItems(){
     return items.sort((a,b)=>a.memo.localeCompare(b.memo,"ko",{numeric:true}));
   }
   const monthly={};
+  const unitsLoaded=Object.keys(unitsData).length>0;
   Object.entries(rentHistData).forEach(([roomId,roomH])=>{
-    if(!unitsData[roomId])return;
+    if(unitsLoaded&&!unitsData[roomId])return;
     Object.entries(roomH).forEach(([ym,rec])=>{
       if(!rec||(!rec.paid&&!rec.partial))return;
       if(viewMode==="yearly"&&filterYear&&!ym.startsWith(filterYear))return;
