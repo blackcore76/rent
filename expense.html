@@ -415,6 +415,7 @@ function getAutoRentItems(){
     if(!filterMonth)return[];
     const items=[];
     Object.entries(rentHistData).forEach(([roomId,roomH])=>{
+      if(!unitsData[roomId])return;
       const rec=roomH[filterMonth];
       if(!rec||(!rec.paid&&!rec.partial))return;
       const amt=rec.amount||(unitsData[roomId]?.monthlyRent||0)*10000;
@@ -427,6 +428,7 @@ function getAutoRentItems(){
   }
   const monthly={};
   Object.entries(rentHistData).forEach(([roomId,roomH])=>{
+    if(!unitsData[roomId])return;
     Object.entries(roomH).forEach(([ym,rec])=>{
       if(!rec||(!rec.paid&&!rec.partial))return;
       if(viewMode==="yearly"&&filterYear&&!ym.startsWith(filterYear))return;
