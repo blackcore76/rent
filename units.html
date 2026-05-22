@@ -265,7 +265,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <button class="export-btn" id="bld-name-label"></button>
     </div>
     <div class="status-tabs-row" id="status-tabs-row">
-      <button class="status-tab on" data-status="" onclick="setStatusFilter('')">전체</button>
+      <button class="status-tab on" data-status="" onclick="setStatusFilter('')">전체보기</button>
       <button class="status-tab" data-status="rented" onclick="setStatusFilter('rented')">임대중</button>
       <button class="status-tab" data-status="vacant" onclick="setStatusFilter('vacant')">공실</button>
     </div>
@@ -430,7 +430,7 @@ function applyLayout(layout){
 }
 function renderFloorTabs(){
   const el=document.getElementById("floor-tabs");if(!el)return;
-  el.innerHTML=`<button class="floor-tab ${curFloor===0?"on":""}" onclick="setFloor(0,this)">전체</button>`+
+  el.innerHTML=`<button class="floor-tab ${curFloor===0?"on":""}" onclick="setFloor(0,this)">전층보기</button>`+
     FLOORS.map(f=>`<button class="floor-tab ${curFloor===f?"on":""}" onclick="setFloor(${f},this)">${f}층</button>`).join("");
 }
 
