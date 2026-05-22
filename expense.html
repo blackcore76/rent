@@ -83,6 +83,8 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .tx-amt{font-size:15px;font-weight:900;white-space:nowrap;flex-shrink:0}
 .tx-amt.income{color:var(--green)}.tx-amt.expense{color:var(--red)}
 .tx-del{width:28px;height:28px;border:none;background:var(--red-lt);color:var(--red);border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tx-item.auto-rent{background:rgba(5,150,105,.04);border-left:3px solid var(--green)}
+.tx-auto-badge{font-size:10px;font-weight:700;background:var(--green-lt);color:var(--green-t);padding:1px 6px;border-radius:4px;flex-shrink:0}
 .pagination{display:flex;align-items:center;justify-content:center;gap:12px;padding:14px;margin-bottom:80px}
 .page-btn{padding:8px 16px;border-radius:8px;border:2px solid var(--border);background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--sub)}
 .page-btn:disabled{opacity:.4;cursor:not-allowed}
@@ -274,6 +276,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 <script>
 let cu=null,txRef=null,txL=null,allTx=[],curPage=1,filterMonth="",filterYear="",viewMode="monthly",mTT="income",readOnly=false;
 let curBid="main",bldgsData={},bldgsRef=null,bldgsL=null,mUid="",mName="";
+let rentHistData={},unitsData={},rhRef=null,rhL=null,auRef=null,auL=null,_tUid="";
 const PS=10;
 const CATS={income:["월세","관리비","보증금수입","기타수입"],expense:["수리비","청소비","보험료","세금/공과금","인건비","관리비지출","기타지출"]};
 
@@ -283,6 +286,7 @@ function enterDemoMode(){
   readOnly=true;sessionStorage.setItem("guestDemo","1");
   bldgsData=DEMO.bldgsData;curBid="main";
   allTx=[...DEMO.transactions].sort((a,b)=>b.date.localeCompare(a.date)||(b.id-a.id));
+  rentHistData=DEMO.rentHistory||{};unitsData=DEMO.units||{};
   document.getElementById("login-screen").style.display="none";
   document.getElementById("app").style.display="block";
   showDemoBanner();renderFeed();
@@ -340,18 +344,23 @@ auth.onAuthStateChanged(async user=>{
       if(bids.length&&!bldgsData[curBid]){curBid=bids[0];setCurBid(targetUid,curBid)}
     });
 
-    txRef=db.ref(`rent_app/${targetUid}/${curBid}/transactions`);listenTx();
+    _tUid=targetUid;
+    txRef=db.ref(`rent_app/${targetUid}/${curBid}/transactions`);listenTx();listenRentData();
   }else{
     if(sessionStorage.getItem("guestDemo")==="1"){enterDemoMode();return;}
     cu=null;app.style.display="none";ls.style.display="flex";
     if(txL&&txRef)txRef.off("value",txL);
     if(bldgsL&&bldgsRef)bldgsRef.off("value",bldgsL);
+    if(rhL&&rhRef)rhRef.off("value",rhL);
+    if(auL&&auRef)auRef.off("value",auL);
   }
 });
 function doSignOut(){
   closeMenu();
   if(txL&&txRef)txRef.off("value",txL);
   if(bldgsL&&bldgsRef)bldgsRef.off("value",bldgsL);
+  if(rhL&&rhRef)rhRef.off("value",rhL);
+  if(auL&&auRef)auRef.off("value",auL);
   auth.signOut();
 }
 
@@ -379,10 +388,11 @@ function switchBld(bid){
   if(txL&&txRef)txRef.off("value",txL);
   curBid=bid;
   const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
+  _tUid=targetUid;
   setCurBid(targetUid,bid);
-  allTx=[];
+  allTx=[];rentHistData={};unitsData={};
   txRef=db.ref(`rent_app/${targetUid}/${bid}/transactions`);
-  listenTx();updateBldLabel();
+  listenTx();listenRentData();updateBldLabel();
 }
 function listenTx(){
   txL=txRef.on("value",snap=>{
@@ -390,6 +400,46 @@ function listenTx(){
     if(viewMode==="yearly")buildYearSel();
     renderFeed();
   },()=>showToast("❗ 연결 오류"));
+}
+function listenRentData(){
+  if(!_tUid)return;
+  if(rhL&&rhRef)rhRef.off("value",rhL);
+  if(auL&&auRef)auRef.off("value",auL);
+  rhRef=db.ref(`rent_app/${_tUid}/${curBid}/rentHistory`);
+  rhL=rhRef.on("value",snap=>{rentHistData=snap.val()||{};renderFeed();});
+  auRef=db.ref(`rent_app/${_tUid}/${curBid}/units`);
+  auL=auRef.on("value",snap=>{unitsData=snap.val()||{};renderFeed();});
+}
+function getAutoRentItems(){
+  if(viewMode==="monthly"){
+    if(!filterMonth)return[];
+    const items=[];
+    Object.entries(rentHistData).forEach(([roomId,roomH])=>{
+      const rec=roomH[filterMonth];
+      if(!rec||(!rec.paid&&!rec.partial))return;
+      const amt=rec.amount||(unitsData[roomId]?.monthlyRent||0)*10000;
+      if(!amt)return;
+      items.push({type:"income",category:"월세수입",amount:amt,
+        memo:`${roomId}호 ${rec.paid?"완납":"부분납부"}`,
+        date:filterMonth+"-01",auto:true});
+    });
+    return items.sort((a,b)=>a.memo.localeCompare(b.memo,"ko",{numeric:true}));
+  }
+  const monthly={};
+  Object.entries(rentHistData).forEach(([roomId,roomH])=>{
+    Object.entries(roomH).forEach(([ym,rec])=>{
+      if(!rec||(!rec.paid&&!rec.partial))return;
+      if(viewMode==="yearly"&&filterYear&&!ym.startsWith(filterYear))return;
+      const amt=rec.amount||(unitsData[roomId]?.monthlyRent||0)*10000;
+      if(!amt)return;
+      monthly[ym]=(monthly[ym]||0)+amt;
+    });
+  });
+  return Object.entries(monthly)
+    .map(([ym,amt])=>({type:"income",category:"월세수입",amount:amt,
+      memo:`${ym.slice(0,4)}년 ${Number(ym.slice(5,7))}월 월세수입 합계`,
+      date:ym+"-01",auto:true}))
+    .sort((a,b)=>b.date.localeCompare(a.date));
 }
 function setViewMode(mode){
   viewMode=mode;curPage=1;
@@ -431,7 +481,15 @@ function updateBldLabel(){
 }
 function renderFeed(){
   updateBldLabel();
-  const list=getFiltered();
+  const manual=getFiltered();
+  const auto=getAutoRentItems();
+  const list=[...auto,...manual].sort((a,b)=>{
+    const dc=b.date.localeCompare(a.date);
+    if(dc!==0)return dc;
+    if(a.auto&&!b.auto)return -1;
+    if(!a.auto&&b.auto)return 1;
+    return(b.id||0)-(a.id||0);
+  });
   const inc=list.filter(t=>t.type==="income").reduce((a,t)=>a+(t.amount||0),0);
   const exc=list.filter(t=>t.type==="expense").reduce((a,t)=>a+(t.amount||0),0);
   const net=inc-exc;
@@ -449,14 +507,14 @@ function renderFeed(){
   const emptyMsg=viewMode==="monthly"?"이 달에 기록된 내역이 없어요":viewMode==="yearly"?"이 해에 기록된 내역이 없어요":"기록된 내역이 없어요";
   if(!total){fc.innerHTML=`<div class="empty-st"><div class="ei">💰</div><div class="et">${emptyMsg}<br>+ 버튼으로 추가해 보세요</div></div>`;document.getElementById("pagi").innerHTML="";return}
   fc.innerHTML=`<div class="card">${page.map(t=>`
-    <div class="tx-item">
-      <div class="tx-icon ${t.type}">${t.type==="income"?"📈":"📉"}</div>
+    <div class="tx-item${t.auto?" auto-rent":""}">
+      <div class="tx-icon ${t.type}">${t.auto?"🏠":t.type==="income"?"📈":"📉"}</div>
       <div class="tx-body">
-        <div class="tx-top"><span class="tx-cat">${esc(t.category||"기타")}</span><span class="tx-date">${fmtD(t.date)}</span></div>
+        <div class="tx-top"><span class="tx-cat">${esc(t.category||"기타")}</span>${t.auto?'<span class="tx-auto-badge">자동</span>':""}<span class="tx-date">${fmtD(t.date)}</span></div>
         <div class="tx-memo">${esc(t.memo)||"메모 없음"}</div>
       </div>
       <span class="tx-amt ${t.type}">${t.type==="income"?"+":"−"}₩${fmtN(t.amount)}</span>
-      <button class="tx-del" onclick="delTx(${t.id})">✕</button>
+      ${t.auto?"":` <button class="tx-del" onclick="delTx(${t.id})">✕</button>`}
     </div>`).join("")}</div>`;
   document.getElementById("pagi").innerHTML=`
     <button class="page-btn" onclick="goPage(${curPage-1})" ${curPage<=1?"disabled":""}>◀</button>
