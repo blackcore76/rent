@@ -405,7 +405,7 @@ function listenRentData(){
   if(!_tUid)return;
   if(rhL&&rhRef)rhRef.off("value",rhL);
   if(auL&&auRef)auRef.off("value",auL);
-  const rhPath=`rent_app/${_tUid}/${curBid}/rentHistory`;
+  const rhPath=`rent_app/${_tUid}/${curBid}/rent_history`;
   const auPath=`rent_app/${_tUid}/${curBid}/units`;
   console.log('[expense] listenRentData paths:', rhPath, auPath);
   rhRef=db.ref(rhPath);
