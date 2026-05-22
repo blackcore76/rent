@@ -16,7 +16,9 @@
       "PowerShell(pip install *)",
       "Bash(git commit *)",
       "Bash(manifest)",
-      "Bash(sw\")"
+      "Bash(sw\")",
+      "Bash(Get-ChildItem \"C:\\\\Users\\\\BlackCore\\\\dropbox\\\\github.pages\\\\rent\" -Filter \"admin.html\")",
+      "Bash(Select-Object Name, LastWriteTime)"
     ]
   }
 }
