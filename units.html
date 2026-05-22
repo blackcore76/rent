@@ -1052,7 +1052,7 @@ function openHelp(){
     {key:'sheet-tg',el:document.getElementById('m-sect-tg')},
     {key:'sheet-chg',el:document.getElementById('m-sect-chg')},
     {key:'sheet-hist',el:document.getElementById('m-sect-hist')},
-    {key:'sheet-photo',el:document.getElementById('m-sect-photo')},
+    {key:'sheet-photo',el:document.getElementById('m-sect-photo'),topOffset:-44},
   ]:[
     {key:'floor-tabs',el:document.getElementById('floor-tabs')},
     {key:'rooms-grid',el:document.getElementById('rooms-grid')},
@@ -1072,7 +1072,7 @@ function openHelp(){
     const r=s.el.getBoundingClientRect();
     const mark=document.createElement('div');
     mark.className='cm-mark';
-    mark.style.top=Math.max(r.top+10,HDR+8)+'px';
+    mark.style.top=Math.max(r.top+10+(s.topOffset||0),HDR+8)+'px';
     mark.innerHTML=`<div class="cm-mtitle">${d.title}</div><div class="cm-mbody">${d.body}</div>`;
     wrap.appendChild(mark);
   });
