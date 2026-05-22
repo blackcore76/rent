@@ -60,6 +60,11 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .tg-btn.on-rtype{background:var(--sky);color:#fff}
 .floor-tab{padding:6px 14px;border-radius:20px;border:2px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;transition:all .15s}
 .floor-tab.on{background:var(--hdr);color:#fff;border-color:var(--hdr)}
+.status-tabs-row{display:flex;gap:6px;margin-bottom:10px}
+.status-tab{padding:5px 14px;border-radius:20px;border:2px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;transition:all .15s}
+.status-tab.on{background:var(--hdr);color:#fff;border-color:var(--hdr)}
+.status-tab[data-status="rented"].on{background:var(--blue-t);border-color:var(--blue-t)}
+.status-tab[data-status="vacant"].on{background:#6366F1;border-color:#6366F1}
 .rooms-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 @media(min-width:600px){.rooms-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .room-card{background:var(--card);border-radius:var(--radius);padding:14px 12px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s;border:2px solid transparent;min-width:0;overflow:hidden}
@@ -258,6 +263,11 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
         <!-- 동적 생성 -->
       </div>
       <button class="export-btn" id="bld-name-label"></button>
+    </div>
+    <div class="status-tabs-row" id="status-tabs-row">
+      <button class="status-tab on" data-status="" onclick="setStatusFilter('')">전체</button>
+      <button class="status-tab" data-status="rented" onclick="setStatusFilter('rented')">임대중</button>
+      <button class="status-tab" data-status="vacant" onclick="setStatusFilter('vacant')">공실</button>
     </div>
     <div id="filter-banner" style="display:none" class="filter-banner">
       <span id="filter-banner-txt"></span>
@@ -578,10 +588,14 @@ function tryOpenURLParam(){
   const params=new URLSearchParams(location.search);
   const room=params.get("room"),filter=params.get("filter");
   if(filter){
-    curFilter=filter;
-    const labels={rented:"임대중만 보기",vacant:"공실만 보기",unpaid:"미납 세대만 보기"};
-    document.getElementById("filter-banner-txt").textContent="🔍 "+(labels[filter]||filter);
-    document.getElementById("filter-banner").style.display="flex";renderGrid();
+    if(filter==="rented"||filter==="vacant"){
+      setStatusFilter(filter);
+    } else {
+      curFilter=filter;
+      const labels={unpaid:"미납 세대만 보기"};
+      document.getElementById("filter-banner-txt").textContent="🔍 "+(labels[filter]||filter);
+      document.getElementById("filter-banner").style.display="flex";renderGrid();
+    }
   }
   if(room&&units[room])openSheet(room);
 }
@@ -700,6 +714,13 @@ function defRoom(r){return{room:String(r),floor:Math.floor(parseInt(r)/100),stat
 function setFloor(f,btn){
   curFloor=f;document.querySelectorAll(".floor-tab").forEach(b=>b.classList.remove("on"));
   btn.classList.add("on");renderGrid();
+}
+function setStatusFilter(val){
+  curFilter=val;
+  document.querySelectorAll(".status-tab").forEach(b=>b.classList.toggle("on",b.dataset.status===val));
+  document.getElementById("filter-banner").style.display="none";
+  history.replaceState({},"",location.pathname);
+  renderGrid();
 }
 function computePaidStatus(roomId){
   const recs=Object.values(rentHistory[roomId]||{});
@@ -977,7 +998,7 @@ function showCM(title,msg,cb){
 }
 function closeCM(){document.getElementById("confirm-modal").classList.remove("show")}
 function truncate(s,n){return s&&s.length>n?s.slice(0,n)+"…":s||""}
-function clearFilter(){curFilter="";document.getElementById("filter-banner").style.display="none";history.replaceState({},"",location.pathname);renderGrid()}
+function clearFilter(){curFilter="";document.getElementById("filter-banner").style.display="none";document.querySelectorAll(".status-tab").forEach(b=>b.classList.toggle("on",b.dataset.status===""));history.replaceState({},"",location.pathname);renderGrid()}
 function fmtDate(){const d=new Date();return`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`}
 function exportJSON(){
   const data={
