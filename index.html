@@ -16,6 +16,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="shared.js?v=2"></script>
 <script src="demo-data.js?v=2"></script>
+<script src="db-paths.js"></script>
 <style>
 :root{
   --bg:#F0F4F8;--card:#fff;--border:#E2E8F0;
@@ -343,12 +344,12 @@ auth.onAuthStateChanged(async user=>{
 
     // Notes for current building
     if(nL&&nRef)nRef.off("value",nL);
-    nRef=db.ref("rent_app/"+targetUid+"/"+curBid+"/notes");
+    nRef=db.ref(`${DBPath.bldData(targetUid, curBid)}/notes`);
     nL=nRef.on("value",snap=>{notes=snap.val()||{};renderNotes()});
 
     // Building registry listener
     if(bldgsL&&bldgsRef)bldgsRef.off("value",bldgsL);
-    bldgsRef=db.ref("rent_app/"+targetUid+"/_buildings");
+    bldgsRef=db.ref(DBPath.bldList(targetUid));
     bldgsL=bldgsRef.on("value",snap=>{
       bldgsData=snap.val()||{};
       const bids=sortedBids(bldgsData);
@@ -373,7 +374,7 @@ function schedRenderBldCards(){clearTimeout(_rbTm);_rbTm=setTimeout(renderBldCar
 function setupBldListeners(uid,bid){
   if(bldListeners[bid])return;
   if(!allBldData[bid])allBldData[bid]={};
-  const base=db.ref("rent_app/"+uid+"/"+bid);
+  const base=db.ref(DBPath.bldData(uid, bid));
   const uRef=base.child("units"),hRef=base.child("rent_history"),biRef=base.child("buildings"),rlRef=base.child("config/roomLayout");
   const uL=uRef.on("value",snap=>{allBldData[bid].units=snap.val()||{};schedRenderDash();setSS("ok")},()=>setSS("err"));
   const hL=hRef.on("value",snap=>{allBldData[bid].history=snap.val()||{};schedRenderDash()});

@@ -13,6 +13,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="db-paths.js"></script>
 <style>
 :root{
   --bg:#F0F4F8;--card:#fff;--border:#E2E8F0;--text:#1E293B;--sub:#64748B;--hint:#94A3B8;
@@ -252,7 +253,7 @@ auth.onAuthStateChanged(user=>{
     const targetUid=(user.uid===MASTER_UID&&mUid)?mUid:user.uid;
     curBid=getCurBid(targetUid);
     // Load building name
-    bldgsRef=db.ref("rent_app/"+targetUid+"/_buildings");
+    bldgsRef=db.ref(DBPath.bldList(targetUid));
     bldgsL=bldgsRef.on("value",snap=>{
       bldgsData=snap.val()||{};
       const bids=sortedBids(bldgsData);
@@ -392,7 +393,7 @@ async function applyRestore(){
 }
 
 async function applyUnits(uid,fill,msg){
-  const base=`rent_app/${uid}/${curBid}`;
+  const base=DBPath.bldData(uid, curBid);
   // Convert units array → object keyed by room
   const unitsObj={};
   (parsedData.units||[]).forEach(u=>{if(u&&u.room)unitsObj[u.room]=u});
@@ -420,7 +421,7 @@ async function applyUnits(uid,fill,msg){
 }
 
 async function applyExpense(uid,fill,msg){
-  const base=`rent_app/${uid}/${curBid}/transactions`;
+  const base=DBPath.transactions(uid, curBid);
   const txObj={};
   (parsedData||[]).forEach(t=>{if(t&&t.id)txObj[String(t.id)]=t});
   msg.textContent="수지 데이터 저장 중…";fill.style.width="40%";

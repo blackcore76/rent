@@ -17,6 +17,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script src="shared.js?v=2"></script>
 <script src="demo-data.js?v=2"></script>
+<script src="db-paths.js"></script>
 <style>
 :root{
   --bg:#F0F4F8;--card:#fff;--border:#E2E8F0;--text:#1E293B;--sub:#64748B;--hint:#94A3B8;
@@ -495,16 +496,16 @@ auth.onAuthStateChanged(async user=>{
     ls.style.display="none";app.style.display="block";
 
     // Load building registry for switcher
-    bldgsRef=db.ref("rent_app/"+targetUid+"/_buildings");
+    bldgsRef=db.ref(DBPath.bldList(targetUid));
     bldgsL=bldgsRef.on("value",snap=>{
       bldgsData=snap.val()||{};
       const bids=sortedBids(bldgsData);
       if(bids.length&&!bldgsData[curBid]){curBid=bids[0];setCurBid(targetUid,curBid)}
     });
 
-    configRef=db.ref(`rent_app/${targetUid}/${curBid}/config/roomLayout`);
-    uRef=db.ref(`rent_app/${targetUid}/${curBid}/units`);
-    hRef=db.ref(`rent_app/${targetUid}/${curBid}/rent_history`);
+    configRef=db.ref(DBPath.roomLayout(targetUid, curBid));
+    uRef=db.ref(DBPath.units(targetUid, curBid));
+    hRef=db.ref(DBPath.rentHistory(targetUid, curBid));
     configRef.once("value").then(snap=>{
       applyLayout(snap.val()||DEFAULT_LAYOUT);
       listenUnits();listenHistory();
@@ -553,9 +554,9 @@ function switchBld(bid){
   setCurBid(targetUid,bid);
   units={};rentHistory={};ROOMS=[];FLOORS=[];curFloor=0;
   _unitsReady=false;_historyReady=false;
-  configRef=db.ref(`rent_app/${targetUid}/${bid}/config/roomLayout`);
-  uRef=db.ref(`rent_app/${targetUid}/${bid}/units`);
-  hRef=db.ref(`rent_app/${targetUid}/${bid}/rent_history`);
+  configRef=db.ref(DBPath.roomLayout(targetUid, bid));
+  uRef=db.ref(DBPath.units(targetUid, bid));
+  hRef=db.ref(DBPath.rentHistory(targetUid, bid));
   configRef.once("value").then(snap=>{applyLayout(snap.val()||DEFAULT_LAYOUT);listenUnits();listenHistory();})
     .catch(()=>{applyLayout(DEFAULT_LAYOUT);listenUnits();listenHistory();});
   renderGrid();
@@ -856,7 +857,7 @@ async function saveRentChange(){
     saves.forEach(({id,data})=>{mpath[`${_chgRoomId}/rentChanges/${id}`]=data;});
     if(depFilled) mpath[`${_chgRoomId}/depositAmount`]=parseInt(depNewStr);
     if(monFilled) mpath[`${_chgRoomId}/monthlyRent`]=parseInt(monNewStr);
-    await db.ref(`rent_app/${targetUid}/${curBid}/units`).update(mpath);
+    await db.ref(DBPath.units(targetUid, curBid)).update(mpath);
     if(!units[_chgRoomId])units[_chgRoomId]={};
     if(!units[_chgRoomId].rentChanges)units[_chgRoomId].rentChanges={};
     saves.forEach(({id,data})=>{units[_chgRoomId].rentChanges[id]=data;});
@@ -876,7 +877,7 @@ function deleteRentChange(roomId,id){
   showCM("변동 이력 삭제","이 변동 이력을 삭제하시겠습니까?",async()=>{
     try{
       const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
-      await db.ref(`rent_app/${targetUid}/${curBid}/units/${roomId}/rentChanges/${id}`).remove();
+      await db.ref(DBPath.rentChanges(targetUid, curBid, roomId, id)).remove();
       if(units[roomId]?.rentChanges)delete units[roomId].rentChanges[id];
       showToast("🗑 삭제됨");renderRentChanges(roomId);
     }catch(e){showToast("❗ 실패");}
@@ -973,7 +974,7 @@ async function onPhotos(e){
       fill.style.width="100%";pct.textContent=`${label}완료!`;
       const pid=String(ts+(i*10));
       const targetUid=(cu.uid===MASTER_UID&&mUid)?mUid:cu.uid;
-      await db.ref(`rent_app/${targetUid}/${curBid}/units/${curRoom}/photos/${pid}`).set({id:pid,url,storagePath:path,uploadedAt:new Date().toISOString()});
+      await db.ref(DBPath.unitPhoto(targetUid, curBid, curRoom, pid)).set({id:pid,url,storagePath:path,uploadedAt:new Date().toISOString()});
       if(!units[curRoom].photos)units[curRoom].photos={};
       units[curRoom].photos[pid]={id:pid,url,storagePath:path};
       renderPhotos(units[curRoom].photos);showToast("✅ 업로드 완료");
@@ -987,7 +988,7 @@ function delPhoto(pid,spath){
     try{
       if(spath)await storage.ref(spath).delete().catch(()=>{});
       const targetUid=(cu.uid===MASTER_UID&&mUid)?mUid:cu.uid;
-      await db.ref(`rent_app/${targetUid}/${curBid}/units/${curRoom}/photos/${pid}`).remove();
+      await db.ref(DBPath.unitPhoto(targetUid, curBid, curRoom, pid)).remove();
       if(units[curRoom]&&units[curRoom].photos)delete units[curRoom].photos[pid];
       renderPhotos(units[curRoom]&&units[curRoom].photos||{});showToast("🗑 삭제됨");
     }catch(e){showToast("❗ 삭제 실패")}});

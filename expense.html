@@ -16,6 +16,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="shared.js?v=2"></script>
 <script src="demo-data.js?v=2"></script>
+<script src="db-paths.js"></script>
 <style>
 :root{
   --bg:#F0F4F8;--card:#fff;--border:#E2E8F0;--text:#1E293B;--sub:#64748B;--hint:#94A3B8;
@@ -337,7 +338,7 @@ auth.onAuthStateChanged(async user=>{
 
     ls.style.display="none";app.style.display="block";
 
-    bldgsRef=db.ref("rent_app/"+targetUid+"/_buildings");
+    bldgsRef=db.ref(DBPath.bldList(targetUid));
     bldgsL=bldgsRef.on("value",snap=>{
       bldgsData=snap.val()||{};
       const bids=sortedBids(bldgsData);
@@ -345,7 +346,7 @@ auth.onAuthStateChanged(async user=>{
     });
 
     _tUid=targetUid;
-    txRef=db.ref(`rent_app/${targetUid}/${curBid}/transactions`);listenTx();listenRentData();
+    txRef=db.ref(DBPath.transactions(targetUid, curBid));listenTx();listenRentData();
   }else{
     if(sessionStorage.getItem("guestDemo")==="1"){enterDemoMode();return;}
     cu=null;app.style.display="none";ls.style.display="flex";
@@ -391,7 +392,7 @@ function switchBld(bid){
   _tUid=targetUid;
   setCurBid(targetUid,bid);
   allTx=[];rentHistData={};unitsData={};
-  txRef=db.ref(`rent_app/${targetUid}/${bid}/transactions`);
+  txRef=db.ref(DBPath.transactions(targetUid, bid));
   listenTx();listenRentData();updateBldLabel();
 }
 function listenTx(){
@@ -405,9 +406,9 @@ function listenRentData(){
   if(!_tUid)return;
   if(rhL&&rhRef)rhRef.off("value",rhL);
   if(auL&&auRef)auRef.off("value",auL);
-  rhRef=db.ref(`rent_app/${_tUid}/${curBid}/rent_history`);
+  rhRef=db.ref(DBPath.rentHistory(_tUid, curBid));
   rhL=rhRef.on("value",snap=>{rentHistData=snap.val()||{};renderFeed();});
-  auRef=db.ref(auPath);
+  auRef=db.ref(DBPath.units(_tUid, curBid));
   auL=auRef.on("value",snap=>{unitsData=snap.val()||{};renderFeed();});
 }
 function getAutoRentItems(){

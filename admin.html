@@ -17,6 +17,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script src="shared.js?v=2"></script>
 <script src="demo-data.js?v=2"></script>
+<script src="db-paths.js"></script>
 <style>
 :root{
   --bg:#F0F4F8;--card:#fff;--border:#E2E8F0;--text:#1E293B;--sub:#64748B;--hint:#94A3B8;
@@ -508,8 +509,8 @@ auth.onAuthStateChanged(async user=>{
 
     ls.style.display="none";app.style.display="block";
 
-    pbRef=db.ref(`rent_app/${targetUid}/phonebook`); // SHARED - no bid
-    bldgsRef=db.ref("rent_app/"+targetUid+"/_buildings");
+    pbRef=db.ref(DBPath.phonebook(targetUid)); // SHARED - no bid
+    bldgsRef=db.ref(DBPath.bldList(targetUid));
     bldgsL=bldgsRef.on("value",snap=>{
       bldgsData=snap.val()||{};
       const bids=sortedBids(bldgsData);
@@ -538,9 +539,9 @@ function loadBldData(uid,bid){
   if(uL&&uRef)uRef.off("value",uL);
   if(bldgDetailL&&bldgDetailRef)bldgDetailRef.off("value",bldgDetailL);
   if(cL&&configRef)configRef.off("value",cL);
-  uRef=db.ref(`rent_app/${uid}/${bid}/units`);
-  bldgDetailRef=db.ref(`rent_app/${uid}/${bid}/buildings`);
-  configRef=db.ref(`rent_app/${uid}/${bid}/config/roomLayout`);
+  uRef=db.ref(DBPath.units(uid, bid));
+  bldgDetailRef=db.ref(DBPath.buildings(uid, bid));
+  configRef=db.ref(DBPath.roomLayout(uid, bid));
   uL=uRef.on("value",snap=>{units=snap.val()||{};if(curSub===1)renderContracts()},()=>{});
   bldgDetailL=bldgDetailRef.on("value",snap=>{bldgDetails=snap.val()||{};if(curSub===2)renderBldDetails()},()=>showToast("❗ 연결 오류"));
   cL=configRef.on("value",snap=>{
@@ -585,8 +586,8 @@ async function renderBldRegistry(){
   if(!bids.length){el.innerHTML='<div style="font-size:13px;color:var(--hint);text-align:center;padding:12px">등록된 건물이 없습니다</div>';return}
   const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
   const [unitSnaps,layoutSnaps]=await Promise.all([
-    Promise.all(bids.map(bid=>db.ref(`rent_app/${targetUid}/${bid}/units`).once("value"))),
-    Promise.all(bids.map(bid=>db.ref(`rent_app/${targetUid}/${bid}/config/roomLayout`).once("value")))
+    Promise.all(bids.map(bid=>db.ref(DBPath.units(targetUid, bid)).once("value"))),
+    Promise.all(bids.map(bid=>db.ref(DBPath.roomLayout(targetUid, bid)).once("value")))
   ]);
   const counts={},roomCounts={};
   bids.forEach((bid,i)=>{
@@ -624,7 +625,7 @@ async function renderBldRegistry(){
 }
 async function cleanupLegacyPaths(uid){
   if(localStorage.getItem("lgclean_"+uid))return;
-  const bldSnap=await db.ref("rent_app/"+uid+"/_buildings").once("value");
+  const bldSnap=await db.ref(DBPath.bldList(uid)).once("value");
   if(!bldSnap.exists())return;
   const OLD=["units","rent_history","config","transactions","notes","buildings"];
   for(const p of OLD){
@@ -643,14 +644,14 @@ async function mergeFromBld(srcBid){
     const PATHS=["units","rent_history","config","transactions","notes","buildings"];
     for(const p of PATHS){
       try{
-        const snap=await db.ref(`rent_app/${targetUid}/${srcBid}/${p}`).once("value");
+        const snap=await db.ref(`${DBPath.bldData(targetUid, srcBid)}/${p}`).once("value");
         if(snap.exists()){
-          await db.ref(`rent_app/${targetUid}/${curBid}/${p}`).set(snap.val());
-          await db.ref(`rent_app/${targetUid}/${srcBid}/${p}`).remove();
+          await db.ref(`${DBPath.bldData(targetUid, curBid)}/${p}`).set(snap.val());
+          await db.ref(`${DBPath.bldData(targetUid, srcBid)}/${p}`).remove();
         }
       }catch(e){}
     }
-    await db.ref(`rent_app/${targetUid}/_buildings/${srcBid}`).remove();
+    await db.ref(DBPath.bld(targetUid, srcBid)).remove();
     showToast("✅ 데이터 이관 완료");
     renderBldRegistry();
   });
@@ -667,7 +668,7 @@ function saveNewBld(){
   const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
   const bid=Date.now().toString(36);
   const order=Object.keys(bldgsData).length;
-  db.ref("rent_app/"+targetUid+"/_buildings/"+bid).set({id:bid,name,order,createdAt:new Date().toISOString()})
+  db.ref(DBPath.bld(targetUid, bid)).set({id:bid,name,order,createdAt:new Date().toISOString()})
     .then(()=>{closeAddBldSheet();showToast("✅ 건물 추가됨");switchBld(bid)})
     .catch(()=>showToast("❗ 저장 실패"));
 }
@@ -681,7 +682,7 @@ async function openEditBldSheet(bid){
   document.getElementById("edit-floor-rows").innerHTML='<div style="font-size:12px;color:var(--hint);text-align:center;padding:10px">불러오는 중...</div>';
   document.getElementById("edit-bld-sheet").classList.add("show");
   const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
-  const snap=await db.ref(`rent_app/${targetUid}/${bid}/config/roomLayout`).once("value");
+  const snap=await db.ref(DBPath.roomLayout(targetUid, bid)).once("value");
   editRoomLayout=snap.val()||{};
   renderEditFloorRows();
 }
@@ -736,11 +737,11 @@ async function saveEditBld(){
   const newRooms=Object.values(nl).flat().map(String);
   const deletedRooms=oldRooms.filter(r=>!newRooms.includes(r));
   try{
-    await db.ref("rent_app/"+targetUid+"/_buildings/"+editBid+"/name").set(name);
-    await db.ref(`rent_app/${targetUid}/${editBid}/config/roomLayout`).set(nl);
+    await db.ref(DBPath.bld(targetUid, editBid)+"/name").set(name);
+    await db.ref(DBPath.roomLayout(targetUid, editBid)).set(nl);
     if(deletedRooms.length){
       await Promise.all(deletedRooms.map(r=>
-        db.ref(`rent_app/${targetUid}/${editBid}/rent_history/${r}`).remove().catch(()=>{})
+        db.ref(DBPath.rentHistRoom(targetUid, editBid, r)).remove().catch(()=>{})
       ));
     }
     if(editBid===curBid){roomLayout=nl;ROOMS=Object.values(nl).flat().map(String);}
@@ -752,8 +753,8 @@ function delBld(bid){
   if(!guardWrite())return;
   showCM("건물 삭제","\""+(bldgsData[bid]?.name||"건물")+"\" 건물의 모든 호실, 계약, 이력 데이터가 삭제됩니다. 계속하시겠습니까?",async()=>{
     const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
-    await db.ref("rent_app/"+targetUid+"/_buildings/"+bid).remove();
-    await db.ref("rent_app/"+targetUid+"/"+bid).remove();
+    await db.ref(DBPath.bld(targetUid, bid)).remove();
+    await db.ref(DBPath.bldData(targetUid, bid)).remove();
     const remaining=sortedBids(bldgsData).filter(b=>b!==bid);
     if(remaining.length){
       showToast("🗑 건물 삭제됨");
@@ -761,7 +762,7 @@ function delBld(bid){
     }else{
       // 마지막 건물 삭제 시 빈 건물 자동 생성
       const newBid="main";
-      await db.ref("rent_app/"+targetUid+"/_buildings/"+newBid).set({id:newBid,name:"내 건물",order:0,createdAt:new Date().toISOString()});
+      await db.ref(DBPath.bld(targetUid, newBid)).set({id:newBid,name:"내 건물",order:0,createdAt:new Date().toISOString()});
       showToast("🗑 삭제됨 — 새 건물이 생성됐습니다");
       switchBld(newBid);
     }
@@ -1003,7 +1004,7 @@ async function uploadContractPhoto(room,e){
       fill.style.width="100%";
       const pid=String(ts+(i*10));
       const targetUid=(cu.uid===MASTER_UID&&mUid)?mUid:cu.uid;
-      await db.ref(`rent_app/${targetUid}/${curBid}/units/${room}/photos/${pid}`).set({id:pid,url,storagePath:path,uploadedAt:new Date().toISOString()});
+      await db.ref(DBPath.unitPhoto(targetUid, curBid, room, pid)).set({id:pid,url,storagePath:path,uploadedAt:new Date().toISOString()});
       showToast("✅ 업로드 완료");
     }catch(err){showToast("❗ 업로드 실패: "+err.message)}
   }
@@ -1016,7 +1017,7 @@ function delContractPhoto(room,pid,spath){
     try{
       if(spath)await storage.ref(spath).delete().catch(()=>{});
       const targetUid=(cu.uid===MASTER_UID&&mUid)?mUid:cu.uid;
-      await db.ref(`rent_app/${targetUid}/${curBid}/units/${room}/photos/${pid}`).remove();
+      await db.ref(DBPath.unitPhoto(targetUid, curBid, room, pid)).remove();
       showToast("🗑 삭제됨");
     }catch(e){showToast("❗ 삭제 실패")}
   });

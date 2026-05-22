@@ -14,6 +14,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="db-paths.js"></script>
 <style>
 :root{
   --bg:#F0F4F8;--card:#fff;--border:#E2E8F0;--text:#1E293B;--sub:#64748B;--hint:#94A3B8;
@@ -265,30 +266,30 @@ document.addEventListener("click",e=>{const m=document.getElementById("user-menu
 // ── DATA LOAD ──
 function loadAll(uid){
   // Building name
-  db.ref("rent_app/"+uid+"/_buildings").on("value",snap=>{
+  db.ref(DBPath.bldList(uid)).on("value",snap=>{
     bldgsData=snap.val()||{};
     const bids=sortedBids(bldgsData);
     if(bids.length&&!bldgsData[curBid])curBid=bids[0];
     document.getElementById("cur-bld-name").textContent=bldgsData[curBid]?.name||curBid;
   });
   // Room layout
-  db.ref(`rent_app/${uid}/${curBid}/config/roomLayout`).once("value").then(snap=>{
+  db.ref(DBPath.roomLayout(uid, curBid)).once("value").then(snap=>{
     const layout=snap.val()||{};
     ROOMS=Object.keys(layout).sort((a,b)=>Number(a)-Number(b)).flatMap(f=>layout[f]||[]).map(String);
     updateUnitsStats();
   });
   // Units
-  db.ref(`rent_app/${uid}/${curBid}/units`).on("value",snap=>{
+  db.ref(DBPath.units(uid, curBid)).on("value",snap=>{
     unitsData=snap.val()||{};
     updateUnitsStats();
     renderPhotoGrid();
   });
   // Rent history
-  db.ref(`rent_app/${uid}/${curBid}/rent_history`).on("value",snap=>{
+  db.ref(DBPath.rentHistory(uid, curBid)).on("value",snap=>{
     rentHistory=snap.val()||{};
   });
   // Transactions
-  db.ref(`rent_app/${uid}/${curBid}/transactions`).on("value",snap=>{
+  db.ref(DBPath.transactions(uid, curBid)).on("value",snap=>{
     allTx=Object.values(snap.val()||{}).sort((a,b)=>b.date.localeCompare(a.date));
     updateTxStats();
   });

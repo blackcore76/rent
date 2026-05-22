@@ -15,6 +15,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="shared.js?v=2"></script>
+<script src="db-paths.js"></script>
 <style>
 :root{
   --bg:#0F1C2D;--card:#1A2B3C;--border:rgba(255,255,255,.08);
@@ -265,9 +266,9 @@ auth.onAuthStateChanged(user=>{
     ?`<img class="av-img" src="${user.photoURL}">`
     :`<div class="av-txt">${(user.displayName||"A")[0]}</div>`;
 
-  usersRef=db.ref("master_admin/users");
+  usersRef=db.ref(DBPath.masterUsers());
   usersRef.on("value",snap=>renderUsers(snap.val()||{}));
-  pendingUsersRef=db.ref("_users");
+  pendingUsersRef=db.ref(DBPath.pendingUsers());
   pendingUsersRef.on("value",snap=>{allUsersData=snap.val()||{};renderPendingUsers();renderUsersPage()});
 });
 
@@ -311,25 +312,25 @@ function renderPendingUsers(){
 }
 async function approveUser(uid,displayName,email){
   try{
-    await db.ref("_users/"+uid).update({status:"active"});
-    const snap=await db.ref("master_admin/users/"+uid).once("value");
+    await db.ref(DBPath.pendingUser(uid)).update({status:"active"});
+    const snap=await db.ref(DBPath.masterUser(uid)).once("value");
     if(!snap.exists()){
       const memo=document.getElementById("pm-"+uid)?.value.trim()||"";
-      await db.ref("master_admin/users/"+uid).set({uid,name:displayName||email||uid,memo,createdAt:(allUsersData[uid]?.createdAt||new Date().toISOString())});
+      await db.ref(DBPath.masterUser(uid)).set({uid,name:displayName||email||uid,memo,createdAt:(allUsersData[uid]?.createdAt||new Date().toISOString())});
     }
     showToast("✅ 활성화됨: "+(displayName||email));
   }catch(e){showToast("❗ 실패: "+e.message)}
 }
 async function rejectUser(uid){
   try{
-    await db.ref("_users/"+uid).update({status:"rejected"});
+    await db.ref(DBPath.pendingUser(uid)).update({status:"rejected"});
     showToast("🚫 거부됨");
   }catch(e){showToast("❗ 실패")}
 }
 async function savePendingMemo(uid){
   const val=document.getElementById("pm-"+uid)?.value.trim()||"";
   try{
-    await db.ref("_users/"+uid).update({memo:val});
+    await db.ref(DBPath.pendingUser(uid)).update({memo:val});
     showToast("✅ 메모 저장됨");
   }catch(e){showToast("❗ 실패")}
 }
@@ -337,7 +338,7 @@ async function deletePendingMemo(uid){
   try{
     const inp=document.getElementById("pm-"+uid);
     if(inp)inp.value="";
-    await db.ref("_users/"+uid+"/memo").remove();
+    await db.ref(DBPath.pendingUserMemo(uid)).remove();
     showToast("🗑 메모 삭제됨");
   }catch(e){showToast("❗ 실패")}
 }
