@@ -398,7 +398,7 @@ async function enterDemoMode(){
   applyLayout(DEMO.layout);_unitsReady=true;_historyReady=true;
   document.getElementById("login-screen").style.display="none";
   document.getElementById("app").style.display="block";
-  showDemoBanner();renderGrid();
+  showDemoBanner();renderGrid();tryOpenURLParam();
 }
 
 auth.onAuthStateChanged(async user=>{
