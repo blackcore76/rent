@@ -202,6 +202,17 @@
   </div>
 </div>
 
+<!-- AUTO-RENT DETAIL SHEET -->
+<div class="sheet-bg" id="auto-detail-sheet">
+  <div class="sheet">
+    <div class="sheet-hd">
+      <h3 id="auto-detail-title">월세수입 상세</h3>
+      <button class="sheet-close" onclick="closeAutoDetail()">✕</button>
+    </div>
+    <div id="auto-detail-list"></div>
+  </div>
+</div>
+
 <!-- CONFIRM -->
 <div class="confirm-bg" id="confirm-modal">
   <div class="confirm-box">
@@ -463,22 +474,60 @@ function renderFeed(){
   const fc=document.getElementById("feed");
   const emptyMsg=viewMode==="monthly"?"이 달에 기록된 내역이 없어요":viewMode==="yearly"?"이 해에 기록된 내역이 없어요":"기록된 내역이 없어요";
   if(!total){fc.innerHTML=`<div class="empty-st"><div class="ei">💰</div><div class="et">${emptyMsg}<br>+ 버튼으로 추가해 보세요</div></div>`;document.getElementById("pagi").innerHTML="";return}
-  fc.innerHTML=`<div class="card">${page.map(t=>`
-    <div class="tx-item${t.auto?" auto-rent":""}">
+  fc.innerHTML=`<div class="card">${page.map(t=>{
+    const isAggregate=t.auto&&viewMode!=="monthly";
+    const click=isAggregate?`onclick="openAutoDetail('${t.date.slice(0,7)}')" style="cursor:pointer"`:"";
+    const chevron=isAggregate?'<span style="font-size:14px;color:var(--hint);margin-left:4px">›</span>':"";
+    return`<div class="tx-item${t.auto?" auto-rent":""}" ${click}>
       <div class="tx-icon ${t.type}">${t.auto?"🏠":t.type==="income"?"📈":"📉"}</div>
       <div class="tx-body">
         <div class="tx-top"><span class="tx-cat">${esc(t.category||"기타")}</span>${t.auto?'<span class="tx-auto-badge">자동</span>':""}<span class="tx-date">${fmtD(t.date)}</span></div>
         <div class="tx-memo">${esc(t.memo)||"메모 없음"}</div>
       </div>
-      <span class="tx-amt ${t.type}">${t.type==="income"?"+":"−"}₩${fmtN(t.amount)}</span>
+      <span class="tx-amt ${t.type}">${t.type==="income"?"+":"−"}₩${fmtN(t.amount)}</span>${chevron}
       ${t.auto?"":` <button class="tx-del" onclick="delTx(${t.id})">✕</button>`}
-    </div>`).join("")}</div>`;
+    </div>`;}).join("")}</div>`;
   document.getElementById("pagi").innerHTML=`
     <button class="page-btn" onclick="goPage(${curPage-1})" ${curPage<=1?"disabled":""}>◀</button>
     <span class="page-info">${curPage} / ${tp}</span>
     <button class="page-btn" onclick="goPage(${curPage+1})" ${curPage>=tp?"disabled":""}>▶</button>`;
 }
 function goPage(p){curPage=p;renderFeed();window.scrollTo(0,0)}
+
+function openAutoDetail(ym){
+  const rooms=[];
+  const unitsLoaded=Object.keys(unitsData).length>0;
+  Object.entries(rentHistData).forEach(([roomId,roomH])=>{
+    if(unitsLoaded&&!unitsData[roomId])return;
+    const rec=roomH[ym];
+    if(!rec||(!rec.paid&&!rec.partial))return;
+    const amt=rec.amount||(unitsData[roomId]?.monthlyRent||0)*10000;
+    if(!amt)return;
+    rooms.push({roomId,amount:amt,paid:!!rec.paid});
+  });
+  rooms.sort((a,b)=>a.roomId.localeCompare(b.roomId,"ko",{numeric:true}));
+  const total=rooms.reduce((s,r)=>s+r.amount,0);
+  document.getElementById("auto-detail-title").textContent=
+    `${ym.slice(0,4)}년 ${Number(ym.slice(5,7))}월 월세수입 상세`;
+  const itemsHtml=rooms.map(r=>`
+    <div class="tx-item">
+      <div class="tx-icon income">🏠</div>
+      <div class="tx-body">
+        <div class="tx-top"><span class="tx-cat">${r.roomId}호</span><span class="tx-auto-badge">${r.paid?"완납":"부분납부"}</span></div>
+      </div>
+      <span class="tx-amt income">+₩${fmtN(r.amount)}</span>
+    </div>`).join("");
+  const totalHtml=`
+    <div class="tx-item" style="border-top:2px solid var(--border);background:#F8FAFC">
+      <div class="tx-body">
+        <div class="tx-top"><span class="tx-cat" style="font-weight:800">합계 (${rooms.length}호실)</span></div>
+      </div>
+      <span class="tx-amt income" style="font-size:17px">+₩${fmtN(total)}</span>
+    </div>`;
+  document.getElementById("auto-detail-list").innerHTML=`<div class="card">${itemsHtml}${totalHtml}</div>`;
+  document.getElementById("auto-detail-sheet").classList.add("show");
+}
+function closeAutoDetail(){document.getElementById("auto-detail-sheet").classList.remove("show")}
 
 function openAdd(){
   mTT="income";updateTTUI();

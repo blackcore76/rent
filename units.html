@@ -706,7 +706,11 @@ function renderGrid(){
   let list=ROOMS.map(r=>units[String(r)]).filter(u=>u&&(curFloor===0||u.floor===curFloor));
   if(curFilter==="rented") list=list.filter(u=>u.status==="rented");
   else if(curFilter==="vacant") list=list.filter(u=>u.status==="vacant");
-  else if(curFilter==="unpaid") list=list.filter(u=>u.status==="rented"&&computePaidStatus(u.room)===false);
+  else if(curFilter==="unpaid") list=list.filter(u=>{
+    if(u.status!=="rented")return false;
+    const ps=computePaidStatus(u.room);
+    return ps===false||ps==="partial";
+  });
   document.getElementById("rooms-grid").innerHTML=list.map(u=>{
     const isR=u.status==="rented";
     const namesTxt=[u.tenantName,u.tenantName2].filter(Boolean).join(" / ")||"공실";

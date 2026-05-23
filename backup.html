@@ -311,12 +311,31 @@ function exportTxJSON(){
   dlBlob(new Blob([JSON.stringify(allTx,null,2)],{type:"application/json"}),`월세관리_지출전체_${fmtDate()}.json`);
   showToast("✅ 지출 JSON 내려받기 완료");
 }
+function getAutoRentRows(){
+  const rows=[];
+  Object.entries(rentHistory).forEach(([roomId,roomH])=>{
+    if(!unitsData[roomId])return;
+    Object.entries(roomH).forEach(([ym,rec])=>{
+      if(!rec||(!rec.paid&&!rec.partial))return;
+      const amt=rec.amount||(unitsData[roomId]?.monthlyRent||0)*10000;
+      if(!amt)return;
+      rows.push({date:ym+"-01",category:"월세수입",amount:amt,
+        memo:`[자동] ${roomId}호 ${rec.paid?"완납":"부분납부"}`});
+    });
+  });
+  return rows;
+}
 function exportTxCSV(){
-  if(!allTx.length){showToast("❗ 지출 데이터 없음");return}
+  const auto=getAutoRentRows();
+  if(!allTx.length&&!auto.length){showToast("❗ 지출 데이터 없음");return}
+  const all=[
+    ...allTx.map(t=>({date:t.date,type:t.type==="income"?"수입":"지출",category:t.category||"",amount:t.amount||0,memo:t.memo||""})),
+    ...auto.map(r=>({date:r.date,type:"수입",category:r.category,amount:r.amount,memo:r.memo})),
+  ].sort((a,b)=>b.date.localeCompare(a.date));
   const hdr="날짜,유형,카테고리,금액,메모\n";
-  const rows=allTx.map(t=>`${t.date},${t.type==="income"?"수입":"지출"},${t.category||""},${t.amount||0},"${(t.memo||"").replace(/"/g,"'")}"`)
-  dlBlob(new Blob(["﻿"+hdr+rows.join("\n")],{type:"text/csv"}),`월세관리_지출전체_${fmtDate()}.csv`);
-  showToast("✅ 지출 CSV 내려받기 완료");
+  const body=all.map(t=>`${t.date},${t.type},${t.category},${t.amount},"${(t.memo||"").replace(/"/g,"'")}"`).join("\n");
+  dlBlob(new Blob(["﻿"+hdr+body],{type:"text/csv"}),`월세관리_지출전체_${fmtDate()}.csv`);
+  showToast(`✅ 지출 CSV 완료 (수동 ${allTx.length}건 + 자동 ${auto.length}건)`);
 }
 
 // ── PHOTO ZIP ──
