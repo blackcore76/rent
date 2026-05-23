@@ -192,6 +192,21 @@ function showCoachMarks(defs, CM_DATA){
 }
 function closeCoachMarks(){const el=document.getElementById('cm-overlay');if(el)el.classList.remove('show');}
 
+// ── Service Worker 등록 (정적 자산 캐시 / 오프라인 대응) ──
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    // 첫 설치인지(=기존 컨트롤러 없음) 새 SW 활성화 후 한 번만 리로드
+    const hadController = !!navigator.serviceWorker.controller;
+    let _reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (_reloaded || !hadController) return;
+      _reloaded = true;
+      location.reload();
+    });
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
 // ── demo-data.js 지연 로딩 (구경 모드 진입 시점에만) ──
 let _demoLoading=null;
 function ensureDemoLoaded(){
