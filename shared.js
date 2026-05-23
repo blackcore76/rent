@@ -154,3 +154,55 @@ async function compressImage(file){
     return blob||file;
   }catch{return file;}
 }
+
+// ── 코치마크 (도움말) 공통 렌더러 ──
+// defs: [{key, el}, ...]  /  CM_DATA: { key:{title,body}, ... }
+function showCoachMarks(defs, CM_DATA){
+  const HDR=108,BTN=80,vh=window.innerHeight;
+  const vis=defs.filter(s=>{
+    if(!s.el)return false;
+    const r=s.el.getBoundingClientRect();
+    if(!r.height)return false;
+    const h=Math.min(r.bottom,vh-BTN)-Math.max(r.top,HDR);
+    return h>0&&h/r.height>=0.5;
+  });
+  if(!vis.length&&defs.length)vis.push(defs[0]);
+  const wrap=document.getElementById('cm-marks');
+  if(!wrap)return;
+  wrap.innerHTML='';
+  vis.forEach(s=>{
+    const d=CM_DATA[s.key];if(!d)return;
+    const r=s.el.getBoundingClientRect();
+    const mark=document.createElement('div');
+    mark.className='cm-mark';
+    mark.style.top=Math.max(r.top+10+(s.topOffset||0),HDR+8)+'px';
+    mark.innerHTML=`<div class="cm-mtitle">${d.title}</div><div class="cm-mbody">${d.body}</div>`;
+    wrap.appendChild(mark);
+  });
+  document.getElementById('cm-overlay').classList.add('show');
+  requestAnimationFrame(()=>{
+    let floor=HDR+8;
+    wrap.querySelectorAll('.cm-mark').forEach(m=>{
+      let top=parseFloat(m.style.top);
+      if(top<floor)top=floor;
+      m.style.top=top+'px';
+      floor=top+m.getBoundingClientRect().height+10;
+    });
+  });
+}
+function closeCoachMarks(){const el=document.getElementById('cm-overlay');if(el)el.classList.remove('show');}
+
+// ── demo-data.js 지연 로딩 (구경 모드 진입 시점에만) ──
+let _demoLoading=null;
+function ensureDemoLoaded(){
+  if(typeof DEMO!=="undefined")return Promise.resolve();
+  if(_demoLoading)return _demoLoading;
+  _demoLoading=new Promise((resolve,reject)=>{
+    const s=document.createElement("script");
+    s.src="demo-data.js?v=2";
+    s.onload=()=>resolve();
+    s.onerror=()=>reject(new Error("demo-data.js 로드 실패"));
+    document.head.appendChild(s);
+  });
+  return _demoLoading;
+}

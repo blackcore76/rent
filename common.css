@@ -1,0 +1,74 @@
+/* common.css — 6개 라이트 테마 페이지 공통 스타일
+   적용: index.html / units.html / expense.html / admin.html / backup.html / restore.html
+   제외: admin-master.html (다크 테마) / guide.html (구조 다름) */
+
+:root{
+  --bg:#F0F4F8;--card:#fff;--border:#E2E8F0;
+  --text:#1E293B;--sub:#64748B;--hint:#94A3B8;
+  --hdr:#1E2D3D;--hdr2:#2A3F55;
+  --green:#059669;--green-lt:#D1FAE5;--green-t:#065F46;
+  --red:#DC2626;--red-lt:#FEE2E2;--red-t:#991B1B;
+  --blue:#0284C7;--blue-lt:#E0F2FE;--blue-t:#0C4A6E;
+  --indigo:#4F46E5;--indigo-lt:#EEF2FF;--indigo-t:#3730A3;
+  --amber:#D97706;--amber-lt:#FEF3C7;--amber-t:#92400E;
+  --purple:#7C3AED;--purple-lt:#EDE9FE;--purple-t:#4C1D95;
+  --sky:#0EA5E9;
+  --radius:14px;
+  --shadow:0 2px 12px rgba(0,0,0,.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--text)}
+
+/* ── HEADER ── */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,var(--hdr),var(--hdr2));box-shadow:0 3px 16px rgba(0,0,0,.25);padding:0 16px}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;height:52px}
+.hdr-title{font-size:18px;font-weight:900;color:#fff;letter-spacing:-.5px;display:flex;align-items:center;gap:6px}
+.hdr-actions{display:flex;align-items:center;gap:8px;position:relative}
+.av-img{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);cursor:pointer;object-fit:cover}
+.av-txt{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);background:var(--sky);color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.guide-btn{padding:5px 10px;background:rgba(14,165,233,.15);border:1.5px solid rgba(14,165,233,.5);border-radius:8px;color:#7DD3FC;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:background .15s;text-decoration:none;display:flex;align-items:center;gap:3px}
+.guide-btn:active{background:rgba(14,165,233,.32)}
+.admin-btn{padding:5px 10px;background:rgba(255,200,0,.15);border:1.5px solid rgba(255,200,0,.5);border-radius:8px;color:#FFD700;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:none;letter-spacing:.3px;transition:background .15s}
+.admin-btn:active{background:rgba(255,200,0,.32)}
+.nav{display:flex;border-top:1px solid rgba(255,255,255,.08)}
+.nav-tab{flex:1;padding:9px 2px 11px;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,.4);border-bottom:3px solid transparent;text-decoration:none;transition:all .2s;white-space:nowrap}
+.nav-tab.on{color:#fff;border-bottom-color:var(--sky);font-weight:700}
+
+/* ── USER MENU ── */
+.user-menu{position:fixed;top:56px;right:12px;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:16px;min-width:210px;z-index:300;display:none;border:1px solid var(--border)}
+.user-menu.show{display:block}
+.um-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
+.um-email{font-size:12px;color:var(--hint);margin-bottom:12px;word-break:break-all}
+.logout-btn{width:100%;padding:9px;background:var(--red-lt);color:var(--red);border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+
+/* ── CONTENT ── */
+.content{margin-top:100px;padding:14px;min-height:calc(100vh - 100px)}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;background:linear-gradient(160deg,#0F1C2D,#1E2D3D 50%,#2A3F55);z-index:7000;display:none;align-items:center;justify-content:center;padding:20px}
+.login-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:36px 28px;max-width:320px;width:100%;text-align:center;backdrop-filter:blur(16px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.login-logo{margin-bottom:22px}
+.login-logo img{width:180px;height:auto;filter:drop-shadow(0 4px 16px rgba(77,208,225,.4))}
+.login-title{font-size:22px;font-weight:900;color:#fff;margin-bottom:6px;letter-spacing:-.5px}
+.login-sub{font-size:12px;color:rgba(255,255,255,.45);margin-bottom:28px;line-height:1.7}
+.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 20px;background:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;color:#1F2937;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .15s}
+.google-btn:active{transform:scale(.97)}
+.g-icon{width:18px;height:18px;flex-shrink:0}
+.login-footer{font-size:10px;color:rgba(255,255,255,.25);margin-top:18px;line-height:1.7}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1F2937;color:#fff;padding:11px 20px;border-radius:24px;font-size:14px;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);max-width:calc(100vw - 48px);text-align:center;line-height:1.6;box-shadow:0 4px 16px rgba(0,0,0,.3);pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── COACH MARK ── */
+#cm-overlay{position:fixed;inset:0;background:transparent;z-index:800;display:none}
+#cm-overlay.show{display:block}
+#cm-marks{position:absolute;inset:0;pointer-events:none}
+.cm-mark{position:fixed;left:18px;right:18px;background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:13px 16px;border-left:5px solid #22C55E;box-shadow:0 6px 28px rgba(0,0,0,.35),0 1px 6px rgba(0,0,0,.2);pointer-events:none}
+.cm-mtitle{font-size:11px;font-weight:800;color:#4DD0E1;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px}
+.cm-mbody{font-size:13px;color:rgba(255,255,255,.88);line-height:1.68}
+.cm-mbody b{color:#7DD3FC}
+#cm-footer{position:fixed;bottom:0;left:0;right:0;padding:12px 24px 36px;display:flex;flex-direction:column;align-items:center;gap:5px}
+#cm-close{padding:12px 36px;background:rgba(255,255,255,.92);border:1.5px solid rgba(30,45,61,.15);border-radius:24px;font-size:14px;font-weight:700;color:#1E2D3D;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(0,0,0,.25);letter-spacing:-.2px}
+#cm-close:active{opacity:.7}
+#cm-hint{font-size:11px;color:#475569}
