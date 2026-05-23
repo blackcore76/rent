@@ -680,8 +680,11 @@ function setStatusFilter(val){
   history.replaceState({},"",location.pathname);
   renderGrid();
 }
+const RECENT_12MO=getRecentMonthsSet(12);
 function computePaidStatus(roomId){
-  const recs=Object.values(rentHistory[roomId]||{});
+  const h=rentHistory[roomId]||{};
+  const recs=[];
+  for(const ym in h)if(RECENT_12MO.has(ym))recs.push(h[ym]);
   if(!recs.length)return null;
   if(recs.some(r=>r.partial))return "partial";
   return recs.some(r=>!r.paid)?false:true;

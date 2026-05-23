@@ -158,7 +158,7 @@
     </div>
 
     <div class="card" id="card-unpaid">
-      <div class="card-hd">🔴 이달 미납 현황</div>
+      <div class="card-hd">🔴 미납 현황 (최근 1년)</div>
       <div id="unpaid-list"><div class="empty-small">로딩 중...</div></div>
     </div>
 
@@ -352,9 +352,11 @@ function setSS(s){
   el.innerHTML=`<span class="sync-dot ${cls}" title="${s==="ok"?"동기화됨":s==="ing"?"저장중":"오류"}"></span>`;
 }
 
+const RECENT_12MO=getRecentMonthsSet(12);
 function computePaidStatus(bid,roomId){
   const h=((allBldData[bid]||{}).history||{})[String(roomId)]||{};
-  const recs=Object.values(h);
+  const recs=[];
+  for(const ym in h)if(RECENT_12MO.has(ym))recs.push(h[ym]);
   if(!recs.length)return null;
   if(recs.some(r=>r.partial))return "partial";
   return recs.some(r=>!r.paid)?false:true;
@@ -566,7 +568,7 @@ function fmtDt(iso){if(!iso)return"";const d=new Date(iso);return`${d.getMonth()
 // ── COACH MARK HELP ──
 const CM_DATA={
   stats:{title:'현황 통계 대시보드',body:'자동차의 계기반이라 생각하면 됩니다.<br><b>전체 · 임대중 · 공실 · 미납</b>세대 수를 한눈에 확인합니다.<br>각 카드를 탭하면 해당 상태 세대만 필터링해서 세대 목록으로 이동합니다.'},
-  'card-unpaid':{title:'이달 미납 현황',body:'이번 달 월세를 납부하지 않은 세대 목록입니다.<br><b>세대 탭 -> 호실 -> 월세납부이력</b> 항목의 입력에 따라 <b>미납 · 부분미납</b>으로 <br>해당 호실을 표시합니다.'},
+  'card-unpaid':{title:'미납 현황 (최근 1년)',body:'최근 12개월 이내 월세 납부 이력에서 <br><b>미납·부분납부</b> 기록이 있는 세대 목록입니다.<br><b>세대 탭 -> 호실 -> 월세납부이력</b> 항목의 입력에 따라 자동 갱신됩니다.'},
   'card-vacant':{title:'공실 현황',body:'현재 비어있는 세대 목록입니다.<br><b>세대 탭 -> 호실 -> 임대상태</b> 항목의 선택에 따라 <b>공실</b>이 있을 경우에만 <br>해당 호실을 표시합니다.'},
   'card-expiry':{title:'계약 만료 임박',body:'<b>30일 이내</b> 계약이 종료되는 세대 목록입니다.<br><b>세대 탭 -> 호실 -> 계약 종료일</b> 기준  일자에 따라 <br>만료 7일 이내 🔴빨간색, 8~30일 🟠주황색으로 구분하여 표시합니다.'},
   'card-notes':{title:'특이사항 메모',body:'수리 요청 · 특이사항 등 건물 관련 메모를 남깁니다.<br>✏️ 버튼으로 수정, ✕ 버튼으로 삭제할 수 있습니다.<br>각각의 호실 메모는 <b>세대 탭 -> 호실 -> 특이사항 메모</b>에서 입력합니다.'},

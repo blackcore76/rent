@@ -155,6 +155,17 @@ async function compressImage(file){
   }catch{return file;}
 }
 
+// ── 최근 N개월 Set (rent_history 필터링용) ──
+function getRecentMonthsSet(n=12){
+  const months=new Set();
+  const now=new Date();
+  for(let i=0;i<n;i++){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    months.add(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`);
+  }
+  return months;
+}
+
 // ── 코치마크 (도움말) 공통 렌더러 ──
 // defs: [{key, el}, ...]  /  CM_DATA: { key:{title,body}, ... }
 function showCoachMarks(defs, CM_DATA){
