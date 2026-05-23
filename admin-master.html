@@ -185,7 +185,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <div class="vb-actions">
         <button class="vb-btn btn-sky" onclick="goPage('index')">📊 메인</button>
         <button class="vb-btn btn-sky" onclick="goPage('units')">🏠 세대</button>
-        <button class="vb-btn btn-sky" onclick="goPage('expense')" style="background:#7C3AED">💸 지출</button>
+        <button class="vb-btn btn-sky" onclick="goPage('expense')" style="background:#7C3AED">💸 장부</button>
         <button class="vb-btn btn-sky" onclick="goPage('admin')" style="background:#059669">🗂 관리</button>
         <button class="vb-btn btn-ghost" onclick="clearViewing()">✕ 해제</button>
       </div>
@@ -399,7 +399,7 @@ function renderUsersPage(){
       <div class="uc-actions">
         <button class="uc-btn btn-main" onclick="quickGo('${esc(u.uid)}','${esc(showName)}','index')">📊 메인</button>
         <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(showName)}','units')">🏠 세대</button>
-        <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(showName)}','expense')" style="background:rgba(124,58,237,.12);color:#7C3AED;border:1px solid rgba(124,58,237,.25)">💸 지출</button>
+        <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(showName)}','expense')" style="background:rgba(124,58,237,.12);color:#7C3AED;border:1px solid rgba(124,58,237,.25)">💸 장부</button>
         <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(showName)}','admin')" style="background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.25)">🗂 관리</button>
         <div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 🗑</div><button class="uc-btn btn-del" style="width:100%" onclick="delUser('${esc(u.uid)}','${esc(showName)}')">🗑</button></div>
       </div>

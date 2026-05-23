@@ -91,7 +91,7 @@ html,body{overscroll-behavior:none}
     <div class="nav">
       <a href="index.html" class="nav-tab">📊 메인</a>
       <a href="units.html" class="nav-tab">🏠 세대</a>
-      <a href="expense.html" class="nav-tab">💸 지출</a>
+      <a href="expense.html" class="nav-tab">💸 장부</a>
       <a href="admin.html" class="nav-tab on">🗂 관리</a>
     </div>
   </div>
@@ -126,8 +126,8 @@ html,body{overscroll-behavior:none}
       </div>
     </div>
 
-    <!-- 지출 데이터 -->
-    <div class="section-hd">💸 지출 데이터 (전체-사용자 입력 데이터만 표시합니다)</div>
+    <!-- 장부 데이터 -->
+    <div class="section-hd">💸 장부 데이터 (전체-사용자 입력 데이터만 표시합니다)</div>
     <div class="card" id="card-tx">
       <div class="stat-row">
         <div class="stat-box"><div class="stat-val" id="s-tx">—</div><div class="stat-lbl">총 건수</div></div>
@@ -307,9 +307,9 @@ function exportUnitsCSV(){
 
 // ── TX EXPORT ──
 function exportTxJSON(){
-  if(!allTx.length){showToast("❗ 지출 데이터 없음");return}
-  dlBlob(new Blob([JSON.stringify(allTx,null,2)],{type:"application/json"}),`월세관리_지출전체_${fmtDate()}.json`);
-  showToast("✅ 지출 JSON 내려받기 완료");
+  if(!allTx.length){showToast("❗ 장부 데이터 없음");return}
+  dlBlob(new Blob([JSON.stringify(allTx,null,2)],{type:"application/json"}),`월세관리_장부전체_${fmtDate()}.json`);
+  showToast("✅ 장부 JSON 내려받기 완료");
 }
 function getAutoRentRows(){
   const rows=[];
@@ -327,15 +327,15 @@ function getAutoRentRows(){
 }
 function exportTxCSV(){
   const auto=getAutoRentRows();
-  if(!allTx.length&&!auto.length){showToast("❗ 지출 데이터 없음");return}
+  if(!allTx.length&&!auto.length){showToast("❗ 장부 데이터 없음");return}
   const all=[
     ...allTx.map(t=>({date:t.date,type:t.type==="income"?"수입":"지출",category:t.category||"",amount:t.amount||0,memo:t.memo||""})),
     ...auto.map(r=>({date:r.date,type:"수입",category:r.category,amount:r.amount,memo:r.memo})),
   ].sort((a,b)=>b.date.localeCompare(a.date));
   const hdr="날짜,유형,카테고리,금액,메모\n";
   const body=all.map(t=>`${t.date},${t.type},${t.category},${t.amount},"${(t.memo||"").replace(/"/g,"'")}"`).join("\n");
-  dlBlob(new Blob(["﻿"+hdr+body],{type:"text/csv"}),`월세관리_지출전체_${fmtDate()}.csv`);
-  showToast(`✅ 지출 CSV 완료 (수동 ${allTx.length}건 + 자동 ${auto.length}건)`);
+  dlBlob(new Blob(["﻿"+hdr+body],{type:"text/csv"}),`월세관리_장부전체_${fmtDate()}.csv`);
+  showToast(`✅ 장부 CSV 완료 (수동 ${allTx.length}건 + 자동 ${auto.length}건)`);
 }
 
 // ── PHOTO ZIP ──
@@ -395,7 +395,7 @@ function dlBlob(blob,name){
 // ── COACH MARK HELP ──
 const CM_DATA={
   'card-units':{title:'세대 데이터 내보내기',body:'현재 건물의 전체 세대 정보를 내보냅니다.<br><b>CSV</b>는 엑셀에서 열고, <b>JSON</b>은 복구에 사용합니다.'},
-  'card-tx':{title:'지출 데이터 내보내기',body:'전체 기간의 수입·지출 내역을 내보냅니다.<br><b>CSV</b>는 엑셀에서 열고, <b>JSON</b>은 복구에 사용합니다.'},
+  'card-tx':{title:'장부 데이터 내보내기',body:'전체 기간의 수입·지출 내역을 내보냅니다.<br><b>CSV</b>는 엑셀에서 열고, <b>JSON</b>은 복구에 사용합니다.'},
   'card-photos':{title:'계약서 사진 내보내기',body:'저장된 계약서 사진을 <b>ZIP 파일</b>로 다운로드합니다.<br>호실별 폴더로 구성됩니다.'}
 };
 function openHelp(){
