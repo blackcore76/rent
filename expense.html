@@ -86,6 +86,8 @@
 .field textarea{resize:none}
 .btn-save{width:100%;padding:15px;background:var(--hdr);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px}
 .btn-save:active{opacity:.85}
+.btn-close-sheet{padding:14px 28px;min-width:120px;background:#F1F5F9;color:var(--sub);border:2px solid var(--border);border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-close-sheet:active{background:#E2E8F0}
 /* CONFIRM */
 .confirm-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
 .confirm-bg.show{display:flex}
@@ -210,6 +212,9 @@
       <button class="sheet-close" onclick="closeAutoDetail()">✕</button>
     </div>
     <div id="auto-detail-list"></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+      <button class="btn-close-sheet" onclick="closeAutoDetail()">✕ 닫기</button>
+    </div>
   </div>
 </div>
 

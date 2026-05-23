@@ -44,6 +44,7 @@
 .status-tab.on{background:var(--hdr);color:#fff;border-color:var(--hdr)}
 .status-tab[data-status="rented"].on{background:var(--blue-t);border-color:var(--blue-t)}
 .status-tab[data-status="vacant"].on{background:#6366F1;border-color:#6366F1}
+.status-tab[data-status="unpaid"].on{background:var(--red);border-color:var(--red)}
 .rooms-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 @media(min-width:600px){.rooms-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .room-card{background:var(--card);border-radius:var(--radius);padding:14px 12px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s;border:2px solid transparent;min-width:0;overflow:hidden}
@@ -218,6 +219,7 @@
         <button class="status-tab on" data-status="" onclick="setStatusFilter('')">전체</button>
         <button class="status-tab" data-status="rented" onclick="setStatusFilter('rented')">임대중</button>
         <button class="status-tab" data-status="vacant" onclick="setStatusFilter('vacant')">공실</button>
+        <button class="status-tab" data-status="unpaid" onclick="setStatusFilter('unpaid')">미납</button>
       </div>
       <button class="export-btn" id="bld-name-label"></button>
     </div>
@@ -545,12 +547,11 @@ function tryOpenURLParam(){
   const params=new URLSearchParams(location.search);
   const room=params.get("room"),filter=params.get("filter");
   if(filter){
-    if(filter==="rented"||filter==="vacant"){
+    if(filter==="rented"||filter==="vacant"||filter==="unpaid"){
       setStatusFilter(filter);
     } else {
       curFilter=filter;
-      const labels={unpaid:"미납 세대만 보기"};
-      document.getElementById("filter-banner-txt").textContent="🔍 "+(labels[filter]||filter);
+      document.getElementById("filter-banner-txt").textContent="🔍 "+filter;
       document.getElementById("filter-banner").style.display="flex";renderGrid();
     }
   }
