@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0F1C2D">
+<link rel="icon" href="../favicon.png">
+<link rel="apple-touch-icon" href="../icon-192.png">
+<title>🔧 관리자 · 메인</title>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://rent-4d521-default-rtdb.firebaseio.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="../shared.js?v=2"></script>
+<script src="../db-paths.js"></script>
+<style>
+:root{
+  --bg:#0F1C2D;--card:#1A2B3C;--border:rgba(255,255,255,.08);
+  --text:#F0F6FF;--sub:#94A3B8;--hint:#64748B;
+  --sky:#0EA5E9;--gold:#F59E0B;--green:#10B981;--red:#EF4444;
+  --radius:14px;--shadow:0 4px 20px rgba(0,0,0,.4)
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--text);overscroll-behavior:none}
+/* HDR */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,#0A1628,#1A2B3C);border-bottom:1px solid rgba(245,158,11,.2);box-shadow:0 3px 20px rgba(0,0,0,.5)}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 16px}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.admin-badge{font-size:10px;font-weight:800;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:var(--gold);padding:3px 8px;border-radius:6px;letter-spacing:.5px}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.ctx-btn{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:6px 10px;background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.25);color:var(--sky);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+.av-img{width:32px;height:32px;border-radius:50%;border:2px solid rgba(245,158,11,.4);object-fit:cover;cursor:pointer}
+.av-txt{width:32px;height:32px;border-radius:50%;background:var(--sky);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid rgba(245,158,11,.4);cursor:pointer}
+.nav{display:flex;border-top:1px solid rgba(255,255,255,.08);overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav-tab{flex:1;text-align:center;padding:10px 4px;font-size:12px;font-weight:700;color:var(--sub);text-decoration:none;white-space:nowrap;min-width:60px;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+.nav-tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+.content{margin-top:96px;padding:16px;min-height:calc(100vh - 96px);padding-bottom:40px}
+/* CARDS */
+.sec-title{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.add-card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:14px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.field label{font-size:11px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.5px}
+.field input{border:1.5px solid var(--border);border-radius:10px;padding:11px 13px;font-size:14px;font-family:inherit;outline:none;color:var(--text);background:rgba(255,255,255,.04);width:100%;transition:border-color .2s}
+.field input:focus{border-color:var(--sky)}
+.field input::placeholder{color:var(--hint)}
+.btn-add-u{width:100%;padding:13px;background:linear-gradient(135deg,var(--gold),#D97706);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+/* USER CARDS */
+.users-list{display:flex;flex-direction:column;gap:10px}
+.user-card{background:var(--card);border-radius:var(--radius);padding:14px;border:1.5px solid var(--border);box-shadow:var(--shadow)}
+.user-card.active{border-color:var(--sky);background:rgba(14,165,233,.05)}
+.uc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.uc-name{font-size:15px;font-weight:700;color:var(--text)}
+.uc-num{font-size:11px;font-weight:700;background:rgba(255,255,255,.07);color:var(--sub);padding:2px 8px;border-radius:5px}
+.uc-desc{font-size:12px;color:var(--sub);margin-bottom:6px}
+.uc-uid{font-size:10px;color:var(--hint);word-break:break-all;background:rgba(0,0,0,.25);border-radius:6px;padding:5px 8px;font-family:monospace;margin-bottom:10px}
+.uc-actions{display:flex;gap:6px;flex-wrap:wrap}
+.uc-btn{flex:1;min-width:56px;padding:9px 4px;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-sky{background:var(--sky);color:#fff}
+.btn-main{background:rgba(14,165,233,.1);color:var(--sky);border:1px solid rgba(14,165,233,.25)}
+.btn-grn{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.25)}
+.btn-pur{background:rgba(124,58,237,.12);color:#7C3AED;border:1px solid rgba(124,58,237,.25)}
+.btn-teal{background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.25)}
+.btn-del{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+/* PENDING */
+.pending-card{background:rgba(245,158,11,.06);border:1.5px solid rgba(245,158,11,.2);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+.pending-card.card-rejected{background:rgba(239,68,68,.04);border-color:rgba(239,68,68,.2)}
+.pending-card.card-active{background:rgba(16,185,129,.04);border-color:rgba(16,185,129,.2)}
+.pc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.pc-name{font-size:14px;font-weight:700;color:var(--text)}
+.pc-badge{font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px}
+.badge-pending{background:rgba(245,158,11,.15);color:var(--gold)}
+.badge-rejected{background:rgba(239,68,68,.12);color:var(--red)}
+.badge-active{background:rgba(16,185,129,.12);color:var(--green)}
+.pc-email{font-size:12px;color:var(--sub);margin-bottom:2px}
+.pc-time{font-size:11px;color:var(--hint);margin-bottom:10px}
+.pc-memo-row{display:flex;gap:6px;margin-bottom:8px}
+.pc-memo-inp{flex:1;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit;color:var(--text);outline:none}
+.pc-btn-row{display:flex;gap:6px}
+.btn-approve{flex:1;padding:9px 4px;background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.3);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-reject{flex:1;padding:9px 4px;background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+/* FILTER TABS */
+.filter-tabs{display:flex;gap:6px;margin-bottom:10px}
+.filter-tab{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--sub);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.filter-tab.on{background:var(--gold);color:#0F1C2D;border-color:var(--gold)}
+/* PAGINATION */
+.page-btn{padding:8px 16px;border-radius:8px;border:1.5px solid var(--border);background:rgba(255,255,255,.04);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--sub);transition:background .15s}
+.page-btn:disabled{opacity:.3;cursor:not-allowed}
+.page-info{font-size:13px;color:var(--sub);font-weight:600}
+/* MEMO */
+.uc-pending-memo{font-size:11px;color:var(--sky);margin-bottom:6px;line-height:1.5;word-break:break-all}
+.uc-memo-details{margin-bottom:6px}
+.uc-memo-summary{font-size:11px;color:var(--sky);cursor:pointer;list-style:none;display:flex;align-items:center;gap:4px;word-break:break-all}
+.uc-memo-summary::-webkit-details-marker{display:none}
+.uc-memo-full{font-size:11px;color:var(--sky);margin-top:6px;padding:7px 10px;background:rgba(14,165,233,.06);border-radius:7px;line-height:1.7;white-space:pre-wrap;word-break:break-all}
+/* EMPTY */
+.empty-state{text-align:center;padding:40px 16px;color:var(--hint)}
+.empty-icon{font-size:40px;margin-bottom:10px}
+.empty-txt{font-size:13px;line-height:1.8}
+/* BLIND */
+.btn-blind-wrap{position:relative;flex:1;min-width:56px}
+.btn-blind{position:absolute;inset:0;border-radius:9px;background:rgba(71,85,105,.28);border:1.5px solid rgba(100,116,139,.4);color:var(--sub);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;z-index:2;font-family:inherit;transition:opacity .2s,transform .22s cubic-bezier(.4,0,.2,1);user-select:none}
+.btn-blind.lifted{opacity:0;transform:translateY(-8px);pointer-events:none}
+/* CONFIRM */
+.confirm-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
+.confirm-bg.show{display:flex}
+.confirm-box{background:#1A2B3C;border:1px solid var(--border);border-radius:20px;padding:24px;max-width:320px;width:100%;box-shadow:0 12px 48px rgba(0,0,0,.5)}
+.confirm-box h3{font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px}
+.confirm-box p{font-size:13px;color:var(--sub);margin-bottom:18px;line-height:1.6;white-space:pre-line}
+.confirm-btns{display:flex;gap:10px;justify-content:flex-end}
+.confirm-btns button{padding:9px 18px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+/* TOAST / LOADING */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1F2937;color:#fff;padding:11px 20px;border-radius:24px;font-size:14px;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);max-width:calc(100vw - 48px);text-align:center;line-height:1.6;box-shadow:0 4px 16px rgba(0,0,0,.4);pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0)}
+#loading-overlay{position:fixed;inset:0;background:rgba(10,22,40,.95);z-index:8000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .3s}
+#loading-overlay.hide{opacity:0;pointer-events:none}
+.spinner{width:44px;height:44px;border:5px solid rgba(255,255,255,.12);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{color:rgba(255,255,255,.5);font-size:13px}
+#access-denied{position:fixed;inset:0;background:linear-gradient(160deg,#0A1628,#1A2B3C);z-index:7500;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;gap:14px}
+.denied-icon{font-size:64px}
+.denied-title{font-size:20px;font-weight:900;color:var(--red)}
+.denied-sub{font-size:13px;color:var(--sub);line-height:1.7}
+.denied-btn{padding:12px 28px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--red);border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+/* USER DROPDOWN */
+.usr-drop{position:fixed;background:#1A2B3C;border:1px solid var(--border);border-radius:12px;min-width:220px;max-width:300px;z-index:500;box-shadow:0 8px 32px rgba(0,0,0,.5);overflow:hidden;max-height:60vh;overflow-y:auto}
+.usr-drop-item{padding:11px 14px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:2px}
+.usr-drop-item:last-child{border-bottom:none}
+.usr-drop-item:active{background:rgba(14,165,233,.1)}
+.usr-drop-item.on{color:var(--sky)}
+.usr-drop-uid{font-size:10px;color:var(--hint);font-family:monospace}
+.usr-drop-none{padding:11px 14px;font-size:12px;color:var(--hint);cursor:pointer;border-bottom:1px solid var(--border)}
+.usr-drop-none:active{background:rgba(255,255,255,.04)}
+</style>
+</head>
+<body>
+
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-txt">인증 확인 중...</div>
+</div>
+<div id="access-denied" style="display:none">
+  <div class="denied-icon">🚫</div>
+  <div class="denied-title">접근 권한 없음</div>
+  <div class="denied-sub">전체 관리자만 접근할 수 있는 페이지입니다.</div>
+  <button class="denied-btn" onclick="location.href='../index.html'">← 돌아가기</button>
+</div>
+
+<div id="app" style="display:none">
+  <div class="hdr">
+    <div class="hdr-top">
+      <div class="hdr-left">
+        <a href="admin.html" style="display:flex;align-items:center;line-height:0">
+          <img src="../logo.png" alt="PlusHome" style="height:36px;width:auto;image-rendering:-webkit-optimize-contrast">
+        </a>
+        <span class="admin-badge">ADMIN</span>
+      </div>
+      <div class="hdr-right">
+        <button class="ctx-btn" id="ctx-btn" onclick="toggleUserDrop(event)">사용자 선택 ▾</button>
+        <div id="av-wrap" style="cursor:pointer" onclick="auth.signOut().then(()=>location.href='../index.html')"></div>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="admin.html" class="nav-tab on">📊 메인</a>
+      <a href="units.html" class="nav-tab">🏠 세대</a>
+      <a href="expense.html" class="nav-tab">💸 장부</a>
+      <a href="manage.html" class="nav-tab">🗂 관리</a>
+    </nav>
+  </div>
+
+  <div class="content">
+    <!-- 신규 사용자 승인 -->
+    <div class="sec-title" style="margin-bottom:8px">🔔 신규 사용자 승인</div>
+    <div class="filter-tabs">
+      <button class="filter-tab on" id="ft-pending" onclick="setFilter('pending')">⏳ 대기중</button>
+      <button class="filter-tab" id="ft-all" onclick="setFilter('all')">전체</button>
+    </div>
+    <div id="pending-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
+
+    <!-- 사용자 등록 -->
+    <div class="add-card">
+      <div class="sec-title">➕ 사용자 등록</div>
+      <div class="field">
+        <label>표시 이름 (담당자 · 건물명)</label>
+        <input type="text" id="inp-name" placeholder="예: 홍길동 · 강남빌라">
+      </div>
+      <div class="field">
+        <label>Firebase UID</label>
+        <input type="text" id="inp-uid" placeholder="Authentication에서 복사한 UID">
+      </div>
+      <div class="field">
+        <label>메모 (선택)</label>
+        <input type="text" id="inp-memo" placeholder="연락처, 주소 등">
+      </div>
+      <button class="btn-add-u" onclick="addUser()">➕ 등록하기</button>
+    </div>
+
+    <!-- 사용자 목록 -->
+    <div class="sec-title" style="margin-bottom:10px">👥 관리 사용자 목록</div>
+    <div class="users-list" id="users-list"></div>
+    <div id="uc-pagination" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 0;margin-bottom:20px"></div>
+  </div>
+</div>
+
+<div class="confirm-bg" id="confirm-modal">
+  <div class="confirm-box">
+    <h3 id="cm-title">확인</h3>
+    <p id="cm-msg"></p>
+    <div class="confirm-btns">
+      <button style="background:rgba(255,255,255,.07);color:var(--sub)" onclick="closeCM()">취소</button>
+      <button style="background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)" id="cm-ok">확인</button>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+let usersRef=null,pendingUsersRef=null,allUsersData={},pendingFilter="pending";
+let viewingUid=sessionStorage.getItem("master_view_uid")||null;
+let viewingName=sessionStorage.getItem("master_view_name")||null;
+let ucTotalList=[],ucPage=1,_usrDrop=null;
+
+auth.onAuthStateChanged(user=>{
+  const lo=document.getElementById("loading-overlay");
+  const app=document.getElementById("app");
+  const denied=document.getElementById("access-denied");
+  if(!user){
+    auth.signInWithPopup(gProv)
+      .then(r=>{if(r.user.uid!==MASTER_UID){lo.classList.add("hide");denied.style.display="flex";auth.signOut();}})
+      .catch(()=>{lo.classList.add("hide");denied.style.display="flex";});
+    return;
+  }
+  if(user.uid!==MASTER_UID){lo.classList.add("hide");denied.style.display="flex";return;}
+  lo.classList.add("hide");app.style.display="block";
+  const w=document.getElementById("av-wrap");
+  w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"A")[0]}</div>`;
+  usersRef=db.ref(DBPath.masterUsers());
+  usersRef.on("value",snap=>renderUsers(snap.val()||{}));
+  pendingUsersRef=db.ref(DBPath.pendingUsers());
+  pendingUsersRef.on("value",snap=>{allUsersData=snap.val()||{};renderPendingUsers();renderUsersPage();});
+  updateCtxBtn();
+});
+
+function updateCtxBtn(){
+  const btn=document.getElementById("ctx-btn");if(!btn)return;
+  if(viewingUid){
+    const n=viewingName||viewingUid;
+    btn.textContent=(n.length>12?n.slice(0,11)+"…":n)+" ▾";
+    btn.style.color="var(--green)";btn.style.borderColor="rgba(16,185,129,.4)";btn.style.background="rgba(16,185,129,.1)";
+  }else{
+    btn.textContent="사용자 선택 ▾";
+    btn.style.color="var(--sky)";btn.style.borderColor="rgba(14,165,233,.25)";btn.style.background="rgba(14,165,233,.1)";
+  }
+}
+
+function toggleUserDrop(e){
+  if(e)e.stopPropagation();
+  if(_usrDrop){_usrDrop.remove();_usrDrop=null;return;}
+  if(!ucTotalList.length){showToast("등록된 사용자가 없습니다");return;}
+  const btn=document.getElementById("ctx-btn");
+  const drop=document.createElement("div");drop.className="usr-drop";
+  const none=document.createElement("div");none.className="usr-drop-none";
+  none.textContent="— 선택 안함 —";
+  none.onclick=()=>{clearViewing();_usrDrop.remove();_usrDrop=null;};
+  drop.appendChild(none);
+  ucTotalList.forEach(u=>{
+    const item=document.createElement("div");
+    item.className="usr-drop-item"+(viewingUid===u.uid?" on":"");
+    const nm=document.createElement("span");nm.textContent=u.name;
+    const uid=document.createElement("span");uid.className="usr-drop-uid";uid.textContent=u.uid;
+    item.appendChild(nm);item.appendChild(uid);
+    item.onclick=()=>{setViewing(u.uid,u.name);_usrDrop.remove();_usrDrop=null;};
+    drop.appendChild(item);
+  });
+  const r=btn.getBoundingClientRect();
+  drop.style.cssText=`top:${r.bottom+4}px;right:${window.innerWidth-r.right}px;position:fixed`;
+  document.body.appendChild(drop);_usrDrop=drop;
+}
+document.addEventListener("click",()=>{if(_usrDrop){_usrDrop.remove();_usrDrop=null;}});
+
+// ── 신규 승인 ──
+function setFilter(f){
+  pendingFilter=f;
+  document.getElementById("ft-pending").className="filter-tab"+(f==="pending"?" on":"");
+  document.getElementById("ft-all").className="filter-tab"+(f==="all"?" on":"");
+  renderPendingUsers();
+}
+function renderPendingUsers(){
+  const all=Object.values(allUsersData).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""));
+  const list=pendingFilter==="pending"?all.filter(u=>(u.status||"pending")==="pending"):all;
+  const el=document.getElementById("pending-list");
+  if(!list.length){
+    el.innerHTML=`<div class="empty-state" style="padding:20px 0"><div class="empty-icon" style="font-size:32px">✅</div><div class="empty-txt">${pendingFilter==="pending"?"대기 중인 신규 사용자 없음":"신규 사용자 없음"}</div></div>`;
+    return;
+  }
+  el.innerHTML=list.map(u=>{
+    const st=u.status||"pending";
+    const badgeCls=st==="active"?"badge-active":st==="rejected"?"badge-rejected":"badge-pending";
+    const badgeTxt=st==="active"?"✅ 활성":st==="rejected"?"🚫 거부":"⏳ 대기";
+    const cardCls=st==="active"?" card-active":st==="rejected"?" card-rejected":"";
+    const dt=u.createdAt?new Date(u.createdAt).toLocaleString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}):"";
+    return`<div class="pending-card${cardCls}">
+      <div class="pc-top"><div class="pc-name">${esc(u.displayName||"(이름없음)")}</div><span class="pc-badge ${badgeCls}">${badgeTxt}</span></div>
+      <div class="pc-email">📧 ${esc(u.email||"")}</div>
+      <div class="pc-time">🕐 신청: ${esc(dt)}</div>
+      <div class="pc-memo-row">
+        <input class="pc-memo-inp" id="pm-${esc(u.uid)}" type="text" value="${esc(u.memo||"")}" placeholder="메모 (결제일, 건물명 등)">
+        <button style="padding:8px 12px;background:rgba(14,165,233,.1);color:var(--sky);border:1px solid rgba(14,165,233,.25);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap" onclick="savePendingMemo('${esc(u.uid)}')">저장</button>
+        <button style="padding:8px 10px;background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0" onclick="deletePendingMemo('${esc(u.uid)}')">🗑</button>
+      </div>
+      <div class="pc-btn-row">
+        ${st!=="active"?`<button class="btn-approve" onclick="approveUser('${esc(u.uid)}','${esc(u.displayName||"")}','${esc(u.email||"")}')">✅ 활성화</button>`:""}
+        ${st!=="rejected"?`<div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 거부</div><button class="btn-reject" style="width:100%" onclick="rejectUser('${esc(u.uid)}')">🚫 거부</button></div>`:""}
+        ${st==="active"?`<button class="btn-approve" style="background:rgba(14,165,233,.12);color:var(--sky);border:1px solid rgba(14,165,233,.3)" onclick="setAndGo('${esc(u.uid)}','${esc(u.displayName||u.uid)}','units')">👁 세대 열람</button>`:""}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+async function approveUser(uid,displayName,email){
+  try{
+    await db.ref(DBPath.pendingUser(uid)).update({status:"active"});
+    const snap=await db.ref(DBPath.masterUser(uid)).once("value");
+    if(!snap.exists()){
+      const memo=document.getElementById("pm-"+uid)?.value.trim()||"";
+      await db.ref(DBPath.masterUser(uid)).set({uid,name:displayName||email||uid,memo,createdAt:(allUsersData[uid]?.createdAt||new Date().toISOString())});
+    }
+    showToast("✅ 활성화됨: "+(displayName||email));
+  }catch(e){showToast("❗ 실패: "+e.message)}
+}
+async function rejectUser(uid){
+  try{await db.ref(DBPath.pendingUser(uid)).update({status:"rejected"});showToast("🚫 거부됨");}
+  catch(e){showToast("❗ 실패")}
+}
+async function savePendingMemo(uid){
+  const val=document.getElementById("pm-"+uid)?.value.trim()||"";
+  try{await db.ref(DBPath.pendingUser(uid)).update({memo:val});showToast("✅ 메모 저장됨");}
+  catch(e){showToast("❗ 실패")}
+}
+async function deletePendingMemo(uid){
+  try{
+    const inp=document.getElementById("pm-"+uid);if(inp)inp.value="";
+    await db.ref(DBPath.pendingUserMemo(uid)).remove();showToast("🗑 메모 삭제됨");
+  }catch(e){showToast("❗ 실패")}
+}
+
+// ── 사용자 등록 ──
+function addUser(){
+  const name=document.getElementById("inp-name").value.trim();
+  const uid=document.getElementById("inp-uid").value.trim();
+  const memo=document.getElementById("inp-memo").value.trim();
+  if(!name){showToast("❗ 이름을 입력하세요");return}
+  if(!uid||uid.length<20){showToast("❗ 올바른 UID를 입력하세요");return}
+  usersRef.child(uid).set({uid,name,memo,createdAt:new Date().toISOString()})
+    .then(()=>{document.getElementById("inp-name").value="";document.getElementById("inp-uid").value="";document.getElementById("inp-memo").value="";showToast("✅ 등록됨: "+name);})
+    .catch(()=>showToast("❗ 등록 실패"));
+}
+
+// ── 목록 렌더 ──
+function renderUsers(data){
+  ucTotalList=Object.values(data).sort((a,b)=>a.createdAt>b.createdAt?1:-1);
+  ucPage=1;renderUsersPage();
+}
+function renderUsersPage(){
+  const el=document.getElementById("users-list");
+  const pgEl=document.getElementById("uc-pagination");
+  if(!ucTotalList.length){
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-txt">등록된 사용자가 없습니다<br>위에서 UID를 등록해보세요</div></div>`;
+    if(pgEl)pgEl.innerHTML="";return;
+  }
+  const total=ucTotalList.length,tp=Math.ceil(total/10);
+  if(ucPage<1)ucPage=1;if(ucPage>tp)ucPage=tp;
+  const start=(ucPage-1)*10;
+  el.innerHTML=ucTotalList.slice(start,start+10).map((u,i)=>{
+    const isV=viewingUid===u.uid;
+    const pm=allUsersData[u.uid]?.memo||"";
+    const googleName=allUsersData[u.uid]?.displayName||"";
+    const showName=googleName||u.name;
+    const alias=(googleName&&googleName!==u.name)?u.name:"";
+    const memoHtml=pm
+      ?(pm.length<=25?`<div class="uc-pending-memo">💬 ${esc(pm)}</div>`:`<details class="uc-memo-details"><summary class="uc-memo-summary">💬 ${esc(pm.slice(0,25))}…</summary><div class="uc-memo-full">${esc(pm)}</div></details>`)
+      :"";
+    return`<div class="user-card${isV?" active":""}" id="uc-${esc(u.uid)}">
+      <div class="uc-top"><div class="uc-name">${esc(showName)}${alias?`<span style="font-size:11px;color:var(--sub);font-weight:400;margin-left:6px">(${esc(alias)})</span>`:""}</div><div class="uc-num">#${start+i+1}</div></div>
+      ${memoHtml}
+      ${u.memo&&u.memo!==pm?`<div class="uc-desc">📝 ${esc(u.memo)}</div>`:""}
+      <div class="uc-uid">${esc(u.uid)}</div>
+      <div class="uc-actions">
+        <button class="uc-btn btn-main" onclick="setAndGo('${esc(u.uid)}','${esc(showName)}','units')">🏠 세대</button>
+        <button class="uc-btn btn-pur" onclick="setAndGo('${esc(u.uid)}','${esc(showName)}','expense')">💸 장부</button>
+        <button class="uc-btn btn-teal" onclick="setAndGo('${esc(u.uid)}','${esc(showName)}','manage')">🗂 관리</button>
+        <div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 🗑</div><button class="uc-btn btn-del" style="width:100%" onclick="delUser('${esc(u.uid)}','${esc(showName)}')">🗑</button></div>
+      </div>
+    </div>`;
+  }).join("");
+  if(!pgEl)return;
+  if(tp<=1){pgEl.innerHTML="";return;}
+  pgEl.innerHTML=`<button class="page-btn" onclick="ucSetPage(${ucPage-1})" ${ucPage<=1?"disabled":""}>◀</button><span class="page-info">${ucPage} / ${tp}</span><button class="page-btn" onclick="ucSetPage(${ucPage+1})" ${ucPage>=tp?"disabled":""}>▶</button>`;
+}
+function ucSetPage(p){ucPage=p;renderUsersPage()}
+
+// ── 사용자 선택 ──
+function setViewing(uid,name){
+  viewingUid=uid;viewingName=name;
+  sessionStorage.setItem("master_view_uid",uid);
+  sessionStorage.setItem("master_view_name",name);
+  document.querySelectorAll(".user-card").forEach(c=>c.classList.remove("active"));
+  const el=document.getElementById("uc-"+uid);if(el)el.classList.add("active");
+  updateCtxBtn();showToast("✅ 선택됨: "+name);
+}
+function clearViewing(){
+  viewingUid=null;viewingName=null;
+  sessionStorage.removeItem("master_view_uid");
+  sessionStorage.removeItem("master_view_name");
+  document.querySelectorAll(".user-card").forEach(c=>c.classList.remove("active"));
+  updateCtxBtn();
+}
+function setAndGo(uid,name,page){setViewing(uid,name);setTimeout(()=>location.href=page+".html",150);}
+function liftBlind(el){el.classList.add("lifted")}
+
+// ── 삭제 ──
+function delUser(uid,name){
+  showCM("사용자 삭제",`"${name}"을 목록에서 삭제할까요?\n실제 데이터는 삭제되지 않습니다`,()=>{
+    usersRef.child(uid).remove()
+      .then(()=>{if(viewingUid===uid)clearViewing();showToast("🗑 삭제됨: "+name)})
+      .catch(()=>showToast("❗ 삭제 실패"));
+  });
+}
+function showCM(title,msg,cb){
+  document.getElementById("cm-title").textContent=title;
+  document.getElementById("cm-msg").textContent=msg;
+  document.getElementById("cm-ok").onclick=()=>{cb();closeCM();};
+  document.getElementById("confirm-modal").classList.add("show");
+}
+function closeCM(){document.getElementById("confirm-modal").classList.remove("show")}
+</script>
+</body>
+</html>
