@@ -160,9 +160,9 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
           <img src="../logo.png" alt="PlusHome" style="height:36px;width:auto;image-rendering:-webkit-optimize-contrast">
         </a>
         <span class="admin-badge">ADMIN</span>
+        <button class="ctx-btn" id="ctx-btn" onclick="toggleUserDrop(event)">사용자 선택 ▾</button>
       </div>
       <div class="hdr-right">
-        <button class="ctx-btn" id="ctx-btn" onclick="toggleUserDrop(event)">사용자 선택 ▾</button>
         <div id="av-wrap" style="cursor:pointer" onclick="auth.signOut().then(()=>location.href='../index.html')"></div>
       </div>
     </div>
@@ -176,33 +176,23 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 
   <div class="content">
     <!-- 신규 사용자 승인 -->
-    <div class="sec-title" style="margin-bottom:8px">🔔 신규 사용자 승인</div>
+    <div class="sec-title" style="margin-bottom:8px" id="pending-sec-title">🔔 신규 사용자 승인</div>
     <div class="filter-tabs">
       <button class="filter-tab on" id="ft-pending" onclick="setFilter('pending')">⏳ 대기중</button>
       <button class="filter-tab" id="ft-all" onclick="setFilter('all')">전체</button>
     </div>
     <div id="pending-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
 
-    <!-- 사용자 등록 -->
-    <div class="add-card">
-      <div class="sec-title">➕ 사용자 등록</div>
-      <div class="field">
-        <label>표시 이름 (담당자 · 건물명)</label>
-        <input type="text" id="inp-name" placeholder="예: 홍길동 · 강남빌라">
+    <!-- 사용자 목록 제목 (removed 사용자 등록 section) -->
+    <div style="display:none">
+      <input type="text" id="inp-name">
+      <input type="text" id="inp-uid">
+      <input type="text" id="inp-memo">
       </div>
-      <div class="field">
-        <label>Firebase UID</label>
-        <input type="text" id="inp-uid" placeholder="Authentication에서 복사한 UID">
-      </div>
-      <div class="field">
-        <label>메모 (선택)</label>
-        <input type="text" id="inp-memo" placeholder="연락처, 주소 등">
-      </div>
-      <button class="btn-add-u" onclick="addUser()">➕ 등록하기</button>
     </div>
 
     <!-- 사용자 목록 -->
-    <div class="sec-title" style="margin-bottom:10px">👥 관리 사용자 목록</div>
+    <div class="sec-title" style="margin-bottom:10px" id="users-sec-title">👥 관리 사용자 목록</div>
     <div class="users-list" id="users-list"></div>
     <div id="uc-pagination" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 0;margin-bottom:20px"></div>
   </div>
@@ -293,6 +283,10 @@ function setFilter(f){
 }
 function renderPendingUsers(){
   const all=Object.values(allUsersData).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""));
+  const pendingCount=all.filter(u=>(u.status||"pending")==="pending").length;
+  const totalCount=all.length;
+  const titleEl=document.getElementById("pending-sec-title");
+  if(titleEl)titleEl.textContent=`🔔 신규 사용자 승인 (대기중-${pendingCount}명, 전체-${totalCount}명)`;
   const list=pendingFilter==="pending"?all.filter(u=>(u.status||"pending")==="pending"):all;
   const el=document.getElementById("pending-list");
   if(!list.length){
@@ -365,13 +359,15 @@ function addUser(){
 // ── 목록 렌더 ──
 function renderUsers(data){
   ucTotalList=Object.values(data).sort((a,b)=>a.createdAt>b.createdAt?1:-1);
+  const t=document.getElementById("users-sec-title");
+  if(t)t.textContent=`👥 관리 사용자 목록 (${ucTotalList.length}명)`;
   ucPage=1;renderUsersPage();
 }
 function renderUsersPage(){
   const el=document.getElementById("users-list");
   const pgEl=document.getElementById("uc-pagination");
   if(!ucTotalList.length){
-    el.innerHTML=`<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-txt">등록된 사용자가 없습니다<br>위에서 UID를 등록해보세요</div></div>`;
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-txt">등록된 사용자가 없습니다<br>신규 승인 후 자동으로 표시됩니다</div></div>`;
     if(pgEl)pgEl.innerHTML="";return;
   }
   const total=ucTotalList.length,tp=Math.ceil(total/10);

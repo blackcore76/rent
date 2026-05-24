@@ -133,6 +133,13 @@
 .btn-blind{position:absolute;inset:0;border-radius:6px;background:rgba(71,85,105,.32);border:1.5px solid rgba(100,116,139,.45);color:rgba(255,255,255,.55);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;z-index:2;font-family:inherit;transition:opacity .2s,transform .22s cubic-bezier(.4,0,.2,1);user-select:none}
 .btn-blind.lifted{opacity:0;transform:translateY(-7px);pointer-events:none}
 #restore-blind-btn.lifted{opacity:1!important;transform:none!important;pointer-events:auto!important;background:#FCA5A5!important;color:#7F1D1D!important;border:2px solid #F87171!important}
+.usr-drop{position:fixed;background:#fff;border:1px solid var(--border);border-radius:12px;min-width:200px;max-width:280px;z-index:500;box-shadow:0 8px 28px rgba(0,0,0,.18);overflow:hidden;max-height:55vh;overflow-y:auto}
+.usr-drop-item{padding:10px 14px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:2px}
+.usr-drop-item:last-child{border-bottom:none}
+.usr-drop-item:active{background:var(--bg)}
+.usr-drop-item.on{color:var(--sky)}
+.usr-drop-uid{font-size:10px;color:var(--hint);font-family:monospace}
+.usr-drop-none{padding:10px 14px;font-size:12px;color:var(--hint);cursor:pointer;border-bottom:1px solid var(--border)}
 </style>
 </head>
 <body>
@@ -158,7 +165,7 @@
           <img src="../logo.png" alt="PlusHome" style="height:40px;width:auto;image-rendering:-webkit-optimize-contrast">
         </a>
         <span style="font-size:10px;font-weight:800;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);color:#D97706;padding:3px 7px;border-radius:6px;letter-spacing:.4px;flex-shrink:0">ADMIN</span>
-        <button id="ctx-btn" onclick="location.href='admin.html'" style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:5px 9px;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.3);color:#059669;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">—</button>
+        <button id="ctx-btn" onclick="toggleUserDrop(event)" style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:5px 9px;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.3);color:#059669;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">—  ▾</button>
       </div>
       <div class="hdr-actions">
         <button class="guide-btn" onclick="toggleBackup(event)">💾 백업</button>
@@ -372,7 +379,7 @@
 <div id="backup-panel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;align-items:flex-end;justify-content:center">
   <div style="background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 36px;width:100%;max-width:540px;max-height:80vh;overflow-y:auto;overscroll-behavior:contain">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <h3 style="font-size:17px;font-weight:900;color:var(--hdr)">💾 관리 데이터 백업 / 복구</h3>
+      <h3 style="font-size:17px;font-weight:900;color:var(--hdr)">💾 전체 건물 백업 / 복구</h3>
       <button onclick="toggleBackup()" style="width:32px;height:32px;border:none;background:#F3F4F6;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
     </div>
     <div id="backup-user-label" style="font-size:12px;font-weight:700;color:#D97706;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:7px 12px;margin-bottom:14px"></div>
@@ -382,7 +389,7 @@
     </div>
     <div style="font-size:12px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">복구</div>
     <div style="background:#FFF7ED;border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:10px 12px;font-size:12px;color:#92400E;margin-bottom:10px;line-height:1.6">
-      ⚠️ JSON 복구는 <b>기존 관리 데이터를 모두 덮어씁니다.</b> 반드시 먼저 백업하세요.
+      ⚠️ JSON 복구는 <b>전화번호부 · 건물목록 · 모든 건물 데이터를 덮어씁니다.</b> 반드시 먼저 백업하세요.
     </div>
     <label style="display:flex;align-items:center;gap:10px;padding:12px;background:#F8FAFC;border:2px dashed var(--border);border-radius:12px;cursor:pointer;margin-bottom:10px">
       <span style="font-size:13px;font-weight:600;color:var(--sub)">📂 JSON 파일 선택</span>
@@ -437,7 +444,8 @@ auth.onAuthStateChanged(async user=>{
     }
     const w=document.getElementById("av-wrap");
     w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"U")[0]}</div>`;
-    document.getElementById("ctx-btn").textContent=_tName||_tUid;
+    document.getElementById("ctx-btn").textContent=(_tName||_tUid)+" ▾";
+    loadUserList();
     if(pbL&&pbRef)pbRef.off("value",pbL);
     if(uL&&uRef)uRef.off("value",uL);
     if(bldgDetailL&&bldgDetailRef)bldgDetailRef.off("value",bldgDetailL);
@@ -496,6 +504,42 @@ function doSignOut(){
   if(bldgsL&&bldgsRef)bldgsRef.off("value",bldgsL);
   auth.signOut().then(()=>location.href="admin.html");
 }
+// ── USER DROPDOWN ──
+let _usrDrop=null,_usrList=[];
+function loadUserList(){
+  db.ref(DBPath.masterUsers()).once("value").then(snap=>{
+    _usrList=Object.values(snap.val()||{}).sort((a,b)=>a.createdAt>b.createdAt?1:-1);
+  });
+}
+function toggleUserDrop(e){
+  if(e)e.stopPropagation();
+  if(_usrDrop){_usrDrop.remove();_usrDrop=null;return;}
+  if(!_usrList.length){showToast("사용자 목록 로드 중…");return;}
+  const btn=document.getElementById("ctx-btn");
+  const drop=document.createElement("div");drop.className="usr-drop";
+  const none=document.createElement("div");none.className="usr-drop-none";
+  none.textContent="← 메인으로";none.onclick=()=>{_usrDrop.remove();_usrDrop=null;location.href="admin.html";};
+  drop.appendChild(none);
+  _usrList.forEach(u=>{
+    const item=document.createElement("div");
+    item.className="usr-drop-item"+(_tUid===u.uid?" on":"");
+    const nm=document.createElement("span");nm.textContent=u.name;
+    const uid=document.createElement("span");uid.className="usr-drop-uid";uid.textContent=u.uid;
+    item.appendChild(nm);item.appendChild(uid);
+    item.onclick=()=>{_usrDrop.remove();_usrDrop=null;switchUser(u.uid,u.name);};
+    drop.appendChild(item);
+  });
+  const r=btn.getBoundingClientRect();
+  drop.style.cssText=`top:${r.bottom+4}px;left:${r.left}px;position:fixed`;
+  document.body.appendChild(drop);_usrDrop=drop;
+}
+function switchUser(uid,name){
+  if(uid===_tUid){showToast("이미 선택된 사용자입니다");return;}
+  sessionStorage.setItem("master_view_uid",uid);
+  sessionStorage.setItem("master_view_name",name);
+  location.reload();
+}
+document.addEventListener("click",()=>{if(_usrDrop){_usrDrop.remove();_usrDrop=null;}});
 // ── SUB TABS ──
 let curSub=0;
 function setSubTab(n,btn){
@@ -1026,18 +1070,26 @@ function fmtToday(){const d=new Date();return`${d.getFullYear()}${String(d.getMo
 async function adminBackupJSON(){
   if(!_tUid){showToast("❗ 선택된 사용자 없음");return;}
   try{
-    const [pbSnap,bldgSnap,uSnap,cSnap]=await Promise.all([
-      db.ref(DBPath.phonebook(_tUid)).once("value"),
-      db.ref(DBPath.buildings(_tUid,curBid)).once("value"),
-      db.ref(DBPath.units(_tUid,curBid)).once("value"),
-      db.ref(DBPath.roomLayout(_tUid,curBid)).once("value")
-    ]);
-    const data={exportedAt:new Date().toISOString(),phonebook:pbSnap.val()||{},bldgDetails:bldgSnap.val()||{},units:uSnap.val()||{},layout:cSnap.val()||{}};
+    const bldListSnap=await db.ref(DBPath.bldList(_tUid)).once("value");
+    const bldList=bldListSnap.val()||{};
+    const bids=Object.keys(bldList);
+    const pbSnap=await db.ref(DBPath.phonebook(_tUid)).once("value");
+    const perBld={};
+    for(const bid of bids){
+      const [bSnap,uSnap,cSnap,rSnap]=await Promise.all([
+        db.ref(DBPath.buildings(_tUid,bid)).once("value"),
+        db.ref(DBPath.units(_tUid,bid)).once("value"),
+        db.ref(DBPath.roomLayout(_tUid,bid)).once("value"),
+        db.ref(DBPath.rentHistory(_tUid,bid)).once("value")
+      ]);
+      perBld[bid]={bldgDetails:bSnap.val()||{},units:uSnap.val()||{},layout:cSnap.val()||{},rentHistory:rSnap.val()||{}};
+    }
+    const data={exportedAt:new Date().toISOString(),phonebook:pbSnap.val()||{},buildings:bldList,perBuilding:perBld};
     const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
     const a=document.createElement("a");a.href=URL.createObjectURL(blob);
-    a.download=`관리자_관리_${_tName||_tUid}_${fmtToday()}.json`;a.click();URL.revokeObjectURL(a.href);
-    showToast("✅ JSON 내려받기 완료");
-  }catch(e){showToast("❗ 데이터 로드 실패");}
+    a.download=`관리자_전체건물_${_tName||_tUid}_${fmtToday()}.json`;a.click();URL.revokeObjectURL(a.href);
+    showToast("✅ 전체 건물 백업 완료");
+  }catch(e){showToast("❗ 데이터 로드 실패: "+e.message);}
 }
 function onRestoreFileSelected(e){
   const file=e.target.files[0];if(!file)return;
@@ -1048,9 +1100,10 @@ function onRestoreFileSelected(e){
       if(!parsed||typeof parsed!=="object"){showToast("❗ 올바른 JSON 파일이 아닙니다");return;}
       _restoreParsed=parsed;
       const pbCount=Object.keys(parsed.phonebook||{}).length;
+      const bldCount=Object.keys(parsed.buildings||{}).length;
       const prev=document.getElementById("restore-preview");
       prev.style.display="block";
-      prev.textContent=`✅ 전화번호부 ${pbCount}개 · 내보낸 날짜: ${(parsed.exportedAt||"알 수 없음").slice(0,10)}`;
+      prev.textContent=`✅ 전화번호부 ${pbCount}개 · 건물 ${bldCount}개 · 내보낸 날짜: ${(parsed.exportedAt||"알 수 없음").slice(0,10)}`;
       document.getElementById("restore-blind-wrap").style.display="block";
     }catch{showToast("❗ JSON 파싱 오류");}
   };
@@ -1074,12 +1127,21 @@ async function runAdminRestore(){
   prog.style.display="block";fill.style.width="10%";msg.textContent="전화번호부 저장 중…";
   try{
     if(_restoreParsed.phonebook)await db.ref(DBPath.phonebook(_tUid)).set(_restoreParsed.phonebook);
-    fill.style.width="40%";msg.textContent="건물 정보 저장 중…";
-    if(_restoreParsed.bldgDetails)await db.ref(DBPath.buildings(_tUid,curBid)).set(_restoreParsed.bldgDetails);
-    fill.style.width="70%";msg.textContent="레이아웃 저장 중…";
-    if(_restoreParsed.layout)await db.ref(DBPath.roomLayout(_tUid,curBid)).set(_restoreParsed.layout);
+    fill.style.width="30%";msg.textContent="건물 목록 저장 중…";
+    if(_restoreParsed.buildings)await db.ref(DBPath.bldList(_tUid)).set(_restoreParsed.buildings);
+    const perBld=_restoreParsed.perBuilding||{};
+    const bids=Object.keys(perBld);
+    for(let i=0;i<bids.length;i++){
+      const bid=bids[i];const d=perBld[bid];
+      fill.style.width=`${30+Math.round(60*(i+1)/bids.length)}%`;
+      msg.textContent=`건물 데이터 저장 중… (${i+1}/${bids.length})`;
+      if(d.bldgDetails)await db.ref(DBPath.buildings(_tUid,bid)).set(d.bldgDetails);
+      if(d.units)await db.ref(DBPath.units(_tUid,bid)).set(d.units);
+      if(d.layout)await db.ref(DBPath.roomLayout(_tUid,bid)).set(d.layout);
+      if(d.rentHistory)await db.ref(DBPath.rentHistory(_tUid,bid)).set(d.rentHistory);
+    }
     fill.style.width="100%";msg.textContent="완료!";
-    showToast("✅ 관리 데이터 복구 완료");
+    showToast("✅ 전체 건물 복구 완료");
     setTimeout(()=>{toggleBackup();resetRestoreUI();},1200);
   }catch(e){showToast("❗ 복구 실패: "+e.message);prog.style.display="none";}
 }

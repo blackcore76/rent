@@ -160,6 +160,13 @@
 .confirm-btns{display:flex;gap:10px;justify-content:flex-end}
 .confirm-btns button{padding:9px 18px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
 .btn-blind.lifted{background:#FCA5A5!important;color:#7F1D1D!important;border:2px solid #F87171!important}
+.usr-drop{position:fixed;background:#fff;border:1px solid var(--border);border-radius:12px;min-width:200px;max-width:280px;z-index:500;box-shadow:0 8px 28px rgba(0,0,0,.18);overflow:hidden;max-height:55vh;overflow-y:auto}
+.usr-drop-item{padding:10px 14px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:2px}
+.usr-drop-item:last-child{border-bottom:none}
+.usr-drop-item:active{background:var(--bg)}
+.usr-drop-item.on{color:var(--sky)}
+.usr-drop-uid{font-size:10px;color:var(--hint);font-family:monospace}
+.usr-drop-none{padding:10px 14px;font-size:12px;color:var(--hint);cursor:pointer;border-bottom:1px solid var(--border)}
 </style>
 </head>
 <body>
@@ -185,7 +192,7 @@
           <img src="../logo.png" alt="PlusHome" style="height:40px;width:auto;image-rendering:-webkit-optimize-contrast">
         </a>
         <span style="font-size:10px;font-weight:800;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);color:#D97706;padding:3px 7px;border-radius:6px;letter-spacing:.4px;flex-shrink:0">ADMIN</span>
-        <button id="ctx-btn" onclick="location.href='admin.html'" style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:5px 9px;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.3);color:#059669;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">—</button>
+        <button id="ctx-btn" onclick="toggleUserDrop(event)" style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:5px 9px;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.3);color:#059669;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">—  ▾</button>
       </div>
       <div class="hdr-actions">
         <button class="guide-btn" onclick="toggleBackup(event)">💾 백업</button>
@@ -440,7 +447,8 @@ auth.onAuthStateChanged(async user=>{
     }
     const w=document.getElementById("av-wrap");
     w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"U")[0]}</div>`;
-    document.getElementById("ctx-btn").textContent=_tName||_tUid;
+    document.getElementById("ctx-btn").textContent=(_tName||_tUid)+" ▾";
+    loadUserList();
     if(uL&&uRef)uRef.off("value",uL);
     if(hL&&hRef)hRef.off("value",hL);
     if(bldgsL&&bldgsRef)bldgsRef.off("value",bldgsL);
@@ -474,6 +482,41 @@ function doSignOut(){
   auth.signOut().then(()=>location.href="admin.html");
 }
 
+// ── USER DROPDOWN ──
+let _usrDrop=null,_usrList=[];
+function loadUserList(){
+  db.ref(DBPath.masterUsers()).once("value").then(snap=>{
+    _usrList=Object.values(snap.val()||{}).sort((a,b)=>a.createdAt>b.createdAt?1:-1);
+  });
+}
+function toggleUserDrop(e){
+  if(e)e.stopPropagation();
+  if(_usrDrop){_usrDrop.remove();_usrDrop=null;return;}
+  if(!_usrList.length){showToast("사용자 목록 로드 중…");return;}
+  const btn=document.getElementById("ctx-btn");
+  const drop=document.createElement("div");drop.className="usr-drop";
+  const none=document.createElement("div");none.className="usr-drop-none";
+  none.textContent="← 메인으로";none.onclick=()=>{_usrDrop.remove();_usrDrop=null;location.href="admin.html";};
+  drop.appendChild(none);
+  _usrList.forEach(u=>{
+    const item=document.createElement("div");
+    item.className="usr-drop-item"+(_tUid===u.uid?" on":"");
+    const nm=document.createElement("span");nm.textContent=u.name;
+    const uid=document.createElement("span");uid.className="usr-drop-uid";uid.textContent=u.uid;
+    item.appendChild(nm);item.appendChild(uid);
+    item.onclick=()=>{_usrDrop.remove();_usrDrop=null;switchUser(u.uid,u.name);};
+    drop.appendChild(item);
+  });
+  const r=btn.getBoundingClientRect();
+  drop.style.cssText=`top:${r.bottom+4}px;left:${r.left}px;position:fixed`;
+  document.body.appendChild(drop);_usrDrop=drop;
+}
+function switchUser(uid,name){
+  if(uid===_tUid){showToast("이미 선택된 사용자입니다");return;}
+  sessionStorage.setItem("master_view_uid",uid);
+  sessionStorage.setItem("master_view_name",name);
+  location.reload();
+}
 let _bldDrop=null;
 function openBldDrop(e){
   if(e)e.stopPropagation();
@@ -492,7 +535,10 @@ function openBldDrop(e){
   drop.style.cssText=`top:${r.bottom+4}px;right:${window.innerWidth-r.right}px`;
   document.body.appendChild(drop);_bldDrop=drop;
 }
-document.addEventListener("click",()=>{if(_bldDrop){_bldDrop.remove();_bldDrop=null;}});
+document.addEventListener("click",()=>{
+  if(_bldDrop){_bldDrop.remove();_bldDrop=null;}
+  if(_usrDrop){_usrDrop.remove();_usrDrop=null;}
+});
 function switchBld(bid){
   if(bid===curBid)return;
   if(uL&&uRef)uRef.off("value",uL);
