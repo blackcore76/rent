@@ -881,6 +881,18 @@ function saveRoom(){
   if(!curRoom)return;
   if(!guardWrite())return;
   const roomId=curRoom;
+  // 공실인데 임대 정보(이름·연락처·계약·금액)가 입력된 경우 임대중으로 자동 변경
+  const hasTenantInfo=
+    document.getElementById("m-name").value.trim()||
+    document.getElementById("m-name2").value.trim()||
+    document.getElementById("m-phone").value.trim()||
+    document.getElementById("m-phone2").value.trim()||
+    parseInt(document.getElementById("m-deposit").value)||
+    parseInt(document.getElementById("m-rent").value)||
+    document.getElementById("m-start").value||
+    document.getElementById("m-end").value;
+  const autoRented=mStatus==="vacant"&&hasTenantInfo;
+  if(autoRented){mStatus="rented";updateTgUI();}
   const data={room:roomId,floor:Math.floor(parseInt(roomId)/100),status:mStatus,roomType:mRoomType,rentType:mRentType,
     tenantName:document.getElementById("m-name").value.trim(),
     tenantName2:document.getElementById("m-name2").value.trim(),
@@ -893,7 +905,7 @@ function saveRoom(){
     memo:document.getElementById("m-memo").value.trim()};
   const prev=units[roomId]?{...units[roomId]}:null;
   units[roomId]={...(units[roomId]||{}), ...data};
-  closeSheet();showToast("✅ 저장됨");renderGrid();
+  closeSheet();showToast(autoRented?"✅ 저장됨 · 임대중으로 자동 변경":"✅ 저장됨");renderGrid();
   uRef.child(roomId).update(data).catch(()=>{
     if(prev)units[roomId]=prev;else delete units[roomId];
     showToast("❗ 저장 실패");renderGrid();
