@@ -310,7 +310,8 @@ auth.onAuthStateChanged(async user=>{
     bldgsL=bldgsRef.on("value",snap=>{
       bldgsData=snap.val()||{};
       const bids=sortedBids(bldgsData);
-      if(bids.length&&!bldgsData[curBid]){curBid=bids[0];setCurBid(targetUid,curBid)}
+      if(bids.length&&!bldgsData[curBid]){switchBld(bids[0]);}
+      else{updateBldLabel();}
     });
 
     _tUid=targetUid;
