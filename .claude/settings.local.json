@@ -18,7 +18,12 @@
       "Bash(manifest)",
       "Bash(sw\")",
       "Bash(Get-ChildItem \"C:\\\\Users\\\\BlackCore\\\\dropbox\\\\github.pages\\\\rent\" -Filter \"admin.html\")",
-      "Bash(Select-Object Name, LastWriteTime)"
+      "Bash(Select-Object Name, LastWriteTime)",
+      "Bash(New-Item -ItemType Directory -Force -Path \"C:\\\\Users\\\\BlackCore\\\\dropbox\\\\github.pages\\\\rent\\\\master\")",
+      "Bash(Out-Null)",
+      "Bash(Write-Host \"created\")",
+      "PowerShell(New-Item *)",
+      "PowerShell(Copy-Item *)"
     ]
   }
 }
