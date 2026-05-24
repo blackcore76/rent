@@ -216,22 +216,14 @@
       <!-- 백업 / 복구 -->
       <div id="sp2-backup">
       <div style="font-size:11px;font-weight:800;color:var(--sub);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">💾 백업 / 복구</div>
-      <a href="backup.html" style="display:flex;align-items:center;gap:10px;background:#F0FDF4;border:1.5px solid #A7F3D0;border-radius:12px;padding:12px 14px;margin-bottom:8px;text-decoration:none">
+      <button onclick="toggleBackup(event)" style="display:flex;align-items:center;gap:10px;background:#F0FDF4;border:1.5px solid #A7F3D0;border-radius:12px;padding:12px 14px;margin-bottom:8px;width:100%;cursor:pointer;font-family:inherit;text-align:left">
         <span style="font-size:22px">💾</span>
         <div style="flex:1">
-          <div style="font-size:13px;font-weight:800;color:#065F46">백업 내보내기</div>
-          <div style="font-size:11px;color:#059669;margin-top:2px">세대 · 장부 CSV · JSON 및 사진 ZIP 다운로드</div>
+          <div style="font-size:13px;font-weight:800;color:#065F46">전체 건물 백업 / 복구</div>
+          <div style="font-size:11px;color:#059669;margin-top:2px">전화번호부 · 건물목록 · 모든 건물 데이터 JSON</div>
         </div>
         <span style="color:#A7F3D0;font-size:16px">›</span>
-      </a>
-      <a href="restore.html" style="display:flex;align-items:center;gap:10px;background:#EFF6FF;border:1.5px solid #BAE6FD;border-radius:12px;padding:12px 14px;margin-bottom:8px;text-decoration:none">
-        <span style="font-size:22px">🔄</span>
-        <div style="flex:1">
-          <div style="font-size:13px;font-weight:800;color:#0C4A6E">데이터 복구</div>
-          <div style="font-size:11px;color:#0284C7;margin-top:2px">JSON 백업 파일로 세대 · 장부 데이터 복원</div>
-        </div>
-        <span style="color:#BAE6FD;font-size:16px">›</span>
-      </a>
+      </button>
       </div><!-- /sp2-backup -->
       <!-- 건물정보카드 -->
       <div class="bldg-hd-row">
