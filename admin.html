@@ -685,16 +685,22 @@ async function saveEditBld(){
   });
   if(!Object.keys(nl).length){showToast("❗ 최소 1개 층 이상 설정하세요");return}
   const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
-  const oldRooms=Object.values(editRoomLayout).flat().map(String);
   const newRooms=Object.values(nl).flat().map(String);
-  const deletedRooms=oldRooms.filter(r=>!newRooms.includes(r));
   try{
+    // roomLayout config가 아닌 Firebase 실제 데이터 기준으로 삭제 대상 산출
+    const [uSnap,hSnap]=await Promise.all([
+      db.ref(DBPath.units(targetUid,editBid)).once("value"),
+      db.ref(DBPath.rentHistory(targetUid,editBid)).once("value")
+    ]);
+    const existing=[...new Set([...Object.keys(uSnap.val()||{}),...Object.keys(hSnap.val()||{})])];
+    const deletedRooms=existing.filter(r=>!newRooms.includes(r));
     await db.ref(DBPath.bld(targetUid, editBid)+"/name").set(name);
     await db.ref(DBPath.roomLayout(targetUid, editBid)).set(nl);
     if(deletedRooms.length){
-      await Promise.all(deletedRooms.map(r=>
-        db.ref(DBPath.rentHistRoom(targetUid, editBid, r)).remove().catch(()=>{})
-      ));
+      await Promise.all(deletedRooms.map(r=>Promise.all([
+        db.ref(DBPath.unit(targetUid,editBid,r)).remove().catch(()=>{}),
+        db.ref(DBPath.rentHistRoom(targetUid,editBid,r)).remove().catch(()=>{})
+      ])));
     }
     if(editBid===curBid){roomLayout=nl;ROOMS=Object.values(nl).flat().map(String);}
     closeEditBldSheet();showToast("✅ 저장됨");
