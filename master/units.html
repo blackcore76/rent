@@ -161,6 +161,7 @@
 .confirm-btns{display:flex;gap:10px;justify-content:flex-end}
 .confirm-btns button{padding:9px 18px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
 .btn-blind.lifted{background:#FCA5A5!important;color:#7F1D1D!important;border:2px solid #F87171!important}
+@media(max-width:480px){.adm-badge{display:none}}
 .usr-drop{position:fixed;background:#fff;border:1px solid var(--border);border-radius:12px;min-width:200px;max-width:280px;z-index:500;box-shadow:0 8px 28px rgba(0,0,0,.18);overflow:hidden;max-height:55vh;overflow-y:auto}
 .usr-drop-item{padding:10px 14px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:2px}
 .usr-drop-item:last-child{border-bottom:none}
@@ -192,12 +193,11 @@
         <a href="admin.html" style="flex-shrink:0;display:flex;align-items:center;line-height:0">
           <img src="../logo.png" alt="PlusHome" style="height:40px;width:auto;image-rendering:-webkit-optimize-contrast">
         </a>
-        <span style="font-size:10px;font-weight:800;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);color:#D97706;padding:3px 7px;border-radius:6px;letter-spacing:.4px;flex-shrink:0">ADMIN</span>
+        <span class="adm-badge" style="font-size:10px;font-weight:800;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);color:#D97706;padding:3px 7px;border-radius:6px;letter-spacing:.4px;flex-shrink:0">ADMIN</span>
         <button id="ctx-btn" onclick="toggleUserDrop(event)" style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:5px 9px;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.3);color:#059669;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">—  ▾</button>
       </div>
       <div class="hdr-actions">
-        <button class="guide-btn" onclick="toggleBackup(event)">💾 백업</button>
-        <button class="guide-btn" onclick="openHelp()">❓ 도움말</button>
+        <button class="guide-btn" onclick="toggleBackup(event)" style="padding:5px 9px;font-size:15px">💾</button>
         <div id="av-wrap" style="display:flex;align-items:center;cursor:pointer" onclick="auth.signOut().then(()=>location.href='admin.html')"></div>
       </div>
     </div>
