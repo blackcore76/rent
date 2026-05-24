@@ -178,7 +178,7 @@ html,body{overscroll-behavior:none}
 // signInGoogle, toggleMenu, closeMenu, showToast, esc 는 shared.js 에서 제공
 let cu=null,curBid="main",mUid="",mName="",readOnly=false;
 let unitsData={},rentHistory={},allTx=[],bldgsData={};
-let ROOMS=[];
+let ROOMS=[],customCats={income:[],expense:[]};
 const RTYPE_LBL={oneroom:"원룸",twobay:"투베이",tworoom:"투룸",threeroom:"쓰리룸"};
 
 function fmtDate(){const d=new Date();return`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`}
@@ -241,6 +241,11 @@ function loadAll(uid){
   db.ref(DBPath.transactions(uid, curBid)).on("value",snap=>{
     allTx=Object.values(snap.val()||{}).sort((a,b)=>b.date.localeCompare(a.date));
     updateTxStats();
+  });
+  // Custom categories
+  db.ref(`${DBPath.bldData(uid, curBid)}/config/categories`).on("value",snap=>{
+    const v=snap.val()||{};
+    customCats={income:Array.isArray(v.income)?v.income:[],expense:Array.isArray(v.expense)?v.expense:[]};
   });
 }
 
@@ -308,7 +313,9 @@ function exportUnitsCSV(){
 // ── TX EXPORT ──
 function exportTxJSON(){
   if(!allTx.length){showToast("❗ 장부 데이터 없음");return}
-  dlBlob(new Blob([JSON.stringify(allTx,null,2)],{type:"application/json"}),`월세관리_장부전체_${fmtDate()}.json`);
+  const hasCats=(customCats.income.length||customCats.expense.length);
+  const data=hasCats?{version:2,transactions:allTx,categories:customCats}:allTx;
+  dlBlob(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),`월세관리_장부전체_${fmtDate()}.json`);
   showToast("✅ 장부 JSON 내려받기 완료");
 }
 function getAutoRentRows(){

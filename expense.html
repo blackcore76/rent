@@ -58,6 +58,7 @@
 .tx-memo{font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tx-amt{font-size:15px;font-weight:900;white-space:nowrap;flex-shrink:0}
 .tx-amt.income{color:var(--green)}.tx-amt.expense{color:var(--red)}
+.tx-edit{width:28px;height:28px;border:none;background:#EFF6FF;color:#3B82F6;border-radius:7px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .tx-del{width:28px;height:28px;border:none;background:var(--red-lt);color:var(--red);border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .tx-item.auto-rent{background:rgba(5,150,105,.04);border-left:3px solid var(--green)}
 .tx-auto-badge{font-size:10px;font-weight:700;background:var(--green-lt);color:var(--green-t);padding:1px 6px;border-radius:4px;flex-shrink:0}
@@ -265,6 +266,7 @@ let rentHistData={},unitsData={},rhRef=null,rhL=null,auRef=null,auL=null,_tUid="
 const PS=10;
 const CATS={income:["월세","관리비","보증금수입","기타수입"],expense:["수리비","청소비","보험료","세금/공과금","인건비","관리비지출","기타지출"]};
 let customCats={income:[],expense:[]},catRef=null,catL=null,selectedCat="";
+let editMode=false,editId=null;
 
 (function(){const n=new Date();document.getElementById("filter-month").value=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`;filterMonth=document.getElementById("filter-month").value;filterYear=String(n.getFullYear())})();
 
@@ -511,7 +513,7 @@ function renderFeed(){
         <div class="tx-memo">${esc(t.memo)||"메모 없음"}</div>
       </div>
       <span class="tx-amt ${t.type}">${t.type==="income"?"+":"−"}₩${fmtN(t.amount)}</span>${chevron}
-      ${t.auto?"":` <button class="tx-del" onclick="delTx(${t.id})">✕</button>`}
+      ${t.auto?"":` <button class="tx-edit" onclick="editTx(${t.id})">✏️</button><button class="tx-del" onclick="delTx(${t.id})">✕</button>`}
     </div>`;}).join("")}</div>`;
   document.getElementById("pagi").innerHTML=`
     <button class="page-btn" onclick="goPage(${curPage-1})" ${curPage<=1?"disabled":""}>◀</button>
@@ -621,8 +623,25 @@ function delCustomCat(i){
     .then(()=>{if(selectedCat===removed){selectedCat=CATS[mTT][0]||"";document.getElementById("m-cat").value=selectedCat;}showToast("🗑 삭제됨")})
     .catch(()=>showToast("❗ 실패"));
 }
+function editTx(id){
+  if(!guardWrite())return;
+  const t=allTx.find(x=>x.id===id);if(!t)return;
+  editMode=true;editId=id;
+  mTT=t.type;updateTTUI();
+  document.querySelector("#add-sheet .sheet-hd h3").textContent="✏️ 내역 수정";
+  document.getElementById("m-date").value=t.date||"";
+  document.getElementById("m-amt").value=t.amount||"";
+  document.getElementById("m-memo").value=t.memo||"";
+  document.getElementById("cat-add-row").style.display="none";
+  if(document.getElementById("new-cat-inp"))document.getElementById("new-cat-inp").value="";
+  selectedCat=t.category||CATS[mTT][0]||"";
+  renderCatChips();
+  document.getElementById("add-sheet").classList.add("show");
+}
 function openAdd(){
+  editMode=false;editId=null;
   mTT="income";updateTTUI();
+  document.querySelector("#add-sheet .sheet-hd h3").textContent="💰 내역 추가";
   const n=new Date();
   document.getElementById("m-date").value=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`;
   document.getElementById("m-amt").value="";document.getElementById("m-memo").value="";
@@ -630,7 +649,11 @@ function openAdd(){
   if(document.getElementById("new-cat-inp"))document.getElementById("new-cat-inp").value="";
   updateCats();document.getElementById("add-sheet").classList.add("show");
 }
-function closeAdd(){document.getElementById("add-sheet").classList.remove("show")}
+function closeAdd(){
+  document.getElementById("add-sheet").classList.remove("show");
+  editMode=false;editId=null;
+  document.querySelector("#add-sheet .sheet-hd h3").textContent="💰 내역 추가";
+}
 function setTT(t){mTT=t;updateTTUI();updateCats()}
 function updateTTUI(){
   document.getElementById("tg-in").className="tg-btn"+(mTT==="income"?" on-green":"");
@@ -646,10 +669,19 @@ function saveTx(){
   const date=document.getElementById("m-date").value;
   if(!amt||amt<=0){showToast("❗ 금액을 입력하세요");return}
   if(!date){showToast("❗ 날짜를 입력하세요");return}
-  const id=Date.now();
-  txRef.child(String(id)).set({id,type:mTT,amount:amt,category:document.getElementById("m-cat").value,date,memo:document.getElementById("m-memo").value.trim(),createdAt:new Date().toISOString()})
-    .then(()=>{closeAdd();showToast("✅ 저장됨")})
-    .catch(()=>showToast("❗ 저장 실패"));
+  const cat=document.getElementById("m-cat").value||selectedCat;
+  const memo=document.getElementById("m-memo").value.trim();
+  if(editMode&&editId){
+    const original=allTx.find(x=>x.id===editId)||{};
+    txRef.child(String(editId)).set({...original,type:mTT,amount:amt,category:cat,date,memo})
+      .then(()=>{closeAdd();showToast("✅ 수정됨")})
+      .catch(()=>showToast("❗ 수정 실패"));
+  }else{
+    const id=Date.now();
+    txRef.child(String(id)).set({id,type:mTT,amount:amt,category:cat,date,memo,createdAt:new Date().toISOString()})
+      .then(()=>{closeAdd();showToast("✅ 저장됨")})
+      .catch(()=>showToast("❗ 저장 실패"));
+  }
 }
 function delTx(id){
   if(!guardWrite())return;

@@ -248,6 +248,7 @@ function readFile(file){
 
 function detectType(json){
   if(Array.isArray(json)&&json[0]&&"amount" in json[0]&&"type" in json[0])return "expense";
+  if(json&&json.version===2&&Array.isArray(json.transactions))return "expense";
   if(json&&Array.isArray(json.units)&&json.rentHistory!==undefined)return "units";
   return null;
 }
@@ -287,16 +288,17 @@ function renderPreview(json,type){
       <div class="preview-item"><div class="preview-item-label">납부 이력</div><div class="preview-item-val">${histRooms}</div><div class="preview-item-sub">세대 분</div></div>
       <div class="preview-item"><div class="preview-item-label">백업 일시</div><div class="preview-item-val" style="font-size:13px">${expAt}</div><div class="preview-item-sub"></div></div>`;
   }else{
-    const list=json;
+    const list=Array.isArray(json)?json:(json.transactions||[]);
+    const cats=(!Array.isArray(json)&&json.categories)||null;
     const income=list.filter(t=>t.type==="income").reduce((s,t)=>s+(t.amount||0),0);
-    const expense=list.filter(t=>t.type!=="income").reduce((s,t)=>s+(t.amount||0),0);
+    const catCount=cats?((cats.income||[]).length+(cats.expense||[]).length):0;
     const dates=list.map(t=>t.date).sort();
     const range=dates.length?(dates[0]+" ~ "+dates[dates.length-1]):"—";
     grid.innerHTML=`
       <div class="preview-item"><div class="preview-item-label">총 건수</div><div class="preview-item-val">${list.length}</div><div class="preview-item-sub">건</div></div>
       <div class="preview-item"><div class="preview-item-label">수입 / 지출</div><div class="preview-item-val" style="font-size:13px">${list.filter(t=>t.type==="income").length} / ${list.filter(t=>t.type!=="income").length}</div><div class="preview-item-sub">건</div></div>
       <div class="preview-item"><div class="preview-item-label">수입 합계</div><div class="preview-item-val" style="font-size:13px">+${fmtN(income)}</div><div class="preview-item-sub">원</div></div>
-      <div class="preview-item"><div class="preview-item-label">날짜 범위</div><div class="preview-item-val" style="font-size:11px;word-break:break-all">${range}</div><div class="preview-item-sub"></div></div>`;
+      <div class="preview-item"><div class="preview-item-label">${catCount?"커스텀 카테고리":"날짜 범위"}</div><div class="preview-item-val" style="font-size:${catCount?"14px":"11px"};word-break:break-all">${catCount?catCount+"개 포함":range}</div><div class="preview-item-sub"></div></div>`;
   }
 }
 
@@ -367,14 +369,31 @@ async function applyUnits(uid,fill,msg){
 }
 
 async function applyExpense(uid,fill,msg){
-  const base=DBPath.transactions(uid, curBid);
+  const txList=Array.isArray(parsedData)?parsedData:(parsedData.transactions||[]);
+  const cats=(!Array.isArray(parsedData)&&parsedData.categories)||null;
   const txObj={};
-  (parsedData||[]).forEach(t=>{if(t&&t.id)txObj[String(t.id)]=t});
+  txList.forEach(t=>{if(t&&t.id)txObj[String(t.id)]=t});
   msg.textContent="수지 데이터 저장 중…";fill.style.width="40%";
   if(selectedMode==="replace"){
-    await db.ref(base).set(txObj);
+    await db.ref(DBPath.transactions(uid, curBid)).set(txObj);
   }else{
-    await db.ref(base).update(txObj);
+    await db.ref(DBPath.transactions(uid, curBid)).update(txObj);
+  }
+  if(cats){
+    fill.style.width="70%";
+    msg.textContent="카테고리 저장 중…";
+    const catBase=`${DBPath.bldData(uid,curBid)}/config/categories`;
+    if(selectedMode==="replace"){
+      await db.ref(catBase).set(cats);
+    }else{
+      const snap=await db.ref(catBase).once("value");
+      const ex=snap.val()||{income:[],expense:[]};
+      const merged={
+        income:[...new Set([...(ex.income||[]),...(cats.income||[])])],
+        expense:[...new Set([...(ex.expense||[]),...(cats.expense||[])])]
+      };
+      await db.ref(catBase).set(merged);
+    }
   }
   fill.style.width="90%";
 }
