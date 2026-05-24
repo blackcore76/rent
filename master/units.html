@@ -20,6 +20,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="../shared.js?v=2"></script>
 <script src="../db-paths.js"></script>
 <style>
@@ -367,9 +368,16 @@
     </div>
     <div id="backup-user-label" style="font-size:12px;font-weight:700;color:#D97706;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:7px 12px;margin-bottom:14px"></div>
     <div style="font-size:12px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">백업</div>
-    <div style="display:flex;gap:8px;margin-bottom:20px">
-      <button onclick="adminBackupJSON()" style="flex:1;padding:12px;background:#EFF6FF;color:#1D4ED8;border:2px solid #BFDBFE;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📦 JSON 내려받기</button>
-      <button onclick="adminBackupCSV()" style="flex:1;padding:12px;background:#F0FDF4;color:#15803D;border:2px solid #BBF7D0;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📋 CSV 내려받기</button>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <button onclick="adminBackupJSON()" style="flex:1;padding:12px;background:#EFF6FF;color:#1D4ED8;border:2px solid #BFDBFE;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📦 JSON</button>
+      <button onclick="adminBackupCSV()" style="flex:1;padding:12px;background:#F0FDF4;color:#15803D;border:2px solid #BBF7D0;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📋 CSV</button>
+    </div>
+    <button id="zip-btn" onclick="adminDownloadPhotosZip()" style="width:100%;padding:12px;background:#FDF4FF;color:#7C3AED;border:2px solid #E9D5FF;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:20px">📸 계약서 사진 ZIP 다운로드</button>
+    <div id="zip-prog" style="display:none;margin-bottom:12px">
+      <div style="height:16px;border-radius:8px;background:#E2E8F0;overflow:hidden;position:relative">
+        <div id="zip-fill" style="height:100%;background:linear-gradient(90deg,#7C3AED,#A855F7);transition:width .2s;width:0%"></div>
+        <span id="zip-msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#4C1D95"></span>
+      </div>
     </div>
     <div style="font-size:12px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">복구</div>
     <div style="background:#FFF7ED;border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:10px 12px;font-size:12px;color:#92400E;margin-bottom:10px;line-height:1.6">
@@ -1111,6 +1119,47 @@ function adminBackupJSON(){
   }).catch(()=>showToast("❗ 데이터 로드 실패"));
 }
 function adminBackupCSV(){exportCSV();}
+async function adminDownloadPhotosZip(){
+  if(!_tUid){showToast("❗ 선택된 사용자 없음");return;}
+  const photos=[];
+  Object.entries(units).forEach(([room,u])=>{
+    Object.values(u.photos||{}).forEach(p=>photos.push({...p,room}));
+  });
+  if(!photos.length){showToast("❗ 저장된 계약서 사진이 없습니다");return;}
+  const btn=document.getElementById("zip-btn");
+  const prog=document.getElementById("zip-prog");
+  const fill=document.getElementById("zip-fill");
+  const msg=document.getElementById("zip-msg");
+  btn.disabled=true;prog.style.display="block";fill.style.width="0%";
+  const zip=new JSZip();
+  const folder=zip.folder("계약서사진_"+(_tName||_tUid));
+  let done=0,failed=0;
+  for(const p of photos){
+    msg.textContent=`다운로드 중… ${done+1}/${photos.length}`;
+    fill.style.width=`${Math.round((done/photos.length)*80)}%`;
+    let blob=null;
+    for(let attempt=0;attempt<3;attempt++){
+      try{
+        if(attempt>0)await new Promise(r=>setTimeout(r,1200*attempt));
+        const res=await fetch(p.url);
+        if(!res.ok)throw new Error(`HTTP ${res.status}`);
+        blob=await res.blob();break;
+      }catch(e){if(attempt===2){console.warn("스킵:",p.id,e);failed++;}}
+    }
+    if(blob){
+      const ext=blob.type.includes("png")?"png":blob.type.includes("gif")?"gif":"jpg";
+      folder.file(`${p.room}호_${p.id}.${ext}`,blob);
+    }
+    done++;
+  }
+  msg.textContent="ZIP 생성 중…";fill.style.width="90%";
+  const zipBlob=await zip.generateAsync({type:"blob"});
+  fill.style.width="100%";msg.textContent="완료!";
+  const a=document.createElement("a");a.href=URL.createObjectURL(zipBlob);
+  a.download=`계약서사진_${_tName||_tUid}_${fmtDate()}.zip`;a.click();URL.revokeObjectURL(a.href);
+  showToast(failed?`⚠️ ${photos.length-failed}/${photos.length}장 완료 (${failed}장 실패)`:`✅ 사진 ${photos.length}장 ZIP 완료`);
+  btn.disabled=false;setTimeout(()=>{prog.style.display="none";},2000);
+}
 function onRestoreFileSelected(e){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
