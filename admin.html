@@ -171,7 +171,6 @@
       </div>
       <div class="hdr-actions">
 
-        <button class="admin-btn" id="admin-btn" onclick="location.href='admin-master.html'" style="padding:5px 8px">🔧</button>
         <button class="guide-btn" onclick="openHelp()">❓ 도움말</button>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
@@ -425,8 +424,7 @@ auth.onAuthStateChanged(async user=>{
     w.style.display="block";
     document.getElementById("um-name").textContent=user.displayName||"사용자";
     document.getElementById("um-email").textContent=user.email||"";
-    if(user.uid===MASTER_UID)document.getElementById("admin-btn").style.display="block";
-    if(pbL&&pbRef)pbRef.off("value",pbL);
+if(pbL&&pbRef)pbRef.off("value",pbL);
     if(uL&&uRef)uRef.off("value",uL);
     if(bldgDetailL&&bldgDetailRef)bldgDetailRef.off("value",bldgDetailL);
     if(cL&&configRef)configRef.off("value",cL);
