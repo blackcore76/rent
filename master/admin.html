@@ -100,17 +100,19 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .uc-memo-summary::-webkit-details-marker{display:none}
 .uc-memo-full{font-size:11px;color:var(--sky);margin-top:6px;padding:7px 10px;background:rgba(14,165,233,.06);border-radius:7px;line-height:1.7;white-space:pre-wrap;word-break:break-all}
 /* EXPIRY */
-.exp-card{background:var(--card);border-radius:10px;padding:12px 14px;border:1.5px solid var(--border);display:flex;flex-direction:column;gap:4px}
-.exp-card.exp-red{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.04)}
-.exp-card.exp-ora{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.04)}
-.exp-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.exp-who{font-size:13px;font-weight:700;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.exp-badge{font-size:11px;font-weight:800;padding:2px 8px;border-radius:5px;flex-shrink:0}
-.exp-badge.red{background:rgba(239,68,68,.15);color:var(--red)}
-.exp-badge.ora{background:rgba(245,158,11,.15);color:var(--gold)}
-.exp-detail{font-size:11px;color:var(--sub)}
 #expiry-load-btn{width:100%;padding:11px;background:rgba(14,165,233,.1);color:var(--sky);border:1px solid rgba(14,165,233,.25);border-radius:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:4px}
 #expiry-load-btn:disabled{opacity:.5;cursor:not-allowed}
+.exp-group{background:var(--card);border-radius:12px;padding:14px;border:1.5px solid var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:7px}
+.exp-group-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.exp-group-name{font-size:14px;font-weight:700;color:var(--text)}
+.exp-copy-btn{padding:6px 12px;background:rgba(14,165,233,.1);color:var(--sky);border:1px solid rgba(14,165,233,.25);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.exp-row{display:flex;align-items:center;gap:6px;padding:6px 8px;background:rgba(0,0,0,.18);border-radius:7px;flex-wrap:wrap}
+.exp-room{font-size:12px;font-weight:700;color:var(--text);flex-shrink:0}
+.exp-tenant{font-size:12px;color:var(--sub);flex:1;min-width:50px}
+.exp-date{font-size:11px;color:var(--hint);flex-shrink:0}
+.exp-dl{font-size:11px;font-weight:800;padding:1px 6px;border-radius:4px;flex-shrink:0}
+.exp-dl.red{background:rgba(239,68,68,.15);color:var(--red)}
+.exp-dl.ora{background:rgba(245,158,11,.15);color:var(--gold)}
 /* COLLAPSIBLE CARD */
 .uc-expand{display:none;margin-top:6px}
 .user-card.open .uc-expand{display:block}
@@ -345,17 +347,32 @@ function renderExpiryPage(){
     el.innerHTML='<div class="empty-state" style="padding:16px 0"><div class="empty-icon" style="font-size:28px">✅</div><div class="empty-txt">30일 내 만료 없음</div></div>';
     if(pgEl)pgEl.innerHTML="";return;
   }
-  const tp=Math.ceil(expiryAll.length/10);
+  // 사용자별 그룹핑 (각 그룹 내 dl 오름차순 유지)
+  const groupMap={};
+  expiryAll.forEach(r=>{
+    if(!groupMap[r.uid])groupMap[r.uid]={userName:r.userName,uid:r.uid,items:[]};
+    groupMap[r.uid].items.push(r);
+  });
+  const groups=Object.values(groupMap).sort((a,b)=>a.items[0].dl-b.items[0].dl);
+  const tp=Math.ceil(groups.length/10);
   if(expiryPage<1)expiryPage=1;if(expiryPage>tp)expiryPage=tp;
   const start=(expiryPage-1)*10;
-  el.innerHTML=expiryAll.slice(start,start+10).map(r=>{
-    const isRed=r.dl<=7;
-    return`<div class="exp-card ${isRed?"exp-red":"exp-ora"}">
-      <div class="exp-top">
-        <div class="exp-who">${esc(r.userName)} · ${esc(r.bldName)} · ${esc(String(r.room))}호</div>
-        <span class="exp-badge ${isRed?"red":"ora"}">D-${r.dl}</span>
+  el.innerHTML=groups.slice(start,start+10).map(g=>{
+    const rows=g.items.map(r=>{
+      const isRed=r.dl<=7;
+      return`<div class="exp-row">
+        <span class="exp-room">${esc(r.bldName)} ${esc(String(r.room))}호</span>
+        <span class="exp-tenant">${esc(r.tenantName||"(미등록)")}</span>
+        <span class="exp-date">${esc(r.contractEnd)}</span>
+        <span class="exp-dl ${isRed?"red":"ora"}">D-${r.dl}</span>
+      </div>`;
+    }).join("");
+    return`<div class="exp-group">
+      <div class="exp-group-hd">
+        <span class="exp-group-name">👤 ${esc(g.userName)}</span>
+        <button class="exp-copy-btn" onclick="copyUserMsg('${esc(g.uid)}')">📋 문자 복사</button>
       </div>
-      <div class="exp-detail">👤 ${esc(r.tenantName||"(세입자 미등록)")} &nbsp;|&nbsp; 📅 ${esc(r.contractEnd)}</div>
+      ${rows}
     </div>`;
   }).join("");
   if(!pgEl)return;
@@ -363,6 +380,14 @@ function renderExpiryPage(){
   pgEl.innerHTML=`<button class="page-btn" onclick="expSetPage(${expiryPage-1})" ${expiryPage<=1?"disabled":""}>◀</button><span class="page-info">${expiryPage} / ${tp}</span><button class="page-btn" onclick="expSetPage(${expiryPage+1})" ${expiryPage>=tp?"disabled":""}>▶</button>`;
 }
 function expSetPage(p){expiryPage=p;renderExpiryPage();}
+function copyUserMsg(uid){
+  const items=expiryAll.filter(r=>r.uid===uid);
+  if(!items.length)return;
+  const name=items[0].userName;
+  const lines=items.map(r=>`▪ ${r.bldName} ${r.room}호 · ${r.tenantName||"(세입자 미등록)"} · ${r.contractEnd} (D-${r.dl}일)`).join("\n");
+  const msg=`[PlusHome] 계약 만료 임박 안내\n\n안녕하세요, ${name}님.\n관리 중이신 건물에 30일 이내 계약 만료 세대가 있어 안내드립니다.\n\n📋 만료 임박 세대\n${lines}\n\n계약 갱신 협의 또는 이사 일정을 미리 조율해 두시면 좋겠습니다.\n👉 plushome.kr 에서 세부 내용 확인`;
+  navigator.clipboard.writeText(msg).then(()=>showToast("📋 클립보드에 복사됨")).catch(()=>showToast("❗ 복사 실패 — 직접 선택하세요"));
+}
 
 // ── 신규 승인 ──
 function setFilter(f){
