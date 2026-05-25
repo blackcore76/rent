@@ -99,6 +99,12 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .uc-memo-summary{font-size:11px;color:var(--sky);cursor:pointer;list-style:none;display:flex;align-items:center;gap:4px;word-break:break-all}
 .uc-memo-summary::-webkit-details-marker{display:none}
 .uc-memo-full{font-size:11px;color:var(--sky);margin-top:6px;padding:7px 10px;background:rgba(14,165,233,.06);border-radius:7px;line-height:1.7;white-space:pre-wrap;word-break:break-all}
+/* COLLAPSIBLE CARD */
+.uc-expand{display:none;margin-top:6px}
+.user-card.open .uc-expand{display:block}
+.uc-top{cursor:pointer;user-select:none}
+.uc-chevron{font-size:10px;color:var(--hint);flex-shrink:0;transition:transform .2s}
+.user-card.open .uc-chevron{transform:rotate(180deg)}
 /* EMPTY */
 .empty-state{text-align:center;padding:40px 16px;color:var(--hint)}
 .empty-icon{font-size:40px;margin-bottom:10px}
@@ -382,16 +388,18 @@ function renderUsersPage(){
     const memoHtml=pm
       ?(pm.length<=25?`<div class="uc-pending-memo">💬 ${esc(pm)}</div>`:`<details class="uc-memo-details"><summary class="uc-memo-summary">💬 ${esc(pm.slice(0,25))}…</summary><div class="uc-memo-full">${esc(pm)}</div></details>`)
       :"";
-    return`<div class="user-card${isV?" active":""}" id="uc-${esc(u.uid)}">
-      <div class="uc-top"><div class="uc-name">${esc(showName)}${alias?`<span style="font-size:11px;color:var(--sub);font-weight:400;margin-left:6px">(${esc(alias)})</span>`:""}</div><div class="uc-num">#${start+i+1}</div></div>
+    return`<div class="user-card${isV?" active open":""}" id="uc-${esc(u.uid)}">
+      <div class="uc-top" onclick="toggleCard(this)"><div class="uc-name">${esc(showName)}${alias?`<span style="font-size:11px;color:var(--sub);font-weight:400;margin-left:6px">(${esc(alias)})</span>`:""}</div><div style="display:flex;align-items:center;gap:6px"><div class="uc-num">#${start+i+1}</div><span class="uc-chevron">▼</span></div></div>
       ${memoHtml}
       ${u.memo&&u.memo!==pm?`<div class="uc-desc">📝 ${esc(u.memo)}</div>`:""}
-      <div class="uc-uid">${esc(u.uid)}</div>
-      <div class="uc-actions">
-        <button class="uc-btn btn-main" onclick="setAndGo('${esc(u.uid)}','${esc(showName)}','units')">🏠 세대</button>
-        <button class="uc-btn btn-pur" onclick="setAndGo('${esc(u.uid)}','${esc(showName)}','expense')">💸 장부</button>
-        <button class="uc-btn btn-teal" onclick="setAndGo('${esc(u.uid)}','${esc(showName)}','manage')">🗂 관리</button>
-        <div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 🗑</div><button class="uc-btn btn-del" style="width:100%" onclick="delUser('${esc(u.uid)}','${esc(showName)}')">🗑</button></div>
+      <div class="uc-expand">
+        <div class="uc-uid">${esc(u.uid)}</div>
+        <div class="uc-actions">
+          <button class="uc-btn btn-main" onclick="setAndGo('${esc(u.uid)}','${esc(showName)}','units')">🏠 세대</button>
+          <button class="uc-btn btn-pur" onclick="setAndGo('${esc(u.uid)}','${esc(showName)}','expense')">💸 장부</button>
+          <button class="uc-btn btn-teal" onclick="setAndGo('${esc(u.uid)}','${esc(showName)}','manage')">🗂 관리</button>
+          <div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 🗑</div><button class="uc-btn btn-del" style="width:100%" onclick="delUser('${esc(u.uid)}','${esc(showName)}')">🗑</button></div>
+        </div>
       </div>
     </div>`;
   }).join("");
@@ -406,8 +414,8 @@ function setViewing(uid,name){
   viewingUid=uid;viewingName=name;
   sessionStorage.setItem("master_view_uid",uid);
   sessionStorage.setItem("master_view_name",name);
-  document.querySelectorAll(".user-card").forEach(c=>c.classList.remove("active"));
-  const el=document.getElementById("uc-"+uid);if(el)el.classList.add("active");
+  document.querySelectorAll(".user-card").forEach(c=>c.classList.remove("active","open"));
+  const el=document.getElementById("uc-"+uid);if(el)el.classList.add("active","open");
   updateCtxBtn();showToast("✅ 선택됨: "+name);
 }
 function clearViewing(){
@@ -419,6 +427,7 @@ function clearViewing(){
 }
 function setAndGo(uid,name,page){setViewing(uid,name);setTimeout(()=>location.href=page+".html",150);}
 function liftBlind(el){el.classList.add("lifted")}
+function toggleCard(el){el.closest(".user-card").classList.toggle("open")}
 
 // ── 삭제 ──
 function delUser(uid,name){
