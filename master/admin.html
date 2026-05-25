@@ -106,13 +106,20 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .exp-group-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
 .exp-group-name{font-size:14px;font-weight:700;color:var(--text)}
 .exp-copy-btn{padding:6px 12px;background:rgba(14,165,233,.1);color:var(--sky);border:1px solid rgba(14,165,233,.25);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
-.exp-row{display:flex;align-items:center;gap:6px;padding:6px 8px;background:rgba(0,0,0,.18);border-radius:7px;flex-wrap:wrap}
+.exp-row{padding:8px;background:rgba(0,0,0,.18);border-radius:7px;display:flex;flex-direction:column;gap:6px}
+.exp-row-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .exp-room{font-size:12px;font-weight:700;color:var(--text);flex-shrink:0}
 .exp-tenant{font-size:12px;color:var(--sub);flex:1;min-width:50px}
 .exp-date{font-size:11px;color:var(--hint);flex-shrink:0}
 .exp-dl{font-size:11px;font-weight:800;padding:1px 6px;border-radius:4px;flex-shrink:0}
 .exp-dl.red{background:rgba(239,68,68,.15);color:var(--red)}
 .exp-dl.ora{background:rgba(245,158,11,.15);color:var(--gold)}
+.exp-row-memo{display:flex;gap:6px;align-items:center}
+.exp-memo-inp{flex:1;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:7px;padding:6px 9px;font-size:11px;font-family:inherit;color:var(--text);outline:none}
+.exp-memo-inp::placeholder{color:var(--hint)}
+.exp-memo-inp:focus{border-color:var(--sky)}
+.exp-memo-save{padding:5px 10px;background:rgba(14,165,233,.1);color:var(--sky);border:1px solid rgba(14,165,233,.25);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
+.exp-dismiss{padding:5px 8px;background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);border-radius:7px;font-size:12px;cursor:pointer;font-family:inherit;flex-shrink:0}
 /* COLLAPSIBLE CARD */
 .uc-expand{display:none;margin-top:6px}
 .user-card.open .uc-expand{display:block}
@@ -331,6 +338,11 @@ async function loadAllExpiring(){
           });
       }));
     }
+    // 메모·삭제 노트 로드 후 dismissed 항목 제거 + 메모 첨부
+    const notesSnap=await db.ref("master_admin/expiry_notes").once("value");
+    const notes=notesSnap.val()||{};
+    expiryAll=expiryAll.filter(r=>!notes[r.uid]?.[r.bid]?.[String(r.room)]?.dismissed);
+    expiryAll.forEach(r=>{r.memo=notes[r.uid]?.[r.bid]?.[String(r.room)]?.memo||"";});
     expiryAll.sort((a,b)=>a.dl!==b.dl?a.dl-b.dl:(parseInt(a.room)-parseInt(b.room))||String(a.room).localeCompare(String(b.room)));
     expiryPage=1;renderExpiryPage();
     btn.textContent=`📋 다시 조회 (총 ${expiryAll.length}건)`;
@@ -360,11 +372,19 @@ function renderExpiryPage(){
   el.innerHTML=groups.slice(start,start+10).map(g=>{
     const rows=g.items.map(r=>{
       const isRed=r.dl<=7;
+      const eid=`${esc(r.uid)}-${esc(r.bid)}-${esc(String(r.room))}`;
       return`<div class="exp-row">
-        <span class="exp-room">${esc(r.bldName)} ${esc(String(r.room))}호</span>
-        <span class="exp-tenant">${esc(r.tenantName||"(미등록)")}</span>
-        <span class="exp-date">${esc(r.contractEnd)}</span>
-        <span class="exp-dl ${isRed?"red":"ora"}">D-${r.dl}</span>
+        <div class="exp-row-top">
+          <span class="exp-room">${esc(r.bldName)} ${esc(String(r.room))}호</span>
+          <span class="exp-tenant">${esc(r.tenantName||"(미등록)")}</span>
+          <span class="exp-date">${esc(r.contractEnd)}</span>
+          <span class="exp-dl ${isRed?"red":"ora"}">D-${r.dl}</span>
+          <button class="exp-dismiss" onclick="dismissExpiry('${esc(r.uid)}','${esc(r.bid)}','${esc(String(r.room))}')">🗑</button>
+        </div>
+        <div class="exp-row-memo">
+          <input class="exp-memo-inp" id="ememo-${eid}" type="text" value="${esc(r.memo)}" placeholder="메모 (통화함, 갱신예정 등)">
+          <button class="exp-memo-save" onclick="saveExpiryMemo('${esc(r.uid)}','${esc(r.bid)}','${esc(String(r.room))}')">💾</button>
+        </div>
       </div>`;
     }).join("");
     return`<div class="exp-group">
@@ -380,6 +400,27 @@ function renderExpiryPage(){
   pgEl.innerHTML=`<button class="page-btn" onclick="expSetPage(${expiryPage-1})" ${expiryPage<=1?"disabled":""}>◀</button><span class="page-info">${expiryPage} / ${tp}</span><button class="page-btn" onclick="expSetPage(${expiryPage+1})" ${expiryPage>=tp?"disabled":""}>▶</button>`;
 }
 function expSetPage(p){expiryPage=p;renderExpiryPage();}
+async function saveExpiryMemo(uid,bid,room){
+  const eid=`${uid}-${bid}-${room}`;
+  const inp=document.getElementById("ememo-"+eid);if(!inp)return;
+  const memo=inp.value.trim();
+  try{
+    await db.ref(`master_admin/expiry_notes/${uid}/${bid}/${room}`).update({memo});
+    const item=expiryAll.find(r=>r.uid===uid&&r.bid===bid&&String(r.room)===String(room));
+    if(item)item.memo=memo;
+    showToast("✅ 메모 저장됨");
+  }catch(e){showToast("❗ 저장 실패");}
+}
+async function dismissExpiry(uid,bid,room){
+  try{
+    await db.ref(`master_admin/expiry_notes/${uid}/${bid}/${room}`).update({dismissed:true});
+    expiryAll=expiryAll.filter(r=>!(r.uid===uid&&r.bid===bid&&String(r.room)===String(room)));
+    renderExpiryPage();
+    const btn=document.getElementById("expiry-load-btn");
+    if(btn&&!btn.disabled)btn.textContent=`📋 다시 조회 (총 ${expiryAll.length}건)`;
+    showToast("🗑 목록에서 제거됨");
+  }catch(e){showToast("❗ 실패");}
+}
 function copyUserMsg(uid){
   const items=expiryAll.filter(r=>r.uid===uid);
   if(!items.length)return;
