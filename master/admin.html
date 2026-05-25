@@ -120,6 +120,18 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .exp-memo-inp:focus{border-color:var(--sky)}
 .exp-memo-save{padding:5px 10px;background:rgba(14,165,233,.1);color:var(--sky);border:1px solid rgba(14,165,233,.25);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
 .exp-dismiss{padding:5px 8px;background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);border-radius:7px;font-size:12px;cursor:pointer;font-family:inherit;flex-shrink:0}
+/* HIST */
+.hist-open-btn{padding:5px 10px;background:rgba(100,116,139,.1);color:var(--sub);border:1px solid rgba(100,116,139,.25);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.hist-search-inp{width:100%;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:inherit;color:var(--text);outline:none}
+.hist-search-inp:focus{border-color:var(--sky)}
+.hist-search-inp::placeholder{color:var(--hint)}
+.hist-row{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.hist-row-top{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.hist-who{font-size:12px;font-weight:700;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-date{font-size:10px;color:var(--hint);flex-shrink:0}
+.hist-detail{font-size:11px;color:var(--sub)}
+.hist-memo{font-size:11px;color:var(--sky);margin-top:2px}
+.hist-restore{padding:3px 8px;background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.25);border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
 /* COLLAPSIBLE CARD */
 .uc-expand{display:none;margin-top:6px}
 .user-card.open .uc-expand{display:block}
@@ -211,7 +223,10 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
     <div id="pending-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
 
     <!-- 계약 만료 임박 -->
-    <div class="sec-title" style="margin-top:4px;margin-bottom:8px">⚠️ 사용자 건물 만료 임박 (30일 이내)</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;margin-bottom:8px">
+      <div class="sec-title" style="margin:0">⚠️ 사용자 건물 만료 임박 (30일 이내)</div>
+      <button class="hist-open-btn" onclick="openExpiryHistory()">🗄 알림 이력</button>
+    </div>
     <button id="expiry-load-btn" onclick="loadAllExpiring()">📋 전체 조회</button>
     <div id="expiry-list" style="margin-top:10px;display:flex;flex-direction:column;gap:8px"></div>
     <div id="expiry-pagination" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:8px 0;margin-bottom:20px"></div>
@@ -228,6 +243,21 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
     <div class="sec-title" style="margin-bottom:10px" id="users-sec-title">👥 관리 사용자 목록</div>
     <div class="users-list" id="users-list"></div>
     <div id="uc-pagination" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 0;margin-bottom:20px"></div>
+  </div>
+</div>
+
+<!-- 알림 이력 모달 -->
+<div class="confirm-bg" id="hist-modal" style="align-items:flex-start;padding-top:60px">
+  <div class="confirm-box" style="max-width:480px;width:100%;max-height:80vh;display:flex;flex-direction:column;gap:0;padding:0;overflow:hidden">
+    <div style="padding:18px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div style="font-size:15px;font-weight:700;color:var(--text)">🗄 삭제된 알림 이력</div>
+      <button onclick="closeExpiryHistory()" style="background:rgba(255,255,255,.07);color:var(--sub);border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">✕ 닫기</button>
+    </div>
+    <div style="padding:12px 18px;border-bottom:1px solid var(--border);flex-shrink:0">
+      <input class="hist-search-inp" id="hist-search" type="text" placeholder="사용자명, 건물명, 호실, 세입자명 검색..." oninput="histSearch(this.value)">
+    </div>
+    <div id="hist-list" style="flex:1;overflow-y:auto;padding:12px 18px;display:flex;flex-direction:column;gap:8px"></div>
+    <div id="hist-pagination" style="padding:10px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:12px;flex-shrink:0"></div>
   </div>
 </div>
 
@@ -412,8 +442,14 @@ async function saveExpiryMemo(uid,bid,room){
   }catch(e){showToast("❗ 저장 실패");}
 }
 async function dismissExpiry(uid,bid,room){
+  const item=expiryAll.find(r=>r.uid===uid&&r.bid===bid&&String(r.room)===String(room));
   try{
-    await db.ref(`master_admin/expiry_notes/${uid}/${bid}/${room}`).update({dismissed:true});
+    await db.ref(`master_admin/expiry_notes/${uid}/${bid}/${room}`).update({
+      dismissed:true,dismissedAt:new Date().toISOString(),
+      userName:item?.userName||"",bldName:item?.bldName||"",
+      tenantName:item?.tenantName||"",contractEnd:item?.contractEnd||"",
+      dl:item?.dl??""
+    });
     expiryAll=expiryAll.filter(r=>!(r.uid===uid&&r.bid===bid&&String(r.room)===String(room)));
     renderExpiryPage();
     const btn=document.getElementById("expiry-load-btn");
@@ -421,6 +457,72 @@ async function dismissExpiry(uid,bid,room){
     showToast("🗑 목록에서 제거됨");
   }catch(e){showToast("❗ 실패");}
 }
+// ── 알림 이력 모달 ──
+let histAll=[],histFiltered=[],histPage=1;
+async function openExpiryHistory(){
+  document.getElementById("hist-modal").classList.add("show");
+  document.getElementById("hist-search").value="";
+  document.getElementById("hist-list").innerHTML='<div class="empty-state" style="padding:20px 0"><div class="loading-txt">불러오는 중...</div></div>';
+  document.getElementById("hist-pagination").innerHTML="";
+  const snap=await db.ref("master_admin/expiry_notes").once("value");
+  const notes=snap.val()||{};
+  histAll=[];
+  Object.entries(notes).forEach(([uid,bids])=>{
+    Object.entries(bids).forEach(([bid,rooms])=>{
+      Object.entries(rooms).forEach(([room,n])=>{
+        if(!n.dismissed)return;
+        histAll.push({uid,bid,room,
+          userName:n.userName||uid,bldName:n.bldName||bid,
+          tenantName:n.tenantName||"",contractEnd:n.contractEnd||"",
+          dl:n.dl??"",memo:n.memo||"",dismissedAt:n.dismissedAt||""
+        });
+      });
+    });
+  });
+  histAll.sort((a,b)=>b.dismissedAt.localeCompare(a.dismissedAt));
+  histFiltered=[...histAll];histPage=1;renderHistoryPage();
+}
+function closeExpiryHistory(){document.getElementById("hist-modal").classList.remove("show");}
+function histSearch(q){
+  const kw=q.trim().toLowerCase();
+  histFiltered=kw?histAll.filter(r=>[r.userName,r.bldName,String(r.room),r.tenantName].some(s=>s.toLowerCase().includes(kw))):([...histAll]);
+  histPage=1;renderHistoryPage();
+}
+function renderHistoryPage(){
+  const el=document.getElementById("hist-list");
+  const pgEl=document.getElementById("hist-pagination");
+  if(!histFiltered.length){
+    el.innerHTML='<div class="empty-state" style="padding:20px 0"><div class="empty-icon" style="font-size:28px">📭</div><div class="empty-txt">이력 없음</div></div>';
+    pgEl.innerHTML="";return;
+  }
+  const tp=Math.ceil(histFiltered.length/10);
+  if(histPage<1)histPage=1;if(histPage>tp)histPage=tp;
+  const start=(histPage-1)*10;
+  el.innerHTML=histFiltered.slice(start,start+10).map(r=>{
+    const dt=r.dismissedAt?new Date(r.dismissedAt).toLocaleDateString("ko-KR",{year:"2-digit",month:"2-digit",day:"2-digit"}):"";
+    return`<div class="hist-row">
+      <div class="hist-row-top">
+        <span class="hist-who">${esc(r.userName)} · ${esc(r.bldName)} ${esc(String(r.room))}호</span>
+        <span class="hist-date">${esc(dt)}</span>
+        <button class="hist-restore" onclick="restoreExpiry('${esc(r.uid)}','${esc(r.bid)}','${esc(String(r.room))}')">↩ 복구</button>
+      </div>
+      <div class="hist-detail">👤 ${esc(r.tenantName||"(미등록)")} &nbsp;|&nbsp; 📅 ${esc(r.contractEnd)}${r.dl!==""?` (D-${r.dl}일)`:""}</div>
+      ${r.memo?`<div class="hist-memo">💬 ${esc(r.memo)}</div>`:""}
+    </div>`;
+  }).join("");
+  if(tp<=1){pgEl.innerHTML="";return;}
+  pgEl.innerHTML=`<button class="page-btn" onclick="histSetPage(${histPage-1})" ${histPage<=1?"disabled":""}>◀</button><span class="page-info">${histPage} / ${tp}</span><button class="page-btn" onclick="histSetPage(${histPage+1})" ${histPage>=tp?"disabled":""}>▶</button>`;
+}
+function histSetPage(p){histPage=p;renderHistoryPage();}
+async function restoreExpiry(uid,bid,room){
+  try{
+    await db.ref(`master_admin/expiry_notes/${uid}/${bid}/${room}`).update({dismissed:false,dismissedAt:null});
+    histAll=histAll.filter(r=>!(r.uid===uid&&r.bid===bid&&String(r.room)===String(room)));
+    histFiltered=histFiltered.filter(r=>!(r.uid===uid&&r.bid===bid&&String(r.room)===String(room)));
+    renderHistoryPage();showToast("↩ 복구됨 — 다음 전체 조회 시 표시됩니다");
+  }catch(e){showToast("❗ 실패");}
+}
+
 function copyUserMsg(uid){
   const items=expiryAll.filter(r=>r.uid===uid);
   if(!items.length)return;
