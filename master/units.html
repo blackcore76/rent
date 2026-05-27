@@ -981,23 +981,29 @@ async function onPhotos(e){
       pct.textContent=`${label}업로드 준비 중...`;
       const ref=storage.ref(path);
       let url=null;
-      for(let attempt=0;attempt<2;attempt++){
+      const MAX_TRIES=3;
+      for(let attempt=0;attempt<MAX_TRIES;attempt++){
         try{
+          if(attempt>0){
+            pct.textContent=`${label}재연결 중... (${attempt}/${MAX_TRIES-1})`;
+            fill.style.width="0%";
+            await new Promise(r=>setTimeout(r,2000));
+            await auth.currentUser?.getIdToken(true).catch(()=>{});
+          }
           const task=ref.put(blob);
-          let tmo=null;
-          const resetTmo=()=>{clearTimeout(tmo);tmo=setTimeout(()=>task.cancel(),25000);};
+          let tmo=null,firstByte=false;
+          const resetTmo=()=>{clearTimeout(tmo);tmo=setTimeout(()=>task.cancel(),firstByte?25000:10000);};
           resetTmo();
           await new Promise((res,rej)=>task.on("state_changed",
-            s=>{resetTmo();const p=Math.round(s.bytesTransferred/s.totalBytes*100)||0;fill.style.width=`${p}%`;pct.textContent=`${label}업로드 중... ${p}%`;},
+            s=>{if(s.bytesTransferred>0)firstByte=true;resetTmo();const p=Math.round(s.bytesTransferred/s.totalBytes*100)||0;fill.style.width=`${p}%`;pct.textContent=`${label}업로드 중... ${p}%`;},
             e=>{clearTimeout(tmo);rej(e);},
             ()=>{clearTimeout(tmo);res();}
           ));
           url=await ref.getDownloadURL();break;
         }catch(e){
           const isTimeout=e.code==="storage/canceled";
-          if(attempt===1)throw e;
+          if(attempt===MAX_TRIES-1)throw e;
           pct.textContent=isTimeout?`${label}⏱ 응답 없음 — 재시도 중...`:`${label}❗ 실패 — 재시도 중...`;
-          fill.style.width="0%";await new Promise(r=>setTimeout(r,1800));
         }
       }
       fill.style.width="100%";pct.textContent=`${label}완료!`;
@@ -1008,7 +1014,7 @@ async function onPhotos(e){
       units[curRoom].photos[pid]={id:pid,url,storagePath:path};
       renderPhotos(units[curRoom].photos);showToast("✅ 업로드 완료");
     }catch(err){
-      const msg=err.code==="storage/canceled"?"네트워크 응답 없음 — Wi-Fi 확인 후 재시도하세요":"업로드 실패: "+err.message;
+      const msg=err.code==="storage/canceled"?"네트워크 오류 — 잠시 후 다시 시도하세요":"업로드 실패: "+err.message;
       showToast("❗ "+msg);
     }
   }
