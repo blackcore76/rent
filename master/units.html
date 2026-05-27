@@ -978,7 +978,9 @@ async function onPhotos(e){
     try{
       pct.textContent=`${label}압축 중...`;
       const blob=await compressImage(file);
-      pct.textContent=`${label}업로드 준비 중...`;
+      pct.textContent=`${label}파일 로딩 중...`;
+      let uploadBlob=blob;
+      try{const ab=await blob.arrayBuffer();uploadBlob=new Blob([ab],{type:blob.type||"image/jpeg"});}catch(e){}
       const ref=storage.ref(path);
       let url=null;
       const MAX_TRIES=3;
@@ -990,7 +992,8 @@ async function onPhotos(e){
             await new Promise(r=>setTimeout(r,2000));
             await auth.currentUser?.getIdToken(true).catch(()=>{});
           }
-          const task=ref.put(blob);
+          pct.textContent=`${label}서버 연결 중...`;
+          const task=ref.put(uploadBlob,{contentType:uploadBlob.type||"image/jpeg"});
           let tmo=null,firstByte=false;
           const resetTmo=()=>{clearTimeout(tmo);tmo=setTimeout(()=>task.cancel(),firstByte?25000:10000);};
           resetTmo();
