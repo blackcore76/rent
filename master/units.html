@@ -983,10 +983,11 @@ async function onPhotos(e){
       for(let attempt=0;attempt<2;attempt++){
         try{
           const task=ref.put(blob);
-          let progSeen=false;
-          const tmo=setTimeout(()=>{if(!progSeen)task.cancel();},25000);
+          let tmo=null;
+          const resetTmo=()=>{clearTimeout(tmo);tmo=setTimeout(()=>task.cancel(),25000);};
+          resetTmo();
           await new Promise((res,rej)=>task.on("state_changed",
-            s=>{progSeen=true;clearTimeout(tmo);const p=Math.round(s.bytesTransferred/s.totalBytes*100)||0;fill.style.width=`${p}%`;pct.textContent=`${label}업로드 중... ${p}%`;},
+            s=>{resetTmo();const p=Math.round(s.bytesTransferred/s.totalBytes*100)||0;fill.style.width=`${p}%`;pct.textContent=`${label}업로드 중... ${p}%`;},
             e=>{clearTimeout(tmo);rej(e);},
             ()=>{clearTimeout(tmo);res();}
           ));

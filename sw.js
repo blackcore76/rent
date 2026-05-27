@@ -1,7 +1,7 @@
 // Service Worker — 월세 관리 앱
 // 정적 자산 캐시 + 외부 SDK/폰트 캐시 + Firebase API는 항상 네트워크
 
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE_NAME = `rent-app-${VERSION}`;
 
 // 사전 캐싱할 앱 셸 (첫 설치 시)
