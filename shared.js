@@ -150,7 +150,10 @@ async function compressImage(file){
     if(w>MAX||h>MAX){if(w>=h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
     const canvas=document.createElement("canvas");canvas.width=w;canvas.height=h;
     canvas.getContext("2d").drawImage(bitmap,0,0,w,h);bitmap.close();
-    const blob=await new Promise(res=>canvas.toBlob(b=>res(b),"image/jpeg",0.82));
+    const blob=await Promise.race([
+      new Promise(res=>canvas.toBlob(b=>res(b),"image/jpeg",0.82)),
+      new Promise(res=>setTimeout(()=>res(null),10000))
+    ]);
     return blob||file;
   }catch{return file;}
 }

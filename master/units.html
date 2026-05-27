@@ -978,6 +978,7 @@ async function onPhotos(e){
     try{
       pct.textContent=`${label}압축 중...`;
       const blob=await compressImage(file);
+      pct.textContent=`${label}업로드 준비 중...`;
       const ref=storage.ref(path);
       let url=null;
       for(let attempt=0;attempt<2;attempt++){
