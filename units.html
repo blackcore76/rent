@@ -937,13 +937,20 @@ async function onPhotos(e){
       for(let attempt=0;attempt<2;attempt++){
         try{
           const task=ref.put(blob);
-          await new Promise((res,rej)=>task.on("state_changed",s=>{
-            const p=Math.round(s.bytesTransferred/s.totalBytes*100)||0;
-            fill.style.width=`${p}%`;
-            pct.textContent=`${label}업로드 중... ${p}%`;
-          },rej,res));
+          let progSeen=false;
+          const tmo=setTimeout(()=>{if(!progSeen)task.cancel();},25000);
+          await new Promise((res,rej)=>task.on("state_changed",
+            s=>{progSeen=true;clearTimeout(tmo);const p=Math.round(s.bytesTransferred/s.totalBytes*100)||0;fill.style.width=`${p}%`;pct.textContent=`${label}업로드 중... ${p}%`;},
+            e=>{clearTimeout(tmo);rej(e);},
+            ()=>{clearTimeout(tmo);res();}
+          ));
           url=await ref.getDownloadURL();break;
-        }catch(e){if(attempt===1)throw e;pct.textContent=`${label}❗ 실패 — 재시도 중...`;fill.style.width="0%";await new Promise(r=>setTimeout(r,1800));}
+        }catch(e){
+          const isTimeout=e.code==="storage/canceled";
+          if(attempt===1)throw e;
+          pct.textContent=isTimeout?`${label}⏱ 응답 없음 — 재시도 중...`:`${label}❗ 실패 — 재시도 중...`;
+          fill.style.width="0%";await new Promise(r=>setTimeout(r,1800));
+        }
       }
       fill.style.width="100%";pct.textContent=`${label}완료!`;
       const pid=String(ts+(i*10));
@@ -952,7 +959,10 @@ async function onPhotos(e){
       if(!units[curRoom].photos)units[curRoom].photos={};
       units[curRoom].photos[pid]={id:pid,url,storagePath:path};
       renderPhotos(units[curRoom].photos);showToast("✅ 업로드 완료");
-    }catch(err){showToast("❗ 업로드 실패: "+err.message)}
+    }catch(err){
+      const msg=err.code==="storage/canceled"?"네트워크 응답 없음 — Wi-Fi 확인 후 재시도하세요":"업로드 실패: "+err.message;
+      showToast("❗ "+msg);
+    }
   }
   btn.disabled=false;camBtn.disabled=false;if(saveBtn)saveBtn.disabled=false;bar.style.display="none";fill.style.width="0%";pct.textContent="";e.target.value="";
 }
