@@ -91,6 +91,46 @@
 
 .bld-subhd{font-size:11px;font-weight:800;color:var(--sub);padding:10px 4px 4px;letter-spacing:.5px;border-top:1px solid var(--border);margin-top:4px}
 .bld-subhd:first-child{border-top:none;padding-top:4px;margin-top:0}
+
+/* ── 이지모드 ── */
+#em-view{background:#0a0f1a;min-height:100vh;padding:12px 12px 100px;}
+.em-bld-block{background:#111827;border-radius:18px;padding:14px;margin-bottom:16px;border:1px solid rgba(255,255,255,.08);}
+.em-bld-header{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;}
+.em-bld-name{background:linear-gradient(135deg,#1e2d3d,#2a3f55);border-radius:12px;padding:10px 14px;font-size:16px;font-weight:900;color:#4DD0E1;min-width:90px;text-align:center;border:1px solid rgba(77,208,225,.2);flex-shrink:0;}
+.em-status-groups{flex:1;display:flex;flex-direction:column;gap:8px;}
+.em-status-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.em-status-btn{display:flex;align-items:center;gap:5px;border:none;border-radius:8px;padding:6px 12px;font-size:14px;font-weight:900;cursor:pointer;flex-shrink:0;font-family:inherit;}
+.em-status-btn.vacant{background:rgba(99,102,241,.25);color:#a5b4fc;border:1px solid rgba(99,102,241,.4);}
+.em-status-btn.unpaid{background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid rgba(239,68,68,.35);}
+.em-chip{font-size:12px;font-weight:700;padding:4px 9px;border-radius:6px;cursor:pointer;}
+.em-chip.vacant{background:rgba(99,102,241,.15);color:#c4b5fd;border:1px solid rgba(99,102,241,.3);}
+.em-chip.unpaid{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3);}
+.em-panel{margin:6px 0 4px;display:none;}
+.em-panel.open{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;}
+.em-floor-section{margin-bottom:4px;}
+.em-floor-label{text-align:center;font-size:14px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:2px;padding:10px 0 6px;position:relative;}
+.em-floor-label::before,.em-floor-label::after{content:'';position:absolute;top:50%;width:30%;height:1px;background:rgba(255,255,255,.1);}
+.em-floor-label::before{left:0}.em-floor-label::after{right:0}
+.em-floor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:8px;}
+.em-card{background:#1a2332;border-radius:14px;padding:12px 14px;border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:border-color .15s;}
+.em-card:active{border-color:rgba(77,208,225,.5);}
+.em-card.vacant{border-color:rgba(99,102,241,.35);background:rgba(99,102,241,.08);}
+.em-card.unpaid{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.06);}
+.em-card.partial{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.06);}
+.em-card-hd{font-size:13px;font-weight:800;color:#e2e8f0;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:6px;}
+.em-tenant-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
+.em-name{font-size:14px;font-weight:700;color:#f1f5f9;}
+.em-phone{font-size:12px;color:#94a3b8;}
+.em-rent{font-size:14px;font-weight:700;color:#4DD0E1;margin-top:6px;}
+.em-footer{display:flex;justify-content:space-between;align-items:center;margin-top:6px;}
+.em-dday{font-size:12px;font-weight:700;color:#94a3b8;}
+.em-pay{font-size:11px;font-weight:800;padding:2px 7px;border-radius:5px;}
+.em-pay.paid{background:rgba(0,230,118,.15);color:#6ee7b7;}
+.em-pay.partial{background:rgba(245,158,11,.15);color:#fcd34d;}
+.em-pay.unpaid{background:rgba(239,68,68,.15);color:#fca5a5;}
+.em-pay.none{background:rgba(100,116,139,.15);color:#94a3b8;}
+.em-toggle-btn{background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.35);color:#6ee7b7;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;}
+.em-toggle-btn.on{background:rgba(245,158,11,.2);border-color:rgba(245,158,11,.4);color:#fcd34d;}
 </style>
 </style>
 </head>
@@ -160,6 +200,7 @@
         <span id="sync-st" style="font-size:10px"></span>
 
         <button class="guide-btn" onclick="openHelp()">❓ 도움말</button>
+        <button class="em-toggle-btn" id="em-toggle-btn" onclick="toggleEasyMode()">👴 이지모드</button>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
     </div>
@@ -176,7 +217,7 @@
     <button class="logout-btn" onclick="doSignOut()">🚪 로그아웃</button>
   </div>
 
-  <div class="content">
+  <div class="content" id="normal-content">
     <div class="stats-grid">
       <div class="kpi total" onclick="goUnits()"><div class="kpi-val" id="s-total">—</div><div class="kpi-lbl">전체</div></div>
       <div class="kpi rented" onclick="goUnits('rented')"><div class="kpi-val" id="s-rented">—</div><div class="kpi-lbl">임대중</div></div>
@@ -210,6 +251,11 @@
 
     <div id="buildings-wrap"></div>
 
+  </div>
+
+  <!-- 이지모드 뷰 -->
+  <div id="em-view" style="display:none;">
+    <div id="em-content"></div>
   </div>
 </div>
 
@@ -612,6 +658,145 @@ function openHelp(){
   ], CM_DATA);
 }
 function closeHelp(){closeCoachMarks()}
+
+// ══════════════════════════════════════════
+//  이지모드
+// ══════════════════════════════════════════
+let emOn = false;
+
+function toggleEasyMode() {
+  emOn = !emOn;
+  document.getElementById('normal-content').style.display = emOn ? 'none' : '';
+  document.getElementById('em-view').style.display = emOn ? 'block' : 'none';
+  const btn = document.getElementById('em-toggle-btn');
+  btn.textContent = emOn ? '📊 일반모드' : '👴 이지모드';
+  btn.classList.toggle('on', emOn);
+  if (emOn) renderEasyMode();
+}
+
+function emYM() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+}
+
+function emDday(contractEnd) {
+  if (!contractEnd) return null;
+  const end = new Date(contractEnd); end.setHours(0,0,0,0);
+  const today = new Date(); today.setHours(0,0,0,0);
+  return Math.ceil((end - today) / 864e5);
+}
+
+function emPayStatus(bid, roomId, ym) {
+  const rec = (((allBldData[bid]||{}).history||{})[String(roomId)]||{})[ym];
+  if (!rec) return 'none';
+  if (rec.partial) return 'partial';
+  if (rec.paid) return 'paid';
+  return 'unpaid';
+}
+
+function emCardHtml(u, bid, ym) {
+  const isVacant = u.status === 'vacant';
+  const typeLbl = RTYPE_LBL[u.roomType] || '';
+  const statusLbl = isVacant ? '공실' : u.status === 'rented' ? '임대중' : '기타';
+  const pay = isVacant ? null : emPayStatus(bid, u.room, ym);
+  const dday = emDday(u.contractEnd);
+
+  const cardCls = isVacant ? 'em-card vacant'
+    : pay === 'unpaid' ? 'em-card unpaid'
+    : pay === 'partial' ? 'em-card partial'
+    : 'em-card';
+
+  const rentStr = u.rentType === 'jeonse'
+    ? `${(u.depositAmount||0).toLocaleString()}만원 (전세)`
+    : isVacant ? '' : `${(u.monthlyRent||0).toLocaleString()}만원 / 월`;
+
+  let ddayStr = '';
+  if (dday !== null) {
+    if (isVacant) ddayStr = `D+${Math.abs(dday)}일 (공실기간)`;
+    else if (dday < 0) ddayStr = `D+${Math.abs(dday)}일 (만료)`;
+    else ddayStr = `D-${dday}일`;
+  }
+
+  const payLbl = {paid:'완납', partial:'부분납부', unpaid:'미납', none:'이력없음'}[pay] || '';
+  const payCls = pay || 'none';
+
+  return `<div class="${cardCls}" onclick="goToUnit('${bid}','${esc(u.room)}')">
+    <div class="em-card-hd">${esc(u.room)}호 · ${typeLbl} · ${statusLbl}</div>
+    ${u.tenantName ? `<div class="em-tenant-row"><span class="em-name">${esc(u.tenantName)}</span><span class="em-phone">${esc(u.tenantPhone||'')}</span></div>` : ''}
+    ${u.tenantName2 ? `<div class="em-tenant-row"><span class="em-name">${esc(u.tenantName2)}</span><span class="em-phone">${esc(u.tenantPhone2||'')}</span></div>` : ''}
+    ${rentStr ? `<div class="em-rent">${rentStr}</div>` : ''}
+    <div class="em-footer">
+      <span class="em-dday">${ddayStr}</span>
+      ${!isVacant ? `<span class="em-pay ${payCls}">${payLbl}</span>` : ''}
+    </div>
+  </div>`;
+}
+
+function renderEasyMode() {
+  const el = document.getElementById('em-content');
+  if (!el) return;
+  const bids = sortedBids(bldgsData);
+  const ym = emYM();
+  let html = '';
+
+  bids.forEach(bid => {
+    const bldName = bldgsData[bid]?.name || '건물';
+    const units = Object.values((allBldData[bid]||{}).units||{});
+    if (!units.length) return;
+
+    // 공실 / 미납 분류
+    const vacants = units.filter(u => u.status === 'vacant');
+    const unpaid  = units.filter(u => u.status === 'rented' && ['unpaid','partial','none'].includes(emPayStatus(bid, u.room, ym)));
+
+    // 층별 그룹 (높은 층 → 낮은 층)
+    const byFloor = {};
+    units.forEach(u => {
+      const f = u.floor || Math.floor(parseInt(u.room||0)/100);
+      if (!byFloor[f]) byFloor[f] = [];
+      byFloor[f].push(u);
+    });
+    const floors = Object.keys(byFloor).map(Number).sort((a,b) => b-a);
+
+    html += `<div class="em-bld-block">
+      <div class="em-bld-header">
+        <div class="em-bld-name">${esc(bldName)}</div>
+        <div class="em-status-groups">
+          <div class="em-status-row">
+            <button class="em-status-btn vacant" onclick="toggleEmPanel('${bid}','vacant')">공실 ${vacants.length}</button>
+            ${vacants.map(u=>`<span class="em-chip vacant" onclick="toggleEmPanel('${bid}','vacant')">${esc(u.room)}호 ${RTYPE_LBL[u.roomType]||''}</span>`).join('')}
+          </div>
+          <div class="em-status-row">
+            <button class="em-status-btn unpaid" onclick="toggleEmPanel('${bid}','unpaid')">미납 ${unpaid.length}</button>
+            ${unpaid.map(u=>`<span class="em-chip unpaid" onclick="toggleEmPanel('${bid}','unpaid')">${esc(u.room)}호</span>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="em-panel" id="em-panel-${bid}-vacant">
+        ${vacants.map(u=>emCardHtml(u,bid,ym)).join('')}
+      </div>
+      <div class="em-panel" id="em-panel-${bid}-unpaid">
+        ${unpaid.map(u=>emCardHtml(u,bid,ym)).join('')}
+      </div>
+      ${floors.map(f=>`
+        <div class="em-floor-section">
+          <div class="em-floor-label">${f}층</div>
+          <div class="em-floor-grid">${byFloor[f].sort((a,b)=>parseInt(a.room)-parseInt(b.room)).map(u=>emCardHtml(u,bid,ym)).join('')}</div>
+        </div>
+      `).join('')}
+    </div>`;
+  });
+
+  el.innerHTML = html || '<div style="color:rgba(255,255,255,.3);text-align:center;padding:60px 20px;">등록된 세대가 없습니다</div>';
+}
+
+function toggleEmPanel(bid, type) {
+  ['vacant','unpaid'].forEach(t => {
+    const p = document.getElementById(`em-panel-${bid}-${t}`);
+    if (p && t !== type) p.classList.remove('open');
+  });
+  const panel = document.getElementById(`em-panel-${bid}-${type}`);
+  if (panel) panel.classList.toggle('open');
+}
 </script>
 </body>
 </html>
