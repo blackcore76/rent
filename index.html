@@ -126,13 +126,11 @@ body{overflow-x:hidden}
 .em-pay.partial{background:rgba(245,158,11,.15);color:#fcd34d;}
 .em-pay.unpaid{background:rgba(239,68,68,.15);color:#fca5a5;}
 .em-pay.none{background:rgba(100,116,139,.15);color:#94a3b8;}
-.em-toggle-btn{background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.35);color:#6ee7b7;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;}
-.em-toggle-btn.on{background:rgba(245,158,11,.2);border-color:rgba(245,158,11,.4);color:#fcd34d;}
 /* 이지모드 플로팅 사이드 버튼 */
-#em-side-btn{position:fixed;left:-58px;bottom:200px;z-index:500;width:86px;padding:20px 10px 20px 8px;background:linear-gradient(180deg,#00c853,#00a844);border-radius:0 18px 18px 0;cursor:pointer;transition:left .28s cubic-bezier(.4,0,.2,1);box-shadow:3px 3px 16px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;user-select:none;-webkit-tap-highlight-color:transparent;}
-#em-side-btn:hover{left:0;}
-#em-side-btn.on{background:linear-gradient(180deg,#ffb300,#ff6f00);}
-#em-side-txt{writing-mode:vertical-rl;transform:rotate(180deg);font-size:14px;font-weight:900;color:#000;letter-spacing:3px;font-family:'Noto Sans KR',sans-serif;}
+#em-side-btn{position:fixed;left:-54px;bottom:200px;z-index:500;width:80px;padding:16px 8px 16px 6px;background:rgba(0,200,83,.5);border:1.5px solid rgba(255,202,40,.8);border-left:none;border-radius:0 16px 16px 0;cursor:pointer;transition:left .28s cubic-bezier(.4,0,.2,1);box-shadow:2px 2px 12px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;user-select:none;-webkit-tap-highlight-color:transparent;}
+#em-side-btn:hover,#em-side-btn.peeking{left:0;}
+#em-side-btn.on{background:rgba(255,179,0,.5);}
+#em-side-txt{writing-mode:vertical-rl;font-size:13px;font-weight:900;color:#fff;letter-spacing:3px;font-family:'Noto Sans KR',sans-serif;}
 </style>
 </head>
 <body>
@@ -201,7 +199,6 @@ body{overflow-x:hidden}
         <span id="sync-st" style="font-size:10px"></span>
 
         <button class="guide-btn" onclick="openHelp()">❓ 도움말</button>
-        <button class="em-toggle-btn" id="em-toggle-btn" onclick="toggleEasyMode()">👴 이지모드</button>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
     </div>
@@ -255,7 +252,7 @@ body{overflow-x:hidden}
   </div>
 
   <!-- 이지모드 플로팅 사이드 버튼 -->
-  <div id="em-side-btn" onclick="toggleEasyMode()">
+  <div id="em-side-btn">
     <span id="em-side-txt">이지모드</span>
   </div>
 
@@ -671,9 +668,6 @@ function toggleEasyMode() {
   emOn = !emOn;
   document.getElementById('normal-content').style.display = emOn ? 'none' : '';
   document.getElementById('em-view').style.display = emOn ? 'block' : 'none';
-  const hBtn = document.getElementById('em-toggle-btn');
-  hBtn.textContent = emOn ? '📊 일반모드' : '👴 이지모드';
-  hBtn.classList.toggle('on', emOn);
   const sBtn = document.getElementById('em-side-btn');
   const sTxt = document.getElementById('em-side-txt');
   sBtn.classList.toggle('on', emOn);
@@ -788,6 +782,37 @@ function renderEasyMode() {
 
   el.innerHTML = html || '<div style="color:rgba(255,255,255,.3);text-align:center;padding:60px 20px;">등록된 세대가 없습니다</div>';
 }
+
+// ── 사이드 버튼 터치/마우스 분기 ──────────────────────────
+(function(){
+  var btn = document.getElementById('em-side-btn');
+  var peekTimer = null;
+  var peeking = false;
+
+  // 모바일 터치: 첫 탭→열림(2초 대기), 2초내 재탭→전환+1초후 숨김
+  btn.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    clearTimeout(peekTimer);
+    if (peeking) {
+      peeking = false;
+      btn.classList.remove('peeking');
+      toggleEasyMode();
+      btn.classList.add('peeking');
+      peekTimer = setTimeout(function(){ btn.classList.remove('peeking'); }, 1000);
+    } else {
+      peeking = true;
+      btn.classList.add('peeking');
+      peekTimer = setTimeout(function(){ peeking = false; btn.classList.remove('peeking'); }, 2000);
+    }
+  }, { passive: false });
+
+  // PC 마우스: 호버로 버튼이 이미 보이는 상태에서 클릭 즉시 전환
+  btn.addEventListener('click', function(e) {
+    if (e.sourceCapabilities && !e.sourceCapabilities.firesTouchEvents) {
+      toggleEasyMode();
+    }
+  });
+})();
 </script>
 </body>
 </html>
