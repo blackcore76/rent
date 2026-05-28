@@ -22,6 +22,7 @@
 <script src="shared.js?v=2"></script>
 <script src="db-paths.js"></script>
 <style>
+body{overflow-x:hidden}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
 .kpi{background:var(--card);border-radius:12px;padding:12px 4px;text-align:center;box-shadow:var(--shadow);cursor:pointer;transition:transform .12s,box-shadow .12s}
 .kpi:active{transform:scale(.95);box-shadow:0 1px 4px rgba(0,0,0,.08)}
@@ -31,12 +32,15 @@
 .kpi.rented .kpi-val{color:var(--blue)}
 .kpi.vacant .kpi-val{color:var(--indigo)}
 .kpi.unpaid .kpi-val{color:var(--red)}
-.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
 .card-hd{font-size:13px;font-weight:700;color:var(--hdr2);margin-bottom:12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);padding-bottom:10px}
-.status-row{display:flex;align-items:center;gap:8px;padding:9px 4px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:8px;transition:background .12s}
+.status-row{display:flex;flex-direction:column;align-items:stretch;padding:10px 4px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:8px;transition:background .12s;overflow:hidden}
 .status-row:last-child{border-bottom:none}
 .status-row:active{background:#F0F4F8}
-.room-num{font-size:14px;font-weight:800;color:var(--hdr);min-width:40px}
+.sr-top{display:flex;align-items:center;gap:6px;width:100%;overflow:hidden}
+.sr-sub{font-size:12px;font-weight:600;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;padding-top:5px}
+.sr-arrow{margin-left:auto;flex-shrink:0;font-size:14px;color:var(--hint)}
+.room-num{font-size:14px;font-weight:800;color:var(--hdr);min-width:40px;flex-shrink:0}
 .tenant-nm{flex:1;font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rent-amt{font-size:12px;font-weight:700;color:var(--sub);white-space:nowrap}
 .badge{display:inline-block;padding:3px 7px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap}
@@ -66,7 +70,7 @@
 .note-btn.edit{background:var(--blue-lt);color:var(--blue)}
 .note-btn.del{background:var(--red-lt);color:var(--red)}
 .empty-small{text-align:center;padding:20px;color:var(--hint);font-size:13px}
-.expiry-row{display:flex;align-items:center;gap:8px;padding:9px 4px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:8px;transition:background .12s}
+.expiry-row{display:flex;flex-direction:column;align-items:stretch;padding:10px 4px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:8px;transition:background .12s;overflow:hidden}
 .expiry-row:last-child{border-bottom:none}
 .expiry-row:active{background:#F0F4F8}
 /* MODAL */
@@ -475,10 +479,9 @@ function renderDash(){
       const ps=computePaidStatus(bid,u.room);
       const pBadge=ps==="partial"?`<span class="badge" style="background:#FEF3C7;color:#92400E">🔶 부분납부</span>`:`<span class="badge badge-unpaid">❌ 미납</span>`;
       return`<div class="status-row" onclick="goToUnit('${bid}','${u.room}')">
-      <span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}
-      <span class="tenant-nm">${esc(names(u))}</span>
-      <span class="rent-amt">${fmtWon(u.monthlyRent)}</span>
-      ${pBadge}<span style="font-size:14px;color:var(--hint)">›</span></div>`;}).join("");
+      <div class="sr-top"><span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}${pBadge}<span class="sr-arrow">›</span></div>
+      <div class="sr-sub">${esc(names(u))}</div>
+      </div>`;}).join("");
   });
   document.getElementById("unpaid-list").innerHTML=uHtml||'<div class="empty-small">✅ 이달 미납 없음</div>';
 
@@ -501,10 +504,9 @@ function renderDash(){
     if(!vacItems.length)return;
     vHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
     vHtml+=vacItems.map(({room,unit})=>`<div class="status-row" onclick="goToUnit('${bid}','${room}')">
-      <span class="room-num">${room}호</span>${unit?rentTypeBadge(unit):""}${unit?rtBadge(unit):""}
-      ${unit?.memo?`<span class="tenant-nm" style="color:var(--sub);font-size:12px">${esc(unit.memo.split('\n')[0])}</span>`:''}
-      <span class="badge badge-vacant">공실</span>
-      <span style="font-size:14px;color:var(--hint)">›</span></div>`).join("");
+      <div class="sr-top"><span class="room-num">${room}호</span>${unit?rentTypeBadge(unit):""}${unit?rtBadge(unit):""}<span class="badge badge-vacant">공실</span><span class="sr-arrow">›</span></div>
+      ${unit?.memo?`<div class="sr-sub">${esc(unit.memo.split('\n')[0])}</div>`:''}
+      </div>`).join("");
   });
   document.getElementById("vacant-list").innerHTML=vHtml||'<div class="empty-small">🏠 공실 없음</div>';
 
@@ -522,11 +524,9 @@ function renderDash(){
     if(!soon.length)return;
     eHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
     eHtml+=soon.map(u=>`<div class="expiry-row" onclick="goToUnit('${bid}','${u.room}')">
-      <span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}
-      <span class="tenant-nm">${esc(names(u))}</span>
-      <span class="badge badge-warning">${u.contractEnd}</span>
-      <span style="font-size:11px;font-weight:700;color:${u.dl<=7?"var(--red)":"var(--amber)"};min-width:40px;text-align:right">${u.dl}일 후</span>
-      <span style="font-size:14px;color:var(--hint)">›</span></div>`).join("");
+      <div class="sr-top"><span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}<span class="badge badge-warning">${shortDate(u.contractEnd)}</span><span style="font-size:11px;font-weight:700;color:${u.dl<=7?"var(--red)":"var(--amber)"};white-space:nowrap">${u.dl}일 후</span><span class="sr-arrow">›</span></div>
+      <div class="sr-sub">${esc(names(u))}</div>
+      </div>`).join("");
   });
   document.getElementById("expiry-list").innerHTML=eHtml||'<div class="empty-small">✅ 30일 내 만료 없음</div>';
   clearTimeout(_alertTimer);_alertTimer=setTimeout(checkContractAlerts,900);
@@ -639,6 +639,7 @@ function goUnits(filter){
   location.href=`units.html${filter?"?filter="+filter:""}${mUid?(filter?"&":"?")+"master_uid="+encodeURIComponent(mUid)+"&master_name="+encodeURIComponent(mName):""}`;
 }
 function fmtDt(iso){if(!iso)return"";const d=new Date(iso);return`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`}
+function shortDate(s){if(!s)return'';const p=s.split('-');return(p[1]?+p[1]:'')+'/'+(p[2]?+p[2]:'');}
 
 // ── COACH MARK HELP ──
 const CM_DATA={
