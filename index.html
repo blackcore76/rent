@@ -131,6 +131,7 @@ body{overflow-x:hidden}
 #em-side-btn:hover,#em-side-btn.peeking{left:0;}
 #em-side-btn.on{background:rgba(255,179,0,.5);}
 #em-side-txt{writing-mode:vertical-rl;font-size:13px;font-weight:900;color:#fff;letter-spacing:3px;font-family:'Noto Sans KR',sans-serif;}
+#em-side-btn.on #em-side-txt{color:#000;}
 </style>
 </head>
 <body>
@@ -788,29 +789,32 @@ function renderEasyMode() {
   var btn = document.getElementById('em-side-btn');
   var peekTimer = null;
   var peeking = false;
+  var lastTouchTime = 0;
 
-  // 모바일 터치: 첫 탭→열림(2초 대기), 2초내 재탭→전환+1초후 숨김
+  // 모바일 터치: 첫 탭→열림(2초 대기), 2초내 재탭→전환+즉시 숨김
   btn.addEventListener('touchend', function(e) {
     e.preventDefault();
+    lastTouchTime = Date.now();
     clearTimeout(peekTimer);
     if (peeking) {
       peeking = false;
       btn.classList.remove('peeking');
       toggleEasyMode();
-      btn.classList.add('peeking');
-      peekTimer = setTimeout(function(){ btn.classList.remove('peeking'); }, 1000);
     } else {
       peeking = true;
       btn.classList.add('peeking');
-      peekTimer = setTimeout(function(){ peeking = false; btn.classList.remove('peeking'); }, 2000);
+      peekTimer = setTimeout(function(){
+        peeking = false;
+        btn.classList.remove('peeking');
+      }, 2000);
     }
   }, { passive: false });
 
   // PC 마우스: 호버로 버튼이 이미 보이는 상태에서 클릭 즉시 전환
-  btn.addEventListener('click', function(e) {
-    if (e.sourceCapabilities && !e.sourceCapabilities.firesTouchEvents) {
-      toggleEasyMode();
-    }
+  // (touchend 직후 300ms 내 발생하는 ghost click 무시)
+  btn.addEventListener('click', function() {
+    if (Date.now() - lastTouchTime < 300) return;
+    toggleEasyMode();
   });
 })();
 </script>
