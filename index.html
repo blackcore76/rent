@@ -124,7 +124,11 @@
 .em-pay.none{background:rgba(100,116,139,.15);color:#94a3b8;}
 .em-toggle-btn{background:rgba(0,230,118,.15);border:1px solid rgba(0,230,118,.35);color:#6ee7b7;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;}
 .em-toggle-btn.on{background:rgba(245,158,11,.2);border-color:rgba(245,158,11,.4);color:#fcd34d;}
-</style>
+/* 이지모드 플로팅 사이드 버튼 */
+#em-side-btn{position:fixed;left:-58px;bottom:200px;z-index:500;width:86px;padding:20px 10px 20px 8px;background:linear-gradient(180deg,#00c853,#00a844);border-radius:0 18px 18px 0;cursor:pointer;transition:left .28s cubic-bezier(.4,0,.2,1);box-shadow:3px 3px 16px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;user-select:none;-webkit-tap-highlight-color:transparent;}
+#em-side-btn:hover{left:0;}
+#em-side-btn.on{background:linear-gradient(180deg,#ffb300,#ff6f00);}
+#em-side-txt{writing-mode:vertical-rl;transform:rotate(180deg);font-size:14px;font-weight:900;color:#000;letter-spacing:3px;font-family:'Noto Sans KR',sans-serif;}
 </style>
 </head>
 <body>
@@ -244,6 +248,11 @@
 
     <div id="buildings-wrap"></div>
 
+  </div>
+
+  <!-- 이지모드 플로팅 사이드 버튼 -->
+  <div id="em-side-btn" onclick="toggleEasyMode()">
+    <span id="em-side-txt">이지모드</span>
   </div>
 
   <!-- 이지모드 뷰 -->
@@ -661,9 +670,13 @@ function toggleEasyMode() {
   emOn = !emOn;
   document.getElementById('normal-content').style.display = emOn ? 'none' : '';
   document.getElementById('em-view').style.display = emOn ? 'block' : 'none';
-  const btn = document.getElementById('em-toggle-btn');
-  btn.textContent = emOn ? '📊 일반모드' : '👴 이지모드';
-  btn.classList.toggle('on', emOn);
+  const hBtn = document.getElementById('em-toggle-btn');
+  hBtn.textContent = emOn ? '📊 일반모드' : '👴 이지모드';
+  hBtn.classList.toggle('on', emOn);
+  const sBtn = document.getElementById('em-side-btn');
+  const sTxt = document.getElementById('em-side-txt');
+  sBtn.classList.toggle('on', emOn);
+  sTxt.textContent = emOn ? '일반모드' : '이지모드';
   if (emOn) renderEasyMode();
 }
 
