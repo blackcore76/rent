@@ -103,11 +103,11 @@ body{overflow-x:hidden}
 .em-section-lbl::before,.em-section-lbl::after{content:'';position:absolute;top:50%;width:35%;height:1px;background:rgba(255,255,255,.12);}
 .em-section-lbl::before{left:0}.em-section-lbl::after{right:0}
 .em-bld-block{background:#111827;border-radius:18px;padding:14px 12px;margin-bottom:20px;border:1px solid rgba(255,255,255,.1);}
-.em-chips-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:6px;}
+.em-chips-grid,.em-floor-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:6px;}
 .em-chip-v{flex:0 0 calc(25% - 7px);background:rgba(234,179,8,.08);border:1.5px solid rgba(234,179,8,.55);color:#fde047;border-radius:10px;padding:8px 4px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;line-height:1.4;}
 .em-chip-u{flex:0 0 calc(25% - 7px);background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.55);color:#fca5a5;border-radius:10px;padding:8px 4px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;line-height:1.4;}
-.em-floor-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:8px;}
-.em-floor-grid>.em-card{flex:0 0 calc(50% - 5px);}
+.em-chip-ok{flex:0 0 calc(25% - 7px);background:rgba(34,197,94,.08);border:1.5px solid rgba(34,197,94,.55);color:#86efac;border-radius:10px;padding:8px 4px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;line-height:1.4;}
+.em-chip-p{flex:0 0 calc(25% - 7px);background:rgba(245,158,11,.08);border:1.5px solid rgba(245,158,11,.55);color:#fcd34d;border-radius:10px;padding:8px 4px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;line-height:1.4;}
 .em-card{background:#202c3e;border-radius:16px;padding:14px;border:2px solid transparent;cursor:pointer;transition:opacity .15s;}
 .em-card:active{opacity:.75;}
 .em-card.rented{border-color:rgba(34,197,94,.65);}
@@ -700,40 +700,12 @@ function emPayStatus(bid, roomId, ym) {
 function emCardHtml(u, bid, ym) {
   const isVacant = u.status === 'vacant';
   const typeLbl  = RTYPE_LBL[u.roomType] || '';
-  const statusLbl = isVacant ? '공실' : u.status === 'rented' ? '임대중' : '기타';
-  const pay  = isVacant ? null : emPayStatus(bid, u.room, ym);
-  const dday = emDday(u.contractEnd);
-
-  const cardCls = isVacant       ? 'em-card vacant'
-    : pay === 'unpaid'           ? 'em-card unpaid'
-    : pay === 'partial'          ? 'em-card partial'
-    : pay === 'paid'             ? 'em-card rented'
-    : 'em-card unpaid';
-
-  const rentStr = u.rentType === 'jeonse'
-    ? `${(u.depositAmount||0).toLocaleString()}만원 (전세)`
-    : isVacant ? '' : `${(u.monthlyRent||0).toLocaleString()}만원 / 월`;
-
-  let ddayStr = '';
-  if (dday !== null) {
-    if (isVacant)    ddayStr = `D+${Math.abs(dday)}일 (공실기간)`;
-    else if (dday<0) ddayStr = `D+${Math.abs(dday)}일 (만료)`;
-    else             ddayStr = `D-${dday}일`;
-  }
-
-  const payLbl = {paid:'완납', partial:'부분납부', unpaid:'미납', none:'미납'}[pay] || '';
-  const payCls = (pay === 'none' ? 'unpaid' : pay) || 'unpaid';
-
-  return `<div class="${cardCls}" onclick="goToUnit('${bid}','${esc(u.room)}')">
-    <div class="em-card-hd">${esc(u.room)}호 · ${typeLbl} · ${statusLbl}</div>
-    ${u.tenantName  ? `<div class="em-tenant-row"><span class="em-name">${esc(u.tenantName)}</span><span class="em-phone">${esc(u.tenantPhone||'')}</span></div>` : ''}
-    ${u.tenantName2 ? `<div class="em-tenant-row"><span class="em-name">${esc(u.tenantName2)}</span><span class="em-phone">${esc(u.tenantPhone2||'')}</span></div>` : ''}
-    ${rentStr ? `<div class="em-rent">${rentStr}</div>` : ''}
-    <div class="em-footer">
-      <span class="em-dday">${ddayStr}</span>
-      ${!isVacant ? `<span class="em-pay ${payCls}">${payLbl}</span>` : ''}
-    </div>
-  </div>`;
+  const pay      = isVacant ? null : emPayStatus(bid, u.room, ym);
+  const chipCls  = isVacant        ? 'em-chip-v'
+    : pay === 'paid'               ? 'em-chip-ok'
+    : pay === 'partial'            ? 'em-chip-p'
+    : 'em-chip-u';
+  return `<div class="${chipCls}" onclick="goToUnit('${bid}','${esc(u.room)}')">${esc(u.room)}호<br>${typeLbl}</div>`;
 }
 
 function renderEasyMode() {
