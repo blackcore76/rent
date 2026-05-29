@@ -19,6 +19,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script src="shared.js?v=2"></script>
 <script src="db-paths.js"></script>
 <style>
@@ -138,6 +139,51 @@ body{overflow-x:hidden}
 #em-legend.show{display:flex;}
 .em-leg{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:rgba(255,255,255,.7);}
 .em-leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+/* ── 이지모드 유닛 상세 모달 ── */
+#eu-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600}
+#eu-overlay.show{display:block}
+#eu-sheet{position:fixed;left:0;right:0;bottom:0;z-index:601;background:#fff;border-radius:20px 20px 0 0;max-height:88vh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+#eu-sheet.show{transform:translateY(0)}
+.eu-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.eu-title{font-size:16px;font-weight:900;color:var(--hdr)}
+.eu-close{width:32px;height:32px;border-radius:50%;background:#F1F5F9;border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sub);flex-shrink:0}
+.eu-body{overflow-y:auto;padding:14px 18px 80px;-webkit-overflow-scrolling:touch}
+.eu-slbl{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px;display:flex;align-items:center;gap:4px}
+.eu-slbl:first-child{margin-top:0}
+.eu-card{background:#F8FAFC;border-radius:12px;padding:12px 14px;margin-bottom:4px}
+.eu-row{display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid #F1F5F9}
+.eu-row:last-child{border-bottom:none}
+.eu-lbl{font-size:11px;font-weight:700;color:var(--hint);min-width:72px;flex-shrink:0}
+.eu-val{font-size:13px;font-weight:600;color:var(--text);flex:1;word-break:break-all}
+.eu-chg-item{background:#EEF2FF;border-radius:10px;padding:10px 12px;margin-bottom:6px}
+.eu-chg-date{font-size:12px;font-weight:700;color:var(--indigo);margin-bottom:3px}
+.eu-chg-desc{font-size:12px;color:var(--text)}
+.eu-memo-ta{width:100%;border:2px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;resize:none;outline:none;color:var(--text);background:#FAFCFF}
+.eu-memo-ta:focus{border-color:var(--sky)}
+.eu-save-btn{margin-top:8px;width:100%;padding:11px;background:var(--hdr);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.eu-photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.eu-ph-thumb{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:#F1F5F9;cursor:pointer}
+.eu-ph-thumb img{width:100%;height:100%;object-fit:cover}
+.eu-upload-row{display:flex;gap:8px}
+.eu-upload-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:10px;border:2px dashed var(--border);border-radius:10px;background:#FAFCFF;color:var(--sub);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.eu-upload-btn:active{border-color:var(--sky);color:var(--sky)}
+/* 납부이력 그리드 (units.html 동일) */
+.rent-hist-wrap{margin-bottom:4px}
+.rent-hist-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:6px}
+.rh-cell{border-radius:8px;padding:6px 2px;text-align:center;cursor:pointer;transition:transform .1s,opacity .1s;user-select:none;-webkit-user-select:none}
+.rh-cell:active{transform:scale(.92);opacity:.75}
+.rh-month{font-size:9px;font-weight:700;color:inherit;opacity:.7;margin-bottom:3px}
+.rh-icon{font-size:13px;line-height:1}
+.rh-paid{background:var(--green-lt);color:var(--green-t)}
+.rh-unpaid{background:var(--red-lt);color:var(--red-t)}
+.rh-partial{background:#FEF3C7;color:#92400E}
+.rh-none{background:#F1F5F9;color:var(--hint)}
+.rh-drop{position:fixed;z-index:900;background:#fff;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.22);padding:6px;min-width:148px;border:1px solid var(--border)}
+.rh-dd-btn{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;border:none;background:none;font-size:13px;font-weight:600;cursor:pointer;border-radius:9px;text-align:left;font-family:inherit;color:var(--text)}
+.rh-dd-btn:active{background:#F1F5F9}
+.rh-partial-input{padding:8px;display:flex;flex-direction:column;gap:6px}
+.rh-partial-input input{padding:8px 10px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:inherit;width:100%}
+.rh-partial-input button{padding:9px;background:#F59E0B;color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
 </style>
 </head>
 <body>
@@ -268,6 +314,22 @@ body{overflow-x:hidden}
     <div id="em-content"></div>
   </div>
 
+  <!-- 이지모드 유닛 상세 모달 -->
+  <div id="eu-overlay" onclick="closeEmUnit()"></div>
+  <div id="eu-sheet">
+    <div class="eu-hdr">
+      <span class="eu-title" id="eu-title">—</span>
+      <button class="eu-close" onclick="closeEmUnit()">✕</button>
+    </div>
+    <div class="eu-body" id="eu-body"></div>
+  </div>
+  <div id="eu-pv" style="display:none;position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.9);align-items:center;justify-content:center">
+    <button onclick="closeEuPV()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.2);border:none;border-radius:50%;width:36px;height:36px;color:#fff;font-size:18px;cursor:pointer;line-height:1">✕</button>
+    <img id="eu-pv-img" src="" alt="" style="max-width:95%;max-height:90vh;border-radius:8px;object-fit:contain">
+  </div>
+  <input type="file" id="eu-photo-input" accept="image/*" multiple style="display:none" onchange="onEuPhotos(event)">
+  <input type="file" id="eu-camera-input" accept="image/*" capture="environment" style="display:none" onchange="onEuPhotos(event)">
+
   <!-- 이지모드 범례 푸터 -->
   <div id="em-legend">
     <span class="em-leg"><span class="em-leg-dot" style="background:#86efac"></span>임대중</span>
@@ -316,6 +378,7 @@ body{overflow-x:hidden}
 <div id="toast"></div>
 
 <script>
+const storage = firebase.storage();
 let cu=null,mUid="",mName="",readOnly=false;
 let bldgsData={},curBid="main",bldgsRef=null,bldgsL=null;
 let allBldData={}; // {bid:{units:{},history:{},bldInfo:{}}}
@@ -687,6 +750,11 @@ function toggleEasyMode() {
   sBtn.classList.toggle('on', emOn);
   sTxt.textContent = emOn ? '일반모드' : '이지모드';
   document.getElementById('em-legend').classList.toggle('show', emOn);
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    const href = tab.getAttribute('href') || '';
+    if (href.includes('units') || href.includes('admin'))
+      tab.style.display = emOn ? 'none' : '';
+  });
   if (emOn) renderEasyMode();
 }
 
@@ -718,7 +786,7 @@ function emCardHtml(u, bid, ym) {
     : pay === 'paid'               ? 'em-chip-ok'
     : pay === 'partial'            ? 'em-chip-p'
     : 'em-chip-u';
-  return `<div class="${chipCls}" onclick="goToUnit('${bid}','${esc(u.room)}')">${esc(u.room)}호<br>${typeLbl}</div>`;
+  return `<div class="${chipCls}" onclick="openEmUnit('${bid}','${esc(u.room)}')">${esc(u.room)}호<br>${typeLbl}</div>`;
 }
 
 function renderEasyMode() {
@@ -768,6 +836,243 @@ function renderEasyMode() {
   });
 
   el.innerHTML = html || '<div style="color:rgba(255,255,255,.3);text-align:center;padding:60px 20px;">등록된 세대가 없습니다</div>';
+}
+
+// ══════════════════════════════════════════
+//  이지모드 유닛 상세 모달
+// ══════════════════════════════════════════
+let _euBid='', _euRoom='', _euRhDrop=null;
+
+function getLastNMonths(n){
+  const res=[],now=new Date();
+  for(let i=n-1;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    res.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  }
+  return res;
+}
+
+function openEmUnit(bid, roomId) {
+  _euBid=bid; _euRoom=roomId;
+  const u = ((allBldData[bid]||{}).units||{})[roomId] || {};
+  const bldName = bldgsData[bid]?.name || '';
+  document.getElementById('eu-title').textContent = `${bldName} ${roomId}호`;
+  document.getElementById('eu-body').innerHTML = euBodyHtml(bid, roomId, u);
+  renderEuHist();
+  document.getElementById('eu-overlay').classList.add('show');
+  document.getElementById('eu-sheet').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeEmUnit() {
+  document.getElementById('eu-overlay').classList.remove('show');
+  document.getElementById('eu-sheet').classList.remove('show');
+  document.body.style.overflow = '';
+  if (_euRhDrop) { _euRhDrop.remove(); _euRhDrop=null; }
+}
+
+function euBodyHtml(bid, roomId, u) {
+  const RT = {monthly:'월세', jeonse:'전세'};
+  const ST = {rented:'임대중', vacant:'공실'};
+  let html = '';
+
+  // 임대 구조/형태
+  html += `<div class="eu-slbl">🏠 임대 구조 / 형태</div>
+  <div class="eu-card">
+    <div class="eu-row"><span class="eu-lbl">임대 형태</span><span class="eu-val">${RT[u.rentType]||'월세'}</span></div>
+    <div class="eu-row"><span class="eu-lbl">임대상 형태</span><span class="eu-val">${RTYPE_LBL[u.roomType]||'—'}</span></div>
+    <div class="eu-row"><span class="eu-lbl">임대 상태</span><span class="eu-val">${ST[u.status]||'—'}</span></div>
+  </div>`;
+
+  // 임차인
+  if (u.tenantName || u.tenantName2) {
+    html += `<div class="eu-slbl">👤 임차인</div><div class="eu-card">`;
+    if (u.tenantName) {
+      html += `<div class="eu-row"><span class="eu-lbl">임차인①</span><span class="eu-val">${esc(u.tenantName)}</span></div>`;
+      if (u.tenantPhone) html += `<div class="eu-row"><span class="eu-lbl">연락처①</span><span class="eu-val"><a href="tel:${esc(u.tenantPhone)}" style="color:var(--blue);text-decoration:none">${esc(u.tenantPhone)}</a></span></div>`;
+    }
+    if (u.tenantName2) {
+      html += `<div class="eu-row"><span class="eu-lbl">임차인②</span><span class="eu-val">${esc(u.tenantName2)}</span></div>`;
+      if (u.tenantPhone2) html += `<div class="eu-row"><span class="eu-lbl">연락처②</span><span class="eu-val"><a href="tel:${esc(u.tenantPhone2)}" style="color:var(--blue);text-decoration:none">${esc(u.tenantPhone2)}</a></span></div>`;
+    }
+    html += `</div>`;
+  }
+
+  // 계약 정보
+  html += `<div class="eu-slbl">💰 계약 정보</div><div class="eu-card">`;
+  if (u.rentType==='jeonse') {
+    html += `<div class="eu-row"><span class="eu-lbl">전세보증금</span><span class="eu-val">${(u.depositAmount||0).toLocaleString()}만원</span></div>`;
+  } else {
+    html += `<div class="eu-row"><span class="eu-lbl">보증금</span><span class="eu-val">${(u.depositAmount||0).toLocaleString()}만원</span></div>
+             <div class="eu-row"><span class="eu-lbl">월세</span><span class="eu-val">${(u.monthlyRent||0).toLocaleString()}만원</span></div>`;
+  }
+  if (u.manageFee) html += `<div class="eu-row"><span class="eu-lbl">관리비</span><span class="eu-val">${esc(String(u.manageFee))}</span></div>`;
+  if (u.contractStart) html += `<div class="eu-row"><span class="eu-lbl">계약 시작</span><span class="eu-val">${esc(u.contractStart)}</span></div>`;
+  if (u.contractEnd)   html += `<div class="eu-row"><span class="eu-lbl">계약 종료</span><span class="eu-val">${esc(u.contractEnd)}</span></div>`;
+  html += `</div>`;
+
+  // 임대 조건 변경
+  const changes = Object.values(u.rentChanges||{}).sort((a,b)=>(b.effectiveDate||'').localeCompare(a.effectiveDate||''));
+  if (changes.length) {
+    const typeMap = {deposit:'보증금 변경', monthly:'월세 변경', both:'보증금+월세 변경'};
+    html += `<div class="eu-slbl">📋 임대 조건 변경</div>`;
+    changes.forEach(c => {
+      html += `<div class="eu-chg-item">
+        <div class="eu-chg-date">${esc(c.effectiveDate||'')} · ${typeMap[c.type]||c.type||''}</div>
+        <div class="eu-chg-desc">${c.oldVal!==undefined?`${Number(c.oldVal).toLocaleString()}만 → ${Number(c.newVal).toLocaleString()}만원`:''}${c.reason?`<br><span style="color:var(--hint)">${esc(c.reason)}</span>`:''}
+        </div></div>`;
+    });
+  }
+
+  // 특이사항 메모 (편집 가능)
+  html += `<div class="eu-slbl">📝 특이사항 메모</div>
+  <textarea class="eu-memo-ta" id="eu-memo" rows="3" placeholder="메모 없음">${esc(u.memo||'')}</textarea>
+  <button class="eu-save-btn" onclick="saveEuMemo()">💾 메모 저장</button>`;
+
+  // 납부이력 (편집 가능)
+  html += `<div class="eu-slbl">📅 월세 납부 이력 <span style="font-size:10px;font-weight:400;color:var(--hint);margin-left:4px">최근 12개월</span></div>
+  <div class="rent-hist-wrap"><div class="rent-hist-grid" id="eu-hist-grid"></div></div>`;
+
+  // 계약서 사진 (편집 가능)
+  const photos = Object.values(u.photos||{}).sort((a,b)=>a.id-b.id);
+  html += `<div class="eu-slbl">📷 계약서 사진</div>
+  <div class="eu-photo-grid" id="eu-photo-grid">
+    ${photos.map(p=>`<div class="eu-ph-thumb"><img src="${esc(p.url)}" onclick="openEuPV('${esc(p.url)}')" loading="lazy"></div>`).join('')}
+  </div>
+  <div class="eu-upload-row">
+    <button class="eu-upload-btn" onclick="document.getElementById('eu-photo-input').click()">📁 사진 추가</button>
+    <button class="eu-upload-btn" onclick="document.getElementById('eu-camera-input').click()">📸 카메라</button>
+  </div>`;
+
+  return html;
+}
+
+function renderEuHist() {
+  const el = document.getElementById('eu-hist-grid'); if (!el) return;
+  const months = getLastNMonths(12);
+  const roomH = ((allBldData[_euBid]||{}).history||{})[_euRoom] || {};
+  el.innerHTML = months.map(ym => {
+    const rec = roomH[ym];
+    let cls, icon;
+    if (!rec)             { cls='rh-none';    icon='—'; }
+    else if (rec.paid)    { cls='rh-paid';    icon='✅'; }
+    else if (rec.partial) { cls='rh-partial'; icon='🔶'; }
+    else                  { cls='rh-unpaid';  icon='❌'; }
+    const mLabel = ym.split('-')[1]+'월';
+    const amtTitle = rec?.amount ? ' · '+rec.amount.toLocaleString()+'원' : '';
+    return `<div class="rh-cell ${cls}" onclick="openEuHistDrop(event,'${ym}')" title="${ym}${amtTitle}">
+      <div class="rh-month">${mLabel}</div><div class="rh-icon">${icon}</div></div>`;
+  }).join('');
+}
+
+function openEuHistDrop(e, ym) {
+  if (!guardWrite()) return;
+  e.stopPropagation();
+  if (_euRhDrop) { _euRhDrop.remove(); _euRhDrop=null; }
+  const u = ((allBldData[_euBid]||{}).units||{})[_euRoom] || {};
+  const rentAmt = (u.monthlyRent||0)*10000;
+  const drop = document.createElement('div'); drop.className='rh-drop';
+  [{label:'✅ 납부완료',status:'paid'},{label:'❌ 미납',status:'unpaid'},{label:'🔶 부분납부',status:'partial'},{label:'— 기록없음',status:'none'}]
+  .forEach(opt => {
+    const btn = document.createElement('button'); btn.className='rh-dd-btn'; btn.textContent=opt.label;
+    if (opt.status==='partial') {
+      btn.onclick = ev => {
+        ev.stopPropagation(); drop.innerHTML='';
+        const wrap=document.createElement('div'); wrap.className='rh-partial-input';
+        const lbl=document.createElement('div'); lbl.style.cssText='font-size:11px;font-weight:700;color:#92400E'; lbl.textContent='🔶 부분납부 금액 (원)';
+        const inp=document.createElement('input'); inp.type='number'; inp.value=rentAmt; inp.min=0;
+        const cfm=document.createElement('button'); cfm.textContent='확인';
+        cfm.onclick=ev=>{ ev.stopPropagation(); setEuHistStatus(ym,'partial',parseInt(inp.value)||0); drop.remove(); _euRhDrop=null; };
+        wrap.append(lbl,inp,cfm); drop.appendChild(wrap); setTimeout(()=>inp.focus(),50);
+      };
+    } else {
+      btn.onclick = ()=>{ setEuHistStatus(ym,opt.status,rentAmt); drop.remove(); _euRhDrop=null; };
+    }
+    drop.appendChild(btn);
+  });
+  const rect=e.currentTarget.getBoundingClientRect();
+  let top=rect.bottom+6, left=rect.left;
+  if (left+160>window.innerWidth) left=window.innerWidth-164;
+  if (top+180>window.innerHeight) top=rect.top-186;
+  drop.style.cssText+=`;top:${top}px;left:${left}px`;
+  document.body.appendChild(drop); _euRhDrop=drop;
+}
+
+function setEuHistStatus(ym, status, amount) {
+  const uid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||''; if(!uid)return;
+  if (!allBldData[_euBid]) allBldData[_euBid]={};
+  if (!allBldData[_euBid].history) allBldData[_euBid].history={};
+  if (!allBldData[_euBid].history[_euRoom]) allBldData[_euBid].history[_euRoom]={};
+  const ref=db.ref(`${DBPath.rentHistory(uid,_euBid)}/${_euRoom}/${ym}`);
+  if (status==='none') {
+    const prev=allBldData[_euBid].history[_euRoom][ym];
+    delete allBldData[_euBid].history[_euRoom][ym];
+    renderEuHist(); schedRenderDash();
+    ref.remove().then(()=>showToast('🗑 기록 삭제됨')).catch(()=>{
+      if(prev) allBldData[_euBid].history[_euRoom][ym]=prev;
+      renderEuHist(); showToast('❗ 저장 실패');
+    }); return;
+  }
+  const data={room:_euRoom,yearMonth:ym,paid:status==='paid',partial:status==='partial',amount,updatedAt:new Date().toISOString()};
+  const prev=allBldData[_euBid].history[_euRoom][ym];
+  allBldData[_euBid].history[_euRoom][ym]=data;
+  renderEuHist(); schedRenderDash();
+  showToast({paid:'✅ 완납 기록됨',unpaid:'❌ 미납 기록됨',partial:'🔶 부분납부 기록됨'}[status]);
+  ref.set(data).catch(()=>{
+    if(prev) allBldData[_euBid].history[_euRoom][ym]=prev;
+    else delete allBldData[_euBid].history[_euRoom][ym];
+    renderEuHist(); showToast('❗ 저장 실패');
+  });
+}
+
+function saveEuMemo() {
+  if (!guardWrite()) return;
+  const uid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||''; if(!uid)return;
+  const memo=document.getElementById('eu-memo').value;
+  setSS('ing');
+  db.ref(DBPath.unit(uid,_euBid,_euRoom)+'/memo').set(memo)
+    .then(()=>{ showToast('✅ 메모 저장됨'); setSS('ok');
+      if(allBldData[_euBid]?.units?.[_euRoom]) allBldData[_euBid].units[_euRoom].memo=memo;
+    }).catch(()=>{ setSS('err'); showToast('❗ 저장 실패'); });
+}
+
+async function onEuPhotos(e) {
+  if (!guardWrite()) return;
+  const uid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||''; if(!uid)return;
+  const files=Array.from(e.target.files||[]); e.target.value='';
+  if (!files.length) return;
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) { showToast('❗ 이미지만 가능'); continue; }
+    try {
+      const ts=Date.now(), pid=String(ts);
+      const path=`rent_app/${uid}/contracts/${_euRoom}/${ts}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+      showToast('⏳ 업로드 중...');
+      const ref=storage.ref(path);
+      await ref.put(file,{contentType:file.type});
+      const url=await ref.getDownloadURL();
+      const pd={id:pid,url,storagePath:path,uploadedAt:new Date().toISOString()};
+      await db.ref(DBPath.unitPhoto(uid,_euBid,_euRoom,pid)).set(pd);
+      if (!allBldData[_euBid]?.units?.[_euRoom]) return;
+      if (!allBldData[_euBid].units[_euRoom].photos) allBldData[_euBid].units[_euRoom].photos={};
+      allBldData[_euBid].units[_euRoom].photos[pid]=pd;
+      renderEuPhotos(); showToast('✅ 업로드 완료');
+    } catch(err){ showToast('❗ 업로드 실패'); console.error(err); }
+  }
+}
+
+function renderEuPhotos() {
+  const photos=Object.values(((allBldData[_euBid]||{}).units||{})[_euRoom]?.photos||{}).sort((a,b)=>a.id-b.id);
+  const grid=document.getElementById('eu-photo-grid'); if(!grid)return;
+  grid.innerHTML=photos.map(p=>`<div class="eu-ph-thumb"><img src="${esc(p.url)}" onclick="openEuPV('${esc(p.url)}')" loading="lazy"></div>`).join('');
+}
+
+function openEuPV(url) {
+  document.getElementById('eu-pv-img').src=url;
+  document.getElementById('eu-pv').style.display='flex';
+}
+function closeEuPV() {
+  document.getElementById('eu-pv').style.display='none';
+  document.getElementById('eu-pv-img').src='';
 }
 
 // ── 사이드 버튼 터치/마우스 분기 ──────────────────────────
