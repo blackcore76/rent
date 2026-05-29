@@ -942,7 +942,8 @@ function euBodyHtml(bid, roomId, u) {
   <div class="eu-upload-row">
     <button class="eu-upload-btn" onclick="document.getElementById('eu-photo-input').click()">📁 사진 추가</button>
     <button class="eu-upload-btn" onclick="document.getElementById('eu-camera-input').click()">📸 카메라</button>
-  </div>`;
+  </div>
+  <button onclick="closeEmUnit()" style="margin-top:20px;width:100%;padding:13px;background:#F1F5F9;border:none;border-radius:12px;font-size:14px;font-weight:700;color:var(--sub);cursor:pointer;font-family:inherit">✕ 닫기</button>`;
 
   return html;
 }
