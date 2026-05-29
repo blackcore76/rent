@@ -128,7 +128,7 @@ body{overflow-x:hidden}
 .em-pay.unpaid{background:rgba(239,68,68,.15);color:#fca5a5;}
 .em-pay.none{background:rgba(100,116,139,.15);color:#94a3b8;}
 /* 이지모드 플로팅 사이드 버튼 */
-#em-side-btn{position:fixed;left:-54px;bottom:200px;z-index:500;width:80px;padding:16px 8px 16px 6px;background:rgba(0,200,83,.5);border:1.5px solid rgba(255,202,40,.8);border-left:none;border-radius:0 16px 16px 0;cursor:pointer;transition:left .28s cubic-bezier(.4,0,.2,1);box-shadow:2px 2px 12px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;user-select:none;-webkit-tap-highlight-color:transparent;}
+#em-side-btn{position:fixed;left:-48px;bottom:200px;z-index:500;width:80px;padding:16px 8px 16px 6px;background:rgba(0,200,83,.5);border:1.5px solid rgba(255,202,40,.8);border-left:none;border-radius:0 16px 16px 0;cursor:pointer;transition:left .28s cubic-bezier(.4,0,.2,1);box-shadow:2px 2px 12px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 #em-side-btn.peeking{left:0;}
 @media(hover:hover){#em-side-btn:hover{left:0;}}
 #em-side-btn.on{background:rgba(255,179,0,.5);}
@@ -604,10 +604,17 @@ function renderDash(){
   });
   document.getElementById("expiry-list").innerHTML=eHtml||'<div class="empty-small">✅ 30일 내 만료 없음</div>';
   clearTimeout(_alertTimer);_alertTimer=setTimeout(checkContractAlerts,900);
-  // 저장된 모드 복원 (최초 1회)
+  // 저장된 모드 복원 (최초 1회) + 이지모드 활성 시 항상 최신 데이터로 재렌더
   if (!_emRestored) {
     _emRestored = true;
-    try { if (localStorage.getItem(_emUidKey()) === '1' && !emOn) toggleEasyMode(); } catch(e) {}
+    try {
+      if (localStorage.getItem(_emUidKey()) === '1') {
+        if (!emOn) toggleEasyMode();   // 꺼져있으면 켜기 (내부에서 renderEasyMode 호출)
+        else renderEasyMode();          // 이미 켜져있으면 데이터만 갱신
+      }
+    } catch(e) {}
+  } else if (emOn) {
+    renderEasyMode(); // 이후 renderDash 호출시에도 이지모드 뷰 동기화
   }
 }
 
@@ -1091,9 +1098,23 @@ function closeEuPV() {
   var peekTimer = null;
   var peeking = false;
   var lastTouchTime = 0;
+  var touchStartX = 0, touchStartY = 0, touchMoved = false;
 
-  // 모바일 터치: 첫 탭→열림(2초 대기), 2초내 재탭→전환+즉시 숨김
+  btn.addEventListener('touchstart', function(e) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchMoved = false;
+  }, { passive: true });
+
+  btn.addEventListener('touchmove', function(e) {
+    if (Math.abs(e.touches[0].clientX - touchStartX) > 8 ||
+        Math.abs(e.touches[0].clientY - touchStartY) > 8) {
+      touchMoved = true;
+    }
+  }, { passive: true });
+
   btn.addEventListener('touchend', function(e) {
+    if (touchMoved) return;
     e.preventDefault();
     lastTouchTime = Date.now();
     clearTimeout(peekTimer);
@@ -1111,8 +1132,6 @@ function closeEuPV() {
     }
   }, { passive: false });
 
-  // PC 마우스: 호버로 버튼이 이미 보이는 상태에서 클릭 즉시 전환
-  // (touchend 직후 300ms 내 발생하는 ghost click 무시)
   btn.addEventListener('click', function() {
     if (Date.now() - lastTouchTime < 300) return;
     toggleEasyMode();
