@@ -312,6 +312,7 @@ body{overflow-x:hidden}
   <!-- 이지모드 뷰 -->
   <div id="em-view" style="display:none;">
     <div id="em-content"></div>
+    <div id="em-buildings-wrap" style="margin-top:24px;padding-bottom:8px;"></div>
   </div>
 
   <!-- 이지모드 유닛 상세 모달 -->
@@ -634,11 +635,9 @@ function checkContractAlerts(){
   else sessionStorage.removeItem("ca_alerts");
   maybeShowAlerts();
 }
-function renderBldCards(){
-  const el=document.getElementById("buildings-wrap");if(!el)return;
-  const bids=sortedBids(bldgsData);
-  const html=bids.flatMap(bid=>{
-    const bldInfo=(allBldData[bid]||{}).bldInfo||{};
+function _bldCardsHtml(bids) {
+  return bids.flatMap(bid => {
+    const bldInfo = (allBldData[bid]||{}).bldInfo||{};
     return Object.values(bldInfo).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).map(b=>
       `<div style="background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:18px 20px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.06)">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1)">
@@ -655,7 +654,13 @@ function renderBldCards(){
         </div>
       </div>`);
   }).join("");
+}
+function renderBldCards(){
+  const el=document.getElementById("buildings-wrap");if(!el)return;
+  const html=_bldCardsHtml(sortedBids(bldgsData));
   el.innerHTML=html;
+  const emEl=document.getElementById("em-buildings-wrap");
+  if(emEl) emEl.innerHTML=html;
 }
 
 function renderNotes(){
@@ -858,6 +863,10 @@ function renderEasyMode() {
   });
 
   el.innerHTML = html || '<div style="color:rgba(255,255,255,.3);text-align:center;padding:60px 20px;">등록된 세대가 없습니다</div>';
+
+  // 건물정보 카드 동기화
+  const emBldEl = document.getElementById('em-buildings-wrap');
+  if (emBldEl) emBldEl.innerHTML = _bldCardsHtml(sortedBids(bldgsData));
 }
 
 // ══════════════════════════════════════════
