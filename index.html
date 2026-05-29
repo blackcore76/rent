@@ -99,23 +99,6 @@ body{overflow-x:hidden}
 
 /* ── 이지모드 ── */
 #em-view{background:var(--bg);min-height:100vh;margin-top:91px;padding:14px 12px 100px;}
-/* 이지모드 파이차트 */
-.em-pie-section{background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:18px;padding:14px 12px;margin-bottom:18px;border:1px solid rgba(255,255,255,.06)}
-.em-pie-hd{display:flex;align-items:center;justify-content:space-between;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.em-pie-hd-title{font-size:14px;font-weight:700;color:rgba(255,255,255,.9);display:flex;align-items:center;gap:6px}
-.em-pie-tog{font-size:11px;padding:2px 8px;border:1px solid rgba(255,255,255,.2);border-radius:12px;background:transparent;cursor:pointer;font-family:inherit;color:rgba(255,255,255,.45)}
-.em-pie-body{overflow:hidden;transition:max-height .35s ease;max-height:600px}
-.em-pie-body.collapsed{max-height:0}
-.em-pie-type-tabs{display:flex;gap:6px;margin:10px 0 12px}
-.em-pie-type-tab{padding:5px 14px;border-radius:16px;border:1.5px solid rgba(255,255,255,.15);background:transparent;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:rgba(255,255,255,.45)}
-.em-pie-type-tab.active{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.4)}
-.em-pie-inner{display:flex;align-items:center;gap:16px}
-.em-pie-legend{flex:1;display:flex;flex-direction:column;gap:7px;min-width:0}
-.em-pie-leg{display:flex;align-items:center;gap:6px}
-.em-pie-leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.em-pie-leg-lbl{flex:1;font-size:12px;font-weight:600;color:rgba(255,255,255,.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.em-pie-leg-val{font-size:11px;font-weight:700;color:rgba(255,255,255,.5);white-space:nowrap}
-.em-pie-empty{text-align:center;padding:20px 10px;color:rgba(255,255,255,.3);font-size:12px;line-height:1.8}
 .em-bld-name-box{text-align:center;font-size:24px;font-weight:900;color:#fff;letter-spacing:4px;background:#1a2332;border:2px solid rgba(255,255,255,.18);border-radius:18px;padding:18px 16px;margin-bottom:18px;}
 .em-section-lbl{text-align:center;font-size:18px;font-weight:700;color:rgba(255,255,255,.85);margin:16px 0 10px;position:relative;}
 .em-section-lbl::before,.em-section-lbl::after{content:'';position:absolute;top:50%;width:35%;height:1px;background:rgba(255,255,255,.12);}
@@ -328,7 +311,6 @@ body{overflow-x:hidden}
 
   <!-- 이지모드 뷰 -->
   <div id="em-view" style="display:none;">
-    <div id="em-pie-wrap"></div>
     <div id="em-content"></div>
     <div id="em-buildings-wrap" style="margin-top:24px;padding-bottom:8px;"></div>
   </div>
@@ -409,7 +391,7 @@ async function enterDemoMode(){
   await ensureDemoLoaded();
   readOnly=true;sessionStorage.setItem("guestDemo","1");
   bldgsData=DEMO.bldgsData;curBid="main";
-  allBldData["main"]={units:DEMO.units,history:DEMO.rentHistory,bldInfo:DEMO.bldInfo,transactions:DEMO.transactions||[]};
+  allBldData["main"]={units:DEMO.units,history:DEMO.rentHistory,bldInfo:DEMO.bldInfo};
   notes=DEMO.notes;
   document.getElementById("login-screen").style.display="none";
   document.getElementById("app").style.display="block";
@@ -498,9 +480,7 @@ function setupBldListeners(uid,bid){
   const hL=hRef.on("value",snap=>{allBldData[bid].history=snap.val()||{};schedRenderDash()});
   const biL=biRef.on("value",snap=>{allBldData[bid].bldInfo=snap.val()||{};schedRenderBldCards()});
   const rlL=rlRef.on("value",snap=>{allBldData[bid].roomLayout=snap.val()||null;schedRenderDash()});
-  const tRef=db.ref(DBPath.transactions(uid,bid));
-  const tL=tRef.on("value",snap=>{allBldData[bid].transactions=Object.values(snap.val()||{});if(emOn)renderEmPie();});
-  bldListeners[bid]={uRef,hRef,biRef,rlRef,tRef,uL,hL,biL,rlL,tL};
+  bldListeners[bid]={uRef,hRef,biRef,rlRef,uL,hL,biL,rlL};
 }
 function teardownBldListeners(bid){
   const l=bldListeners[bid];if(!l)return;
@@ -508,7 +488,6 @@ function teardownBldListeners(bid){
   if(l.hRef&&l.hL)l.hRef.off("value",l.hL);
   if(l.biRef&&l.biL)l.biRef.off("value",l.biL);
   if(l.rlRef&&l.rlL)l.rlRef.off("value",l.rlL);
-  if(l.tRef&&l.tL)l.tRef.off("value",l.tL);
   delete bldListeners[bid];delete allBldData[bid];
 }
 function teardownAll(){
@@ -889,7 +868,6 @@ function renderEasyMode() {
   const emBldEl = document.getElementById('em-buildings-wrap');
   if (emBldEl) emBldEl.innerHTML = _bldCardsHtml(sortedBids(bldgsData));
 
-  renderEmPie();
 }
 
 // ══════════════════════════════════════════
@@ -1130,67 +1108,6 @@ function openEuPV(url) {
 function closeEuPV() {
   document.getElementById('eu-pv').style.display='none';
   document.getElementById('eu-pv-img').src='';
-}
-
-// ── 이지모드 파이차트 ──────────────────────────────────────
-const EM_PIE_COLORS=['#60A5FA','#F87171','#34D399','#FBBF24','#A78BFA','#22D3EE','#FB923C','#F472B6','#94A3B8','#2DD4BF'];
-let _emPieCollapsed=false,_emPieType='expense';
-function emFmtN(n){return(n||0).toLocaleString('ko-KR');}
-
-function _buildEmDonut(segs){
-  const r=35,circ=2*Math.PI*r,total=segs.reduce((s,g)=>s+g.v,0);
-  if(!total)return`<svg viewBox="0 0 100 100" width="110" height="110"><circle r="35" cx="50" cy="50" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="18"/></svg>`;
-  let off=0;
-  return`<svg viewBox="0 0 100 100" width="110" height="110">${segs.map(g=>{const d=(g.v/total)*circ;const el=`<circle r="35" cx="50" cy="50" fill="none" stroke="${g.c}" stroke-width="18" stroke-dasharray="${d} ${circ}" stroke-dashoffset="${-off}" transform="rotate(-90,50,50)"/>`;off+=d;return el;}).join('')}</svg>`;
-}
-
-function renderEmPie(){
-  const wrap=document.getElementById('em-pie-wrap');if(!wrap)return;
-  const ym=emYM();
-  const ymLabel=ym.slice(0,4)+'년 '+Number(ym.slice(5,7))+'월';
-  wrap.innerHTML=`<div class="em-pie-section">
-    <div class="em-pie-hd" onclick="toggleEmPie()">
-      <span class="em-pie-hd-title">📊 ${ymLabel} 수지분석</span>
-      <button class="em-pie-tog" id="em-pie-tog-lbl">${_emPieCollapsed?'펼치기 ▼':'접기 ▲'}</button>
-    </div>
-    <div class="em-pie-body${_emPieCollapsed?' collapsed':''}" id="em-pie-body">
-      <div class="em-pie-type-tabs">
-        <button class="em-pie-type-tab${_emPieType==='expense'?' active':''}" id="em-pie-tab-ex" onclick="setEmPieType('expense');event.stopPropagation()">지출</button>
-        <button class="em-pie-type-tab${_emPieType==='income'?' active':''}" id="em-pie-tab-in" onclick="setEmPieType('income');event.stopPropagation()">수입</button>
-      </div>
-      <div id="em-pie-content"></div>
-    </div>
-  </div>`;
-  _renderEmPieContent();
-}
-
-function _renderEmPieContent(){
-  const el=document.getElementById('em-pie-content');if(!el)return;
-  const ym=emYM();
-  const map={};
-  sortedBids(bldgsData).forEach(bid=>{
-    (allBldData[bid]?.transactions||[]).filter(t=>t.type===_emPieType&&t.date&&t.date.startsWith(ym))
-      .forEach(t=>{const c=t.category||'기타';map[c]=(map[c]||0)+(t.amount||0);});
-  });
-  const segs=Object.entries(map).sort((a,b)=>b[1]-a[1]).map(([l,v],i)=>({l,v,c:EM_PIE_COLORS[i%EM_PIE_COLORS.length]}));
-  if(!segs.length){
-    const ym=emYM();
-    el.innerHTML=`<div class="em-pie-empty">${ym.slice(0,4)}년 ${Number(ym.slice(5,7))}월 ${_emPieType==='expense'?'지출':'수입'} 내역 없음<br><span style="font-size:11px">장부 탭에서 먼저 입력하세요</span></div>`;
-    return;
-  }
-  const total=segs.reduce((s,g)=>s+g.v,0);
-  el.innerHTML=`<div class="em-pie-inner">${_buildEmDonut(segs)}<div class="em-pie-legend">${segs.map(g=>`<div class="em-pie-leg"><span class="em-pie-leg-dot" style="background:${g.c}"></span><span class="em-pie-leg-lbl">${esc(g.l)}</span><span class="em-pie-leg-val">₩${emFmtN(g.v)}&nbsp;<span style="opacity:.5;font-size:10px">${Math.round(g.v/total*100)}%</span></span></div>`).join('')}</div></div>`;
-}
-
-function toggleEmPie(){
-  _emPieCollapsed=!_emPieCollapsed;
-  const body=document.getElementById('em-pie-body'),lbl=document.getElementById('em-pie-tog-lbl');
-  if(body)body.classList.toggle('collapsed',_emPieCollapsed);
-  if(lbl)lbl.textContent=_emPieCollapsed?'펼치기 ▼':'접기 ▲';
-}
-function setEmPieType(t){
-  _emPieType=t;
-  renderEmPie();
 }
 
 // ── 사이드 버튼 터치/마우스 분기 ──────────────────────────
