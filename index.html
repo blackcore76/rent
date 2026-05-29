@@ -604,6 +604,11 @@ function renderDash(){
   });
   document.getElementById("expiry-list").innerHTML=eHtml||'<div class="empty-small">✅ 30일 내 만료 없음</div>';
   clearTimeout(_alertTimer);_alertTimer=setTimeout(checkContractAlerts,900);
+  // 저장된 모드 복원 (최초 1회)
+  if (!_emRestored) {
+    _emRestored = true;
+    try { if (localStorage.getItem(_emUidKey()) === '1' && !emOn) toggleEasyMode(); } catch(e) {}
+  }
 }
 
 function checkContractAlerts(){
@@ -740,6 +745,9 @@ function closeHelp(){closeCoachMarks()}
 //  이지모드
 // ══════════════════════════════════════════
 let emOn = false;
+let _emRestored = false;
+
+function _emUidKey() { return 'em_mode_' + (cu?.uid || 'guest'); }
 
 function toggleEasyMode() {
   emOn = !emOn;
@@ -755,6 +763,7 @@ function toggleEasyMode() {
     if (href.includes('units') || href.includes('admin'))
       tab.style.display = emOn ? 'none' : '';
   });
+  try { localStorage.setItem(_emUidKey(), emOn ? '1' : '0'); } catch(e) {}
   if (emOn) renderEasyMode();
 }
 
