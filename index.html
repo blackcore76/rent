@@ -888,7 +888,9 @@ function openEmUnit(bid, roomId) {
   const u = ((allBldData[bid]||{}).units||{})[roomId] || {};
   const bldName = bldgsData[bid]?.name || '';
   document.getElementById('eu-title').textContent = `${bldName} ${roomId}호`;
-  document.getElementById('eu-body').innerHTML = euBodyHtml(bid, roomId, u);
+  const body = document.getElementById('eu-body');
+  body.innerHTML = euBodyHtml(bid, roomId, u);
+  body.scrollTop = 0;
   renderEuHist();
   document.getElementById('eu-overlay').classList.add('show');
   document.getElementById('eu-sheet').classList.add('show');
@@ -968,7 +970,7 @@ function euBodyHtml(bid, roomId, u) {
   const photos = Object.values(u.photos||{}).sort((a,b)=>a.id-b.id);
   html += `<div class="eu-slbl">📷 계약서 사진</div>
   <div class="eu-photo-grid" id="eu-photo-grid">
-    ${photos.map(p=>`<div class="eu-ph-thumb"><img src="${esc(p.url)}" onclick="openEuPV('${esc(p.url)}')" loading="lazy"></div>`).join('')}
+    ${photos.map(p=>`<div class="eu-ph-thumb"><img src="${esc(p.url)}" onclick="openEuPV('${esc(p.url)}')" loading="eager"></div>`).join('')}
   </div>
   <div class="eu-upload-row">
     <button class="eu-upload-btn" onclick="document.getElementById('eu-photo-input').click()">📁 사진 추가</button>
@@ -1080,7 +1082,7 @@ async function onEuPhotos(e) {
       const path=`rent_app/${uid}/contracts/${_euRoom}/${ts}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
       showToast('⏳ 업로드 중...');
       const ref=storage.ref(path);
-      await ref.put(file,{contentType:file.type});
+      await ref.put(file,{contentType:file.type,cacheControl:'public,max-age=86400'});
       const url=await ref.getDownloadURL();
       const pd={id:pid,url,storagePath:path,uploadedAt:new Date().toISOString()};
       await db.ref(DBPath.unitPhoto(uid,_euBid,_euRoom,pid)).set(pd);
@@ -1095,7 +1097,7 @@ async function onEuPhotos(e) {
 function renderEuPhotos() {
   const photos=Object.values(((allBldData[_euBid]||{}).units||{})[_euRoom]?.photos||{}).sort((a,b)=>a.id-b.id);
   const grid=document.getElementById('eu-photo-grid'); if(!grid)return;
-  grid.innerHTML=photos.map(p=>`<div class="eu-ph-thumb"><img src="${esc(p.url)}" onclick="openEuPV('${esc(p.url)}')" loading="lazy"></div>`).join('');
+  grid.innerHTML=photos.map(p=>`<div class="eu-ph-thumb"><img src="${esc(p.url)}" onclick="openEuPV('${esc(p.url)}')" loading="eager"></div>`).join('');
 }
 
 function openEuPV(url) {
