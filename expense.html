@@ -127,7 +127,12 @@
 .suji-pct{font-size:11px;font-weight:600;color:var(--hint);margin-left:4px}
 .suji-empty{text-align:center;padding:20px 10px;color:var(--hint);font-size:13px}
 /* ── 이지모드 다크 테마 ── */
-body.em-on{background:#080c14}
+#em-side-btn{position:fixed;left:-48px;bottom:200px;z-index:500;width:80px;padding:16px 8px 16px 6px;background:rgba(0,200,83,.5);border:1.5px solid rgba(255,202,40,.8);border-left:none;border-radius:0 16px 16px 0;cursor:pointer;transition:left .28s cubic-bezier(.4,0,.2,1);box-shadow:2px 2px 12px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+#em-side-btn.peeking{left:0;}
+@media(hover:hover){#em-side-btn:hover{left:0;}}
+#em-side-btn.on{background:rgba(255,179,0,.5);}
+#em-side-txt{writing-mode:vertical-rl;font-size:13px;font-weight:900;color:#000;letter-spacing:3px;font-family:'Noto Sans KR',sans-serif;}
+#em-side-btn.on #em-side-txt{color:#fff;}
 body.em-on .kpi{background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border:1px solid rgba(255,255,255,.06);box-shadow:none}
 body.em-on .kpi-lbl{color:rgba(255,255,255,.4)}
 body.em-on .pie-section{background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border:1px solid rgba(255,255,255,.06);box-shadow:none}
@@ -185,6 +190,10 @@ body.em-on .fab{background:#1e2d45;box-shadow:0 4px 20px rgba(0,0,0,.5)}
     <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:24px" id="ss-email"></div>
     <button onclick="auth.signOut().then(()=>location.reload())" style="width:100%;padding:13px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">로그아웃</button>
   </div>
+</div>
+
+<div id="em-side-btn">
+  <span id="em-side-txt">이지모드</span>
 </div>
 
 <div id="app" style="display:none">
@@ -336,6 +345,20 @@ function applyEasyMode(){
     const href=tab.getAttribute('href')||'';
     if(href.includes('units')||href.includes('admin'))tab.style.display='none';
   });
+  const sBtn=document.getElementById('em-side-btn'),sTxt=document.getElementById('em-side-txt');
+  if(sBtn)sBtn.classList.add('on');
+  if(sTxt)sTxt.textContent='일반모드';
+}
+function toggleExpenseEasyMode(){
+  const isEm=document.body.classList.toggle('em-on');
+  document.querySelectorAll('.nav-tab').forEach(tab=>{
+    const href=tab.getAttribute('href')||'';
+    if(href.includes('units')||href.includes('admin'))tab.style.display=isEm?'none':'';
+  });
+  const sBtn=document.getElementById('em-side-btn'),sTxt=document.getElementById('em-side-txt');
+  sBtn.classList.toggle('on',isEm);
+  sTxt.textContent=isEm?'일반모드':'이지모드';
+  try{localStorage.setItem(_emKey(cu?.uid||'guest'),isEm?'1':'0');}catch(e){}
 }
 
 async function enterDemoMode(){
@@ -826,6 +849,29 @@ function togglePie(){
   document.getElementById('pie-body').classList.toggle('collapsed',_pieCollapsed);
   document.getElementById('pie-tog-lbl').textContent=_pieCollapsed?'펼치기 ▼':'접기 ▲';
 }
+
+// ── 사이드 버튼 ────────────────────────────────────────────
+(function(){
+  var btn=document.getElementById('em-side-btn');
+  var peekTimer=null,peeking=false,lastTouchTime=0;
+  var touchStartX=0,touchStartY=0,touchMoved=false;
+  btn.addEventListener('touchstart',function(e){
+    touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;touchMoved=false;
+  },{passive:true});
+  btn.addEventListener('touchmove',function(e){
+    if(Math.abs(e.touches[0].clientX-touchStartX)>8||Math.abs(e.touches[0].clientY-touchStartY)>8)touchMoved=true;
+  },{passive:true});
+  btn.addEventListener('touchend',function(e){
+    if(touchMoved)return;
+    e.preventDefault();lastTouchTime=Date.now();clearTimeout(peekTimer);
+    if(peeking){peeking=false;btn.classList.remove('peeking');toggleExpenseEasyMode();}
+    else{peeking=true;btn.classList.add('peeking');peekTimer=setTimeout(function(){peeking=false;btn.classList.remove('peeking');},2000);}
+  },{passive:false});
+  btn.addEventListener('click',function(){
+    if(Date.now()-lastTouchTime<300)return;
+    toggleExpenseEasyMode();
+  });
+})();
 </script>
 </body>
 </html>
