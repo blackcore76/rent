@@ -86,7 +86,8 @@
 .field input,.field select,.field textarea{border:2px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;outline:none;color:var(--text);background:#FAFCFF;width:100%;transition:border-color .2s}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--sky);background:#fff}
 .field textarea{resize:none}
-.btn-save{width:100%;padding:15px;background:var(--hdr);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px}
+.sheet-actions{display:flex;gap:10px;margin-top:4px}
+.btn-save{flex:1;padding:15px;background:var(--hdr);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
 .btn-save:active{opacity:.85}
 .btn-close-sheet{padding:14px 28px;min-width:120px;background:#F1F5F9;color:var(--sub);border:2px solid var(--border);border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
 .btn-close-sheet:active{background:#E2E8F0}
@@ -288,7 +289,10 @@ body.em-on .fab{background:#1e2d45;box-shadow:0 4px 20px rgba(0,0,0,.5)}
       <label>메모</label>
       <textarea id="m-memo" rows="2" placeholder="201호 4월 월세, 보일러 수리 등..."></textarea>
     </div>
-    <button class="btn-save" onclick="saveTx()">💾 저장</button>
+    <div class="sheet-actions">
+      <button class="btn-close-sheet" onclick="closeAdd()">✕ 닫기</button>
+      <button class="btn-save" onclick="saveTx()">💾 저장</button>
+    </div>
   </div>
 </div>
 
