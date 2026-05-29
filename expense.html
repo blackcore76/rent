@@ -109,6 +109,23 @@
 .cat-add-inp{flex:1;border:2px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;color:var(--text);background:#FAFCFF}
 .cat-add-inp:focus{border-color:var(--sky)}
 .cat-add-btn{padding:9px 14px;border-radius:10px;background:var(--hdr);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+/* PIE CHART */
+.pie-section{background:var(--card);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow)}
+.pie-hd{display:flex;align-items:center;justify-content:space-between;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.pie-hd-title{font-size:13px;font-weight:700;color:var(--hdr2);display:flex;align-items:center;gap:6px}
+.pie-tog{font-size:11px;padding:2px 8px;border:1px solid var(--border);border-radius:12px;background:transparent;cursor:pointer;font-family:inherit;color:var(--hint)}
+.pie-body{overflow:hidden;transition:max-height .35s ease;max-height:600px}
+.pie-body.collapsed{max-height:0}
+.pie-type-tabs{display:flex;gap:6px;margin:10px 0 12px}
+.pie-type-tab{padding:5px 14px;border-radius:16px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--sub)}
+.pie-type-tab.active{background:var(--hdr);color:#fff;border-color:var(--hdr)}
+.pie-inner{display:flex;align-items:center;gap:16px}
+.pie-legend{flex:1;display:flex;flex-direction:column;gap:7px;min-width:0}
+.pie-leg{display:flex;align-items:center;gap:6px}
+.pie-leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.pie-leg-lbl{flex:1;font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pie-leg-val{font-size:11px;font-weight:700;color:var(--sub);white-space:nowrap}
+.pie-empty{text-align:center;padding:24px 10px;color:var(--hint);font-size:13px;line-height:1.7}
 </style>
 </head>
 <body>
@@ -168,6 +185,19 @@
       <div class="kpi income"><div class="kpi-val" id="s-in">—</div><div class="kpi-lbl">수입</div></div>
       <div class="kpi expense"><div class="kpi-val" id="s-ex">—</div><div class="kpi-lbl">지출</div></div>
       <div class="kpi net"><div class="kpi-val" id="s-net">—</div><div class="kpi-lbl">순수익</div></div>
+    </div>
+    <div class="pie-section" id="pie-section">
+      <div class="pie-hd" onclick="togglePie()">
+        <span class="pie-hd-title">📊 카테고리 분석</span>
+        <button class="pie-tog" id="pie-tog-lbl">접기 ▲</button>
+      </div>
+      <div class="pie-body" id="pie-body">
+        <div class="pie-type-tabs">
+          <button class="pie-type-tab active" id="pie-tab-ex" onclick="setPieType('expense');event.stopPropagation()">지출</button>
+          <button class="pie-type-tab" id="pie-tab-in" onclick="setPieType('income');event.stopPropagation()">수입</button>
+        </div>
+        <div id="pie-content"></div>
+      </div>
     </div>
     <div class="view-tabs">
       <button class="view-tab active" data-mode="monthly" onclick="setViewMode('monthly')">📅 월별</button>
@@ -494,6 +524,7 @@ function renderFeed(){
   const nEl=document.getElementById("s-net");
   nEl.textContent=(net>=0?"₩":"−₩")+fmtN(Math.abs(net));
   nEl.style.color=net>0?"var(--green)":net<0?"var(--red)":"var(--blue)";
+  renderPie(list);
 
   const total=list.length,tp=Math.max(1,Math.ceil(total/PS));
   if(curPage>tp)curPage=tp;
@@ -723,6 +754,38 @@ function openHelp(){
   ], CM_DATA);
 }
 function closeHelp(){closeCoachMarks()}
+
+// ── 파이차트 ──────────────────────────────────────────────
+const PIE_COLORS=['#3B82F6','#EF4444','#10B981','#F59E0B','#8B5CF6','#06B6D4','#F97316','#EC4899','#6B7280','#14B8A6'];
+let _pieCollapsed=false,_pieType='expense',_pieList=[];
+
+function _buildDonut(segs,emptyClr){
+  const r=35,circ=2*Math.PI*r,total=segs.reduce((s,g)=>s+g.v,0);
+  if(!total)return`<svg viewBox="0 0 100 100" width="110" height="110"><circle r="35" cx="50" cy="50" fill="none" stroke="${emptyClr}" stroke-width="18"/></svg>`;
+  let off=0;
+  return`<svg viewBox="0 0 100 100" width="110" height="110">${segs.map(g=>{const d=(g.v/total)*circ;const el=`<circle r="35" cx="50" cy="50" fill="none" stroke="${g.c}" stroke-width="18" stroke-dasharray="${d} ${circ}" stroke-dashoffset="${-off}" transform="rotate(-90,50,50)"/>`;off+=d;return el;}).join('')}</svg>`;
+}
+function renderPie(list){
+  _pieList=list;
+  const el=document.getElementById('pie-content');if(!el)return;
+  const map={};
+  list.filter(t=>t.type===_pieType).forEach(t=>{const c=t.category||'기타';map[c]=(map[c]||0)+(t.amount||0);});
+  const segs=Object.entries(map).sort((a,b)=>b[1]-a[1]).map(([l,v],i)=>({l,v,c:PIE_COLORS[i%PIE_COLORS.length]}));
+  if(!segs.length){el.innerHTML=`<div class="pie-empty">이 기간에 ${_pieType==='expense'?'지출':'수입'} 내역이 없습니다</div>`;return;}
+  const total=segs.reduce((s,g)=>s+g.v,0);
+  el.innerHTML=`<div class="pie-inner">${_buildDonut(segs,'#e5e7eb')}<div class="pie-legend">${segs.map(g=>`<div class="pie-leg"><span class="pie-leg-dot" style="background:${g.c}"></span><span class="pie-leg-lbl">${esc(g.l)}</span><span class="pie-leg-val">₩${fmtN(g.v)}&nbsp;<span style="color:var(--hint);font-size:10px">${Math.round(g.v/total*100)}%</span></span></div>`).join('')}</div></div>`;
+}
+function togglePie(){
+  _pieCollapsed=!_pieCollapsed;
+  document.getElementById('pie-body').classList.toggle('collapsed',_pieCollapsed);
+  document.getElementById('pie-tog-lbl').textContent=_pieCollapsed?'펼치기 ▼':'접기 ▲';
+}
+function setPieType(t){
+  _pieType=t;
+  document.getElementById('pie-tab-ex').classList.toggle('active',t==='expense');
+  document.getElementById('pie-tab-in').classList.toggle('active',t==='income');
+  renderPie(_pieList);
+}
 </script>
 </body>
 </html>
