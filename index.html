@@ -817,12 +817,18 @@ function renderEasyMode() {
     const units   = Object.values((allBldData[bid]||{}).units||{});
     if (!units.length) return;
 
-    const vacants = units.filter(u => u.status === 'vacant');
-    const unpaid  = units.filter(u => u.status === 'rented' && ['unpaid','partial','none'].includes(emPayStatus(bid, u.room, ym)));
+    const floorOf = u => u.floor || Math.floor(parseInt(u.room||0)/100);
+    const sortFloorDesc = arr => arr.slice().sort((a,b) => {
+      const fd = floorOf(b) - floorOf(a);
+      return fd !== 0 ? fd : parseInt(a.room) - parseInt(b.room);
+    });
+
+    const vacants = sortFloorDesc(units.filter(u => u.status === 'vacant'));
+    const unpaid  = sortFloorDesc(units.filter(u => u.status === 'rented' && ['unpaid','partial','none'].includes(emPayStatus(bid, u.room, ym))));
 
     const byFloor = {};
     units.forEach(u => {
-      const f = u.floor || Math.floor(parseInt(u.room||0)/100);
+      const f = floorOf(u);
       if (!byFloor[f]) byFloor[f] = [];
       byFloor[f].push(u);
     });
