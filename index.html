@@ -604,6 +604,7 @@ function renderDash(){
     eHtml+=soon.map(u=>`<div class="expiry-row" onclick="goToUnit('${bid}','${u.room}')">
       <div class="sr-top"><span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}<span class="badge badge-warning">${shortDate(u.contractEnd)}</span><span style="font-size:11px;font-weight:700;color:${u.dl<=7?"var(--red)":"var(--amber)"};white-space:nowrap">${u.dl}일 후</span><span class="sr-arrow">›</span></div>
       <div class="sr-sub">${esc(names(u))}</div>
+      ${u.memo?`<div class="sr-sub">${esc(u.memo.split('\n')[0])}</div>`:''}
       </div>`).join("");
   });
   document.getElementById("expiry-list").innerHTML=eHtml||'<div class="empty-small">✅ 30일 내 만료 없음</div>';
@@ -721,9 +722,7 @@ function names(u){return[u.tenantName,u.tenantName2].filter(Boolean).join(" / ")
 function unpaidAmtTxt(u){
   const dep=u.depositAmount||0, rent=u.monthlyRent||0;
   if(!dep&&!rent)return"";
-  const isJeonse=(u.rentType||"monthly")==="jeonse";
   const depTxt=dep?dep.toLocaleString()+"만원":"—";
-  if(isJeonse)return depTxt;
   const rentTxt=rent?rent.toLocaleString()+"만원":"—";
   return depTxt+"/"+rentTxt;
 }
