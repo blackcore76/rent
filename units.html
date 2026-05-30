@@ -414,6 +414,25 @@ function updateFilterBtns(){
     fBtn.classList.toggle("on",curFloor!==0);
   }
 }
+function placeDropdown(drop,btn,align){
+  const dh=drop.offsetHeight,dw=drop.offsetWidth;
+  const r=btn.getBoundingClientRect();
+  const vh=window.innerHeight,vw=window.innerWidth,gap=4,margin=8;
+  const spaceBelow=vh-r.bottom-margin,spaceAbove=r.top-margin;
+  let top;
+  if(dh<=spaceBelow||spaceBelow>=spaceAbove)top=r.bottom+gap;
+  else top=Math.max(margin,r.top-dh-gap);
+  let left=(align==='right')?r.right-dw:r.left;
+  if(left+dw>vw-margin)left=vw-dw-margin;
+  if(left<margin)left=margin;
+  drop.style.top=top+'px';
+  drop.style.left=left+'px';
+  drop.style.right='';
+  const onScroll=()=>{try{drop.remove();}catch(e){}};
+  window.addEventListener('scroll',onScroll,{passive:true,once:true});
+  const origRemove=drop.remove.bind(drop);
+  drop.remove=function(){window.removeEventListener('scroll',onScroll);origRemove();};
+}
 function openStatusDrop(e){
   if(e)e.stopPropagation();
   if(_bldDrop){_bldDrop.remove();_bldDrop=null;return;}
@@ -426,9 +445,8 @@ function openStatusDrop(e){
     item.onclick=(ev)=>{ev.stopPropagation();_bldDrop.remove();_bldDrop=null;setStatusFilter(o.v);};
     drop.appendChild(item);
   });
-  const r=btn.getBoundingClientRect();
-  drop.style.cssText=`top:${r.bottom+4}px;left:${r.left}px`;
   document.body.appendChild(drop);_bldDrop=drop;
+  placeDropdown(drop,btn,'left');
 }
 function openFloorDrop(e){
   if(e)e.stopPropagation();
@@ -443,9 +461,8 @@ function openFloorDrop(e){
     item.onclick=(ev)=>{ev.stopPropagation();_bldDrop.remove();_bldDrop=null;setFloor(f);};
     drop.appendChild(item);
   });
-  const r=btn.getBoundingClientRect();
-  drop.style.cssText=`top:${r.bottom+4}px;left:${r.left}px`;
   document.body.appendChild(drop);_bldDrop=drop;
+  placeDropdown(drop,btn,'left');
 }
 
 async function enterDemoMode(){
@@ -552,9 +569,8 @@ function openBldDrop(e){
     item.onclick=(ev)=>{ev.stopPropagation();_bldDrop.remove();_bldDrop=null;switchBld(bid);};
     drop.appendChild(item);
   });
-  const r=btn.getBoundingClientRect();
-  drop.style.cssText=`top:${r.bottom+4}px;left:${r.left}px`;
   document.body.appendChild(drop);_bldDrop=drop;
+  placeDropdown(drop,btn,'left');
 }
 document.addEventListener("click",()=>{if(_bldDrop){_bldDrop.remove();_bldDrop=null;}});
 function switchBld(bid){
