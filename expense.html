@@ -134,8 +134,22 @@
 #em-side-btn.peeking{left:0;}
 @media(hover:hover){#em-side-btn:hover{left:0;}}
 #em-side-btn.on{background:rgba(255,202,40,.8);}
-#em-side-txt{writing-mode:vertical-rl;font-size:13px;font-weight:900;color:#000;letter-spacing:3px;font-family:'Noto Sans KR',sans-serif;}
-#em-side-btn.on #em-side-txt{color:#fff;}
+#em-side-txt,#em-side-txt-hidden{writing-mode:vertical-rl;font-weight:900;color:#000;font-family:'Noto Sans KR',sans-serif;}
+#em-side-txt{font-size:13px;letter-spacing:3px;}
+#em-side-txt-hidden{font-size:11px;letter-spacing:2px;}
+#em-side-btn.on #em-side-txt,#em-side-btn.on #em-side-txt-hidden{color:#fff;}
+#em-side-btn{justify-content:flex-end;}
+#em-side-txt{display:none;}
+#em-side-btn.peeking{justify-content:center;}
+#em-side-btn.peeking #em-side-txt{display:inline;}
+#em-side-btn.peeking #em-side-txt-hidden{display:none;}
+@media(hover:hover){#em-side-btn:hover{justify-content:center;}#em-side-btn:hover #em-side-txt{display:inline;}#em-side-btn:hover #em-side-txt-hidden{display:none;}}
+#em-side-ring{position:absolute;left:50%;top:50%;width:34px;height:34px;margin-left:-17px;margin-top:-17px;border:2px solid rgba(0,0,0,.55);border-radius:50%;pointer-events:none;display:none;animation:emRingPulse 1.5s ease-in-out infinite;}
+#em-side-btn.peeking #em-side-ring{display:block;}
+@media(hover:hover){#em-side-btn:hover #em-side-ring{display:block;}}
+#em-side-btn.on #em-side-ring{border-color:rgba(255,255,255,.75);}
+@keyframes emRingPulse{0%,100%{transform:scale(1);opacity:.6;}50%{transform:scale(1.15);opacity:1;}}
+.won-sfx{font-size:.7em;font-weight:600;margin-left:1px;}
 body.em-on .kpi{background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border:1px solid rgba(255,255,255,.06);box-shadow:none}
 body.em-on .kpi-lbl{color:rgba(255,255,255,.4)}
 body.em-on .pie-section{background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border:1px solid rgba(255,255,255,.06);box-shadow:none}
@@ -197,7 +211,9 @@ body.em-on .fab{background:#1e2d45;box-shadow:0 4px 20px rgba(0,0,0,.5)}
 </div>
 
 <div id="em-side-btn">
+  <span id="em-side-txt-hidden">모드전환</span>
   <span id="em-side-txt">이지모드</span>
+  <span id="em-side-ring"></span>
 </div>
 
 <div id="app" style="display:none">
@@ -589,10 +605,10 @@ function renderFeed(){
   const inc=list.filter(t=>t.type==="income").reduce((a,t)=>a+(t.amount||0),0);
   const exc=list.filter(t=>t.type==="expense").reduce((a,t)=>a+(t.amount||0),0);
   const net=inc-exc;
-  document.getElementById("s-in").textContent=fmtN(inc)+"원";
-  document.getElementById("s-ex").textContent=fmtN(exc)+"원";
+  document.getElementById("s-in").innerHTML=fmtN(inc)+'<span class="won-sfx">원</span>';
+  document.getElementById("s-ex").innerHTML=fmtN(exc)+'<span class="won-sfx">원</span>';
   const nEl=document.getElementById("s-net");
-  nEl.textContent=(net>=0?"":"−")+fmtN(Math.abs(net))+"원";
+  nEl.innerHTML=(net>=0?"":"−")+fmtN(Math.abs(net))+'<span class="won-sfx">원</span>';
   nEl.style.color=net>0?"var(--green)":net<0?"var(--red)":"var(--blue)";
   renderPie(list);
 
@@ -612,7 +628,7 @@ function renderFeed(){
       <div class="tx-icon ${t.type}">${t.auto?"🏠":t.type==="income"?"📈":"📉"}</div>
       <div class="tx-body">
         <div class="tx-top"><span class="tx-cat">${esc(t.category||"기타")}</span>${t.auto?'<span class="tx-auto-badge">자동</span>':""}<span class="tx-date">${fmtD(t.date)}</span></div>
-        <div class="tx-bottom"><span class="tx-memo">${esc(t.memo)||"메모 없음"}</span><span class="tx-amt ${t.type}">${t.type==="income"?"+":"−"}${fmtN(t.amount)}원</span>${chevron}${editBtns}</div>
+        <div class="tx-bottom"><span class="tx-memo">${esc(t.memo)||"메모 없음"}</span><span class="tx-amt ${t.type}">${t.type==="income"?"+":"−"}${fmtN(t.amount)}<span class="won-sfx">원</span></span>${chevron}${editBtns}</div>
       </div>
     </div>`;}).join("")}</div>`;
   document.getElementById("pagi").innerHTML=`
@@ -643,14 +659,14 @@ function openAutoDetail(ym){
       <div class="tx-body">
         <div class="tx-top"><span class="tx-cat">${r.roomId}호</span><span class="tx-auto-badge">${r.paid?"완납":"부분납부"}</span></div>
       </div>
-      <span class="tx-amt income">+${fmtN(r.amount)}원</span>
+      <span class="tx-amt income">+${fmtN(r.amount)}<span class="won-sfx">원</span></span>
     </div>`).join("");
   const totalHtml=`
     <div class="tx-item" style="border-top:2px solid var(--border);background:#F8FAFC">
       <div class="tx-body">
         <div class="tx-top"><span class="tx-cat" style="font-weight:800">합계 (${rooms.length}호실)</span></div>
       </div>
-      <span class="tx-amt income" style="font-size:17px">+${fmtN(total)}원</span>
+      <span class="tx-amt income" style="font-size:17px">+${fmtN(total)}<span class="won-sfx">원</span></span>
     </div>`;
   document.getElementById("auto-detail-list").innerHTML=`<div class="card">${itemsHtml}${totalHtml}</div>`;
   document.getElementById("auto-detail-sheet").classList.add("show");
@@ -840,13 +856,13 @@ function renderPie(list){
   el.innerHTML=`
     <div class="suji-row">
       <span class="suji-lbl">📈 수입</span>
-      <div class="suji-bar-row"><div class="suji-bar-wrap"><div class="suji-bar suji-in" style="width:${incW}%"></div></div><span class="suji-val" style="color:var(--green)">${fmtN(inc)}원</span></div>
+      <div class="suji-bar-row"><div class="suji-bar-wrap"><div class="suji-bar suji-in" style="width:${incW}%"></div></div><span class="suji-val" style="color:var(--green)">${fmtN(inc)}<span class="won-sfx">원</span></span></div>
     </div>
     <div class="suji-row">
       <span class="suji-lbl">📉 지출</span>
-      <div class="suji-bar-row"><div class="suji-bar-wrap"><div class="suji-bar suji-ex" style="width:${excW}%"></div></div><span class="suji-val" style="color:var(--red)">${fmtN(exc)}원</span></div>
+      <div class="suji-bar-row"><div class="suji-bar-wrap"><div class="suji-bar suji-ex" style="width:${excW}%"></div></div><span class="suji-val" style="color:var(--red)">${fmtN(exc)}<span class="won-sfx">원</span></span></div>
     </div>
-    <div class="suji-net" style="color:${netClr}">순수익 ${net>=0?'':'−'}${fmtN(Math.abs(net))}원${pctStr}</div>`;
+    <div class="suji-net" style="color:${netClr}">순수익 ${net>=0?'':'−'}${fmtN(Math.abs(net))}<span class="won-sfx">원</span>${pctStr}</div>`;
 }
 function togglePie(){
   _pieCollapsed=!_pieCollapsed;
