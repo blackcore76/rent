@@ -845,13 +845,13 @@ function renderEasyMode() {
       ${vacants.length ? `
         <div class="em-section-lbl">공실</div>
         <div class="em-chips-grid">
-          ${vacants.map(u=>`<div class="em-chip-v" onclick="goToUnit('${bid}','${esc(u.room)}')">${esc(u.room)}호<br>${RTYPE_LBL[u.roomType]||''}</div>`).join('')}
+          ${vacants.map(u=>`<div class="em-chip-v" onclick="openEmUnit('${bid}','${esc(u.room)}')">${esc(u.room)}호<br>${RTYPE_LBL[u.roomType]||''}</div>`).join('')}
         </div>` : ''}
 
       ${unpaid.length ? `
         <div class="em-section-lbl">미납</div>
         <div class="em-chips-grid">
-          ${unpaid.map(u=>`<div class="em-chip-u" onclick="goToUnit('${bid}','${esc(u.room)}')">${esc(u.room)}호<br>${RTYPE_LBL[u.roomType]||''}</div>`).join('')}
+          ${unpaid.map(u=>`<div class="em-chip-u" onclick="openEmUnit('${bid}','${esc(u.room)}')">${esc(u.room)}호<br>${RTYPE_LBL[u.roomType]||''}</div>`).join('')}
         </div>` : ''}
 
       ${floors.map(f => {
