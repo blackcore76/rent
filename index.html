@@ -43,6 +43,9 @@ body{overflow-x:hidden}
 .sr-sub.sr-amt-row{display:flex;justify-content:space-between;align-items:baseline;gap:18px;overflow:visible}
 .sr-sub.sr-amt-row .sr-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sr-sub.sr-amt-row .sr-amt{flex-shrink:0;white-space:nowrap;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+.sr-sub.sr-name-memo{display:flex;align-items:baseline;gap:14px;overflow:visible}
+.sr-sub.sr-name-memo .sr-name{flex-shrink:0;white-space:nowrap}
+.sr-sub.sr-name-memo .sr-memo{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--sub)}
 .sr-arrow{margin-left:auto;flex-shrink:0;font-size:14px;color:var(--hint)}
 .room-num{font-size:14px;font-weight:800;color:var(--hdr);min-width:40px;flex-shrink:0}
 .tenant-nm{flex:1;font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -601,11 +604,14 @@ function renderDash(){
     }).filter(u=>u.dl>=0&&u.dl<=30).sort((a,b)=>{if(a.dl!==b.dl)return a.dl-b.dl;const na=parseInt(a.room),nb=parseInt(b.room);return(!isNaN(na)&&!isNaN(nb))?na-nb:String(a.room).localeCompare(String(b.room));});
     if(!soon.length)return;
     eHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
-    eHtml+=soon.map(u=>`<div class="expiry-row" onclick="goToUnit('${bid}','${u.room}')">
+    eHtml+=soon.map(u=>{
+      const ml=(u.memo||"").split('\n');
+      const m1=ml[0]||"", m2=ml[1]||"";
+      return`<div class="expiry-row" onclick="goToUnit('${bid}','${u.room}')">
       <div class="sr-top"><span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}<span class="badge badge-warning">${shortDate(u.contractEnd)}</span><span style="font-size:11px;font-weight:700;color:${u.dl<=7?"var(--red)":"var(--amber)"};white-space:nowrap">${u.dl}일 후</span><span class="sr-arrow">›</span></div>
-      <div class="sr-sub">${esc(names(u))}</div>
-      ${u.memo?`<div class="sr-sub">${esc(u.memo.split('\n')[0])}</div>`:''}
-      </div>`).join("");
+      <div class="sr-sub sr-name-memo"><span class="sr-name">${esc(truncName(names(u)))}</span>${m1?`<span class="sr-memo">${esc(m1)}</span>`:''}</div>
+      ${m2?`<div class="sr-sub">${esc(m2)}</div>`:''}
+      </div>`;}).join("");
   });
   document.getElementById("expiry-list").innerHTML=eHtml||'<div class="empty-small">✅ 30일 내 만료 없음</div>';
   clearTimeout(_alertTimer);_alertTimer=setTimeout(checkContractAlerts,900);
@@ -719,6 +725,7 @@ function showConfirm(title,msg,cb){
 }
 function closeConfirm(){document.getElementById("confirm-modal").classList.remove("show")}
 function names(u){return[u.tenantName,u.tenantName2].filter(Boolean).join(" / ")||"(미입력)"}
+function truncName(s,n){s=s||"";n=n||10;return s.length>n?s.slice(0,n)+"…":s;}
 function unpaidAmtTxt(u){
   const dep=u.depositAmount||0, rent=u.monthlyRent||0;
   if(!dep&&!rent)return"";
