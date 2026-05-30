@@ -515,10 +515,10 @@ function renderFeed(){
   const inc=list.filter(t=>t.type==="income").reduce((a,t)=>a+(t.amount||0),0);
   const exc=list.filter(t=>t.type==="expense").reduce((a,t)=>a+(t.amount||0),0);
   const net=inc-exc;
-  document.getElementById("s-in").textContent="₩"+fmtN(inc);
-  document.getElementById("s-ex").textContent="₩"+fmtN(exc);
+  document.getElementById("s-in").textContent=fmtN(inc)+"원";
+  document.getElementById("s-ex").textContent=fmtN(exc)+"원";
   const nEl=document.getElementById("s-net");
-  nEl.textContent=(net>=0?"₩":"−₩")+fmtN(Math.abs(net));
+  nEl.textContent=(net>=0?"":"−")+fmtN(Math.abs(net))+"원";
   nEl.style.color=net>0?"var(--green)":net<0?"var(--red)":"var(--blue)";
 
   const total=list.length,tp=Math.max(1,Math.ceil(total/PS));
@@ -538,7 +538,7 @@ function renderFeed(){
         <div class="tx-top"><span class="tx-cat">${esc(t.category||"기타")}</span>${t.auto?'<span class="tx-auto-badge">자동</span>':""}<span class="tx-date">${fmtD(t.date)}</span></div>
         <div class="tx-memo">${esc(t.memo)||"메모 없음"}</div>
       </div>
-      <span class="tx-amt ${t.type}">${t.type==="income"?"+":"−"}₩${fmtN(t.amount)}</span>${chevron}
+      <span class="tx-amt ${t.type}">${t.type==="income"?"+":"−"}${fmtN(t.amount)}원</span>${chevron}
       ${t.auto?"":` <button class="tx-edit" onclick="editTx(${t.id})">✏️</button><button class="tx-del" onclick="delTx(${t.id})">✕</button>`}
     </div>`;}).join("")}</div>`;
   document.getElementById("pagi").innerHTML=`
@@ -569,14 +569,14 @@ function openAutoDetail(ym){
       <div class="tx-body">
         <div class="tx-top"><span class="tx-cat">${r.roomId}호</span><span class="tx-auto-badge">${r.paid?"완납":"부분납부"}</span></div>
       </div>
-      <span class="tx-amt income">+₩${fmtN(r.amount)}</span>
+      <span class="tx-amt income">+${fmtN(r.amount)}원</span>
     </div>`).join("");
   const totalHtml=`
     <div class="tx-item" style="border-top:2px solid var(--border);background:#F8FAFC">
       <div class="tx-body">
         <div class="tx-top"><span class="tx-cat" style="font-weight:800">합계 (${rooms.length}호실)</span></div>
       </div>
-      <span class="tx-amt income" style="font-size:17px">+₩${fmtN(total)}</span>
+      <span class="tx-amt income" style="font-size:17px">+${fmtN(total)}원</span>
     </div>`;
   document.getElementById("auto-detail-list").innerHTML=`<div class="card">${itemsHtml}${totalHtml}</div>`;
   document.getElementById("auto-detail-sheet").classList.add("show");
