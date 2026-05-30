@@ -24,9 +24,13 @@
 <script src="shared.js?v=2"></script>
 <script src="db-paths.js"></script>
 <style>
-.floor-tabs{display:flex;gap:4px;flex-wrap:wrap}
-.tabs-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.floor-tabs-wrap{margin-bottom:14px}
+.tabs-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.bld-row{margin-bottom:14px}
+.tab-rect{padding:7px 14px;border-radius:8px;border:2px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;transition:all .15s}
+.tab-rect.on{background:var(--hdr);color:#fff;border-color:var(--hdr)}
+.tab-rect.on.rented{background:var(--blue-t);border-color:var(--blue-t)}
+.tab-rect.on.vacant{background:#6366F1;border-color:#6366F1}
+.tab-rect.on.unpaid{background:var(--red);border-color:var(--red)}
 .export-btn{padding:7px 12px;border-radius:8px;border:2px solid var(--border);font-size:12px;font-weight:600;cursor:default;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;flex-shrink:0}
 .bld-drop{position:fixed;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.18);border:1px solid var(--border);z-index:600;min-width:140px;overflow:hidden}
 .bld-drop-item{display:block;width:100%;padding:11px 16px;border:none;background:transparent;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;text-align:left;color:var(--text);transition:background .12s}
@@ -37,14 +41,6 @@
 .badge-tworoom{background:#CCFBF1;color:#0F766E}
 .badge-threeroom{background:#EEF2FF;color:#3730A3}
 .tg-btn.on-rtype{background:var(--sky);color:#fff}
-.floor-tab{padding:6px 14px;border-radius:20px;border:2px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;transition:all .15s}
-.floor-tab.on{background:var(--hdr);color:#fff;border-color:var(--hdr)}
-.status-tabs-row{display:flex;gap:6px;flex:1;min-width:0}
-.status-tab{padding:6px 14px;border-radius:20px;border:2px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;transition:all .15s}
-.status-tab.on{background:var(--hdr);color:#fff;border-color:var(--hdr)}
-.status-tab[data-status="rented"].on{background:var(--blue-t);border-color:var(--blue-t)}
-.status-tab[data-status="vacant"].on{background:#6366F1;border-color:#6366F1}
-.status-tab[data-status="unpaid"].on{background:var(--red);border-color:var(--red)}
 .rooms-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 @media(min-width:600px){.rooms-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .room-card{background:var(--card);border-radius:var(--radius);padding:14px 12px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s;border:2px solid transparent;min-width:0;overflow:hidden}
@@ -234,19 +230,13 @@
     <button class="logout-btn" onclick="doSignOut()">🚪 로그아웃</button>
   </div>
   <div class="content">
-    <div class="tabs-row">
-      <div class="status-tabs-row" id="status-tabs-row">
-        <button class="status-tab on" data-status="" onclick="setStatusFilter('')">전체</button>
-        <button class="status-tab" data-status="rented" onclick="setStatusFilter('rented')">임대중</button>
-        <button class="status-tab" data-status="vacant" onclick="setStatusFilter('vacant')">공실</button>
-        <button class="status-tab" data-status="unpaid" onclick="setStatusFilter('unpaid')">미납</button>
-      </div>
-      <button class="export-btn" id="bld-name-label"></button>
+    <div class="tabs-row" id="tabs-row">
+      <button class="tab-rect on" id="all-tab" onclick="setStatusFilter('')">전체</button>
+      <button class="tab-rect" id="status-drop-btn" onclick="openStatusDrop(event)">상태 ▾</button>
+      <button class="tab-rect" id="floor-drop-btn" onclick="openFloorDrop(event)">층수 ▾</button>
     </div>
-    <div class="floor-tabs-wrap">
-      <div class="floor-tabs" id="floor-tabs">
-        <!-- 동적 생성 -->
-      </div>
+    <div class="bld-row">
+      <button class="export-btn" id="bld-name-label"></button>
     </div>
     <div id="filter-banner" style="display:none" class="filter-banner">
       <span id="filter-banner-txt"></span>
@@ -407,9 +397,55 @@ function applyLayout(layout){
   });
   renderFloorTabs();
 }
-function renderFloorTabs(){
-  const el=document.getElementById("floor-tabs");if(!el)return;
-  el.innerHTML=FLOORS.map(f=>`<button class="floor-tab ${curFloor===f?"on":""}" onclick="setFloor(${f},this)">${f}층</button>`).join("");
+function renderFloorTabs(){updateFilterBtns();}
+function updateFilterBtns(){
+  const allBtn=document.getElementById("all-tab");
+  if(allBtn)allBtn.classList.toggle("on",!curFilter&&curFloor===0);
+  const sBtn=document.getElementById("status-drop-btn");
+  if(sBtn){
+    const lblMap={rented:"임대중",vacant:"공실",unpaid:"미납"};
+    sBtn.textContent=(lblMap[curFilter]||"상태")+" ▾";
+    sBtn.classList.remove("on","rented","vacant","unpaid");
+    if(lblMap[curFilter])sBtn.classList.add("on",curFilter);
+  }
+  const fBtn=document.getElementById("floor-drop-btn");
+  if(fBtn){
+    fBtn.textContent=(curFloor?curFloor+"층":"층수")+" ▾";
+    fBtn.classList.toggle("on",curFloor!==0);
+  }
+}
+function openStatusDrop(e){
+  if(e)e.stopPropagation();
+  if(_bldDrop){_bldDrop.remove();_bldDrop=null;return;}
+  const btn=document.getElementById("status-drop-btn");
+  const drop=document.createElement("div");drop.className="bld-drop";
+  [{v:"rented",l:"임대중"},{v:"vacant",l:"공실"},{v:"unpaid",l:"미납"}].forEach(o=>{
+    const item=document.createElement("button");
+    item.className="bld-drop-item"+(curFilter===o.v?" active":"");
+    item.textContent=o.l;
+    item.onclick=(ev)=>{ev.stopPropagation();_bldDrop.remove();_bldDrop=null;setStatusFilter(o.v);};
+    drop.appendChild(item);
+  });
+  const r=btn.getBoundingClientRect();
+  drop.style.cssText=`top:${r.bottom+4}px;left:${r.left}px`;
+  document.body.appendChild(drop);_bldDrop=drop;
+}
+function openFloorDrop(e){
+  if(e)e.stopPropagation();
+  if(_bldDrop){_bldDrop.remove();_bldDrop=null;return;}
+  if(!FLOORS.length)return;
+  const btn=document.getElementById("floor-drop-btn");
+  const drop=document.createElement("div");drop.className="bld-drop";
+  FLOORS.forEach(f=>{
+    const item=document.createElement("button");
+    item.className="bld-drop-item"+(curFloor===f?" active":"");
+    item.textContent=f+"층";
+    item.onclick=(ev)=>{ev.stopPropagation();_bldDrop.remove();_bldDrop=null;setFloor(f);};
+    drop.appendChild(item);
+  });
+  const r=btn.getBoundingClientRect();
+  drop.style.cssText=`top:${r.bottom+4}px;left:${r.left}px`;
+  document.body.appendChild(drop);_bldDrop=drop;
 }
 
 async function enterDemoMode(){
@@ -571,6 +607,7 @@ function tryOpenURLParam(){
       setStatusFilter(filter);
     } else {
       curFilter=filter;
+      updateFilterBtns();
       document.getElementById("filter-banner-txt").textContent="🔍 "+filter;
       document.getElementById("filter-banner").style.display="flex";renderGrid();
     }
@@ -689,14 +726,13 @@ async function ensureRooms(ex){
   if(Object.keys(up).length)await uRef.update(up);
 }
 function defRoom(r){return{room:String(r),floor:Math.floor(parseInt(r)/100),status:"vacant",roomType:"oneroom",rentType:"monthly",tenantName:"",tenantName2:"",tenantPhone:"",tenantPhone2:"",depositAmount:0,monthlyRent:0,contractStart:"",contractEnd:"",rentPaid:false,memo:""}}
-function setFloor(f,btn){
-  curFloor=f;document.querySelectorAll(".floor-tab").forEach(b=>b.classList.remove("on"));
-  btn.classList.add("on");renderGrid();
+function setFloor(f){
+  curFloor=f;updateFilterBtns();renderGrid();
 }
 function setStatusFilter(val){
   curFilter=val;
-  if(!val){curFloor=0;document.querySelectorAll(".floor-tab").forEach(b=>b.classList.remove("on"));}
-  document.querySelectorAll(".status-tab").forEach(b=>b.classList.toggle("on",b.dataset.status===val));
+  if(!val)curFloor=0;
+  updateFilterBtns();
   document.getElementById("filter-banner").style.display="none";
   history.replaceState({},"",location.pathname);
   renderGrid();
@@ -716,7 +752,8 @@ const RENT_TYPE_LBL={monthly:"월세",jeonse:"전세"};
 const RENT_TYPE_CLS={monthly:"badge-monthly",jeonse:"badge-jeonse"};
 function updateBldLabel(){
   const lbl=document.getElementById("bld-name-label");if(!lbl)return;
-  const name=bldgsData[curBid]?.name||"";
+  let name=bldgsData[curBid]?.name||"";
+  if(name.length>20)name=name.slice(0,20)+"…";
   const multi=sortedBids(bldgsData).length>1;
   lbl.textContent=multi?name+" ▾":name;
   lbl.style.cursor=multi?"pointer":"default";
@@ -1017,7 +1054,7 @@ function showCM(title,msg,cb){
 }
 function closeCM(){document.getElementById("confirm-modal").classList.remove("show")}
 function truncate(s,n){return s&&s.length>n?s.slice(0,n)+"…":s||""}
-function clearFilter(){curFilter="";document.getElementById("filter-banner").style.display="none";document.querySelectorAll(".status-tab").forEach(b=>b.classList.toggle("on",b.dataset.status===""));history.replaceState({},"",location.pathname);renderGrid()}
+function clearFilter(){curFilter="";document.getElementById("filter-banner").style.display="none";updateFilterBtns();history.replaceState({},"",location.pathname);renderGrid()}
 function fmtDate(){const d=new Date();return`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`}
 function exportJSON(){
   const data={
@@ -1072,7 +1109,7 @@ function openHelp(){
     {key:'sheet-hist',el:document.getElementById('m-sect-hist')},
     {key:'sheet-photo',el:document.getElementById('m-sect-photo'),topOffset:-44},
   ]:[
-    {key:'floor-tabs',el:document.getElementById('floor-tabs')},
+    {key:'floor-tabs',el:document.getElementById('tabs-row')},
     {key:'rooms-grid',el:document.getElementById('rooms-grid')},
   ], CM_DATA);
 }
