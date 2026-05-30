@@ -725,7 +725,7 @@ function showConfirm(title,msg,cb){
 }
 function closeConfirm(){document.getElementById("confirm-modal").classList.remove("show")}
 function names(u){return[u.tenantName,u.tenantName2].filter(Boolean).join(" / ")||"(미입력)"}
-function truncName(s,n){s=s||"";n=n||10;return s.length>n?s.slice(0,n)+"…":s;}
+function truncName(s,n){s=s||"";n=n||15;return s.length>n?s.slice(0,n)+"…":s;}
 function unpaidAmtTxt(u){
   const dep=u.depositAmount||0, rent=u.monthlyRent||0;
   if(!dep&&!rent)return"";
