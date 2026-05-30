@@ -33,8 +33,6 @@
 .tab-rect.on.unpaid{background:var(--red);border-color:var(--red)}
 .export-btn{padding:7px 12px;border-radius:8px;border:2px solid var(--border);font-size:12px;font-weight:600;cursor:default;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;flex-shrink:0}
 .bld-drop{position:fixed;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.18);border:1px solid var(--border);z-index:600;min-width:140px;overflow:hidden}
-.bld-drop.bld-name-drop{left:50%;right:auto;transform:translateX(-50%);width:calc(100% - 28px);max-width:480px}
-.bld-drop.bld-name-drop .bld-drop-item{text-align:right;white-space:normal;word-break:keep-all}
 .bld-drop-item{display:block;width:100%;padding:11px 16px;border:none;background:transparent;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;text-align:left;color:var(--text);transition:background .12s}
 .bld-drop-item:active{background:var(--bg)}
 .bld-drop-item.active{color:var(--sky)}
@@ -546,7 +544,7 @@ function openBldDrop(e){
   if(_bldDrop){_bldDrop.remove();_bldDrop=null;return;}
   const bids=sortedBids(bldgsData);if(bids.length<=1)return;
   const btn=document.getElementById("bld-name-label");
-  const drop=document.createElement("div");drop.className="bld-drop bld-name-drop";
+  const drop=document.createElement("div");drop.className="bld-drop";
   bids.forEach(bid=>{
     const item=document.createElement("button");
     item.className="bld-drop-item"+(bid===curBid?" active":"");
@@ -555,7 +553,7 @@ function openBldDrop(e){
     drop.appendChild(item);
   });
   const r=btn.getBoundingClientRect();
-  drop.style.top=`${r.bottom+4}px`;
+  drop.style.cssText=`top:${r.bottom+4}px;left:${r.left}px`;
   document.body.appendChild(drop);_bldDrop=drop;
 }
 document.addEventListener("click",()=>{if(_bldDrop){_bldDrop.remove();_bldDrop=null;}});
