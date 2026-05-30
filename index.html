@@ -140,12 +140,14 @@ body{overflow-x:hidden}
 #em-side-btn.on{background:rgba(255,202,40,.8);}
 #em-side-txt,#em-side-txt-hidden{writing-mode:vertical-rl;font-weight:900;color:#000;font-family:'Noto Sans KR',sans-serif;}
 #em-side-txt{font-size:13px;letter-spacing:3px;}
-#em-side-txt-hidden{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11px;letter-spacing:2px;}
+#em-side-txt-hidden{font-size:11px;letter-spacing:2px;}
 #em-side-btn.on #em-side-txt,#em-side-btn.on #em-side-txt-hidden{color:#fff;}
+#em-side-btn{justify-content:flex-end;}
 #em-side-txt{display:none;}
+#em-side-btn.peeking{justify-content:center;}
 #em-side-btn.peeking #em-side-txt{display:inline;}
 #em-side-btn.peeking #em-side-txt-hidden{display:none;}
-@media(hover:hover){#em-side-btn:hover #em-side-txt{display:inline;}#em-side-btn:hover #em-side-txt-hidden{display:none;}}
+@media(hover:hover){#em-side-btn:hover{justify-content:center;}#em-side-btn:hover #em-side-txt{display:inline;}#em-side-btn:hover #em-side-txt-hidden{display:none;}}
 #em-side-ring{position:absolute;left:50%;top:50%;width:34px;height:34px;margin-left:-17px;margin-top:-17px;border:2px solid rgba(0,0,0,.55);border-radius:50%;pointer-events:none;display:none;animation:emRingPulse 1.5s ease-in-out infinite;}
 #em-side-btn.peeking #em-side-ring{display:block;}
 @media(hover:hover){#em-side-btn:hover #em-side-ring{display:block;}}
