@@ -66,6 +66,9 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .uc-search{flex:1;min-width:120px;padding:7px 12px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text);font-family:inherit;outline:none;transition:border-color .15s}
 .uc-search:focus{border-color:var(--sky)}
 .uc-search::placeholder{color:var(--hint)}
+.uc-sync-btn{flex-shrink:0;padding:6px 12px;background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.3);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:filter .15s}
+.uc-sync-btn:hover{filter:brightness(1.2)}
+.uc-sync-btn:disabled{opacity:.5;cursor:not-allowed}
 .uc-num{font-size:11px;font-weight:700;background:rgba(255,255,255,.07);color:var(--sub);padding:2px 8px;border-radius:5px}
 .uc-desc{font-size:12px;color:var(--sub);margin-bottom:6px}
 .uc-uid{font-size:10px;color:var(--hint);word-break:break-all;background:rgba(0,0,0,.25);border-radius:6px;padding:5px 8px;font-family:monospace;margin-bottom:10px}
@@ -251,6 +254,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
     <div class="users-hdr">
       <div class="sec-title" id="users-sec-title">👥 관리 사용자 목록</div>
       <input type="text" class="uc-search" id="uc-search" placeholder="이름·자율·대행 검색" oninput="onUcSearch()">
+      <button class="uc-sync-btn" id="uc-sync-btn" onclick="syncMasterUsers()">🔄 동기화</button>
     </div>
     <div class="users-list" id="users-list"></div>
     <div id="uc-pagination" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 0;margin-bottom:20px"></div>
@@ -634,6 +638,50 @@ function onUcSearch(){
 function toggleUserType(uid,currentType){
   const newType=currentType==="proxy"?"self":"proxy";
   usersRef.child(uid).update({userType:newType}).catch(()=>showToast("❗ 변경 실패"));
+}
+async function syncMasterUsers(){
+  const btn=document.getElementById("uc-sync-btn");
+  if(btn)btn.disabled=true;
+  try{
+    const [usersSnap,pendingSnap]=await Promise.all([
+      db.ref(DBPath.masterUsers()).once("value"),
+      db.ref(DBPath.pendingUsers()).once("value"),
+    ]);
+    const existing=usersSnap.val()||{};
+    const pending=pendingSnap.val()||{};
+    const updates={};
+    let count=0;
+    for(const [uid,p] of Object.entries(pending)){
+      if((p.status||"pending")!=="active")continue;
+      if(existing[uid])continue;
+      updates[uid]={
+        uid,
+        name:p.displayName||p.email||uid,
+        memo:p.memo||"",
+        userType:"self",
+        createdAt:p.createdAt||new Date().toISOString(),
+      };
+      count++;
+    }
+    const me=auth.currentUser;
+    if(me&&me.uid===MASTER_UID&&!existing[me.uid]&&!updates[me.uid]){
+      updates[me.uid]={
+        uid:me.uid,
+        name:me.displayName||me.email||me.uid,
+        memo:"관리자 본인",
+        userType:"self",
+        createdAt:new Date().toISOString(),
+      };
+      count++;
+    }
+    if(!count){showToast("✅ 누락된 사용자 없음 — 이미 동기화됨");return;}
+    await db.ref(DBPath.masterUsers()).update(updates);
+    showToast(`✅ ${count}명 동기화됨`);
+  }catch(e){
+    showToast("❗ 동기화 실패: "+e.message);
+  }finally{
+    if(btn)btn.disabled=false;
+  }
 }
 function ucFilteredList(){
   if(!ucSearchTerm)return ucTotalList;
