@@ -80,10 +80,14 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .btn-pur{background:rgba(124,58,237,.12);color:#7C3AED;border:1px solid rgba(124,58,237,.25)}
 .btn-teal{background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.25)}
 .btn-del{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.btn-rej{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.uc-status-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:800;padding:3px 8px;border-radius:5px;letter-spacing:.3px;flex-shrink:0}
+.uc-status-badge.active{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.uc-status-badge.rejected{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.uc-meta{font-size:11px;color:var(--sub);margin-bottom:4px;word-break:break-all}
+.user-card.rejected{opacity:.65;background:rgba(239,68,68,.03);border-color:rgba(239,68,68,.18)}
 /* PENDING */
 .pending-card{background:rgba(245,158,11,.06);border:1.5px solid rgba(245,158,11,.2);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
-.pending-card.card-rejected{background:rgba(239,68,68,.04);border-color:rgba(239,68,68,.2)}
-.pending-card.card-active{background:rgba(16,185,129,.04);border-color:rgba(16,185,129,.2)}
 .pc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
 .pc-name{font-size:14px;font-weight:700;color:var(--text)}
 .pc-badge{font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px}
@@ -98,9 +102,6 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .btn-approve{flex:1;padding:9px 4px;background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.3);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
 .btn-reject{flex:1;padding:9px 4px;background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
 /* FILTER TABS */
-.filter-tabs{display:flex;gap:6px;margin-bottom:10px}
-.filter-tab{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--sub);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
-.filter-tab.on{background:var(--gold);color:#0F1C2D;border-color:var(--gold)}
 /* PAGINATION */
 .page-btn{padding:8px 16px;border-radius:8px;border:1.5px solid var(--border);background:rgba(255,255,255,.04);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--sub);transition:background .15s}
 .page-btn:disabled{opacity:.3;cursor:not-allowed}
@@ -228,10 +229,6 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
   <div class="content">
     <!-- 신규 사용자 승인 -->
     <div class="sec-title" style="margin-bottom:8px" id="pending-sec-title">🔔 신규 사용자 승인</div>
-    <div class="filter-tabs">
-      <button class="filter-tab on" id="ft-pending" onclick="setFilter('pending')">⏳ 대기중</button>
-      <button class="filter-tab" id="ft-all" onclick="setFilter('all')">전체</button>
-    </div>
     <div id="pending-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
 
     <!-- 계약 만료 임박 -->
@@ -289,7 +286,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 <div id="toast"></div>
 
 <script>
-let usersRef=null,pendingUsersRef=null,allUsersData={},pendingFilter="pending";
+let usersRef=null,pendingUsersRef=null,allUsersData={},masterUsersData={};
 let viewingUid=sessionStorage.getItem("master_view_uid")||null;
 let viewingName=sessionStorage.getItem("master_view_name")||null;
 let ucTotalList=[],ucPage=1,_usrDrop=null;
@@ -310,9 +307,9 @@ auth.onAuthStateChanged(user=>{
   const w=document.getElementById("av-wrap");
   w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"A")[0]}</div>`;
   usersRef=db.ref(DBPath.masterUsers());
-  usersRef.on("value",snap=>renderUsers(snap.val()||{}));
+  usersRef.on("value",snap=>{masterUsersData=snap.val()||{};renderUsers();});
   pendingUsersRef=db.ref(DBPath.pendingUsers());
-  pendingUsersRef.on("value",snap=>{allUsersData=snap.val()||{};renderPendingUsers();renderUsersPage();});
+  pendingUsersRef.on("value",snap=>{allUsersData=snap.val()||{};renderPendingUsers();renderUsers();});
   updateCtxBtn();
 });
 
@@ -547,33 +544,21 @@ function copyUserMsg(uid){
   navigator.clipboard.writeText(msg).then(()=>showToast("📋 클립보드에 복사됨")).catch(()=>showToast("❗ 복사 실패 — 직접 선택하세요"));
 }
 
-// ── 신규 승인 ──
-function setFilter(f){
-  pendingFilter=f;
-  document.getElementById("ft-pending").className="filter-tab"+(f==="pending"?" on":"");
-  document.getElementById("ft-all").className="filter-tab"+(f==="all"?" on":"");
-  renderPendingUsers();
-}
+// ── 신규 승인 ── (대기중만 표시 - active/rejected는 관리 사용자 목록으로)
 function renderPendingUsers(){
   const all=Object.values(allUsersData).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""));
-  const pendingCount=all.filter(u=>(u.status||"pending")==="pending").length;
-  const totalCount=all.length;
+  const list=all.filter(u=>(u.status||"pending")==="pending");
   const titleEl=document.getElementById("pending-sec-title");
-  if(titleEl)titleEl.textContent=`🔔 신규 사용자 승인 (대기중-${pendingCount}명, 전체-${totalCount}명)`;
-  const list=pendingFilter==="pending"?all.filter(u=>(u.status||"pending")==="pending"):all;
+  if(titleEl)titleEl.textContent=`🔔 신규 사용자 승인 (${list.length}명)`;
   const el=document.getElementById("pending-list");
   if(!list.length){
-    el.innerHTML=`<div class="empty-state" style="padding:20px 0"><div class="empty-icon" style="font-size:32px">✅</div><div class="empty-txt">${pendingFilter==="pending"?"대기 중인 신규 사용자 없음":"신규 사용자 없음"}</div></div>`;
+    el.innerHTML=`<div class="empty-state" style="padding:20px 0"><div class="empty-icon" style="font-size:32px">✅</div><div class="empty-txt">대기 중인 신규 사용자 없음</div></div>`;
     return;
   }
   el.innerHTML=list.map(u=>{
-    const st=u.status||"pending";
-    const badgeCls=st==="active"?"badge-active":st==="rejected"?"badge-rejected":"badge-pending";
-    const badgeTxt=st==="active"?"✅ 활성":st==="rejected"?"🚫 거부":"⏳ 대기";
-    const cardCls=st==="active"?" card-active":st==="rejected"?" card-rejected":"";
     const dt=u.createdAt?new Date(u.createdAt).toLocaleString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}):"";
-    return`<div class="pending-card${cardCls}">
-      <div class="pc-top"><div class="pc-name">${esc(u.displayName||"(이름없음)")}</div><span class="pc-badge ${badgeCls}">${badgeTxt}</span></div>
+    return`<div class="pending-card">
+      <div class="pc-top"><div class="pc-name">${esc(u.displayName||"(이름없음)")}</div><span class="pc-badge badge-pending">⏳ 대기</span></div>
       <div class="pc-email">📧 ${esc(u.email||"")}</div>
       <div class="pc-time">🕐 신청: ${esc(dt)}</div>
       <div class="pc-memo-row">
@@ -582,9 +567,8 @@ function renderPendingUsers(){
         <button style="padding:8px 10px;background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0" onclick="deletePendingMemo('${esc(u.uid)}')">🗑</button>
       </div>
       <div class="pc-btn-row">
-        ${st!=="active"?`<button class="btn-approve" onclick="approveUser('${esc(u.uid)}','${esc(u.displayName||"")}','${esc(u.email||"")}')">✅ 활성화</button>`:""}
-        ${st!=="rejected"?`<div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 거부</div><button class="btn-reject" style="width:100%" onclick="rejectUser('${esc(u.uid)}')">🚫 거부</button></div>`:""}
-        ${st==="active"?`<button class="btn-approve" style="background:rgba(14,165,233,.12);color:var(--sky);border:1px solid rgba(14,165,233,.3)" onclick="setAndGo('${esc(u.uid)}','${esc(u.displayName||u.uid)}','units')">👁 세대 열람</button>`:""}
+        <button class="btn-approve" onclick="approveUser('${esc(u.uid)}','${esc(u.displayName||"")}','${esc(u.email||"")}')">✅ 활성화</button>
+        <div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 거부</div><button class="btn-reject" style="width:100%" onclick="rejectUser('${esc(u.uid)}')">🚫 거부</button></div>
       </div>
     </div>`;
   }).join("");
@@ -596,7 +580,7 @@ async function approveUser(uid,displayName,email){
     const snap=await db.ref(DBPath.masterUser(uid)).once("value");
     if(!snap.exists()){
       const memo=document.getElementById("pm-"+uid)?.value.trim()||"";
-      await db.ref(DBPath.masterUser(uid)).set({uid,name:displayName||email||uid,memo,createdAt:(allUsersData[uid]?.createdAt||new Date().toISOString())});
+      await db.ref(DBPath.masterUser(uid)).set({uid,name:displayName||email||uid,memo,userType:"self",createdAt:(allUsersData[uid]?.createdAt||new Date().toISOString())});
     }
     showToast("✅ 활성화됨: "+(displayName||email));
   }catch(e){showToast("❗ 실패: "+e.message)}
@@ -604,6 +588,32 @@ async function approveUser(uid,displayName,email){
 async function rejectUser(uid){
   try{await db.ref(DBPath.pendingUser(uid)).update({status:"rejected"});showToast("🚫 거부됨");}
   catch(e){showToast("❗ 실패")}
+}
+async function saveUcMemo(uid){
+  const val=document.getElementById("pm-"+uid)?.value.trim()||"";
+  try{
+    if(allUsersData[uid])await db.ref(DBPath.pendingUser(uid)).update({memo:val});
+    else await db.ref(DBPath.masterUser(uid)).update({memo:val});
+    showToast("✅ 메모 저장됨");
+  }catch(e){showToast("❗ 실패")}
+}
+async function deleteUcMemo(uid){
+  try{
+    const inp=document.getElementById("pm-"+uid);if(inp)inp.value="";
+    if(allUsersData[uid])await db.ref(DBPath.pendingUserMemo(uid)).remove();
+    else await db.ref(DBPath.masterUser(uid)).update({memo:""});
+    showToast("🗑 메모 삭제됨");
+  }catch(e){showToast("❗ 실패")}
+}
+async function reApproveUser(uid,displayName,email){
+  try{
+    await db.ref(DBPath.pendingUser(uid)).update({status:"active"});
+    const snap=await db.ref(DBPath.masterUser(uid)).once("value");
+    if(!snap.exists()){
+      await db.ref(DBPath.masterUser(uid)).set({uid,name:displayName||email||uid,memo:"",userType:"self",createdAt:new Date().toISOString()});
+    }
+    showToast("✅ 재승인됨: "+(displayName||email||uid));
+  }catch(e){showToast("❗ 실패: "+e.message)}
 }
 async function savePendingMemo(uid){
   const val=document.getElementById("pm-"+uid)?.value.trim()||"";
@@ -686,15 +696,54 @@ async function syncMasterUsers(){
 function ucFilteredList(){
   if(!ucSearchTerm)return ucTotalList;
   return ucTotalList.filter(u=>{
-    const showName=(allUsersData[u.uid]?.displayName||u.name||"").toLowerCase();
+    const name=(u.displayName||u.managedName||"").toLowerCase();
+    const memo=(u.memo||"").toLowerCase();
     const type=(u.userType==="proxy")?"대행":"자율";
-    return showName.includes(ucSearchTerm)||type.includes(ucSearchTerm);
+    const stKw=u.status==="rejected"?"거부":"활성";
+    return name.includes(ucSearchTerm)||memo.includes(ucSearchTerm)||type.includes(ucSearchTerm)||stKw.includes(ucSearchTerm);
   });
 }
-function renderUsers(data){
-  ucTotalList=Object.values(data).sort((a,b)=>a.createdAt>b.createdAt?1:-1);
+// 관리 사용자 목록: _users(active+rejected) ∪ master_admin/users 머지
+function buildUcList(){
+  const merged={};
+  // 1) _users 에서 status != pending 인 사용자
+  for(const [uid,p] of Object.entries(allUsersData||{})){
+    const st=p.status||"pending";
+    if(st==="pending")continue;
+    const m=masterUsersData[uid]||{};
+    merged[uid]={
+      uid,
+      displayName:p.displayName||m.name||"",
+      email:p.email||"",
+      memo:p.memo!==undefined?p.memo:(m.memo||""),
+      status:st,
+      createdAt:p.createdAt||m.createdAt||"",
+      userType:m.userType==="proxy"?"proxy":"self",
+      managedName:m.name||"",
+    };
+  }
+  // 2) master_admin/users 단독 존재(고아) → active 로 간주
+  for(const [uid,m] of Object.entries(masterUsersData||{})){
+    if(merged[uid])continue;
+    merged[uid]={
+      uid,
+      displayName:m.name||"",
+      email:"",
+      memo:m.memo||"",
+      status:"active",
+      createdAt:m.createdAt||"",
+      userType:m.userType==="proxy"?"proxy":"self",
+      managedName:m.name||"",
+    };
+  }
+  return Object.values(merged).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""));
+}
+function renderUsers(){
+  ucTotalList=buildUcList();
+  const activeN=ucTotalList.filter(u=>u.status==="active").length;
+  const rejN=ucTotalList.filter(u=>u.status==="rejected").length;
   const t=document.getElementById("users-sec-title");
-  if(t)t.textContent=`👥 관리 사용자 목록 (${ucTotalList.length}명)`;
+  if(t)t.textContent=`👥 관리 사용자 목록 (활성-${activeN}명, 거부-${rejN}명)`;
   renderUsersPage();
 }
 function renderUsersPage(){
@@ -714,26 +763,31 @@ function renderUsersPage(){
   const start=(ucPage-1)*10;
   el.innerHTML=list.slice(start,start+10).map((u,i)=>{
     const isV=viewingUid===u.uid;
-    const pm=allUsersData[u.uid]?.memo||"";
-    const googleName=allUsersData[u.uid]?.displayName||"";
-    const showName=googleName||u.name;
-    const alias=(googleName&&googleName!==u.name)?u.name:"";
+    const showName=u.displayName||u.managedName||u.email||u.uid;
+    const alias=(u.managedName&&u.managedName!==u.displayName)?u.managedName:"";
     const userType=u.userType==="proxy"?"proxy":"self";
     const typeLabel=userType==="proxy"?"대행":"자율";
     const typeBadge=`<span class="uc-type-badge ${userType}" onclick="event.stopPropagation();toggleUserType('${esc(u.uid)}','${userType}')">${typeLabel}</span>`;
-    const memoHtml=pm
-      ?(pm.length<=25?`<div class="uc-pending-memo">💬 ${esc(pm)}</div>`:`<details class="uc-memo-details"><summary class="uc-memo-summary">💬 ${esc(pm.slice(0,25))}…</summary><div class="uc-memo-full">${esc(pm)}</div></details>`)
-      :"";
-    return`<div class="user-card${isV?" active open":""}" id="uc-${esc(u.uid)}">
-      <div class="uc-top" onclick="toggleCard(this)"><div class="uc-name">${esc(showName)}${typeBadge}${alias?`<span style="font-size:11px;color:var(--sub);font-weight:400">(${esc(alias)})</span>`:""}</div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><div class="uc-num">#${start+i+1}</div><span class="uc-chevron">▼</span></div></div>
-      ${memoHtml}
-      ${u.memo&&u.memo!==pm?`<div class="uc-desc">📝 ${esc(u.memo)}</div>`:""}
+    const isRej=u.status==="rejected";
+    const stBadge=isRej?`<span class="uc-status-badge rejected">🚫 거부</span>`:`<span class="uc-status-badge active">✅ 활성</span>`;
+    const dt=u.createdAt?new Date(u.createdAt).toLocaleString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit"}):"";
+    const cardCls=`user-card${isV?" active open":""}${isRej?" rejected":""}`;
+    return`<div class="${cardCls}" id="uc-${esc(u.uid)}">
+      <div class="uc-top" onclick="toggleCard(this)"><div class="uc-name">${esc(showName)}${typeBadge}${stBadge}${alias?`<span style="font-size:11px;color:var(--sub);font-weight:400">(${esc(alias)})</span>`:""}</div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><div class="uc-num">#${start+i+1}</div><span class="uc-chevron">▼</span></div></div>
+      <div class="uc-meta">${u.email?`📧 ${esc(u.email)}`:""}${u.email&&dt?" · ":""}${dt?`🕐 승인: ${esc(dt)}`:""}</div>
       <div class="uc-expand">
         <div class="uc-uid">${esc(u.uid)}</div>
+        <div class="pc-memo-row" style="margin-top:8px">
+          <input class="pc-memo-inp" id="pm-${esc(u.uid)}" type="text" value="${esc(u.memo||"")}" placeholder="메모 (결제일, 건물명 등)">
+          <button style="padding:8px 12px;background:rgba(14,165,233,.1);color:var(--sky);border:1px solid rgba(14,165,233,.25);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap" onclick="saveUcMemo('${esc(u.uid)}')">저장</button>
+          <button style="padding:8px 10px;background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0" onclick="deleteUcMemo('${esc(u.uid)}')">🗑</button>
+        </div>
         <div class="uc-actions">
-          <button class="uc-btn btn-main" onclick="setAndGo('${esc(u.uid)}','${esc(showName)}','units')">🏠 세대</button>
+          ${!isRej?`<button class="uc-btn btn-main" onclick="setAndGo('${esc(u.uid)}','${esc(showName)}','units')">🏠 세대</button>
           <button class="uc-btn btn-pur" onclick="setAndGo('${esc(u.uid)}','${esc(showName)}','expense')">💸 장부</button>
           <button class="uc-btn btn-teal" onclick="setAndGo('${esc(u.uid)}','${esc(showName)}','manage')">🗂 관리</button>
+          <div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 거부</div><button class="uc-btn btn-rej" style="width:100%" onclick="rejectUser('${esc(u.uid)}')">🚫 거부</button></div>`:`
+          <button class="uc-btn btn-main" style="grid-column:span 2" onclick="reApproveUser('${esc(u.uid)}','${esc(showName)}','${esc(u.email||"")}')">✅ 재승인</button>`}
           <div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 🗑</div><button class="uc-btn btn-del" style="width:100%" onclick="delUser('${esc(u.uid)}','${esc(showName)}')">🗑</button></div>
         </div>
       </div>
@@ -762,13 +816,30 @@ function clearViewing(){
   updateCtxBtn();
 }
 function setAndGo(uid,name,page){setViewing(uid,name);setTimeout(()=>location.href=page+".html",150);}
-function liftBlind(el){el.classList.add("lifted")}
-function toggleCard(el){el.closest(".user-card").classList.toggle("open")}
+function liftBlind(el){
+  clearTimeout(el._blindTimer);
+  el.classList.add("lifted");
+  el._blindTimer=setTimeout(()=>{el.classList.remove("lifted");el._blindTimer=null;},2000);
+}
+function resetBlindsIn(container){
+  container.querySelectorAll(".btn-blind.lifted").forEach(b=>{
+    clearTimeout(b._blindTimer);b._blindTimer=null;
+    b.classList.remove("lifted");
+  });
+}
+function toggleCard(el){
+  const card=el.closest(".user-card");
+  card.classList.toggle("open");
+  if(!card.classList.contains("open"))resetBlindsIn(card);
+}
 
 // ── 삭제 ──
 function delUser(uid,name){
-  showCM("사용자 삭제",`"${name}"을 목록에서 삭제할까요?\n실제 데이터는 삭제되지 않습니다`,()=>{
-    usersRef.child(uid).remove()
+  showCM("사용자 삭제",`"${name}"을 앱 내에서 완전히 삭제할까요?\n\n• 관리자 메모·자율/대행 설정 모두 제거\n• 사용자의 임대 데이터(세대·장부)는 보존\n• Firebase 인증 계정 자체는 유지됨\n• 사용자가 다시 로그인하면 신규 승인 대기로 등록`,()=>{
+    Promise.all([
+      db.ref(DBPath.masterUser(uid)).remove(),
+      db.ref(DBPath.pendingUser(uid)).remove(),
+    ])
       .then(()=>{if(viewingUid===uid)clearViewing();showToast("🗑 삭제됨: "+name)})
       .catch(()=>showToast("❗ 삭제 실패"));
   });
