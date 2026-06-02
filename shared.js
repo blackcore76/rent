@@ -124,7 +124,22 @@ function signInGoogle(){
 }
 
 // ── 메뉴 유틸 ──
-function toggleMenu(){const el=document.getElementById("user-menu");if(el)el.classList.toggle("show")}
+function toggleMenu(){
+  const el=document.getElementById("user-menu");if(!el)return;
+  el.classList.toggle("show");
+  if(!document.getElementById("um-admin-btn")){
+    const user=firebase.auth().currentUser;
+    if(user&&user.uid===MASTER_UID){
+      const btn=document.createElement("a");
+      btn.id="um-admin-btn";
+      btn.href="master/admin.html";
+      btn.style.cssText="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;margin-bottom:8px;background:rgba(245,158,11,.12);border:1.5px solid rgba(245,158,11,.4);border-radius:10px;color:#D97706;font-size:13px;font-weight:700;text-decoration:none;font-family:inherit;box-sizing:border-box;";
+      btn.innerHTML="🔧 <span>관리자 페이지</span>";
+      const logout=el.querySelector(".logout-btn");
+      if(logout)el.insertBefore(btn,logout);else el.appendChild(btn);
+    }
+  }
+}
 function closeMenu(){const el=document.getElementById("user-menu");if(el)el.classList.remove("show")}
 document.addEventListener("click",e=>{if(!e.target.closest("#av-wrap")&&!e.target.closest("#user-menu"))closeMenu()});
 
