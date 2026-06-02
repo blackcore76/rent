@@ -336,12 +336,13 @@ function toggleUserDrop(e){
   none.onclick=()=>{clearViewing();_usrDrop.remove();_usrDrop=null;};
   drop.appendChild(none);
   ucTotalList.forEach(u=>{
+    const showName=u.displayName||u.managedName||u.email||u.uid;
     const item=document.createElement("div");
     item.className="usr-drop-item"+(viewingUid===u.uid?" on":"");
-    const nm=document.createElement("span");nm.textContent=u.name;
+    const nm=document.createElement("span");nm.textContent=showName;
     const uid=document.createElement("span");uid.className="usr-drop-uid";uid.textContent=u.uid;
     item.appendChild(nm);item.appendChild(uid);
-    item.onclick=()=>{setViewing(u.uid,u.name);_usrDrop.remove();_usrDrop=null;};
+    item.onclick=()=>{setViewing(u.uid,showName);_usrDrop.remove();_usrDrop=null;};
     drop.appendChild(item);
   });
   const r=btn.getBoundingClientRect();
