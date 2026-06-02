@@ -100,7 +100,7 @@ body{overflow-x:hidden}
 .bld-subhd:first-child{border-top:none;padding-top:4px;margin-top:0}
 
 /* ── KPI 카드 왼쪽 액센트 줄 ── */
-.kpi{position:relative;}
+.kpi{position:relative;overflow:hidden;}
 .kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:12px 0 0 12px;}
 .kpi.total::before{background:linear-gradient(to bottom,#64748B,transparent)}
 .kpi.rented::before{background:linear-gradient(to bottom,var(--blue),transparent)}
