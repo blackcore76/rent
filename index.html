@@ -99,6 +99,59 @@ body{overflow-x:hidden}
 .bld-subhd{font-size:11px;font-weight:800;color:var(--sub);padding:10px 4px 4px;letter-spacing:.5px;border-top:1px solid var(--border);margin-top:4px}
 .bld-subhd:first-child{border-top:none;padding-top:4px;margin-top:0}
 
+/* ── SIDEBAR ── */
+.sb{
+  position:fixed;top:100px;left:0;bottom:0;width:200px;
+  background:linear-gradient(180deg,#0a1220 0%,#0f1a2c 60%,#111c2e 100%);
+  border-right:1px solid rgba(77,208,225,.13);
+  z-index:150;
+  display:flex;flex-direction:column;
+  padding:16px 10px 20px;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+.sb-logo{padding:0 6px 14px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:12px;}
+.sb-logo img{height:30px;width:auto;image-rendering:-webkit-optimize-contrast;}
+.sb-lbl{font-size:9px;font-weight:800;color:rgba(255,255,255,.28);letter-spacing:.7px;text-transform:uppercase;padding:0 10px;margin:10px 0 3px;}
+.sb-link{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border-radius:10px;
+  text-decoration:none;
+  color:rgba(255,255,255,.42);
+  font-size:13px;font-weight:600;
+  font-family:'Noto Sans KR',sans-serif;
+  border:1px solid transparent;
+  transition:background .15s,color .15s,border-color .15s;
+  white-space:nowrap;
+}
+.sb-link:hover{background:rgba(77,208,225,.08);color:rgba(255,255,255,.82);}
+.sb-link.sb-on{
+  background:rgba(77,208,225,.12);color:#4DD0E1;
+  border-color:rgba(77,208,225,.25);
+}
+.sb-ico{font-size:15px;flex-shrink:0;}
+.sb-div{height:1px;background:rgba(255,255,255,.06);margin:10px 0;}
+.sb-em-btn{
+  display:flex;align-items:center;gap:10px;
+  width:100%;padding:9px 10px;border-radius:10px;
+  background:transparent;border:1px solid rgba(255,202,40,.22);
+  color:rgba(255,202,40,.65);
+  font-size:12px;font-weight:700;font-family:'Noto Sans KR',sans-serif;
+  cursor:pointer;transition:all .15s;text-align:left;
+}
+.sb-em-btn:hover,.sb-em-btn.on{
+  background:rgba(255,202,40,.1);color:#FFCA28;
+  border-color:rgba(255,202,40,.45);
+}
+.sb-sp{flex:1;}
+.sb-foot{font-size:10px;color:rgba(255,255,255,.22);padding:4px 8px;display:flex;align-items:center;gap:6px;}
+.sb-foot .sync-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+@media(min-width:900px){
+  .content{margin-left:200px;}
+  #em-view{margin-left:200px;}
+  #em-side-btn{display:none!important;}
+}
+@media(max-width:899px){.sb{display:none;}}
+
 /* ── 이지모드 ── */
 #em-view{background:var(--bg);min-height:100vh;margin-top:91px;padding:14px 12px 40px;}
 .em-bld-name-box{text-align:center;font-size:24px;font-weight:900;color:#fff;letter-spacing:4px;background:#1a2332;border:2px solid rgba(255,255,255,.18);border-radius:18px;padding:18px 16px;margin-bottom:18px;}
@@ -293,6 +346,28 @@ body{overflow-x:hidden}
     <button class="logout-btn" onclick="doSignOut()">🚪 로그아웃</button>
   </div>
 
+  <!-- ── SIDEBAR ── -->
+  <nav class="sb" id="sb">
+    <div class="sb-logo">
+      <img src="logo.png" alt="PlusHome">
+    </div>
+    <div class="sb-lbl">페이지</div>
+    <a href="index.html"   class="sb-link sb-on"><span class="sb-ico">📊</span>메인 대시보드</a>
+    <a href="units.html"   class="sb-link"><span class="sb-ico">🏠</span>세대 관리</a>
+    <a href="expense.html" class="sb-link"><span class="sb-ico">💸</span>장부 관리</a>
+    <a href="admin.html"   class="sb-link"><span class="sb-ico">🗂</span>설정 관리</a>
+    <div class="sb-div"></div>
+    <div class="sb-lbl">뷰 모드</div>
+    <button class="sb-em-btn" id="sb-em-btn" onclick="toggleEasyMode()">
+      <span class="sb-ico">⚡</span><span id="sb-em-txt">이지모드</span>
+    </button>
+    <div class="sb-sp"></div>
+    <div class="sb-foot">
+      <span id="sb-sdot" class="sync-dot s-ing"></span>
+      <span id="sb-stxt">연결 중...</span>
+    </div>
+  </nav>
+
   <div class="content" id="normal-content">
     <div class="stats-grid">
       <div class="kpi total" onclick="goUnits()"><div class="kpi-val" id="s-total">—</div><div class="kpi-lbl">전체</div></div>
@@ -450,7 +525,7 @@ auth.onAuthStateChanged(async user=>{
         banner.innerHTML=`<span style="font-size:12px;font-weight:700;color:#F59E0B">🔧 열람 중: ${esc(mName||mUid)}</span><button onclick="location.href='admin-master.html'" style="background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);border-radius:8px;padding:5px 12px;color:#F59E0B;font-size:11px;font-weight:700;cursor:pointer">← 관리자</button>`;
         document.body.appendChild(banner);
         document.querySelector(".content").style.marginTop="136px";
-        document.querySelectorAll(".nav-tab").forEach(a=>{
+        document.querySelectorAll(".nav-tab, .sb-link").forEach(a=>{
           const u=new URL(a.href,location.href);
           u.searchParams.set("master_uid",mUid);
           u.searchParams.set("master_name",mName);
@@ -530,7 +605,12 @@ function doSignOut(){closeMenu();teardownAll();auth.signOut()}
 function setSS(s){
   const el=document.getElementById("sync-st");if(!el)return;
   const cls=s==="ok"?"s-ok":s==="ing"?"s-ing":"s-err";
-  el.innerHTML=`<span class="sync-dot ${cls}" title="${s==="ok"?"동기화됨":s==="ing"?"저장중":"오류"}"></span>`;
+  const lbl=s==="ok"?"동기화됨":s==="ing"?"저장중":"오류";
+  el.innerHTML=`<span class="sync-dot ${cls}" title="${lbl}"></span>`;
+  const sbDot=document.getElementById("sb-sdot");
+  const sbTxt=document.getElementById("sb-stxt");
+  if(sbDot){sbDot.className="sync-dot "+cls;}
+  if(sbTxt){sbTxt.textContent=lbl;}
 }
 
 const RECENT_12MO=getRecentMonthsSet(12);
@@ -814,6 +894,10 @@ function toggleEasyMode() {
     if (href.includes('units') || href.includes('admin'))
       tab.style.display = emOn ? 'none' : '';
   });
+  const sbBtn = document.getElementById('sb-em-btn');
+  const sbTxt = document.getElementById('sb-em-txt');
+  if(sbBtn) sbBtn.classList.toggle('on', emOn);
+  if(sbTxt) sbTxt.textContent = emOn ? '일반모드' : '이지모드';
   try { localStorage.setItem(_emUidKey(), emOn ? '1' : '0'); } catch(e) {}
   if (emOn) renderEasyMode();
 }
