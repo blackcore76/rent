@@ -215,7 +215,7 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
         <button class="ctx-btn" id="ctx-btn" onclick="toggleUserDrop(event)">사용자 선택 ▾</button>
       </div>
       <div class="hdr-right">
-        <div id="av-wrap" style="cursor:pointer" onclick="auth.signOut().then(()=>location.href='../index.html')"></div>
+        <div id="av-wrap" style="cursor:pointer" onclick="toggleMasterMenu()"></div>
       </div>
     </div>
     <nav class="nav">
@@ -224,6 +224,14 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       <a href="expense.html" class="nav-tab">💸 장부</a>
       <a href="manage.html" class="nav-tab">🗂 관리</a>
     </nav>
+  </div>
+
+  <!-- 마스터 유저 드롭다운 -->
+  <div id="master-menu" style="display:none;position:fixed;top:60px;right:12px;background:#1A2B3C;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px;min-width:220px;z-index:400;box-shadow:0 8px 32px rgba(0,0,0,.5)">
+    <div id="mm-name" style="font-size:14px;font-weight:700;color:#F0F6FF;margin-bottom:2px">—</div>
+    <div id="mm-email" style="font-size:12px;color:#64748B;margin-bottom:14px;word-break:break-all">—</div>
+    <a href="../index.html" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;margin-bottom:8px;background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.3);border-radius:10px;color:#0EA5E9;font-size:13px;font-weight:700;text-decoration:none;box-sizing:border-box">← 일반 페이지</a>
+    <button onclick="auth.signOut().then(()=>location.href='../index.html')" style="width:100%;padding:9px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:10px;color:#EF4444;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🚪 로그아웃</button>
   </div>
 
   <div class="content">
@@ -306,11 +314,24 @@ auth.onAuthStateChanged(user=>{
   lo.classList.add("hide");app.style.display="block";
   const w=document.getElementById("av-wrap");
   w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"A")[0]}</div>`;
+  document.getElementById("mm-name").textContent=user.displayName||"관리자";
+  document.getElementById("mm-email").textContent=user.email||"";
   usersRef=db.ref(DBPath.masterUsers());
   usersRef.on("value",snap=>{masterUsersData=snap.val()||{};renderUsers();});
   pendingUsersRef=db.ref(DBPath.pendingUsers());
   pendingUsersRef.on("value",snap=>{allUsersData=snap.val()||{};renderPendingUsers();renderUsers();});
   updateCtxBtn();
+});
+
+function toggleMasterMenu(){
+  const el=document.getElementById("master-menu");
+  if(el)el.style.display=el.style.display==="none"?"block":"none";
+}
+document.addEventListener("click",e=>{
+  if(!e.target.closest("#av-wrap")&&!e.target.closest("#master-menu")){
+    const el=document.getElementById("master-menu");
+    if(el)el.style.display="none";
+  }
 });
 
 function updateCtxBtn(){
