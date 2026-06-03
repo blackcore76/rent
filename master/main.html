@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0A1628">
+<link rel="icon" href="../favicon.png">
+<link rel="apple-touch-icon" href="../icon-192.png">
+<title>🔧 관리자 · 메인</title>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://rent-4d521-default-rtdb.firebaseio.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../common.css?v=1">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="../shared.js?v=2"></script>
+<script src="../db-paths.js"></script>
+<style>
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.kpi{background:var(--card);border-radius:12px;padding:12px 4px;text-align:center;box-shadow:var(--shadow);cursor:pointer;transition:transform .12s,box-shadow .12s;position:relative;overflow:hidden}
+.kpi:active{transform:scale(.95)}
+.kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:12px 0 0 12px}
+.kpi.total::before{background:linear-gradient(to bottom,#64748B,transparent)}
+.kpi.rented::before{background:linear-gradient(to bottom,var(--blue),transparent)}
+.kpi.vacant::before{background:linear-gradient(to bottom,var(--indigo),transparent)}
+.kpi.unpaid::before{background:linear-gradient(to bottom,var(--red),transparent)}
+.kpi-val{font-size:22px;font-weight:900;line-height:1;margin-bottom:3px}
+.kpi-lbl{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.3px}
+.kpi.total .kpi-val{color:var(--text)}
+.kpi.rented .kpi-val{color:var(--blue)}
+.kpi.vacant .kpi-val{color:var(--indigo)}
+.kpi.unpaid .kpi-val{color:var(--red)}
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden;position:relative}
+.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,var(--sky),transparent);border-radius:var(--radius) 0 0 var(--radius)}
+.card-hd{font-size:13px;font-weight:700;color:var(--hdr2);margin-bottom:12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);padding-bottom:10px}
+.status-row{display:flex;flex-direction:column;align-items:stretch;padding:10px 4px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:8px;transition:background .12s;overflow:hidden}
+.status-row:last-child{border-bottom:none}
+.status-row:active{background:#F0F4F8}
+.sr-top{display:flex;align-items:center;gap:6px;width:100%;overflow:hidden}
+.sr-sub{font-size:12px;font-weight:600;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;padding-top:5px}
+.sr-sub.sr-amt-row{display:flex;justify-content:space-between;align-items:baseline;gap:18px;overflow:visible}
+.sr-sub.sr-amt-row .sr-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sr-sub.sr-amt-row .sr-amt{flex-shrink:0;white-space:nowrap;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+.sr-sub.sr-name-memo{display:flex;align-items:baseline;gap:14px;overflow:visible}
+.sr-sub.sr-name-memo .sr-name{flex-shrink:0;white-space:nowrap}
+.sr-sub.sr-name-memo .sr-memo{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--sub)}
+.sr-arrow{margin-left:auto;flex-shrink:0;font-size:14px;color:var(--hint)}
+.room-num{font-size:14px;font-weight:800;color:var(--hdr);min-width:40px;flex-shrink:0}
+.badge{display:inline-block;padding:3px 7px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap}
+.badge-vacant{background:var(--red-lt);color:var(--red-t)}
+.badge-unpaid{background:var(--red-lt);color:var(--red-t)}
+.badge-warning{background:var(--amber-lt);color:var(--amber-t)}
+.badge-oneroom{background:#FEF3C7;color:#92400E}
+.badge-twobay{background:#F3E8FF;color:#6B21A8}
+.badge-tworoom{background:#CCFBF1;color:#0F766E}
+.badge-threeroom{background:#EEF2FF;color:#3730A3}
+.badge-monthly{background:#FFF7ED;color:#C2410C}
+.badge-jeonse{background:#EDE9FE;color:#5B21B6}
+.expiry-row{display:flex;flex-direction:column;align-items:stretch;padding:10px 4px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:8px;transition:background .12s;overflow:hidden}
+.expiry-row:last-child{border-bottom:none}
+.expiry-row:active{background:#F0F4F8}
+.bld-subhd{font-size:11px;font-weight:800;color:var(--sub);padding:10px 4px 4px;letter-spacing:.5px;border-top:1px solid var(--border);margin-top:4px}
+.bld-subhd:first-child{border-top:none;padding-top:4px;margin-top:0}
+.note-item{background:#F8FAFC;border-radius:10px;padding:12px;margin-bottom:8px}
+.note-item:last-child{margin-bottom:0}
+.note-content{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:6px;white-space:pre-wrap;word-break:break-all}
+.note-footer{display:flex;align-items:center;justify-content:space-between}
+.note-date{font-size:11px;color:var(--hint)}
+.empty-small{text-align:center;padding:20px;color:var(--hint);font-size:13px}
+.adm-badge{font-size:10px;font-weight:800;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);color:#D97706;padding:3px 7px;border-radius:6px;letter-spacing:.4px;flex-shrink:0}
+.usr-drop{position:fixed;background:#fff;border:1px solid var(--border);border-radius:12px;min-width:200px;max-width:280px;z-index:500;box-shadow:0 8px 28px rgba(0,0,0,.18);overflow:hidden;max-height:55vh;overflow-y:auto}
+.usr-drop-item{padding:10px 14px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:2px}
+.usr-drop-item:last-child{border-bottom:none}
+.usr-drop-item:active{background:var(--bg)}
+.usr-drop-item.on{color:var(--sky)}
+.usr-drop-uid{font-size:10px;color:var(--hint);font-family:monospace}
+.usr-drop-none{padding:10px 14px;font-size:12px;color:var(--hint);cursor:pointer;border-bottom:1px solid var(--border)}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1F2937;color:#fff;padding:11px 20px;border-radius:24px;font-size:14px;z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);max-width:calc(100vw - 48px);text-align:center;line-height:1.6;box-shadow:0 4px 16px rgba(0,0,0,.4);pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div id="access-denied" style="display:none;position:fixed;inset:0;background:linear-gradient(160deg,#0A1628,#1A2B3C);z-index:7500;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;gap:14px">
+  <div style="font-size:64px">🚫</div>
+  <div style="font-size:20px;font-weight:900;color:#EF4444">접근 권한 없음</div>
+  <div style="font-size:13px;color:#94A3B8;line-height:1.7">전체 관리자만 접근할 수 있는 페이지입니다.</div>
+  <button onclick="location.href='admin.html'" style="padding:12px 28px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#EF4444;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">← 관리자 메인으로</button>
+</div>
+<div id="no-user" style="display:none;position:fixed;inset:0;background:#F8FAFC;z-index:7500;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;gap:14px">
+  <div style="font-size:64px">👤</div>
+  <div style="font-size:18px;font-weight:900;color:var(--hdr)">사용자를 먼저 선택하세요</div>
+  <div style="font-size:13px;color:var(--sub);line-height:1.7">관리자 메인에서 열람할 사용자를 선택해주세요.</div>
+  <button onclick="location.href='admin.html'" style="padding:12px 28px;background:var(--hdr);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">← 사용자 선택하러 가기</button>
+</div>
+
+<div id="app" style="display:none">
+  <div class="hdr">
+    <div class="hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1">
+        <a href="admin.html" style="flex-shrink:0;display:flex;align-items:center;line-height:0">
+          <img src="../logo.png" alt="PlusHome" style="height:36px;width:auto;image-rendering:-webkit-optimize-contrast">
+        </a>
+        <span class="adm-badge">ADMIN</span>
+        <button id="ctx-btn" onclick="toggleUserDrop(event)" style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:5px 9px;background:rgba(5,150,105,.08);border:1px solid rgba(5,150,105,.3);color:#059669;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">— ▾</button>
+      </div>
+      <div class="hdr-actions">
+        <div id="av-wrap" style="display:flex;align-items:center;cursor:pointer" onclick="auth.signOut().then(()=>location.href='admin.html')"></div>
+      </div>
+    </div>
+    <div class="nav">
+      <a href="admin.html" class="nav-tab">📊 메인(관리)</a>
+      <a href="main.html" class="nav-tab on">🏡 메인</a>
+      <a href="units.html" class="nav-tab">🏠 세대</a>
+      <a href="expense.html" class="nav-tab">💸 장부</a>
+      <a href="manage.html" class="nav-tab">🗂 관리</a>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="stats-grid">
+      <div class="kpi total" onclick="goUnits()"><div class="kpi-val" id="s-total">—</div><div class="kpi-lbl">전체</div></div>
+      <div class="kpi rented" onclick="goUnits('rented')"><div class="kpi-val" id="s-rented">—</div><div class="kpi-lbl">임대중</div></div>
+      <div class="kpi vacant" onclick="goUnits('vacant')"><div class="kpi-val" id="s-vacant">—</div><div class="kpi-lbl">공실</div></div>
+      <div class="kpi unpaid" onclick="goUnits('unpaid')"><div class="kpi-val" id="s-unpaid">—</div><div class="kpi-lbl">미납</div></div>
+    </div>
+
+    <div class="card" id="card-unpaid">
+      <div class="card-hd">🔴 미납 현황 (최근 1년)</div>
+      <div id="unpaid-list"><div class="empty-small">로딩 중...</div></div>
+    </div>
+
+    <div class="card" id="card-vacant">
+      <div class="card-hd">🟣 공실 현황</div>
+      <div id="vacant-list"><div class="empty-small">로딩 중...</div></div>
+    </div>
+
+    <div class="card" id="card-expiry">
+      <div class="card-hd">⚠️ 계약 만료 임박 (30일 이내)</div>
+      <div id="expiry-list"><div class="empty-small">로딩 중...</div></div>
+    </div>
+
+    <div class="card" id="card-notes">
+      <div class="card-hd">📝 특이사항 메모</div>
+      <div id="notes-list"><div class="empty-small">로딩 중...</div></div>
+    </div>
+
+    <div id="buildings-wrap"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let cu=null,_tUid="",_tName="";
+let bldgsData={},curBid="main",bldgsRef=null,bldgsL=null;
+let allBldData={};
+let bldListeners={};
+let nRef=null,nL=null,notes={};
+let _usrDrop=null,_usrList=[];
+let _rdTm=null,_rbTm=null;
+
+auth.onAuthStateChanged(async user=>{
+  const app=document.getElementById("app");
+  if(user){
+    if(user.uid!==MASTER_UID){
+      document.getElementById("access-denied").style.display="flex";
+      return;
+    }
+    cu=user;
+    _tUid=sessionStorage.getItem("master_view_uid")||"";
+    _tName=sessionStorage.getItem("master_view_name")||"";
+    if(!_tUid){
+      document.getElementById("no-user").style.display="flex";
+      return;
+    }
+    const w=document.getElementById("av-wrap");
+    w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"U")[0]}</div>`;
+    document.getElementById("ctx-btn").textContent=(_tName||_tUid)+" ▾";
+    loadUserList();
+    app.style.display="block";
+
+    curBid=getCurBid(_tUid);
+
+    if(nL&&nRef)nRef.off("value",nL);
+    nRef=db.ref(`${DBPath.bldData(_tUid,curBid)}/notes`);
+    nL=nRef.on("value",snap=>{notes=snap.val()||{};renderNotes();});
+
+    if(bldgsL&&bldgsRef)bldgsRef.off("value",bldgsL);
+    bldgsRef=db.ref(DBPath.bldList(_tUid));
+    bldgsL=bldgsRef.on("value",snap=>{
+      bldgsData=snap.val()||{};
+      const bids=sortedBids(bldgsData);
+      if(bids.length&&!bldgsData[curBid]){curBid=bids[0];setCurBid(_tUid,curBid);}
+      bids.forEach(bid=>{if(!bldListeners[bid])setupBldListeners(_tUid,bid);});
+      Object.keys(bldListeners).forEach(bid=>{if(!bldgsData[bid])teardownBldListeners(bid);});
+      schedRenderDash();schedRenderBldCards();
+    });
+  }else{
+    cu=null;teardownAll();
+    document.getElementById("app").style.display="none";
+    auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(()=>{});
+  }
+});
+
+function schedRenderDash(){clearTimeout(_rdTm);_rdTm=setTimeout(renderDash,60);}
+function schedRenderBldCards(){clearTimeout(_rbTm);_rbTm=setTimeout(renderBldCards,60);}
+
+function setupBldListeners(uid,bid){
+  if(bldListeners[bid])return;
+  if(!allBldData[bid])allBldData[bid]={};
+  const base=db.ref(DBPath.bldData(uid,bid));
+  const uRef=base.child("units"),hRef=base.child("rent_history"),biRef=base.child("buildings"),rlRef=base.child("config/roomLayout");
+  const uL=uRef.on("value",snap=>{allBldData[bid].units=snap.val()||{};schedRenderDash();});
+  const hL=hRef.on("value",snap=>{allBldData[bid].history=snap.val()||{};schedRenderDash();});
+  const biL=biRef.on("value",snap=>{allBldData[bid].bldInfo=snap.val()||{};schedRenderBldCards();});
+  const rlL=rlRef.on("value",snap=>{allBldData[bid].roomLayout=snap.val()||null;schedRenderDash();});
+  bldListeners[bid]={uRef,hRef,biRef,rlRef,uL,hL,biL,rlL};
+}
+function teardownBldListeners(bid){
+  const l=bldListeners[bid];if(!l)return;
+  if(l.uRef&&l.uL)l.uRef.off("value",l.uL);
+  if(l.hRef&&l.hL)l.hRef.off("value",l.hL);
+  if(l.biRef&&l.biL)l.biRef.off("value",l.biL);
+  if(l.rlRef&&l.rlL)l.rlRef.off("value",l.rlL);
+  delete bldListeners[bid];delete allBldData[bid];
+}
+function teardownAll(){
+  Object.keys(bldListeners).forEach(teardownBldListeners);
+  if(bldgsL&&bldgsRef)bldgsRef.off("value",bldgsL);
+  if(nL&&nRef)nRef.off("value",nL);
+}
+
+const RECENT_12MO=getRecentMonthsSet(12);
+function computePaidStatus(bid,roomId){
+  const h=((allBldData[bid]||{}).history||{})[String(roomId)]||{};
+  const recs=[];
+  for(const ym in h)if(RECENT_12MO.has(ym))recs.push(h[ym]);
+  if(!recs.length)return null;
+  if(recs.some(r=>r.partial))return "partial";
+  return recs.some(r=>!r.paid)?false:true;
+}
+
+function renderDash(){
+  const bids=sortedBids(bldgsData);
+  let tot=0,rented=0,vacant=0,unpaidCnt=0;
+  bids.forEach(bid=>{
+    const rl=allBldData[bid]?.roomLayout;
+    const rlRooms=rl?new Set(Object.values(rl).flat().map(String)):null;
+    const rlCount=rlRooms?rlRooms.size:null;
+    const ul=Object.values((allBldData[bid]||{}).units||{});
+    const r=(rlRooms?ul.filter(u=>rlRooms.has(String(u.room))):ul).filter(u=>u.status==="rented");
+    rented+=r.length;
+    if(rlCount!==null){tot+=rlCount;vacant+=rlCount-r.length;}
+    else{tot+=ul.length;vacant+=ul.filter(u=>u.status==="vacant").length;}
+    unpaidCnt+=r.filter(u=>{const ps=computePaidStatus(bid,u.room);return ps===false||ps==="partial";}).length;
+  });
+  document.getElementById("s-total").textContent=tot;
+  document.getElementById("s-rented").textContent=rented;
+  document.getElementById("s-vacant").textContent=vacant;
+  document.getElementById("s-unpaid").textContent=unpaidCnt;
+
+  // 미납
+  let uHtml="";
+  bids.forEach(bid=>{
+    const rl=allBldData[bid]?.roomLayout;
+    const rlRooms=rl?new Set(Object.values(rl).flat().map(String)):null;
+    const ul=Object.values((allBldData[bid]||{}).units||{});
+    const up=(rlRooms?ul.filter(u=>rlRooms.has(String(u.room))):ul)
+      .filter(u=>{const ps=computePaidStatus(bid,u.room);return u.status==="rented"&&(ps===false||ps==="partial");})
+      .sort((a,b)=>{const na=parseInt(a.room),nb=parseInt(b.room);return(!isNaN(na)&&!isNaN(nb))?na-nb:String(a.room).localeCompare(String(b.room));});
+    if(!up.length)return;
+    uHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
+    uHtml+=up.map(u=>{
+      const ps=computePaidStatus(bid,u.room);
+      const pBadge=ps==="partial"?`<span class="badge" style="background:#FEF3C7;color:#92400E">🔶 부분납부</span>`:`<span class="badge badge-unpaid">❌ 미납</span>`;
+      return`<div class="status-row" onclick="goToUnit('${bid}','${u.room}')">
+        <div class="sr-top"><span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}${pBadge}<span class="sr-arrow">›</span></div>
+        <div class="sr-sub sr-amt-row"><span class="sr-name">${esc(names(u))}</span><span class="sr-amt">${unpaidAmtTxt(u)}</span></div>
+      </div>`;}).join("");
+  });
+  document.getElementById("unpaid-list").innerHTML=uHtml||'<div class="empty-small">✅ 이달 미납 없음</div>';
+
+  // 공실
+  let vHtml="";
+  bids.forEach(bid=>{
+    const rl=allBldData[bid]?.roomLayout;
+    const ul=Object.values((allBldData[bid]||{}).units||{});
+    const unitMap=Object.fromEntries(ul.map(u=>[String(u.room),u]));
+    const rentedRooms=new Set(ul.filter(u=>u.status==="rented").map(u=>String(u.room)));
+    let vacItems=[];
+    if(rl){
+      Object.values(rl).flat().map(String).forEach(room=>{
+        if(!rentedRooms.has(room))vacItems.push({room,unit:unitMap[room]||null});
+      });
+    }else{
+      ul.filter(u=>u.status==="vacant").forEach(u=>vacItems.push({room:String(u.room),unit:u}));
+    }
+    vacItems.sort((a,b)=>{const na=parseInt(a.room),nb=parseInt(b.room);return(!isNaN(na)&&!isNaN(nb))?na-nb:String(a.room).localeCompare(String(b.room));});
+    if(!vacItems.length)return;
+    vHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
+    vHtml+=vacItems.map(({room,unit})=>`<div class="status-row" onclick="goToUnit('${bid}','${room}')">
+      <div class="sr-top"><span class="room-num">${room}호</span>${unit?rentTypeBadge(unit):""}${unit?rtBadge(unit):""}<span class="badge badge-vacant">공실</span><span class="sr-arrow">›</span></div>
+      ${unit?.memo?`<div class="sr-sub">${esc(unit.memo.split('\n')[0])}</div>`:''}
+    </div>`).join("");
+  });
+  document.getElementById("vacant-list").innerHTML=vHtml||'<div class="empty-small">🏠 공실 없음</div>';
+
+  // 계약 만료 임박
+  const today=new Date();today.setHours(0,0,0,0);
+  let eHtml="";
+  bids.forEach(bid=>{
+    const rl=allBldData[bid]?.roomLayout;
+    const rlRooms=rl?new Set(Object.values(rl).flat().map(String)):null;
+    const ul=Object.values((allBldData[bid]||{}).units||{});
+    const soon=(rlRooms?ul.filter(u=>rlRooms.has(String(u.room))):ul)
+      .filter(u=>u.status==="rented"&&u.contractEnd)
+      .map(u=>{const d=new Date(u.contractEnd);d.setHours(0,0,0,0);return{...u,dl:Math.ceil((d-today)/864e5)};})
+      .filter(u=>u.dl>=0&&u.dl<=30)
+      .sort((a,b)=>{if(a.dl!==b.dl)return a.dl-b.dl;const na=parseInt(a.room),nb=parseInt(b.room);return(!isNaN(na)&&!isNaN(nb))?na-nb:String(a.room).localeCompare(String(b.room));});
+    if(!soon.length)return;
+    eHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
+    eHtml+=soon.map(u=>{
+      const ml=(u.memo||"").split('\n');
+      const m1=ml[0]||"",m2=ml[1]||"";
+      return`<div class="expiry-row" onclick="goToUnit('${bid}','${u.room}')">
+        <div class="sr-top"><span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}<span class="badge badge-warning">${shortDate(u.contractEnd)}</span><span style="font-size:11px;font-weight:700;color:${u.dl<=7?"var(--red)":"var(--amber)"};white-space:nowrap">${u.dl}일 후</span><span class="sr-arrow">›</span></div>
+        <div class="sr-sub sr-name-memo"><span class="sr-name">${esc(truncName(names(u)))}</span>${m1?`<span class="sr-memo">${esc(m1)}</span>`:''}</div>
+        ${m2?`<div class="sr-sub">${esc(m2)}</div>`:''}
+      </div>`;}).join("");
+  });
+  document.getElementById("expiry-list").innerHTML=eHtml||'<div class="empty-small">✅ 30일 내 만료 없음</div>';
+}
+
+function renderBldCards(){
+  const el=document.getElementById("buildings-wrap");if(!el)return;
+  const bids=sortedBids(bldgsData);
+  el.innerHTML=bids.flatMap(bid=>{
+    const bldInfo=(allBldData[bid]||{}).bldInfo||{};
+    return Object.values(bldInfo).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).map(b=>
+      `<div style="background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:18px 20px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.06)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1)">
+          <span style="font-size:20px">🏠</span>
+          <span style="font-size:16px;font-weight:900;color:#fff">${esc(b.name)}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          ${b.entranceCode||b.masterCode?`<div style="display:grid;grid-template-columns:${b.entranceCode&&b.masterCode?"1fr 1fr":"1fr"};gap:12px">
+            ${b.entranceCode?`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">🔐</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">1층 현관</div><div style="font-size:15px;font-weight:900;color:#4DD0E1;letter-spacing:1px">${esc(b.entranceCode)}</div></div></div>`:""}
+            ${b.masterCode?`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">🗝️</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">세대 마스터</div><div style="font-size:15px;font-weight:900;color:#4DD0E1;letter-spacing:1px">${esc(b.masterCode)}</div></div></div>`:""}
+          </div>`:""}
+          ${b.manageFee?`<div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)"><span style="font-size:16px;flex-shrink:0">🏦</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">관리비 계좌</div><div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.85)">${esc(b.manageFee)}</div></div></div>`:""}
+          ${b.address?`<div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)"><span style="font-size:16px;flex-shrink:0">📍</span><div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.75);line-height:1.6">${esc(b.address)}</div></div>`:""}
+        </div>
+      </div>`);
+  }).join("");
+}
+
+function renderNotes(){
+  const list=Object.values(notes).sort((a,b)=>b.id-a.id);
+  const el=document.getElementById("notes-list");
+  if(!list.length){el.innerHTML='<div class="empty-small">메모가 없습니다</div>';return;}
+  el.innerHTML=list.map(n=>`<div class="note-item">
+    <div class="note-content">${esc(n.content)}</div>
+    <div class="note-footer"><span class="note-date">${fmtDt(n.createdAt)}</span></div>
+  </div>`).join("");
+}
+
+// ── 사용자 드롭다운 ──
+function loadUserList(){
+  db.ref(DBPath.masterUsers()).once("value").then(snap=>{
+    _usrList=Object.values(snap.val()||{}).sort((a,b)=>a.createdAt>b.createdAt?1:-1);
+  });
+}
+function toggleUserDrop(e){
+  if(e)e.stopPropagation();
+  if(_usrDrop){_usrDrop.remove();_usrDrop=null;return;}
+  if(!_usrList.length){showToast("사용자 목록 로드 중…");return;}
+  const btn=document.getElementById("ctx-btn");
+  const drop=document.createElement("div");drop.className="usr-drop";
+  const none=document.createElement("div");none.className="usr-drop-none";
+  none.textContent="← 관리자 메인으로";
+  none.onclick=()=>{_usrDrop.remove();_usrDrop=null;location.href="admin.html";};
+  drop.appendChild(none);
+  _usrList.forEach(u=>{
+    const item=document.createElement("div");
+    item.className="usr-drop-item"+(_tUid===u.uid?" on":"");
+    const nm=document.createElement("span");nm.textContent=u.name;
+    const uid=document.createElement("span");uid.className="usr-drop-uid";uid.textContent=u.uid;
+    item.appendChild(nm);item.appendChild(uid);
+    item.onclick=()=>{_usrDrop.remove();_usrDrop=null;switchUser(u.uid,u.name);};
+    drop.appendChild(item);
+  });
+  const r=btn.getBoundingClientRect();
+  drop.style.cssText=`top:${r.bottom+4}px;left:${r.left}px;position:fixed`;
+  document.body.appendChild(drop);_usrDrop=drop;
+}
+function switchUser(uid,name){
+  if(uid===_tUid){showToast("이미 선택된 사용자입니다");return;}
+  sessionStorage.setItem("master_view_uid",uid);
+  sessionStorage.setItem("master_view_name",name);
+  location.reload();
+}
+document.addEventListener("click",()=>{if(_usrDrop){_usrDrop.remove();_usrDrop=null;}});
+
+// ── 네비게이션 ──
+function goToUnit(bid,room){
+  setCurBid(_tUid,bid);
+  location.href=`units.html?room=${encodeURIComponent(room)}`;
+}
+function goUnits(filter){
+  location.href=`units.html${filter?"?filter="+filter:""}`;
+}
+
+// ── 유틸 ──
+function names(u){return[u.tenantName,u.tenantName2].filter(Boolean).join(" / ")||"(미입력)";}
+function truncName(s,n=15){s=s||"";return s.length>n?s.slice(0,n)+"…":s;}
+function unpaidAmtTxt(u){
+  const dep=u.depositAmount||0,rent=u.monthlyRent||0;
+  if(!dep&&!rent)return"";
+  return(dep?dep.toLocaleString()+"만원":"—")+"/"+(rent?rent.toLocaleString()+"만원":"—");
+}
+const RTYPE_LBL={oneroom:"원룸",twobay:"투베이",tworoom:"투룸",threeroom:"쓰리룸"};
+const RTYPE_CLS={oneroom:"badge-oneroom",twobay:"badge-twobay",tworoom:"badge-tworoom",threeroom:"badge-threeroom"};
+const RENT_TYPE_CLS={monthly:"badge-monthly",jeonse:"badge-jeonse"};
+function rtBadge(u){const l=RTYPE_LBL[u.roomType];return l?`<span class="badge ${RTYPE_CLS[u.roomType]}">${l}</span>`:""}
+function rentTypeBadge(u){const t=u.rentType||"monthly";return`<span class="badge ${RENT_TYPE_CLS[t]}">${t==="jeonse"?"전세":"월세"}</span>`}
+function shortDate(s){if(!s)return'';const p=s.split('-');return(p[1]?+p[1]:'')+'/'+(p[2]?+p[2]:'');}
+function fmtDt(iso){if(!iso)return"";const d=new Date(iso);return`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;}
+function showToast(msg,dur=2200){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),dur);
+}
+</script>
+</body>
+</html>
