@@ -14,6 +14,10 @@ try {
 } catch(e) {
   serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT.replace(/\n/g, '\\n'));
 }
+// PEM 형식에는 실제 줄바꿈이 필요 — 이스케이프된 \n을 실제 줄바꿈으로 복원
+if (serviceAccount.private_key) {
+  serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+}
 admin.initializeApp({
   credential:  admin.credential.cert(serviceAccount),
   databaseURL: 'https://rent-4d521-default-rtdb.firebaseio.com',
