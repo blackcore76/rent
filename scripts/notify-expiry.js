@@ -7,7 +7,13 @@ const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const CHAT_ID   = process.env.TELEGRAM_CHAT_ID;
 
 // Firebase 초기화
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+// GitHub Secrets에서 \n이 실제 줄바꿈으로 저장되는 경우 처리
+let serviceAccount;
+try {
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+} catch(e) {
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT.replace(/\n/g, '\\n'));
+}
 admin.initializeApp({
   credential:  admin.credential.cert(serviceAccount),
   databaseURL: 'https://rent-4d521-default-rtdb.firebaseio.com',
