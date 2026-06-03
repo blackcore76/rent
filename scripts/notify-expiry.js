@@ -6,18 +6,10 @@ const https = require('https');
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const CHAT_ID   = process.env.TELEGRAM_CHAT_ID;
 
-// Firebase 초기화
-// GitHub Secrets에서 \n이 실제 줄바꿈으로 저장되는 경우 처리
-let serviceAccount;
-try {
-  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-} catch(e) {
-  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT.replace(/\n/g, '\\n'));
-}
-// PEM 형식에는 실제 줄바꿈이 필요 — 이스케이프된 \n을 실제 줄바꿈으로 복원
-if (serviceAccount.private_key) {
-  serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
-}
+// Firebase 초기화 (base64 디코딩 — 줄바꿈 문제 원천 차단)
+const serviceAccount = JSON.parse(
+  Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT, 'base64').toString('utf8')
+);
 admin.initializeApp({
   credential:  admin.credential.cert(serviceAccount),
   databaseURL: 'https://rent-4d521-default-rtdb.firebaseio.com',
