@@ -1,8 +1,11 @@
-name: PlusHome 만료 임박 알림
+name: PlusHome 알림 (만료임박 + 신규승인대기)
 
 on:
   schedule:
-    - cron: '0 23 * * *'   # 매일 23:00 UTC = 08:00 KST
+    - cron: '0 23 * * *'   # 08:00 KST
+    - cron: '0 3 * * *'    # 12:00 KST
+    - cron: '0 7 * * *'    # 16:00 KST
+    - cron: '0 11 * * *'   # 20:00 KST
   workflow_dispatch:        # GitHub에서 수동 실행도 가능
 
 jobs:
@@ -19,10 +22,10 @@ jobs:
         run: npm install
         working-directory: scripts
 
-      - name: 만료 임박 조회 및 텔레그램 전송
+      - name: 만료 임박 + 신규 승인 대기 조회 및 텔레그램 전송
         run: node notify-expiry.js
         working-directory: scripts
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_CHAT_ID: ${{ secrets.CHAT_ID }}

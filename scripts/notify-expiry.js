@@ -1,5 +1,5 @@
-// PlusHome 만료 임박 알림 스크립트
-// 매일 08:00 KST — GitHub Actions cron으로 실행
+// PlusHome 만료 임박 + 신규 승인 대기 알림 스크립트
+// GitHub Actions cron으로 실행 — 08:00 / 12:00 / 16:00 / 20:00 KST
 const admin = require('firebase-admin');
 const https = require('https');
 
@@ -26,19 +26,19 @@ async function main() {
     String(today.getDate()).padStart(2, '0'),
   ].join('-');
 
-  // 관리 사용자 목록
+  // 현재 KST 시각 (UTC+9)
+  const nowUTC = new Date();
+  const kstHour = ((nowUTC.getUTCHours() + 9) % 24);
+  const timeStr = `${String(kstHour).padStart(2, '0')}:${String(nowUTC.getUTCMinutes()).padStart(2, '0')}`;
+
+  // ── 1. 만료 임박 조회 ─────────────────────────────────────────────
   const usersSnap = await db.ref('master_admin/users').once('value');
   const users = Object.values(usersSnap.val() || {});
-  if (!users.length) {
-    await send('ℹ️ PlusHome: 등록된 관리 사용자 없음');
-    return;
-  }
 
-  // 삭제(dismissed) 이력
   const notesSnap = await db.ref('master_admin/expiry_notes').once('value');
   const notes = notesSnap.val() || {};
 
-  const results = [];
+  const expiryResults = [];
 
   for (const u of users) {
     const bldsSnap = await db.ref(`rent_app/${u.uid}/_buildings`).once('value');
@@ -67,10 +67,10 @@ async function main() {
         if (notes[u.uid]?.[bid]?.[String(x.room)]?.dismissed) continue;
 
         userItems.push({
-          bldName:    bld.name || bid,
-          room:       x.room,
-          tenant:     x.tenantName || '(미등록)',
-          end:        x.contractEnd,
+          bldName: bld.name || bid,
+          room:    x.room,
+          tenant:  x.tenantName || '(미등록)',
+          end:     x.contractEnd,
           dl,
         });
       }
@@ -78,28 +78,57 @@ async function main() {
 
     if (userItems.length) {
       userItems.sort((a, b) => a.dl - b.dl);
-      results.push({ name: u.name, items: userItems });
+      expiryResults.push({ name: u.name, items: userItems });
     }
   }
 
-  if (!results.length) {
-    await send(`✅ PlusHome 알림 (${dateStr})\n30일 이내 만료 임박 없음`);
-    return;
-  }
+  // ── 2. 신규 승인 대기 조회 ────────────────────────────────────────
+  const pendingSnap = await db.ref('_users').once('value');
+  const pendingAll  = pendingSnap.val() || {};
+  const pendingList = Object.values(pendingAll)
+    .filter(u => (u.status || 'pending') === 'pending')
+    .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
 
-  const total = results.reduce((s, r) => s + r.items.length, 0);
-  let msg = `📋 <b>PlusHome 만료 임박 알림</b> (${dateStr})\n\n`;
+  // ── 3. 메세지 조합 ────────────────────────────────────────────────
+  let msg = `🏠 <b>PlusHome 알림</b>  ${dateStr} ${timeStr} KST\n`;
+  msg += `━━━━━━━━━━━━━━━━━━━━\n\n`;
 
-  for (const r of results) {
-    msg += `👤 <b>${esc(r.name)}</b>\n`;
-    for (const it of r.items) {
-      const flag = it.dl <= 7 ? ' 🔴' : '';
-      msg += `  🏠 ${esc(it.bldName)} ${esc(String(it.room))}호 · ${esc(it.tenant)} · ~${esc(it.end)} (D-${it.dl})${flag}\n`;
+  // 만료 임박
+  msg += `📋 <b>계약 만료 임박 (30일 이내)</b>\n`;
+  if (!users.length) {
+    msg += `  ℹ️ 등록된 관리 사용자 없음\n`;
+  } else if (!expiryResults.length) {
+    msg += `  ✅ 만료 임박 없음\n`;
+  } else {
+    const total = expiryResults.reduce((s, r) => s + r.items.length, 0);
+    for (const r of expiryResults) {
+      msg += `  👤 <b>${esc(r.name)}</b>\n`;
+      for (const it of r.items) {
+        const flag = it.dl <= 7 ? ' 🔴' : it.dl <= 14 ? ' 🟡' : '';
+        msg += `    🏠 ${esc(it.bldName)} ${esc(String(it.room))}호 · ${esc(it.tenant)} · ~${esc(it.end)} (D-${it.dl})${flag}\n`;
+      }
     }
-    msg += '\n';
+    msg += `  ▸ 총 <b>${total}건</b>\n`;
   }
 
-  msg += `총 <b>${total}건</b>`;
+  msg += `\n`;
+
+  // 신규 승인 대기
+  msg += `🔔 <b>신규 사용자 승인 대기</b>\n`;
+  if (!pendingList.length) {
+    msg += `  ✅ 대기 중인 사용자 없음\n`;
+  } else {
+    for (const u of pendingList) {
+      const name  = esc(u.displayName || '(이름없음)');
+      const email = esc(u.email || '');
+      const since = u.createdAt
+        ? new Date(u.createdAt).toISOString().slice(0, 10)
+        : '';
+      msg += `  ⏳ <b>${name}</b>${email ? ` (${email})` : ''}${since ? ` · 요청일 ${since}` : ''}\n`;
+    }
+    msg += `  ▸ 총 <b>${pendingList.length}명</b> 대기 중\n`;
+  }
+
   await send(msg, 'HTML');
 }
 
