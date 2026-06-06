@@ -24,7 +24,8 @@
       "Bash(Write-Host \"created\")",
       "PowerShell(New-Item *)",
       "PowerShell(Copy-Item *)",
-      "Bash(find \"c:/Users/BlackCore\" -name \"bookmarks.html\" 2>/dev/null | head -10)"
+      "Bash(find \"c:/Users/BlackCore\" -name \"bookmarks.html\" 2>/dev/null | head -10)",
+      "Bash(gh run *)"
     ]
   }
 }
