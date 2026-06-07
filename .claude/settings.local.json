@@ -25,7 +25,8 @@
       "PowerShell(New-Item *)",
       "PowerShell(Copy-Item *)",
       "Bash(find \"c:/Users/BlackCore\" -name \"bookmarks.html\" 2>/dev/null | head -10)",
-      "Bash(gh run *)"
+      "Bash(gh run *)",
+      "Bash(find /Users/blackcore/home -type f | grep -v .git | head -30)"
     ]
   }
 }
