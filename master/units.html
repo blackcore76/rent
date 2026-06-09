@@ -161,6 +161,11 @@
 .confirm-btns{display:flex;gap:10px;justify-content:flex-end}
 .confirm-btns button{padding:9px 18px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
 .btn-blind.lifted{background:#FCA5A5!important;color:#7F1D1D!important;border:2px solid #F87171!important}
+/* 계약내용 지우기 블라인드 */
+.clear-blind-wrap{position:relative;display:inline-flex}
+.clear-blind{position:absolute;inset:0;border-radius:7px;background:#475569;border:1.5px solid #334155;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;z-index:2;font-family:inherit;transition:opacity .2s,transform .22s cubic-bezier(.4,0,.2,1);user-select:none;white-space:nowrap;padding:0 8px;letter-spacing:.3px}
+.clear-blind.lifted{opacity:0;transform:translateY(-6px);pointer-events:none}
+.clear-contract-btn{padding:5px 10px;border:none;border-radius:7px;background:var(--red-lt);color:var(--red);font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap}
 @media(max-width:480px){.adm-badge{display:none}}
 .usr-drop{position:fixed;background:#fff;border:1px solid var(--border);border-radius:12px;min-width:200px;max-width:280px;z-index:500;box-shadow:0 8px 28px rgba(0,0,0,.18);overflow:hidden;max-height:55vh;overflow-y:auto}
 .usr-drop-item{padding:10px 14px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:2px}
@@ -272,7 +277,13 @@
     </div>
     </div><!-- /m-sect-tg -->
     <div class="divider"></div>
-    <div class="section-label">👤 임차인 ①</div>
+    <div class="section-label" style="justify-content:space-between">
+      <span>👤 임차인 ①</span>
+      <div class="clear-blind-wrap">
+        <div class="clear-blind" id="clear-blind" onclick="liftClearBlind()">🚪 퇴실했나요?</div>
+        <button class="clear-contract-btn" onclick="clearContractFields()">계약내용 지우기</button>
+      </div>
+    </div>
     <div class="field-row">
       <div class="field"><label>이름</label><input type="text" id="m-name" placeholder="홍길동"></div>
       <div class="field"><label>연락처</label><input type="tel" id="m-phone" placeholder="010-0000-0000"></div>
@@ -806,6 +817,8 @@ function renderGrid(){
 function openSheet(roomId){
   const u=units[roomId];if(!u)return;
   curRoom=roomId;
+  const blind=document.getElementById("clear-blind");
+  if(blind)blind.classList.remove("lifted");
   document.getElementById("sheet-title").textContent=`${roomId}호`;
   document.getElementById("m-room").value=roomId;
   mStatus=u.status||"vacant";
@@ -932,6 +945,23 @@ function updateRtypeUI(){
     const el=document.getElementById("tg-"+t);
     if(el)el.className="tg-btn"+(mRoomType===t?" on-rtype":"");
   });
+}
+function liftClearBlind(){
+  const blind=document.getElementById("clear-blind");
+  blind.classList.add("lifted");
+  setTimeout(()=>blind.classList.remove("lifted"),2000);
+}
+function clearContractFields(){
+  ["m-name","m-name2","m-phone","m-phone2","m-start","m-end"].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value="";
+  });
+  ["m-deposit","m-rent"].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value="";
+  });
+  mStatus="vacant";updateTgUI();
+  const blind=document.getElementById("clear-blind");
+  if(blind)blind.classList.remove("lifted");
+  showToast("🗑 계약 내용이 지워졌습니다");
 }
 function saveRoom(){
   if(!curRoom)return;
