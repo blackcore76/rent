@@ -127,7 +127,7 @@ function signInGoogle(){
 function toggleMenu(){
   const el=document.getElementById("user-menu");if(!el)return;
   el.classList.toggle("show");
-  if(!document.getElementById("um-admin-btn")){
+  if(!document.getElementById("um-admin-btn")&&!location.pathname.includes("/master/")){
     const user=firebase.auth().currentUser;
     if(user&&user.uid===MASTER_UID){
       const btn=document.createElement("a");
