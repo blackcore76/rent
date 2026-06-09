@@ -147,7 +147,7 @@
       </div>
       <div class="hdr-actions">
         <button class="guide-btn" onclick="toggleBackup(event)" style="padding:5px 9px;font-size:15px">💾</button>
-        <div id="av-wrap" style="display:flex;align-items:center;cursor:pointer" onclick="auth.signOut().then(()=>location.href='admin.html')"></div>
+        <div id="av-wrap" style="display:flex;align-items:center;cursor:pointer" onclick="toggleMenu()"></div>
       </div>
     </div>
     <div class="nav">
@@ -157,6 +157,12 @@
       <a href="expense.html" class="nav-tab on">💸 장부</a>
       <a href="manage.html" class="nav-tab">🗂 관리</a>
     </div>
+  </div>
+  <div id="user-menu" class="user-menu">
+    <div class="um-name" id="um-name">—</div>
+    <div class="um-email" id="um-email">—</div>
+    <a href="../index.html" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;margin-bottom:8px;background:rgba(14,165,233,.1);border:1.5px solid rgba(14,165,233,.3);border-radius:10px;color:#0EA5E9;font-size:13px;font-weight:700;text-decoration:none;font-family:inherit;box-sizing:border-box">🏠 일반 페이지로</a>
+    <button class="logout-btn" onclick="doSignOut()">🚪 로그아웃</button>
   </div>
   <div class="content">
     <div class="summary-grid">
@@ -315,6 +321,8 @@ auth.onAuthStateChanged(async user=>{
     }
     const w=document.getElementById("av-wrap");
     w.innerHTML=user.photoURL?`<img class="av-img" src="${user.photoURL}">`:`<div class="av-txt">${(user.displayName||"U")[0]}</div>`;
+    document.getElementById("um-name").textContent=user.displayName||"사용자";
+    document.getElementById("um-email").textContent=user.email||"";
     document.getElementById("ctx-btn").textContent=(_tName||_tUid)+" ▾";
     loadUserList();
     if(txL&&txRef)txRef.off("value",txL);
@@ -340,6 +348,7 @@ auth.onAuthStateChanged(async user=>{
   }
 });
 function doSignOut(){
+  closeMenu();
   if(txL&&txRef)txRef.off("value",txL);
   if(bldgsL&&bldgsRef)bldgsRef.off("value",bldgsL);
   if(rhL&&rhRef)rhRef.off("value",rhL);
