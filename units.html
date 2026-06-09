@@ -172,7 +172,7 @@
 @keyframes emRingPulse{0%,100%{transform:scale(1);opacity:.6;}50%{transform:scale(1.15);opacity:1;}}
 /* 계약내용 지우기 블라인드 */
 .clear-blind-wrap{position:relative;display:inline-flex}
-.clear-blind{position:absolute;inset:0;border-radius:7px;background:rgba(71,85,105,.38);border:1.5px solid rgba(100,116,139,.5);color:rgba(255,255,255,.85);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;z-index:2;font-family:inherit;transition:opacity .2s,transform .22s cubic-bezier(.4,0,.2,1);user-select:none;white-space:nowrap;padding:0 8px;letter-spacing:.3px}
+.clear-blind{position:absolute;inset:0;border-radius:7px;background:#475569;border:1.5px solid #334155;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;z-index:2;font-family:inherit;transition:opacity .2s,transform .22s cubic-bezier(.4,0,.2,1);user-select:none;white-space:nowrap;padding:0 8px;letter-spacing:.3px}
 .clear-blind.lifted{opacity:0;transform:translateY(-6px);pointer-events:none}
 .clear-contract-btn{padding:5px 10px;border:none;border-radius:7px;background:var(--red-lt);color:var(--red);font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap}
 </style>
@@ -964,7 +964,9 @@ function updateRtypeUI(){
   });
 }
 function liftClearBlind(){
-  document.getElementById("clear-blind").classList.add("lifted");
+  const blind=document.getElementById("clear-blind");
+  blind.classList.add("lifted");
+  setTimeout(()=>blind.classList.remove("lifted"),2000);
 }
 function clearContractFields(){
   ["m-name","m-name2","m-phone","m-phone2","m-start","m-end"].forEach(id=>{
