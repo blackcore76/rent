@@ -170,6 +170,11 @@
 #em-side-btn.peeking #em-side-ring{display:block;}
 @media(hover:hover){#em-side-btn:hover #em-side-ring{display:block;}}
 @keyframes emRingPulse{0%,100%{transform:scale(1);opacity:.6;}50%{transform:scale(1.15);opacity:1;}}
+/* 계약내용 지우기 블라인드 */
+.clear-blind-wrap{position:relative;display:inline-flex}
+.clear-blind{position:absolute;inset:0;border-radius:7px;background:rgba(71,85,105,.38);border:1.5px solid rgba(100,116,139,.5);color:rgba(255,255,255,.85);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;z-index:2;font-family:inherit;transition:opacity .2s,transform .22s cubic-bezier(.4,0,.2,1);user-select:none;white-space:nowrap;padding:0 8px;letter-spacing:.3px}
+.clear-blind.lifted{opacity:0;transform:translateY(-6px);pointer-events:none}
+.clear-contract-btn{padding:5px 10px;border:none;border-radius:7px;background:var(--red-lt);color:var(--red);font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -280,7 +285,13 @@
     </div>
     </div><!-- /m-sect-tg -->
     <div class="divider"></div>
-    <div class="section-label">👤 임차인 ①</div>
+    <div class="section-label" style="justify-content:space-between">
+      <span>👤 임차인 ①</span>
+      <div class="clear-blind-wrap">
+        <div class="clear-blind" id="clear-blind" onclick="liftClearBlind()">🚪 퇴실했나요?</div>
+        <button class="clear-contract-btn" onclick="clearContractFields()">계약내용 지우기</button>
+      </div>
+    </div>
     <div class="field-row">
       <div class="field"><label>이름</label><input type="text" id="m-name" placeholder="홍길동"></div>
       <div class="field"><label>연락처</label><input type="tel" id="m-phone" placeholder="010-0000-0000"></div>
@@ -823,6 +834,8 @@ function renderGrid(){
 function openSheet(roomId){
   const u=units[roomId];if(!u)return;
   curRoom=roomId;
+  const blind=document.getElementById("clear-blind");
+  if(blind)blind.classList.remove("lifted");
   document.getElementById("sheet-title").textContent=`${roomId}호`;
   document.getElementById("m-room").value=roomId;
   mStatus=u.status||"vacant";
@@ -949,6 +962,22 @@ function updateRtypeUI(){
     const el=document.getElementById("tg-"+t);
     if(el)el.className="tg-btn"+(mRoomType===t?" on-rtype":"");
   });
+}
+function liftClearBlind(){
+  document.getElementById("clear-blind").classList.add("lifted");
+}
+function clearContractFields(){
+  ["m-name","m-name2","m-phone","m-phone2","m-start","m-end"].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value="";
+  });
+  ["m-deposit","m-rent"].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value="";
+  });
+  mStatus="vacant";updateTgUI();
+  // 블라인드 복원
+  const blind=document.getElementById("clear-blind");
+  if(blind)blind.classList.remove("lifted");
+  showToast("🗑 계약 내용이 지워졌습니다");
 }
 function saveRoom(){
   if(!curRoom)return;
