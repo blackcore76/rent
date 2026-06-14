@@ -449,6 +449,7 @@ function renderFloorTabs(){
 async function enterDemoMode(){
   await ensureDemoLoaded();
   readOnly=true;sessionStorage.setItem("guestDemo","1");
+  _autofillDemoRent(DEMO.units, DEMO.rentHistory);
   bldgsData=DEMO.bldgsData;curBid="main";
   units=DEMO.units;rentHistory=DEMO.rentHistory;
   applyLayout(DEMO.layout);_unitsReady=true;_historyReady=true;

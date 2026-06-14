@@ -428,6 +428,7 @@ let nRef=null,nL=null,notes={};
 async function enterDemoMode(){
   await ensureDemoLoaded();
   readOnly=true;sessionStorage.setItem("guestDemo","1");
+  _autofillDemoRent(DEMO.units, DEMO.rentHistory);
   bldgsData=DEMO.bldgsData;curBid="main";
   allBldData["main"]={units:DEMO.units,history:DEMO.rentHistory,bldInfo:DEMO.bldInfo};
   notes=DEMO.notes;

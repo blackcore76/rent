@@ -250,3 +250,26 @@ function ensureDemoLoaded(){
   });
   return _demoLoading;
 }
+
+// 데모 납부 이력 자동 채움 — 현재 월까지 빈 월을 마지막 납부 상태로 연장
+function _autofillDemoRent(units, history) {
+  const now = new Date();
+  const curYM = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  for (const [room, info] of Object.entries(units)) {
+    if (info.status !== 'rented' || !info.monthlyRent) continue;
+    if (!history[room]) history[room] = {};
+    const months = Object.keys(history[room]).sort();
+    if (!months.length) continue;
+    let last = months[months.length - 1];
+    const wasPaid = history[room][last]?.paid ?? true;
+    while (last < curYM) {
+      const [y, m] = last.split('-').map(Number);
+      const nm = m === 12 ? 1 : m + 1;
+      const ny = m === 12 ? y + 1 : y;
+      last = ny + '-' + String(nm).padStart(2, '0');
+      if (!history[room][last]) {
+        history[room][last] = { paid: wasPaid, room, yearMonth: last, amount: info.monthlyRent * 10000 };
+      }
+    }
+  }
+}
