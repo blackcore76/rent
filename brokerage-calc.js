@@ -244,7 +244,6 @@
     overlay.classList.remove('show');
     sheet.classList.remove('show');
     document.body.style.overflow = '';
-    setTimeout(() => sideBtn.classList.add('peeking'), 350);
   }
 
   document.getElementById('bc-close-x').addEventListener('click', bcClose);
