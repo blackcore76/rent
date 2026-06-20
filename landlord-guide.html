@@ -113,6 +113,7 @@ body {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  flex-wrap: wrap;
 }
 .section-nav::-webkit-scrollbar { display: none; }
 .section-nav a {
@@ -384,7 +385,8 @@ body {
 .scroll-top:hover{opacity:.85;}
 
 @media (max-width: 480px) {
-  .section-nav { padding-right: 40px; }
+  .section-nav { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .section-nav a { text-align: center; }
 }
 @media all {
   body.in-iframe .guide-header { display: none; }
