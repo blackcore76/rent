@@ -378,6 +378,11 @@ body {
   color: var(--text-dim);
 }
 
+/* ── 맨 위로 버튼 */
+.scroll-top{position:fixed;right:20px;bottom:28px;width:44px;height:44px;border-radius:50%;background:var(--warn);color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;transform:translateY(10px);z-index:90;}
+.scroll-top.show{opacity:1;pointer-events:auto;transform:translateY(0);}
+.scroll-top:hover{opacity:.85;}
+
 @media (max-width: 480px) {
   .section-nav { padding-right: 40px; }
 }
@@ -901,7 +906,15 @@ body {
 
 </div>
 
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
 <script>
+(function(){
+  const btn=document.getElementById('scrollTop');
+  window.addEventListener('scroll',()=>{
+    btn.classList.toggle('show',window.scrollY>300);
+  });
+})();
 if (window.self !== window.top) document.body.classList.add('in-iframe');
 document.addEventListener('DOMContentLoaded', () => {
   const navLinks = document.querySelectorAll('.section-nav a');
