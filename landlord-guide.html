@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>임대인 가이드 | PlusHome</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F0F4F8;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --border: #E2E8F0;
+  --accent: #1E2D3D;
+  --accent-dim: rgba(30,45,61,0.08);
+  --accent-glow: rgba(30,45,61,0.15);
+  --warn: #d97706;
+  --warn-dim: rgba(217,119,6,0.08);
+  --danger: #dc2626;
+  --danger-dim: rgba(220,38,38,0.06);
+  --success: #059669;
+  --success-dim: rgba(5,150,105,0.06);
+  --text: #1e293b;
+  --text-dim: #64748b;
+  --text-section: #94a3b8;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Noto Sans KR', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── Header ── */
+.guide-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(240,244,248,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex; align-items: center; gap: 10px;
+}
+.guide-header .back-btn {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.guide-header .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+.guide-header h1 {
+  font-family: var(--mono);
+  font-size: 14px; font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+}
+.guide-header .badge {
+  font-family: var(--mono);
+  font-size: 10px; font-weight: 600;
+  color: var(--warn);
+  background: var(--warn-dim);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: auto;
+}
+
+/* ── Container ── */
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 16px 80px;
+}
+
+/* ── Hero ── */
+.hero {
+  padding: 32px 0 24px;
+  text-align: center;
+}
+.hero-icon {
+  width: 56px; height: 56px;
+  background: var(--warn-dim);
+  border: 1px solid rgba(232,145,45,0.25);
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 26px;
+}
+.hero h2 {
+  font-size: 20px; font-weight: 700;
+  margin-bottom: 8px;
+}
+.hero p {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+/* ── Section Nav ── */
+.section-nav {
+  display: flex;
+  gap: 6px;
+  padding: 12px 0 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.section-nav::-webkit-scrollbar { display: none; }
+.section-nav a {
+  flex-shrink: 0;
+  font-family: var(--mono);
+  font-size: 11px; font-weight: 600;
+  color: var(--text-dim);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  text-decoration: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.section-nav a:hover,
+.section-nav a.active {
+  color: var(--warn);
+  border-color: var(--warn);
+  background: var(--warn-dim);
+}
+
+/* ── Section ── */
+.section {
+  margin-bottom: 28px;
+  scroll-margin-top: 70px;
+}
+.section-label {
+  font-family: var(--mono);
+  font-size: 10px; font-weight: 600;
+  color: var(--text-section);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.section-title {
+  font-size: 17px; font-weight: 700;
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title .icon { font-size: 18px; }
+
+/* ── Card ── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 10px;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: rgba(232,145,45,0.15); }
+.card-title {
+  font-size: 14px; font-weight: 700;
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.card p, .card li {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.75;
+}
+.card ul { list-style: none; padding: 0; }
+.card ul li {
+  position: relative;
+  padding-left: 16px;
+  margin-bottom: 4px;
+}
+.card ul li::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 10px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--warn);
+  opacity: 0.5;
+}
+
+/* ── Alert ── */
+.alert {
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.alert-warn {
+  background: var(--warn-dim);
+  border: 1px solid rgba(217,119,6,0.2);
+  color: #92400e;
+}
+.alert-danger {
+  background: var(--danger-dim);
+  border: 1px solid rgba(220,38,38,0.15);
+  color: #991b1b;
+}
+.alert-success {
+  background: var(--success-dim);
+  border: 1px solid rgba(5,150,105,0.15);
+  color: #065f46;
+}
+.alert-info {
+  background: var(--accent-dim);
+  border: 1px solid rgba(30,45,61,0.12);
+  color: #1e3a5f;
+}
+.alert .alert-label {
+  font-family: var(--mono);
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+
+/* ── Responsibility Split ── */
+.resp-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.resp-col {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+}
+.resp-col.owner { border-top: 2px solid var(--warn); }
+.resp-col.renter { border-top: 2px solid #2563eb; }
+.resp-col h4 {
+  font-family: var(--mono);
+  font-size: 11px; font-weight: 700;
+  margin-bottom: 8px;
+}
+.resp-col.owner h4 { color: var(--warn); }
+.resp-col.renter h4 { color: #2563eb; }
+.resp-col li {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.65;
+  margin-bottom: 3px;
+  padding-left: 0;
+}
+.resp-col li::before { display: none; }
+
+/* ── Timeline ── */
+.timeline {
+  position: relative;
+  padding-left: 24px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 6px; top: 4px; bottom: 4px;
+  width: 2px;
+  background: var(--border);
+  border-radius: 1px;
+}
+.tl-item {
+  position: relative;
+  margin-bottom: 16px;
+}
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: -21px; top: 7px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--warn);
+  border: 2px solid #fff;
+}
+.tl-item .tl-label {
+  font-family: var(--mono);
+  font-size: 11px; font-weight: 600;
+  color: var(--warn);
+  margin-bottom: 2px;
+}
+.tl-item p {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.65;
+}
+
+/* ── Key-value ── */
+.kv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(26,35,54,0.6);
+  font-size: 13px;
+}
+.kv-row:last-child { border-bottom: none; }
+.kv-key { color: var(--text-dim); }
+.kv-val { color: var(--text); font-weight: 500; text-align: right; }
+
+/* ── Accordion ── */
+.accordion { margin-bottom: 10px; }
+.accordion-toggle {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: var(--text);
+  font-size: 14px; font-weight: 500;
+  font-family: var(--sans);
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+}
+.accordion-toggle:hover { border-color: rgba(232,145,45,0.2); }
+.accordion-toggle .arrow {
+  font-size: 12px;
+  color: var(--text-dim);
+  transition: transform 0.25s;
+}
+.accordion.open .accordion-toggle {
+  border-color: var(--warn);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.accordion.open .arrow { transform: rotate(180deg); }
+.accordion-body {
+  display: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.75;
+}
+.accordion.open .accordion-body { display: block; }
+
+/* ── Footer ── */
+.guide-footer {
+  text-align: center;
+  padding: 24px 0;
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
+}
+.guide-footer p {
+  font-size: 11px;
+  color: var(--text-section);
+  line-height: 1.6;
+}
+.guide-footer a {
+  color: var(--warn);
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.guide-footer p {
+  color: var(--text-dim);
+}
+
+@media (max-width: 480px) {
+  .section-nav { padding-right: 40px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="guide-header">
+  <button class="back-btn" onclick="history.back()">←</button>
+  <h1>LANDLORD GUIDE</h1>
+  <span class="badge">2025.06 기준</span>
+</div>
+
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">🔑</div>
+    <h2>임대인 실무 가이드</h2>
+    <p>계약부터 정산까지, 임대인이 반드시 알아야 할<br>법적 의무·권리·분쟁 대응 체크리스트</p>
+  </div>
+
+  <!-- Section Nav -->
+  <div class="section-nav">
+    <a href="#overview" class="active">전반 참고</a>
+    <a href="#contract">계약</a>
+    <a href="#movein">입주</a>
+    <a href="#living">거주</a>
+    <a href="#moveout">퇴실</a>
+    <a href="#settlement">정산</a>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SECTION 1: 전반 참고 -->
+  <!-- ══════════════════════════════ -->
+  <div class="section" id="overview">
+    <div class="section-label">SECTION 01</div>
+    <div class="section-title"><span class="icon">📋</span> 전반적으로 참고할 내용</div>
+
+    <div class="card">
+      <div class="card-title">⚖️ 임대인에게 적용되는 핵심 법령</div>
+      <div class="kv-row">
+        <span class="kv-key">민법 (제618~654조)</span>
+        <span class="kv-val">임대차 기본 원칙</span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">주택임대차보호법</span>
+        <span class="kv-val">임차인 보호 특별법</span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">부동산거래신고법</span>
+        <span class="kv-val">계약 신고 의무</span>
+      </div>
+      <br>
+      <p>주택임대차보호법(주임법)은 민법보다 우선 적용됩니다. <strong>임차인에게 불리한 특약은 아무리 계약서에 명시해도 효력이 없습니다</strong> (주임법 제10조). 이 점을 전제로 계약서를 작성해야 합니다.</p>
+    </div>
+
+    <div class="alert alert-danger">
+      <span class="alert-label">⚠ 2025.06.01 시행 — 과태료 부과 시작</span>
+      임대차 계약 신고제가 의무화되었습니다. 보증금 6,000만 원 또는 월세 30만 원 초과 계약은 체결일로부터 30일 이내에 신고해야 합니다. 임대인·임차인 공동 의무이며, 미신고·거짓 신고 시 <strong>양측 모두</strong> 과태료 부과 대상입니다.
+    </div>
+
+    <div class="card">
+      <div class="card-title">📅 임대인이 꼭 기억할 기간·수치</div>
+      <div class="kv-row">
+        <span class="kv-key">최소 임대차 기간</span>
+        <span class="kv-val" style="color:var(--warn)">2년 보장</span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">계약갱신청구권</span>
+        <span class="kv-val" style="color:var(--warn)">+2년 (최대 4년)</span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">갱신 시 인상 상한</span>
+        <span class="kv-val" style="color:var(--danger)">5% 이내</span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">갱신거절 통지</span>
+        <span class="kv-val">만료 6~2개월 전</span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">임대차 신고 기한</span>
+        <span class="kv-val">체결일로부터 30일</span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">해지 사유 발생</span>
+        <span class="kv-val">차임 2기 이상 연체</span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">전월세 전환율</span>
+        <span class="kv-val">기준금리 + 대통령령 이율</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💰 임대소득 세금 신고</div>
+      <p>임대소득이 발생하면 종합소득세 신고 대상입니다. 연 2,000만 원 이하 주택임대소득은 분리과세(14%) 선택이 가능하지만, 미신고 시 가산세가 부과됩니다.</p>
+      <br>
+      <p>주택 수·기준시가에 따라 사업자등록 의무 여부가 달라지므로 세무사 상담을 권장합니다.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SECTION 2: 계약 단계 -->
+  <!-- ══════════════════════════════ -->
+  <div class="section" id="contract">
+    <div class="section-label">SECTION 02</div>
+    <div class="section-title"><span class="icon">📝</span> 계약 단계</div>
+
+    <div class="card">
+      <div class="card-title">계약서 작성 시 임대인 체크리스트</div>
+      <ul>
+        <li><strong>보증금·월 차임·납부일</strong>을 명확히 기재합니다.</li>
+        <li><strong>계약 기간</strong> — 2년 미만으로 정해도 임차인이 2년을 주장할 수 있습니다.</li>
+        <li><strong>특약사항</strong> — 분쟁 소지가 큰 항목(못질 금지, 반려동물, 흡연, 원상복구 범위 등)을 구체적으로 서면화합니다.</li>
+        <li><strong>옵션 목록</strong> — 제공하는 가전·가구·비품을 목록으로 기재하고, 상태를 함께 기록합니다.</li>
+        <li><strong>중개보수</strong> — 법정 요율 이내인지 확인합니다.</li>
+      </ul>
+    </div>
+
+    <div class="alert alert-warn">
+      <span class="alert-label">특약의 한계</span>
+      임차인에게 불리한 특약은 효력이 없습니다. 예를 들어 "계약갱신청구권을 행사하지 않겠다"는 사전 약정, 보증금 반환을 조건부로 제한하는 문구 등은 무효입니다. 반면, 원상복구 범위를 구체화하는 특약(예: "도배·장판 교체 비용 임차인 부담")은 합리적 범위 내에서 유효합니다.
+    </div>
+
+    <div class="card">
+      <div class="card-title">갱신 거절 — 언제, 어떻게 가능한가?</div>
+      <p>임차인의 계약갱신청구권(1회, 2년 연장)을 거절할 수 있는 법정 사유는 다음과 같습니다.</p>
+      <br>
+      <ul>
+        <li><strong>임대인 본인 또는 직계존비속의 실거주</strong> (가장 흔한 사유)</li>
+        <li>임차인의 차임 2기 이상 연체</li>
+        <li>임차인의 동의 없이 전대(재임대)한 경우</li>
+        <li>임차인이 고의·중과실로 주택을 파손한 경우</li>
+        <li>주택의 전부 또는 대부분이 멸실된 경우</li>
+        <li>철거·재건축을 위해 목적물 회수가 필요한 경우</li>
+      </ul>
+    </div>
+
+    <div class="alert alert-danger">
+      <span class="alert-label">⚠ 실거주 사유 거절 후 주의</span>
+      실거주를 사유로 갱신을 거절한 뒤, 갱신되었을 기간(2년)이 끝나기 전에 정당한 사유 없이 제3자에게 재임대하면 <strong>임대인이 임차인에게 손해배상 책임</strong>을 집니다. 실거주 거절은 진정한 실거주 계획이 있을 때만 사용하세요.
+    </div>
+
+    <div class="card">
+      <div class="card-title">묵시적 갱신 — 통지 기한을 놓치면?</div>
+      <p>임대인이 계약 만료 <strong>6개월 전~2개월 전</strong> 사이에 갱신 거절을 통지하지 않으면, 같은 조건으로 2년 자동 연장됩니다.</p>
+      <br>
+      <p>묵시적 갱신 후 임차인은 언제든 3개월 통지 후 해지할 수 있지만, 임대인은 정당한 사유 없이 일방 해지할 수 없습니다.</p>
+      <br>
+      <p style="color:var(--warn); font-size:12px;">💡 갱신 거절 통지는 반드시 <strong>내용증명 우편</strong>으로 발송하여 "통지했다"는 증거를 남기세요.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">전월세 전환 시 법정 전환율</div>
+      <p>보증금을 월세로 전환하거나 반대의 경우, 법정 전환율(한국은행 기준금리 + 대통령령 이율)을 초과할 수 없습니다. 초과 시 임차인이 감액을 청구할 수 있으므로 전환 전 현행 전환율을 반드시 확인하세요.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SECTION 3: 입주 단계 -->
+  <!-- ══════════════════════════════ -->
+  <div class="section" id="movein">
+    <div class="section-label">SECTION 03</div>
+    <div class="section-title"><span class="icon">🚚</span> 입주 단계</div>
+
+    <div class="card">
+      <div class="card-title">입주일 임대인 처리 사항</div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-label">STEP 1</div>
+          <p><strong>잔금 수령 확인</strong> — 입금 내역을 스크린샷 등으로 보관합니다.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-label">STEP 2</div>
+          <p><strong>열쇠·출입카드 인도</strong> — 전 임차인에게서 수령한 열쇠를 전달하고, 도어락 비밀번호를 임차인이 직접 변경하도록 안내합니다.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-label">STEP 3</div>
+          <p><strong>주택 상태 공동 확인</strong> — 입주 당일 임차인과 함께 주택 상태를 점검하고, 기존 하자·옵션 상태를 기록합니다.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-label">STEP 4</div>
+          <p><strong>임대차 계약 신고</strong> — 체결일로부터 30일 이내 관할 시·군·구청 또는 부동산거래관리시스템(RTMS)에서 공동 신고합니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <span class="alert-label">핵심 — 입주 시 하자 기록이 퇴실 분쟁을 막는다</span>
+      입주 당일 주택 상태를 사진·영상으로 남기고, 임차인에게 카카오톡 등으로 공유하여 <strong>양측 확인 기록</strong>을 만드세요. 퇴실 시 원상복구 분쟁에서 가장 강력한 증거가 됩니다.
+    </div>
+
+    <div class="card">
+      <div class="card-title">📸 입주 시 점검 기록 항목</div>
+      <ul>
+        <li>벽지 상태 — 얼룩, 곰팡이, 벗겨짐, 못자국</li>
+        <li>바닥재 — 긁힘, 눌림, 들뜸, 오염</li>
+        <li>창문·방충망 — 개폐 작동, 파손 여부</li>
+        <li>수도·배수 — 수압, 누수, 배수 속도</li>
+        <li>보일러·에어컨 — 정상 가동 확인</li>
+        <li>도어락·잠금장치 — 작동 상태</li>
+        <li>제공 옵션 — 가전·가구 수량 및 상태 (계약서 대조)</li>
+        <li>전등·콘센트 — 작동 여부</li>
+      </ul>
+      <br>
+      <p style="color:var(--warn); font-size:12px;">💡 사진에 날짜가 포함되도록 설정하고, 점검 내용을 체크리스트로 양측 서명하면 이상적입니다.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">임차인의 전입신고·확정일자</div>
+      <p>임차인이 전입신고와 확정일자를 받는 것은 임차인의 대항력·우선변제권 확보를 위한 것입니다. 이는 임대인에게 불이익을 주는 것이 아니며, 임대차 신고를 통해 확정일자가 자동 부여되므로 <strong>신고에 적극 협조</strong>하는 것이 양측 모두에게 유리합니다.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SECTION 4: 거주 단계 -->
+  <!-- ══════════════════════════════ -->
+  <div class="section" id="living">
+    <div class="section-label">SECTION 04</div>
+    <div class="section-title"><span class="icon">🏡</span> 거주 단계</div>
+
+    <div class="card">
+      <div class="card-title">🔧 수선의무 — 임대인의 법적 의무</div>
+      <p>민법 제623조에 따라, 임대인은 계약 존속 중 목적물을 사용·수익에 필요한 상태로 유지할 의무를 부담합니다. 수선 요청을 무시하면 임차인이 차임 지급을 거절하거나, 직접 수리 후 비용을 청구하거나, 계약을 해지할 수 있습니다.</p>
+    </div>
+
+    <div class="resp-row">
+      <div class="resp-col owner">
+        <h4>임대인 부담 (대수선)</h4>
+        <ul>
+          <li>보일러 고장·교체</li>
+          <li>배관·수도관 노후 파열</li>
+          <li>구조적 원인 누수</li>
+          <li>창호·샤시 노후 교체</li>
+          <li>전기 배선 문제</li>
+          <li>건물 외벽·구조 균열</li>
+          <li>옥상 방수 등 공용부분</li>
+        </ul>
+      </div>
+      <div class="resp-col renter">
+        <h4>임차인 부담 (소수선)</h4>
+        <ul>
+          <li>형광등·전구 교체</li>
+          <li>수도꼭지 패킹 교체</li>
+          <li>배수구 막힘 (생활 원인)</li>
+          <li>본인 과실로 인한 파손</li>
+          <li>소모품 교체</li>
+          <li>특약에 명시된 항목</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="alert alert-warn">
+      <span class="alert-label">특약으로 면제 가능한 범위</span>
+      소규모 수선(전구 교체 등)은 특약으로 임차인 부담으로 돌릴 수 있습니다. 그러나 건물 주요 구성부분의 대수선(배관, 보일러, 지붕 등)까지 면제하는 특약은 판례상 인정되지 않을 수 있습니다.
+    </div>
+
+    <div class="card">
+      <div class="card-title">💰 차임(월세) 연체 대응</div>
+      <p>임차인이 <strong>2기(통상 2개월)</strong>에 걸쳐 차임을 연체하면 다음 조치가 가능합니다.</p>
+      <br>
+      <ul>
+        <li>묵시적 갱신의 효력이 인정되지 않습니다.</li>
+        <li>계약 해지를 통보할 수 있습니다 (해지 의사 통보 필요).</li>
+        <li>보증금에서 연체 차임을 공제할 수 있습니다.</li>
+      </ul>
+      <br>
+      <p style="color:var(--warn); font-size:12px;">💡 연체 발생 시 즉시 카카오톡·문자 등 기록이 남는 수단으로 독촉하고, 누적되면 내용증명을 발송하세요.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🚫 임차인의 의무 위반 감시 포인트</div>
+      <ul>
+        <li><strong>무단 전대</strong> — 임대인 동의 없이 제3자에게 재임대하면 계약 해지 사유입니다.</li>
+        <li><strong>무단 구조 변경</strong> — 동의 없는 시설 변경·철거는 원상복구 청구 가능합니다.</li>
+        <li><strong>용도 외 사용</strong> — 주거 목적 계약인데 사업장으로 사용하는 경우 등</li>
+        <li><strong>주택 훼손</strong> — 고의·중과실로 파손 시 갱신 거절 사유 + 손해배상 청구 가능</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🏗️ 임대인의 보존행위 출입권</div>
+      <p>민법 제624조에 따라, 임대인이 주택 보존에 필요한 수선을 하려 할 때 임차인은 이를 거절할 수 없습니다. 다만 사전 통지 후 합리적인 시간에 방문하는 것이 분쟁 예방에 도움이 됩니다.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SECTION 5: 퇴실 단계 -->
+  <!-- ══════════════════════════════ -->
+  <div class="section" id="moveout">
+    <div class="section-label">SECTION 05</div>
+    <div class="section-title"><span class="icon">📦</span> 퇴실 단계</div>
+
+    <div class="card">
+      <div class="card-title">퇴실 전 임대인 액션 플랜</div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-label">6~2개월 전</div>
+          <p>계약 종료를 원하면 <strong>내용증명으로 갱신 거절 통지</strong>를 발송합니다. 이 기간을 놓치면 묵시적 갱신됩니다.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-label">1~2개월 전</div>
+          <p>새 임차인 모집을 시작합니다. 부동산 중개업소에 매물 등록하고, 기존 임차인에게 집 보여주기 일정을 협의합니다.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-label">1~2주 전</div>
+          <p>퇴실 점검 일정을 잡고, 원상복구 범위를 사전 협의합니다. 입주 시 기록한 사진과 대조 준비를 합니다.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-label">퇴실 당일</div>
+          <p>양측 함께 현장 점검 → 하자·훼손 확인 → 공과금 정산 → 열쇠 수령 → 보증금 반환</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">원상복구 — 임대인이 청구할 수 있는 범위</div>
+      <p>판례상 원상복구 기준은 <strong>"입주 당시 그대로"가 아니라 "통상적 사용에 의한 자연 마모를 제외한 상태"</strong>입니다. 자연 마모까지 임차인에게 부담시키면 분쟁에서 불리해집니다.</p>
+    </div>
+
+    <div class="resp-row">
+      <div class="resp-col renter">
+        <h4>임차인에게 청구 가능</h4>
+        <ul>
+          <li>고의 낙서·낙인</li>
+          <li>흡연으로 인한 변색·냄새</li>
+          <li>무단 시설 변경·철거</li>
+          <li>반려동물에 의한 파손</li>
+          <li>과도한 못질·타공 (큰 구멍)</li>
+          <li>누수를 신고하지 않아 확대된 피해</li>
+          <li>특약에 명시된 항목</li>
+        </ul>
+      </div>
+      <div class="resp-col owner">
+        <h4>임대인이 감수해야 할 것</h4>
+        <ul>
+          <li>도배·장판 자연 변색</li>
+          <li>가구 놓은 자리 눌림 자국</li>
+          <li>노후 보일러·배관 문제</li>
+          <li>자연 발생 곰팡이</li>
+          <li>구조적 균열</li>
+          <li>건물 노후로 인한 누수</li>
+          <li>일반적 생활 마모</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <span class="alert-label">입증 책임은 임대인에게 있다</span>
+      원상복구 비용을 청구하려면, 훼손이 임차인의 행위로 인한 것임을 <strong>임대인이 입증</strong>해야 합니다. 입주 시 상태 사진이 없으면 "원래부터 있던 하자"라는 임차인의 반론에 대응하기 어렵습니다.
+    </div>
+
+    <div class="card">
+      <div class="card-title">임차인이 퇴거하지 않을 때</div>
+      <p>계약 종료 후에도 임차인이 퇴거를 거부하면 다음 순서로 대응합니다.</p>
+      <br>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-label">1단계</div>
+          <p><strong>내용증명 발송</strong> — 퇴거 요구와 법적 조치 예고를 공식 통보합니다.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-label">2단계</div>
+          <p><strong>분쟁조정위원회</strong> — 주택임대차분쟁조정위원회에 조정을 신청합니다 (무료, 약 60일).</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-label">3단계</div>
+          <p><strong>명도소송</strong> — 법원에 건물 인도(명도) 청구 소송을 제기합니다.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-label">4단계</div>
+          <p><strong>강제집행</strong> — 승소 확정 판결 후 집행관을 통해 강제 퇴거를 진행합니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- SECTION 6: 정산 단계 -->
+  <!-- ══════════════════════════════ -->
+  <div class="section" id="settlement">
+    <div class="section-label">SECTION 06</div>
+    <div class="section-title"><span class="icon">🧾</span> 정산 단계</div>
+
+    <div class="card">
+      <div class="card-title">보증금 반환 원칙</div>
+      <p>계약 종료 시, 보증금에서 연체 차임과 원상복구 비용을 공제한 나머지를 반환해야 합니다.</p>
+      <br>
+      <div class="kv-row">
+        <span class="kv-key">반환 시점</span>
+        <span class="kv-val">계약서상 종료일 (퇴실일)</span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">반환 vs 명도</span>
+        <span class="kv-val" style="color:var(--warn)">동시이행 관계</span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">공제 가능 항목</span>
+        <span class="kv-val">연체 차임 + 원상복구 비용</span>
+      </div>
+      <br>
+      <p>보증금 반환과 목적물 명도는 동시이행 관계입니다. 보증금을 돌려주지 않으면서 퇴거만 요구할 수 없고, 반대로 임차인도 보증금을 받지 못한 채 점유를 풀지 않을 수 있습니다.</p>
+    </div>
+
+    <div class="alert alert-danger">
+      <span class="alert-label">⚠ 보증금 반환을 미루면 생기는 일</span>
+      임차인이 <strong>임차권등기명령</strong>을 신청하면, 등기부에 임차권등기가 설정됩니다. 이 등기가 걸린 상태에서는 새 임차인을 구하기가 사실상 불가능해집니다. 또한 반환 지연일부터 <strong>연 5%의 지연이자</strong>가 발생합니다.
+    </div>
+
+    <div class="card">
+      <div class="card-title">보증금에서 공제할 때 주의사항</div>
+      <ul>
+        <li>공제 항목과 금액을 <strong>서면으로 명세</strong>를 작성하여 임차인에게 제시합니다.</li>
+        <li>근거 없는 채권(존재하지 않는 훼손, 부풀린 수리비)으로 공제하면 부당 거부로 간주됩니다.</li>
+        <li>원상복구 비용은 실제 견적서·영수증으로 입증해야 합니다.</li>
+        <li>자연 마모 부분까지 공제하면 분쟁조정이나 소송에서 불리합니다.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">퇴실 정산 체크리스트</div>
+      <ul>
+        <li>전기·가스·수도 최종 검침 — 정산 기준일 확인</li>
+        <li>관리비 미납 여부 확인</li>
+        <li>열쇠·출입카드·리모컨 회수</li>
+        <li>원상복구 공제 항목 서면 합의</li>
+        <li>보증금 반환 계좌·금액·일정 확인</li>
+        <li>임대차 신고 해제(변경) 신고</li>
+      </ul>
+    </div>
+
+    <div class="alert alert-success">
+      <span class="alert-label">✓ 정산 분쟁 예방 핵심</span>
+      퇴실 점검 시 양측이 함께 확인하고, 공제 내역을 서면으로 합의한 뒤, 서명본을 각자 보관하세요. 구두 합의만으로는 나중에 "그런 적 없다"는 분쟁이 발생합니다.
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- FAQ -->
+  <!-- ══════════════════════════════ -->
+  <div class="section" id="faq">
+    <div class="section-label">FAQ</div>
+    <div class="section-title"><span class="icon">❓</span> 자주 묻는 질문</div>
+
+    <div class="accordion" onclick="this.classList.toggle('open')">
+      <button class="accordion-toggle">
+        임차인이 갱신 청구를 하면 무조건 수락해야 하나요?
+        <span class="arrow">▼</span>
+      </button>
+      <div class="accordion-body">
+        법정 거절 사유(실거주, 차임 2기 연체, 무단 전대, 고의 파손 등)에 해당하면 거절할 수 있습니다. 사유 없이 거절하면 임차인이 법원에 갱신 청구를 할 수 있고, 임대인이 패소할 수 있습니다. 갱신 시 인상폭은 5% 이내로 제한됩니다.
+      </div>
+    </div>
+
+    <div class="accordion" onclick="this.classList.toggle('open')">
+      <button class="accordion-toggle">
+        4년(2+2) 계약이 끝나면 자유롭게 올릴 수 있나요?
+        <span class="arrow">▼</span>
+      </button>
+      <div class="accordion-body">
+        네. 계약갱신청구권은 1회(2년)만 인정되므로, 4년 후 새 계약(재계약 또는 새 임차인)에는 전월세상한제(5%)가 적용되지 않습니다. 시세에 맞춰 자유롭게 조건을 설정할 수 있습니다.
+      </div>
+    </div>
+
+    <div class="accordion" onclick="this.classList.toggle('open')">
+      <button class="accordion-toggle">
+        집을 매도하면 임차인 계약은 어떻게 되나요?
+        <span class="arrow">▼</span>
+      </button>
+      <div class="accordion-body">
+        대항력을 갖춘 임차인이 있는 상태에서 매도하면, 새 매수인이 임대인 지위를 승계합니다. 기존 계약 조건(보증금, 기간)이 그대로 유지되며, 갱신청구권과 5% 상한도 그대로 적용됩니다. 매도 전 임차인 현황을 매수인에게 명확히 고지해야 합니다.
+      </div>
+    </div>
+
+    <div class="accordion" onclick="this.classList.toggle('open')">
+      <button class="accordion-toggle">
+        분쟁조정위원회 조정을 거부할 수 있나요?
+        <span class="arrow">▼</span>
+      </button>
+      <div class="accordion-body">
+        조정 자체에 참여하는 것은 의무가 아니며 거부할 수 있습니다. 다만 거부하면 임차인이 바로 소송을 제기할 수 있고, 조정에 불성실했다는 점이 재판에서 불리하게 작용할 수 있습니다. 비용이 무료이므로 참여하는 것이 대체로 유리합니다.
+      </div>
+    </div>
+
+    <div class="accordion" onclick="this.classList.toggle('open')">
+      <button class="accordion-toggle">
+        "새 세입자 들어오면 보증금 돌려주겠다"고 해도 되나요?
+        <span class="arrow">▼</span>
+      </button>
+      <div class="accordion-body">
+        법적으로 보증금 반환 의무는 계약 종료일에 발생합니다. "새 세입자가 들어오면"이라는 조건은 법적 근거가 없으며, 이를 사유로 반환을 미루면 지연이자가 발생하고, 임차인이 임차권등기명령을 신청할 수 있습니다. 자금 사정이 어려울 경우 반환 일정을 서면으로 합의하는 것이 현실적 대안입니다.
+      </div>
+    </div>
+
+    <div class="accordion" onclick="this.classList.toggle('open')">
+      <button class="accordion-toggle">
+        임대소득 세금 신고는 어떻게 하나요?
+        <span class="arrow">▼</span>
+      </button>
+      <div class="accordion-body">
+        매년 5월 종합소득세 신고 시 임대소득을 포함해야 합니다. 연 2,000만 원 이하 주택임대소득은 종합과세와 분리과세(14%) 중 유리한 쪽을 선택할 수 있습니다. 주택임대 사업자등록(렌트홈) 여부, 보유 주택 수, 기준시가에 따라 과세 방법이 달라지므로 세무사 상담을 권장합니다.
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="guide-footer">
+    <p>본 가이드는 2025년 6월 기준 주택임대차보호법 및<br>관련 판례를 참고하여 작성되었습니다.</p>
+    <p style="margin-top:8px;">법적 분쟁 시 반드시 전문가(변호사, 법률구조공단)와 상담하세요.</p>
+    <br>
+    <a href="https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=276291" target="_blank">국가법령정보센터 →</a>
+    <span style="margin:0 8px; color:var(--text-section);">|</span>
+    <a href="https://www.hankyung.com/article/2025061047741" target="_blank">신고제 해설 →</a>
+  </div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const navLinks = document.querySelectorAll('.section-nav a');
+  const sections = document.querySelectorAll('.section');
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      navLinks.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+    });
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(l => {
+          l.classList.toggle('active', l.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-80px 0px -60% 0px', threshold: 0 });
+
+  sections.forEach(s => { if(s.id) observer.observe(s); });
+});
+</script>
+</body>
+</html>

@@ -194,6 +194,7 @@
       <button class="sub-tab on" onclick="setSubTab(0,this)" id="st0">📞 전화번호부</button>
       <button class="sub-tab" onclick="setSubTab(1,this)" id="st1">📷 계약서</button>
       <button class="sub-tab" onclick="setSubTab(2,this)" id="st2">🏠 건물 정보</button>
+      <button class="sub-tab" onclick="setSubTab(3,this)" id="st3">📋 임대 가이드</button>
     </div>
 
     <!-- 전화번호부 -->
@@ -238,6 +239,11 @@
         <button class="btn-add" onclick="openAddBuilding()">+ 추가</button>
       </div>
       <div id="buildings-list"></div>
+    </div>
+
+    <!-- 임대 가이드 -->
+    <div class="sub-page" id="sp3">
+      <iframe src="../landlord-guide.html" style="width:100%;border:none;min-height:calc(100vh - 160px);border-radius:12px;"></iframe>
     </div>
   </div>
 </div>
