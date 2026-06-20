@@ -378,6 +378,10 @@ body {
 @media (max-width: 480px) {
   .section-nav { padding-right: 40px; }
 }
+@media all {
+  body.in-iframe .guide-header { display: none; }
+  body.in-iframe .container { padding-top: 0; }
+}
 </style>
 </head>
 <body>
@@ -895,6 +899,7 @@ body {
 </div>
 
 <script>
+if (window.self !== window.top) document.body.classList.add('in-iframe');
 document.addEventListener('DOMContentLoaded', () => {
   const navLinks = document.querySelectorAll('.section-nav a');
   const sections = document.querySelectorAll('.section');
