@@ -19,6 +19,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script src="shared.js?v=2"></script>
 <script src="db-paths.js"></script>
 <style>
@@ -93,6 +94,24 @@ body.em-on .toolbar input[type=month]::-webkit-calendar-picker-indicator{filter:
 .btn-save:active{opacity:.85}
 .btn-close-sheet{padding:14px 28px;min-width:120px;background:#F1F5F9;color:var(--sub);border:2px solid var(--border);border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
 .btn-close-sheet:active{background:#E2E8F0}
+/* PHOTO */
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.ph-thumb{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#F0F4F8}
+.ph-thumb img{width:100%;height:100%;object-fit:cover;cursor:pointer}
+.ph-del{position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.upload-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px;border:2px dashed var(--border);border-radius:10px;background:#FAFCFF;color:var(--sub);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.upload-btn:hover{border-color:var(--sky);color:var(--sky)}
+.upload-btn:disabled{opacity:.5;cursor:not-allowed}
+.photo-btn-row{display:flex;gap:8px}
+.photo-btn-row .upload-btn{flex:1;width:auto;font-size:12px;padding:11px 6px;text-align:center}
+.camera-btn{border-color:var(--sky);color:var(--sky)}
+.prog-bar{height:22px;border-radius:11px;background:#E2E8F0;margin-top:10px;overflow:hidden;display:none;position:relative}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--sky),var(--blue,#3B82F6));transition:width .25s;width:0%}
+.prog-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--hdr);letter-spacing:.3px}
+#pv{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:900;display:none;align-items:center;justify-content:center}
+#pv.show{display:flex}
+#pv img{max-width:95%;max-height:90vh;border-radius:8px;object-fit:contain}
+#pv-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 /* CONFIRM */
 .confirm-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
 .confirm-bg.show{display:flex}
@@ -284,6 +303,17 @@ body.em-on .fab{background:#1e2d45;box-shadow:0 4px 20px rgba(0,0,0,.5)}
       <label>메모</label>
       <textarea id="m-memo" rows="2" placeholder="201호 4월 월세, 보일러 수리 등..."></textarea>
     </div>
+    <div class="field">
+      <div class="section-label" style="margin-bottom:6px">📷 증빙 사진</div>
+      <div class="photo-grid" id="tx-photo-grid"></div>
+      <input type="file" id="tx-photo-input" accept="image/*" multiple style="display:none" onchange="onTxPhotos(event)">
+      <input type="file" id="tx-camera-input" accept="image/*" capture="environment" style="display:none" onchange="onTxPhotos(event)">
+      <div class="photo-btn-row">
+        <button class="upload-btn" id="tx-upload-btn" onclick="document.getElementById('tx-photo-input').click()">📁 사진 추가</button>
+        <button class="upload-btn camera-btn" id="tx-camera-btn" onclick="document.getElementById('tx-camera-input').click()">📸 카메라</button>
+      </div>
+      <div class="prog-bar" id="tx-prog-bar"><div class="prog-fill" id="tx-prog-fill"></div><span class="prog-pct" id="tx-prog-pct"></span></div>
+    </div>
     <div class="sheet-actions">
       <button class="btn-save" onclick="saveTx()">💾 저장</button>
       <button class="btn-close-sheet" onclick="closeAdd()">✕ 닫기</button>
@@ -308,8 +338,8 @@ body.em-on .fab{background:#1e2d45;box-shadow:0 4px 20px rgba(0,0,0,.5)}
 <!-- CONFIRM -->
 <div class="confirm-bg" id="confirm-modal">
   <div class="confirm-box">
-    <h3>내역 삭제</h3>
-    <p>이 내역을 삭제하시겠습니까?</p>
+    <h3 id="cm-title">내역 삭제</h3>
+    <p id="cm-msg">이 내역을 삭제하시겠습니까?</p>
     <div class="confirm-btns">
       <button style="background:#F3F4F6;color:var(--sub)" onclick="closeCM()">취소</button>
       <button style="background:var(--red-lt);color:var(--red)" id="cm-ok">삭제</button>
@@ -328,9 +358,14 @@ body.em-on .fab{background:#1e2d45;box-shadow:0 4px 20px rgba(0,0,0,.5)}
   </div>
 </div>
 
+<!-- 사진 프리뷰 -->
+<div id="pv" onclick="closePV()"><img id="pv-img"><button id="pv-close">✕</button></div>
+
 <script>
+const storage=firebase.storage();
 let cu=null,txRef=null,txL=null,allTx=[],curPage=1,filterMonth="",filterYear="",viewMode="monthly",mTT="income",readOnly=false;
 let curBid="main",bldgsData={},bldgsRef=null,bldgsL=null,mUid="",mName="";
+let txPhotos=[];
 let rentHistData={},unitsData={},rhRef=null,rhL=null,auRef=null,auL=null,_tUid="";
 const PS=10;
 const CATS={income:["월세","관리비","보증금수입","기타수입"],expense:["수리비","청소비","보험료","세금/공과금","인건비","관리비지출","기타지출"]};
@@ -625,7 +660,7 @@ function renderFeed(){
       <div class="tx-icon ${t.type}">${t.auto?"🏠":t.type==="income"?"📈":"📉"}</div>
       <div class="tx-body">
         <div class="tx-top"><span class="tx-cat">${esc(t.category||"기타")}</span>${t.auto?'<span class="tx-auto-badge">자동</span>':""}<span class="tx-date">${fmtD(t.date)}</span></div>
-        <div class="tx-bottom"><span class="tx-memo">${esc(t.memo)||"메모 없음"}</span><span class="tx-amt ${t.type}">${t.type==="income"?"+":"−"}${fmtN(t.amount)}<span class="won-sfx">원</span></span>${chevron}${editBtns}</div>
+        <div class="tx-bottom"><span class="tx-memo">${esc(t.memo)||"메모 없음"}${t.photos&&Object.keys(t.photos).length?' <span style="opacity:.5">📷</span>':""}</span><span class="tx-amt ${t.type}">${t.type==="income"?"+":"−"}${fmtN(t.amount)}<span class="won-sfx">원</span></span>${chevron}${editBtns}</div>
       </div>
     </div>`;}).join("")}</div>`;
   document.getElementById("pagi").innerHTML=`
@@ -749,6 +784,8 @@ function editTx(id){
   if(document.getElementById("new-cat-inp"))document.getElementById("new-cat-inp").value="";
   selectedCat=t.category||CATS[mTT][0]||"";
   renderCatChips();
+  txPhotos=(t.photos?Object.values(t.photos):[]).sort((a,b)=>a.id-b.id);
+  renderTxPhotos();
   document.getElementById("add-sheet").classList.add("show");
 }
 function openAdd(){
@@ -760,11 +797,12 @@ function openAdd(){
   document.getElementById("m-amt").value="";document.getElementById("m-memo").value="";
   document.getElementById("cat-add-row").style.display="none";
   if(document.getElementById("new-cat-inp"))document.getElementById("new-cat-inp").value="";
+  txPhotos=[];renderTxPhotos();
   updateCats();document.getElementById("add-sheet").classList.add("show");
 }
 function closeAdd(){
   document.getElementById("add-sheet").classList.remove("show");
-  editMode=false;editId=null;
+  editMode=false;editId=null;txPhotos=[];renderTxPhotos();
   document.querySelector("#add-sheet .sheet-hd h3").textContent="💰 내역 추가";
 }
 function setTT(t){mTT=t;updateTTUI();updateCats()}
@@ -784,27 +822,103 @@ function saveTx(){
   if(!date){showToast("❗ 날짜를 입력하세요");return}
   const cat=document.getElementById("m-cat").value||selectedCat;
   const memo=document.getElementById("m-memo").value.trim();
+  const photosObj={};
+  txPhotos.forEach(p=>{photosObj[p.id]=p;});
   if(editMode&&editId){
     const original=allTx.find(x=>x.id===editId)||{};
-    txRef.child(String(editId)).set({...original,type:mTT,amount:amt,category:cat,date,memo})
+    txRef.child(String(editId)).set({...original,type:mTT,amount:amt,category:cat,date,memo,photos:Object.keys(photosObj).length?photosObj:null})
       .then(()=>{closeAdd();showToast("✅ 수정됨")})
       .catch(()=>showToast("❗ 수정 실패"));
   }else{
     const id=Date.now();
-    txRef.child(String(id)).set({id,type:mTT,amount:amt,category:cat,date,memo,createdAt:new Date().toISOString()})
+    txRef.child(String(id)).set({id,type:mTT,amount:amt,category:cat,date,memo,photos:Object.keys(photosObj).length?photosObj:null,createdAt:new Date().toISOString()})
       .then(()=>{closeAdd();showToast("✅ 저장됨")})
       .catch(()=>showToast("❗ 저장 실패"));
   }
 }
 function delTx(id){
   if(!guardWrite())return;
-  document.getElementById("cm-ok").onclick=()=>{
+  const t=allTx.find(x=>x.id===id);
+  showCM("내역 삭제","이 내역을 삭제하시겠습니까?",async()=>{
+    if(t&&t.photos){Object.values(t.photos).forEach(p=>{if(p.storagePath)storage.ref(p.storagePath).delete().catch(()=>{});});}
     txRef.child(String(id)).remove().then(()=>showToast("🗑 삭제됨")).catch(()=>showToast("❗ 실패"));
-    closeCM();
-  };
+  });
+}
+function showCM(title,msg,onOk){
+  document.getElementById("cm-title").textContent=title;
+  document.getElementById("cm-msg").textContent=msg;
+  document.getElementById("cm-ok").onclick=()=>{closeCM();onOk();};
   document.getElementById("confirm-modal").classList.add("show");
 }
 function closeCM(){document.getElementById("confirm-modal").classList.remove("show")}
+
+// ── 증빙 사진 ─────────────────────────────────────────────
+function renderTxPhotos(){
+  document.getElementById("tx-photo-grid").innerHTML=txPhotos.map(p=>
+    `<div class="ph-thumb"><img src="${p.url}" onclick="openPV('${p.url}')" loading="lazy"><button class="ph-del" onclick="delTxPhoto('${p.id}','${esc(p.storagePath||"")}')">✕</button></div>`
+  ).join("");
+}
+function openPV(url){document.getElementById("pv-img").src=url;document.getElementById("pv").classList.add("show")}
+function closePV(){document.getElementById("pv").classList.remove("show");document.getElementById("pv-img").src=""}
+async function onTxPhotos(e){
+  if(!guardWrite()){e.target.value="";return;}
+  const files=Array.from(e.target.files);if(!files.length||!cu)return;
+  const btn=document.getElementById("tx-upload-btn"),camBtn=document.getElementById("tx-camera-btn"),bar=document.getElementById("tx-prog-bar"),fill=document.getElementById("tx-prog-fill"),pct=document.getElementById("tx-prog-pct"),saveBtn=document.querySelector(".btn-save");
+  btn.disabled=true;camBtn.disabled=true;if(saveBtn)saveBtn.disabled=true;bar.style.display="block";
+  const targetUid=(cu.uid===MASTER_UID&&mUid)?mUid:cu.uid;
+  for(let i=0;i<files.length;i++){
+    const file=files[i];
+    if(!file.type.startsWith("image/")){showToast("❗ 이미지만 가능");continue}
+    if(file.size>50*1024*1024){showToast("❗ 50MB 이하만 가능");continue}
+    const ts=Date.now(),path=`rent_app/${cu.uid}/expense/${curBid}/${ts}_${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
+    const label=files.length>1?`(${i+1}/${files.length}) `:"";
+    try{
+      pct.textContent=`${label}압축 중...`;
+      const blob=await compressImage(file);
+      pct.textContent=`${label}파일 로딩 중...`;
+      let uploadBlob=blob;
+      try{const ab=await blob.arrayBuffer();uploadBlob=new Blob([ab],{type:blob.type||"image/jpeg"});}catch(e){}
+      const ref=storage.ref(path);
+      let url=null;const MAX_TRIES=3;
+      for(let attempt=0;attempt<MAX_TRIES;attempt++){
+        try{
+          if(attempt>0){pct.textContent=`${label}재연결 중... (${attempt}/${MAX_TRIES-1})`;fill.style.width="0%";await new Promise(r=>setTimeout(r,2000));await auth.currentUser?.getIdToken(true).catch(()=>{});}
+          pct.textContent=`${label}서버 연결 중...`;
+          const task=ref.put(uploadBlob,{contentType:uploadBlob.type||"image/jpeg"});
+          let tmo=null,firstByte=false;
+          const resetTmo=()=>{clearTimeout(tmo);tmo=setTimeout(()=>task.cancel(),firstByte?25000:10000);};
+          resetTmo();
+          await new Promise((res,rej)=>task.on("state_changed",
+            s=>{if(s.bytesTransferred>0)firstByte=true;resetTmo();const p=Math.round(s.bytesTransferred/s.totalBytes*100)||0;fill.style.width=`${p}%`;pct.textContent=`${label}업로드 중... ${p}%`;},
+            e=>{clearTimeout(tmo);rej(e);},
+            ()=>{clearTimeout(tmo);res();}
+          ));
+          url=await ref.getDownloadURL();break;
+        }catch(e){
+          if(attempt===MAX_TRIES-1)throw e;
+          pct.textContent=e.code==="storage/canceled"?`${label}⏱ 응답 없음 — 재시도 중...`:`${label}❗ 실패 — 재시도 중...`;
+        }
+      }
+      fill.style.width="100%";pct.textContent=`${label}완료!`;
+      const pid=String(ts+(i*10));
+      txPhotos.push({id:pid,url,storagePath:path});
+      renderTxPhotos();showToast("✅ 업로드 완료");
+    }catch(err){
+      showToast("❗ "+(err.code==="storage/canceled"?"네트워크 오류 — 잠시 후 다시 시도하세요":"업로드 실패: "+err.message));
+    }
+  }
+  btn.disabled=false;camBtn.disabled=false;if(saveBtn)saveBtn.disabled=false;bar.style.display="none";fill.style.width="0%";pct.textContent="";e.target.value="";
+}
+function delTxPhoto(pid,spath){
+  if(!guardWrite())return;
+  showCM("사진 삭제","이 사진을 삭제하시겠습니까?",async()=>{
+    try{
+      if(spath)await storage.ref(spath).delete().catch(()=>{});
+      txPhotos=txPhotos.filter(p=>p.id!==pid);
+      renderTxPhotos();showToast("🗑 삭제됨");
+    }catch(e){showToast("❗ 삭제 실패");}
+  });
+}
 
 function exportCSV(){
   const list=getFiltered();if(!list.length){showToast("데이터 없음");return}

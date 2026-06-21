@@ -10,6 +10,7 @@ const DBPath = {
   rentHistory:  (uid, bid)          => `rent_app/${uid}/${bid}/rent_history`,
   rentHistRoom: (uid, bid, roomId)  => `rent_app/${uid}/${bid}/rent_history/${roomId}`,
   transactions: (uid, bid)          => `rent_app/${uid}/${bid}/transactions`,
+  txPhoto:      (uid, bid, txId, pid) => `rent_app/${uid}/${bid}/transactions/${txId}/photos/${pid}`,
   buildings:    (uid, bid)          => `rent_app/${uid}/${bid}/buildings`,
   // per-user, shared (no bid)
   bldList:      (uid)               => `rent_app/${uid}/_buildings`,
