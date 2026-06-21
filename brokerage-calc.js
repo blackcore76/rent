@@ -8,7 +8,7 @@
   const s = document.createElement('style');
   s.textContent = `
     #bc-side-btn{
-      position:fixed;left:-52px;bottom:315px;z-index:500;
+      position:fixed;left:-52px;bottom:270px;z-index:500;
       width:80px;padding:16px 6px 16px 8px;
       background:rgba(5,150,105,.85);
       border:1.5px solid rgba(5,150,105,.85);border-left:none;
