@@ -282,16 +282,16 @@
         <div class="bc-ref-section">
           <div class="bc-ref-title">중개수수료 요율표</div>
 
-          <table class="bc-ref-tbl">
+        <table class="bc-ref-tbl">
             <thead>
               <tr>
                 <th colspan="4">주택의 중개 수수료 <span style="font-weight:400;font-size:11px">(부속토지 포함)</span></th>
               </tr>
               <tr>
-                <th style="width:17%">거래종류</th>
-                <th>거래금액</th>
-                <th style="width:22%">상한요율</th>
-                <th style="width:18%">한도액</th>
+                <th style="width:17%"><span style="font-size:13px">거래종류</span></th>
+                <th><span style="font-size:13px">거래금액</span></th>
+                <th style="width:22%"><span style="font-size:13px">상한요율</span></th>
+                <th style="width:18%"><span style="font-size:13px">한도액</span></th>
               </tr>
             </thead>
             <tbody>
