@@ -321,7 +321,7 @@
           <table class="bc-ref-tbl">
             <thead>
               <tr>
-                <th colspan="3">주거용 오피스텔 <span style="font-weight:400;font-size:11px">(전용 85㎡ 이하, 전용입식 부엌 및 화장실/목욕시설을 갖출것)</span></th>
+                <th colspan="3">주거용 오피스텔<br><span style="font-weight:400;font-size:11px">(전용 85㎡ 이하, 전용입식 부엌 및 화장실/목욕시설을 갖출것)</span></th>
               </tr>
             </thead>
             <tbody>
