@@ -183,9 +183,10 @@
     }
     .bc-ref-tbl th{
       background:#064E3B;color:#fff;padding:8px 6px;
-      font-weight:700;text-align:center;font-size:11px;
+      font-weight:700;text-align:center;font-size:15px;
       letter-spacing:.3px;border:1px solid #065F46;
     }
+    .bc-ref-tbl th span{font-size:12px;}
     .bc-ref-tbl td{
       padding:7px 6px;text-align:center;color:#334155;
       border:1px solid #E2E8F0;font-variant-numeric:tabular-nums;
