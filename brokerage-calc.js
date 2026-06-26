@@ -285,7 +285,7 @@
           <table class="bc-ref-tbl">
             <thead>
               <tr>
-                <th colspan="4">주택의 중개 수수료 <span style="font-weight:400;font-size:14px">(부속토지 포함)</span></th>
+                <th colspan="4">주택의 중개 수수료 <span style="font-weight:400;font-size:11px">(부속토지 포함)</span></th>
               </tr>
               <tr>
                 <th style="width:17%">거래종류</th>
@@ -321,7 +321,7 @@
           <table class="bc-ref-tbl">
             <thead>
               <tr>
-                <th colspan="3">주거용 오피스텔 <span style="font-weight:400;font-size:14px">(전용 85㎡ 이하, 전용입식 부엌 및 화장실/목욕시설을 갖출것)</span></th>
+                <th colspan="3">주거용 오피스텔 <span style="font-weight:400;font-size:11px">(전용 85㎡ 이하, 전용입식 부엌 및 화장실/목욕시설을 갖출것)</span></th>
               </tr>
             </thead>
             <tbody>
@@ -339,7 +339,7 @@
           <table class="bc-ref-tbl">
             <thead>
               <tr>
-                <th colspan="2">주택 외의 중개 수수료 <span style="font-weight:400;font-size:14px">(공장·창고 등)</span></th>
+                <th colspan="2">주택 외의 중개 수수료 <span style="font-weight:400;font-size:11px">(공장·창고 등)</span></th>
               </tr>
             </thead>
             <tbody>
