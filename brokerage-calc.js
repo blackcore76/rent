@@ -168,6 +168,66 @@
       cursor:pointer;font-family:inherit;margin-top:10px;
     }
     #bc-reset-btn:active{background:#E2E8F0;}
+
+    /* 수수료 법령 참조표 */
+    .bc-ref-section{margin-top:28px;padding-top:20px;border-top:2px solid #E2E8F0;}
+    .bc-ref-title{
+      font-size:14px;font-weight:900;color:#1E2D3D;margin-bottom:14px;
+      display:flex;align-items:center;gap:6px;
+    }
+    .bc-ref-title::before{content:'📋';font-size:15px;}
+    .bc-ref-tbl{
+      width:100%;border-collapse:collapse;font-size:11.5px;
+      border:1.5px solid #CBD5E1;border-radius:10px;
+      overflow:hidden;margin-bottom:14px;
+    }
+    .bc-ref-tbl th{
+      background:#064E3B;color:#fff;padding:8px 6px;
+      font-weight:700;text-align:center;font-size:11px;
+      letter-spacing:.3px;border:1px solid #065F46;
+    }
+    .bc-ref-tbl td{
+      padding:7px 6px;text-align:center;color:#334155;
+      border:1px solid #E2E8F0;font-variant-numeric:tabular-nums;
+    }
+    .bc-ref-tbl .bc-tbl-cat{
+      background:#059669;color:#fff;font-weight:800;
+      font-size:11px;text-align:center;writing-mode:vertical-rl;
+      letter-spacing:2px;padding:10px 6px;
+      border:1px solid #047857;
+    }
+    .bc-ref-tbl .bc-tbl-subcat{
+      background:#ECFDF5;color:#065F46;font-weight:700;
+      font-size:11px;text-align:center;
+    }
+    .bc-ref-tbl tbody tr:nth-child(even) td:not(.bc-tbl-cat):not(.bc-tbl-subcat){
+      background:#F8FAFC;
+    }
+    .bc-ref-tbl tbody tr:hover td:not(.bc-tbl-cat):not(.bc-tbl-subcat){
+      background:#F0FDF4;
+    }
+    .bc-ref-tbl .bc-tbl-section-hdr{
+      background:#F1F5F9;font-weight:800;color:#1E2D3D;
+      text-align:center;font-size:11.5px;padding:9px 6px;
+      border:1px solid #CBD5E1;
+    }
+    .bc-ref-tbl .bc-tbl-note{
+      background:#F8FAFC;color:#64748B;font-size:10.5px;
+      text-align:left;padding:8px 10px;line-height:1.6;
+    }
+    .bc-ref-law{
+      display:block;margin-top:12px;padding:12px 14px;
+      background:linear-gradient(135deg,#064E3B,#047857);
+      border-radius:10px;text-align:center;
+      text-decoration:none;color:#fff;
+      font-size:12px;font-weight:700;
+      transition:opacity .15s;
+    }
+    .bc-ref-law:active{opacity:.8;}
+    .bc-ref-law span{
+      display:block;font-size:10.5px;font-weight:400;
+      color:rgba(255,255,255,.6);margin-top:4px;
+    }
   `;
   document.head.appendChild(s);
 
@@ -217,6 +277,83 @@
         </div>
 
         <button id="bc-reset-btn">초기화</button>
+
+        <div class="bc-ref-section">
+          <div class="bc-ref-title">중개수수료 요율표</div>
+
+          <table class="bc-ref-tbl">
+            <thead>
+              <tr>
+                <th colspan="4">주택의 중개 수수료 <span style="font-weight:400;font-size:10px">(부속토지 포함)</span></th>
+              </tr>
+              <tr>
+                <th style="width:17%">거래종류</th>
+                <th>거래금액</th>
+                <th style="width:22%">상한요율</th>
+                <th style="width:18%">한도액</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="bc-tbl-cat" rowspan="7">임대차 등</td>
+                <td>5천만원 미만</td><td>0.5%</td><td>20만원</td>
+              </tr>
+              <tr><td>5천만원 이상~ 1억원 미만</td><td>0.4%</td><td>30만원</td></tr>
+              <tr><td>1억원 이상~ 6억원 미만</td><td>0.3%</td><td>-</td></tr>
+              <tr><td>6억원 이상~ 12억원 미만</td><td>0.4%</td><td>-</td></tr>
+              <tr><td>12억원 이상~ 15억원 미만</td><td>0.5%</td><td></td></tr>
+              <tr><td>15억원 이상</td><td>0.6%</td><td>-</td></tr>
+              <tr style="height:0;"><td colspan="3" style="border:none;padding:0;"></td></tr>
+              <tr>
+                <td class="bc-tbl-cat" rowspan="7">매매·교환</td>
+                <td>5천만원 미만</td><td>0.6%</td><td>25만원</td>
+              </tr>
+              <tr><td>5천만원 이상~ 2억원 미만</td><td>0.5%</td><td>80만원</td></tr>
+              <tr><td>2억원 이상~ 9억원 미만</td><td>0.4%</td><td>-</td></tr>
+              <tr><td>9억원 이상~ 12억원 미만</td><td>0.5%</td><td>-</td></tr>
+              <tr><td>12억원 이상~ 15억원 미만</td><td>0.6%</td><td></td></tr>
+              <tr><td>15억원 이상</td><td>0.7%</td><td>-</td></tr>
+              <tr style="height:0;"><td colspan="3" style="border:none;padding:0;"></td></tr>
+            </tbody>
+          </table>
+
+          <table class="bc-ref-tbl">
+            <thead>
+              <tr>
+                <th colspan="3">주거용 오피스텔 <span style="font-weight:400;font-size:10px">(전용 85㎡ 이하, 전용입식 부엌 및 화장실/목욕시설을 갖출것)</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="bc-tbl-subcat" style="width:30%">임대차 등</td>
+                <td colspan="2">0.5%</td>
+              </tr>
+              <tr>
+                <td class="bc-tbl-subcat">매매·교환</td>
+                <td colspan="2">0.4%</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table class="bc-ref-tbl">
+            <thead>
+              <tr>
+                <th colspan="2">주택 외의 중개 수수료 <span style="font-weight:400;font-size:10px">(공장·창고 등)</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="bc-tbl-subcat" style="width:30%">임대차/매매 등</td>
+                <td>0.9% 이내에서 중개의뢰인과 공인중개사간 협의하여 결정</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <a class="bc-ref-law" href="https://www.law.go.kr/LSW/lsSc.do?menuId=1&subMenuId=15&tabMenuId=81&query=%EA%B3%B5%EC%9D%B8%EC%A4%91%EA%B0%9C%EC%82%AC%EB%B2%95%20%EC%8B%9C%ED%96%89%EB%A0%B9%A0%B9#J20:0" target="_blank" rel="noopener noreferrer">
+            📖 공인중개사법 시행규칙 제20조 (중개보수 및 실비의 한도 등)
+            <span>법령 원문 보기 →</span>
+          </a>
+        </div>
       </div>
     </div>
   `;
