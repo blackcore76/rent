@@ -350,7 +350,7 @@
             </tbody>
           </table>
 
-          <a class="bc-ref-law" href="https://www.law.go.kr/LSW/lsSc.do?menuId=1&subMenuId=15&tabMenuId=81&query=%EA%B3%B5%EC%9D%B8%EC%A4%91%EA%B0%9C%EC%82%AC%EB%B2%95%20%EC%8B%9C%ED%96%89%EB%A0%B9%A0%B9#J20:0" target="_blank" rel="noopener noreferrer">
+          <a class="bc-ref-law" href="https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B3%B5%EC%9D%B8%EC%A4%91%EA%B0%9C%EC%82%AC%EB%B2%95%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99/(20240710,01349,20240702)/%EC%A0%9C20%EC%A1%B0" target="_blank" rel="noopener noreferrer">
             📖 공인중개사법 시행규칙 제20조 (중개보수 및 실비의 한도 등)
             <span>법령 원문 보기 →</span>
           </a>
