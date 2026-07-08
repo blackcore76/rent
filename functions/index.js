@@ -15,11 +15,19 @@ const THRESHOLDS = [30, 14, 7, 3, 1, 0];
 
 const REGION = 'asia-northeast3';
 
+// Cloud Functions 런타임은 기본적으로 UTC라서 new Date().setHours(0,0,0,0)를 쓰면
+// KST 자정~오전 9시 사이엔 "오늘"이 실제 한국 날짜보다 하루 전으로 계산되는 버그가 있었음.
+// contractEnd("YYYY-MM-DD")는 항상 KST 캘린더 날짜를 의미하므로, "오늘"도 KST 기준
+// 캘린더 날짜를 UTC 자정으로 고정해서 같은 기준으로 비교한다.
+function kstTodayUTCMidnight() {
+  const kst = new Date(Date.now() + 9 * 60 * 60 * 1000);
+  return new Date(Date.UTC(kst.getUTCFullYear(), kst.getUTCMonth(), kst.getUTCDate()));
+}
+
 async function runExpiryCheck() {
   const db = getDatabase();
   const root = (await db.ref('rent_app').once('value')).val() || {};
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = kstTodayUTCMidnight();
 
   const results = [];
 
@@ -41,8 +49,10 @@ async function runExpiryCheck() {
         const unit = units[roomId];
         if (!unit || unit.status !== 'rented' || !unit.contractEnd) continue;
 
-        const end = new Date(unit.contractEnd);
-        end.setHours(0, 0, 0, 0);
+        // contractEnd="YYYY-MM-DD" → 그 캘린더 날짜의 UTC 자정으로 명시적으로 고정
+        // (런타임 타임존에 의존하지 않도록 today와 동일한 방식으로 앵커링)
+        const [ey, em, ed] = unit.contractEnd.split('-').map(Number);
+        const end = new Date(Date.UTC(ey, em - 1, ed));
         const dl = Math.round((end - today) / 86400000);
 
         if (!THRESHOLDS.includes(dl)) continue;
