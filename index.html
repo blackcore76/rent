@@ -294,12 +294,6 @@ body{overflow-x:hidden}
       <div class="kpi unpaid" onclick="goUnits('unpaid')"><div class="kpi-val" id="s-unpaid">—</div><div class="kpi-lbl">미납</div></div>
     </div>
 
-    <div class="card" id="card-push" style="display:none">
-      <div class="card-hd">🔔 계약 만료 푸시 알림</div>
-      <div id="push-status" style="font-size:13px;color:#64748B;margin-bottom:8px">확인 중...</div>
-      <button class="btn-add" id="push-btn" onclick="enablePush()" style="display:none">🔔 알림 받기</button>
-    </div>
-
     <div class="card" id="card-unpaid">
       <div class="card-hd">🔴 미납 현황 (최근 1년)</div>
       <div id="unpaid-list"><div class="empty-small">로딩 중...</div></div>
@@ -311,7 +305,13 @@ body{overflow-x:hidden}
     </div>
 
     <div class="card" id="card-expiry">
-      <div class="card-hd">⚠️ 계약 만료 임박 (30일 이내)</div>
+      <div class="card-hd">
+        <span>⚠️ 계약 만료 임박 (30일 이내)</span>
+        <span style="margin-left:auto;display:flex;align-items:center;gap:6px;font-weight:500">
+          <span id="push-status" style="font-size:11px;color:#64748B"></span>
+          <button class="btn-add" id="push-btn" onclick="enablePush()" style="display:none;padding:4px 10px;font-size:11px;border-radius:7px">🔔 알림받기</button>
+        </span>
+      </div>
       <div id="expiry-list"><div class="empty-small">로딩 중...</div></div>
     </div>
 
@@ -416,21 +416,29 @@ const VAPID_KEY = "BEFCB-Q0633WDL92iFqbnaxtSJGhtWQbo2h4UFf5gWwx3m8P_SfEDQruMNyXp
 let messaging = null;
 try { messaging = firebase.messaging(); } catch (e) {}
 
+// 앱이 열려서 포커스된 상태(포그라운드)일 때 오는 메시지는 SW의 onBackgroundMessage가
+// 아니라 여기서 처리해야 함 — 안 넣으면 포그라운드일 땐 아무 것도 안 뜸
+if (messaging) {
+  messaging.onMessage(payload => {
+    const title = payload.notification?.title || "";
+    const body = payload.notification?.body || "";
+    showToast(`🔔 ${title}${body ? " · " + body : ""}`, 6000);
+  });
+}
+
 function renderPushCard() {
-  const card = document.getElementById("card-push");
   const statusEl = document.getElementById("push-status");
   const btn = document.getElementById("push-btn");
-  if (!card || !messaging || !("Notification" in window)) { if (card) card.style.display = "none"; return; }
-  card.style.display = "block";
+  if (!statusEl || !btn || !messaging || !("Notification" in window)) return;
   const perm = Notification.permission;
   if (perm === "granted") {
-    statusEl.textContent = "✅ 알림이 활성화되어 있습니다";
+    statusEl.textContent = "🔔 알림 ON";
     btn.style.display = "none";
   } else if (perm === "denied") {
-    statusEl.textContent = "❌ 알림이 브라우저에서 차단되어 있습니다. 브라우저 설정에서 허용해주세요.";
+    statusEl.textContent = "🔕 브라우저에서 차단됨";
     btn.style.display = "none";
   } else {
-    statusEl.textContent = "계약 만료가 임박하면 휴대폰으로 알림을 받아보세요.";
+    statusEl.textContent = "";
     btn.style.display = "inline-block";
     btn.disabled = false;
   }
