@@ -421,9 +421,10 @@ try { messaging = firebase.messaging(); } catch (e) {}
 // 알림으로 띄워서 포그라운드/백그라운드 경험을 통일한다 (기존 인앱 토스트와 차별화).
 if (messaging) {
   messaging.onMessage(async payload => {
-    const title = payload.notification?.title || "PlusHome";
-    const body = payload.notification?.body || "";
-    const link = payload.fcmOptions?.link || payload.data?.link || "./units.html";
+    // data-only 메시지로 옴 (payload.notification 아님)
+    const title = payload.data?.title || "PlusHome";
+    const body = payload.data?.body || "";
+    const link = payload.data?.link || "./units.html";
     try {
       const reg = await navigator.serviceWorker.ready;
       await reg.showNotification(title, {

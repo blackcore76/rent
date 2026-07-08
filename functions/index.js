@@ -64,13 +64,18 @@ async function runExpiryCheck() {
         const body = `${unit.tenantName || '임차인'} · 만료일 ${unit.contractEnd}`;
 
         try {
+          // data-only 메시지로 보낸다: notification 필드를 넣으면 브라우저가 자체적으로
+          // 한 번 자동 표시하고 onBackgroundMessage에서 또 한 번 표시해 알림이 중복되는
+          // 문제가 있어서, 표시는 전적으로 클라이언트 코드(onBackgroundMessage/onMessage)가
+          // 직접 showNotification을 호출하도록 한다.
           const resp = await getMessaging().sendEachForMulticast({
             tokens,
-            notification: { title, body },
-            webpush: {
-              notification: { icon: 'https://plushome.kr/icon-192.png' },
-              fcmOptions: { link: `https://plushome.kr/units.html?room=${roomId}` },
+            data: {
+              title,
+              body,
+              link: `https://plushome.kr/units.html?room=${roomId}`,
             },
+            webpush: { headers: { Urgency: 'high' } },
           });
 
           // 무효화된 토큰 정리 (앱 삭제/알림 차단 등)

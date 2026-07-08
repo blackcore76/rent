@@ -2,7 +2,7 @@
 // 정적 자산 캐시 + 외부 SDK/폰트 캐시 + Firebase API는 항상 네트워크
 // + FCM 백그라운드 푸시 (계약 만료 알림)
 
-const VERSION = 'v4';
+const VERSION = 'v5';
 const CACHE_NAME = `rent-app-${VERSION}`;
 
 // ══════════════════════════════════════════
@@ -23,14 +23,15 @@ firebase.initializeApp({
 });
 const messaging = firebase.messaging();
 
+// data-only 메시지로 옴 (payload.notification 아님) — 자동 표시와 중복되지 않게
+// 표시는 전적으로 여기서만 담당한다.
 messaging.onBackgroundMessage(payload => {
-  const { title, body } = payload.notification || {};
-  const link = payload.fcmOptions?.link || payload.data?.link || './units.html';
+  const { title, body, link } = payload.data || {};
   self.registration.showNotification(title || 'PlusHome', {
     body: body || '',
     icon: './icon-192.png',
     badge: './icon-192.png',
-    data: { link },
+    data: { link: link || './units.html' },
     tag: 'contract-expiry',
     renotify: true,
   });
@@ -39,18 +40,9 @@ messaging.onBackgroundMessage(payload => {
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   const link = event.notification.data?.link || './units.html';
-  event.waitUntil((async () => {
-    // 기존에 열려있는 탭이 있으면 재사용하되, 알림이 가리키는 방(room)으로 반드시 이동시킨다
-    // (focus만 하면 그 탭이 이전에 보고 있던 엉뚱한 방 화면 그대로 남아있게 됨)
-    const allClients = await clients.matchAll({ type: 'window', includeUncontrolled: true });
-    for (const client of allClients) {
-      if ('navigate' in client) {
-        try { await client.navigate(link); } catch (e) {}
-        return client.focus();
-      }
-    }
-    return clients.openWindow(link);
-  })());
+  // 기존 탭을 찾아 navigate()시키는 방식이 Android에서 조용히 실패하는 경우가 있어,
+  // 이미 실행 중인 설치형 PWA에 안정적으로 동작하는 openWindow만 사용한다.
+  event.waitUntil(clients.openWindow(link));
 });
 
 // 사전 캐싱할 앱 셸 (첫 설치 시)
