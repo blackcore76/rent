@@ -2,7 +2,7 @@
 // 정적 자산 캐시 + 외부 SDK/폰트 캐시 + Firebase API는 항상 네트워크
 // + FCM 백그라운드 푸시 (계약 만료 알림)
 
-const VERSION = 'v3';
+const VERSION = 'v4';
 const CACHE_NAME = `rent-app-${VERSION}`;
 
 // ══════════════════════════════════════════
@@ -40,10 +40,14 @@ self.addEventListener('notificationclick', event => {
   event.notification.close();
   const link = event.notification.data?.link || './units.html';
   event.waitUntil((async () => {
-    const targetPath = new URL(link, self.location.origin).pathname;
+    // 기존에 열려있는 탭이 있으면 재사용하되, 알림이 가리키는 방(room)으로 반드시 이동시킨다
+    // (focus만 하면 그 탭이 이전에 보고 있던 엉뚱한 방 화면 그대로 남아있게 됨)
     const allClients = await clients.matchAll({ type: 'window', includeUncontrolled: true });
     for (const client of allClients) {
-      if (client.url.includes(targetPath) && 'focus' in client) return client.focus();
+      if ('navigate' in client) {
+        try { await client.navigate(link); } catch (e) {}
+        return client.focus();
+      }
     }
     return clients.openWindow(link);
   })());
