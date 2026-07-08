@@ -1,8 +1,53 @@
 // Service Worker — 월세 관리 앱
 // 정적 자산 캐시 + 외부 SDK/폰트 캐시 + Firebase API는 항상 네트워크
+// + FCM 백그라운드 푸시 (계약 만료 알림)
 
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE_NAME = `rent-app-${VERSION}`;
+
+// ══════════════════════════════════════════
+// Firebase Cloud Messaging — 백그라운드 알림
+// (별도 SW를 등록하면 scope가 겹쳐 충돌하므로 이 SW에 합쳐서 처리)
+// ══════════════════════════════════════════
+importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
+
+firebase.initializeApp({
+  apiKey: "AIzaSyBHMCPX13coKBA9cu72K4k9WKYQQjVA7IA",
+  authDomain: "rent-4d521.firebaseapp.com",
+  databaseURL: "https://rent-4d521-default-rtdb.firebaseio.com",
+  projectId: "rent-4d521",
+  storageBucket: "rent-4d521.firebasestorage.app",
+  messagingSenderId: "922087443394",
+  appId: "1:922087443394:web:ff78188fc5ab967287645b"
+});
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage(payload => {
+  const { title, body } = payload.notification || {};
+  const link = payload.fcmOptions?.link || payload.data?.link || './units.html';
+  self.registration.showNotification(title || 'PlusHome', {
+    body: body || '',
+    icon: './icon-192.png',
+    badge: './icon-192.png',
+    data: { link },
+    tag: 'contract-expiry',
+    renotify: true,
+  });
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const link = event.notification.data?.link || './units.html';
+  event.waitUntil((async () => {
+    const targetPath = new URL(link, self.location.origin).pathname;
+    const allClients = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of allClients) {
+      if (client.url.includes(targetPath) && 'focus' in client) return client.focus();
+    }
+    return clients.openWindow(link);
+  })());
+});
 
 // 사전 캐싱할 앱 셸 (첫 설치 시)
 const APP_SHELL = [

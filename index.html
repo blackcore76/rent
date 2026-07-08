@@ -20,6 +20,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 <script src="shared.js?v=2"></script>
 <script src="db-paths.js"></script>
 <style>
@@ -293,6 +294,12 @@ body{overflow-x:hidden}
       <div class="kpi unpaid" onclick="goUnits('unpaid')"><div class="kpi-val" id="s-unpaid">—</div><div class="kpi-lbl">미납</div></div>
     </div>
 
+    <div class="card" id="card-push" style="display:none">
+      <div class="card-hd">🔔 계약 만료 푸시 알림</div>
+      <div id="push-status" style="font-size:13px;color:#64748B;margin-bottom:8px">확인 중...</div>
+      <button class="btn-add" id="push-btn" onclick="enablePush()" style="display:none">🔔 알림 받기</button>
+    </div>
+
     <div class="card" id="card-unpaid">
       <div class="card-hd">🔴 미납 현황 (최근 1년)</div>
       <div id="unpaid-list"><div class="empty-small">로딩 중...</div></div>
@@ -400,6 +407,67 @@ let _alertTimer=null;
 let bldListeners={}; // {bid:{uRef,hRef,biRef,uL,hL,biL}}
 let nRef=null,nL=null,notes={};
 
+// ══════════════════════════════════════════
+// FCM 푸시 알림 (계약 만료 알림)
+// ══════════════════════════════════════════
+// ⚠️ Firebase 콘솔 > 프로젝트 설정 > Cloud Messaging > 웹 푸시 인증서에서
+//    키 쌍을 생성해 아래 값을 교체하세요.
+const VAPID_KEY = "BEFCB-Q0633WDL92iFqbnaxtSJGhtWQbo2h4UFf5gWwx3m8P_SfEDQruMNyXplU_flpw1Q3Q2DWHqVbqn8aeErM";
+let messaging = null;
+try { messaging = firebase.messaging(); } catch (e) {}
+
+function renderPushCard() {
+  const card = document.getElementById("card-push");
+  const statusEl = document.getElementById("push-status");
+  const btn = document.getElementById("push-btn");
+  if (!card || !messaging || !("Notification" in window)) { if (card) card.style.display = "none"; return; }
+  card.style.display = "block";
+  const perm = Notification.permission;
+  if (perm === "granted") {
+    statusEl.textContent = "✅ 알림이 활성화되어 있습니다";
+    btn.style.display = "none";
+  } else if (perm === "denied") {
+    statusEl.textContent = "❌ 알림이 브라우저에서 차단되어 있습니다. 브라우저 설정에서 허용해주세요.";
+    btn.style.display = "none";
+  } else {
+    statusEl.textContent = "계약 만료가 임박하면 휴대폰으로 알림을 받아보세요.";
+    btn.style.display = "inline-block";
+    btn.disabled = false;
+  }
+}
+
+async function registerFcmToken(uid) {
+  const reg = await navigator.serviceWorker.ready;
+  const token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+  if (!token) return;
+  const safeKey = token.replace(/[.#$\[\]/]/g, "_");
+  await db.ref(`rent_app/${uid}/fcmTokens/${safeKey}`).set({ token, updatedAt: new Date().toISOString() });
+}
+
+async function initPushNotif(uid) {
+  renderPushCard();
+  if (Notification.permission === "granted") {
+    try { await registerFcmToken(uid); } catch (e) {}
+  }
+}
+
+async function enablePush() {
+  if (!cu) return;
+  const btn = document.getElementById("push-btn");
+  const statusEl = document.getElementById("push-status");
+  btn.disabled = true; statusEl.textContent = "권한 요청 중...";
+  try {
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted") { renderPushCard(); return; }
+    await registerFcmToken(cu.uid);
+    renderPushCard();
+    showToast("✅ 알림이 활성화되었습니다");
+  } catch (e) {
+    statusEl.textContent = "❌ 알림 등록 실패: " + e.message;
+    btn.disabled = false;
+  }
+}
+
 async function enterDemoMode(){
   await ensureDemoLoaded();
   readOnly=true;sessionStorage.setItem("guestDemo","1");
@@ -455,6 +523,9 @@ auth.onAuthStateChanged(async user=>{
     if(readOnly){enterDemoMode();return;}
 
     ls.style.display="none";app.style.display="block";
+
+    // 실제 로그인 계정 본인 화면일 때만 푸시 알림 등록 (관리자가 남의 화면 열람 중일 땐 스킵)
+    if(targetUid===user.uid) initPushNotif(user.uid);
 
     // Notes for current building
     if(nL&&nRef)nRef.off("value",nL);
