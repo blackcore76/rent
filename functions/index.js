@@ -120,5 +120,6 @@ exports.testContractExpiry = onRequest({ region: REGION }, async (req, res) => {
     return;
   }
   const results = await runExpiryCheck();
+  console.log('testContractExpiry:', JSON.stringify(results));
   res.json({ ok: true, count: results.length, results });
 });
