@@ -62,8 +62,27 @@
   `;
   document.body.appendChild(btn);
 
+  /* ── 위치 보정: 수수료 버튼(#bc-side-btn) 바로 위, 이지모드-수수료 배치처럼
+     살짝 얹혀지도록 실제 렌더링 높이를 기준으로 계산 ── */
+  (function positionAboveFeeBtn() {
+    const bc = document.getElementById('bc-side-btn');
+    if (!bc) return; // 수수료 버튼이 없는 페이지면 CSS 기본값(360px) 사용
+    const OVERLAP = 6; // 이지모드-수수료 배치와 동일한 느낌의 살짝 겹치는 간격(px)
+    const bcBottom = parseFloat(getComputedStyle(bc).bottom) || 280;
+    const bcHeight = bc.getBoundingClientRect().height;
+    btn.style.bottom = (bcBottom + bcHeight - OVERLAP) + 'px';
+  })();
+
   function lgOpen() {
-    location.href = 'landlord-guide.html';
+    // admin.html에 이미 있다면(서브탭 존재) 새로고침 없이 바로 임대 가이드 탭으로 전환
+    const st3 = document.getElementById('st3');
+    if (st3 && typeof setSubTab === 'function') {
+      setSubTab(3, st3);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    // 그 외 페이지에서는 관리 > 임대 가이드 탭과 동일한 화면(admin.html 임베드 뷰)으로 이동
+    location.href = 'admin.html?tab=guide';
   }
 
   /* ── 사이드 버튼 터치 / 마우스 분기 ─────────────────────── */

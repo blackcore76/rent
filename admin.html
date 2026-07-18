@@ -483,6 +483,10 @@ if(pbL&&pbRef)pbRef.off("value",pbL);
     if(new URLSearchParams(location.search).get("addBld")==="1"){
       setTimeout(()=>openAddBldSheet(),200);
     }
+    // 임대 가이드 사이드 탭 버튼으로 진입 시 해당 서브탭 자동 선택
+    if(new URLSearchParams(location.search).get("tab")==="guide"){
+      setTimeout(()=>setSubTab(3,document.getElementById("st3")),200);
+    }
   }else{
     if(sessionStorage.getItem("guestDemo")==="1"){enterDemoMode();return;}
     cu=null;app.style.display="none";ls.style.display="flex";
