@@ -943,6 +943,13 @@ document.addEventListener('DOMContentLoaded', () => {
   sections.forEach(s => { if(s.id) observer.observe(s); });
 });
 </script>
-<script src="brokerage-calc.js"></script>
+<script>
+// admin.html에 iframe으로 embed될 땐 부모 문서가 이미 수수료 계산기 버튼을 띄우므로 중복 로드 방지
+if (window.self === window.top) {
+  const bcScript = document.createElement('script');
+  bcScript.src = 'brokerage-calc.js';
+  document.body.appendChild(bcScript);
+}
+</script>
 </body>
 </html>
