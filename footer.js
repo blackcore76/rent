@@ -23,7 +23,7 @@
         '<div class="ph-footer-name">플러스홈</div>' +
         '<div class="ph-footer-line">사업자등록번호 104-46-02119</div>' +
         '<div class="ph-footer-line">대전광역시 중구 유천로42번길 6, 302호(유천동)</div>' +
-        '<div class="ph-footer-line">전화 010-3309-6321 · <span class="ph-kakao" id="ph-kakao-btn">카카오톡 ' + KAKAO_ID + '</span> · <a href="mailto:admin@plushome.kr">이메일 admin@plushome.kr</a></div>' +
+        '<div class="ph-footer-line"><a href="tel:010-3309-6321">전화 010-3309-6321</a> · <span class="ph-kakao" id="ph-kakao-btn">카카오톡 ' + KAKAO_ID + '</span> · <a href="mailto:admin@plushome.kr">이메일 admin@plushome.kr</a></div>' +
         '<div class="ph-footer-copy">© ' + year + ' PlusHome. All rights reserved.</div>' +
       '</div>' +
     '</footer>';
