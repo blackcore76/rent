@@ -23,6 +23,11 @@
 <script src="shared.js?v=2"></script>
 <script src="db-paths.js"></script>
 <style>
+/* 로그인 모달: 불투명 그라데이션 대신 뒤에 데모 대시보드가 살짝 비치도록(약 70~80%) */
+#login-screen{background:rgba(10,22,40,.25)}
+/* 로그인 박스는 배경과 분리되도록 진하게 유지 */
+.login-box{background:rgba(15,28,45,.94)}
+.login-privacy{background:rgba(15,28,45,.85)}
 .summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:14px}
 .kpi{background:var(--card);border-radius:12px;padding:12px 6px;text-align:center;box-shadow:var(--shadow)}
 .kpi-val{font-size:clamp(11px,3.5vw,16px);font-weight:900;line-height:1.2;word-break:break-all;margin-bottom:3px}
@@ -397,17 +402,30 @@ function toggleExpenseEasyMode(){
   try{localStorage.setItem(_emKey(cu?.uid||'guest'),isEm?'1':'0');}catch(e){}
 }
 
-async function enterDemoMode(){
+async function _loadDemoIntoApp(){
   await ensureDemoLoaded();
-  readOnly=true;sessionStorage.setItem("guestDemo","1");
   _autofillDemoRent(DEMO.units||{}, DEMO.rentHistory||{});
   bldgsData=DEMO.bldgsData;curBid="main";
   allTx=[...DEMO.transactions].sort((a,b)=>b.date.localeCompare(a.date)||(b.id-a.id));
   rentHistData=DEMO.rentHistory||{};unitsData=DEMO.units||{};
+  renderFeed();
+  try{if(localStorage.getItem(_emKey('guest'))==='1')applyEasyMode();}catch(e){}
+}
+
+async function enterDemoMode(){
+  await _loadDemoIntoApp();
+  readOnly=true;sessionStorage.setItem("guestDemo","1");
   document.getElementById("login-screen").style.display="none";
   document.getElementById("app").style.display="block";
-  showDemoBanner();renderFeed();
-  try{if(localStorage.getItem(_emKey('guest'))==='1')applyEasyMode();}catch(e){}
+  showDemoBanner();
+}
+
+// 로그인 모달 뒤에 살짝 비치는 배경용 — 게스트 모드 진입 없이 데모 대시보드만 렌더링
+async function showLoginBackdrop(){
+  try{
+    await _loadDemoIntoApp();
+    document.getElementById("app").style.display="block";
+  }catch(e){}
 }
 
 auth.onAuthStateChanged(async user=>{
@@ -474,6 +492,7 @@ auth.onAuthStateChanged(async user=>{
     if(rhL&&rhRef)rhRef.off("value",rhL);
     if(auL&&auRef)auRef.off("value",auL);
     if(catL&&catRef)catRef.off("value",catL);
+    showLoginBackdrop();
   }
 });
 function doSignOut(){
