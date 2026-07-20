@@ -25,6 +25,11 @@
 <script src="db-paths.js"></script>
 <style>
 body{overflow-x:hidden}
+/* 로그인 모달: 불투명 그라데이션 대신 뒤에 데모 대시보드가 살짝 비치도록(약 70~80%) */
+#login-screen{background:rgba(10,22,40,.25)}
+/* 로그인 박스는 배경과 분리되도록 진하게 유지 */
+.login-box{background:rgba(15,28,45,.94)}
+.login-privacy{background:rgba(15,28,45,.85)}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
 .kpi{background:var(--card);border-radius:12px;padding:12px 4px;text-align:center;box-shadow:var(--shadow);cursor:pointer;transition:transform .12s,box-shadow .12s}
 .kpi:active{transform:scale(.95);box-shadow:0 1px 4px rgba(0,0,0,.08)}
@@ -491,16 +496,29 @@ async function enablePush() {
   }
 }
 
-async function enterDemoMode(){
+async function _loadDemoIntoApp(){
   await ensureDemoLoaded();
-  readOnly=true;sessionStorage.setItem("guestDemo","1");
   _autofillDemoRent(DEMO.units, DEMO.rentHistory);
   bldgsData=DEMO.bldgsData;curBid="main";
   allBldData["main"]={units:DEMO.units,history:DEMO.rentHistory,bldInfo:DEMO.bldInfo};
   notes=DEMO.notes;
+  renderDash();renderBldCards();renderNotes();
+}
+
+async function enterDemoMode(){
+  await _loadDemoIntoApp();
+  readOnly=true;sessionStorage.setItem("guestDemo","1");
   document.getElementById("login-screen").style.display="none";
   document.getElementById("app").style.display="block";
-  showDemoBanner();renderDash();renderBldCards();renderNotes();setSS("ok");
+  showDemoBanner();setSS("ok");
+}
+
+// 로그인 모달 뒤에 살짝 비치는 배경용 — 게스트 모드 진입 없이 데모 대시보드만 렌더링
+async function showLoginBackdrop(){
+  try{
+    await _loadDemoIntoApp();
+    document.getElementById("app").style.display="block";
+  }catch(e){}
 }
 
 // ── AUTH STATE ── (탭 이동 시 flash 없음: login-screen은 display:none 시작)
@@ -572,6 +590,7 @@ auth.onAuthStateChanged(async user=>{
     if(sessionStorage.getItem("guestDemo")==="1"){enterDemoMode();return;}
     cu=null;teardownAll();
     app.style.display="none";ls.style.display="flex";
+    showLoginBackdrop();
   }
 });
 
