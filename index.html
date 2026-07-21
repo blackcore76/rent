@@ -316,6 +316,14 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
           <button class="btn-add" id="push-btn" onclick="enablePush()" style="display:none;padding:4px 10px;font-size:11px;border-radius:7px">🔔 알림받기</button>
         </span>
       </div>
+      <div id="push-info-box" style="display:none;position:relative;margin-bottom:12px;padding:12px 26px 12px 14px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px">
+        <button onclick="document.getElementById('push-info-box').style.display='none'" aria-label="닫기" style="position:absolute;top:6px;right:6px;width:22px;height:22px;border:none;background:transparent;color:#64748B;font-size:14px;cursor:pointer;line-height:1;border-radius:50%">✕</button>
+        <div style="font-size:12px;font-weight:700;color:#1E3A8A;margin-bottom:4px">🔔 알림이 이렇게 와요</div>
+        <div style="font-size:11.5px;color:#334155;line-height:1.6">
+          · 접속(로그인)할 때마다 화면 위쪽에 작은 알림이 <b>최대 3번</b> 떠요<br>
+          · 계약 만료가 다가오면 <b>만료 30·14·7·3·1일 전, 당일</b>에 휴대폰·브라우저로 푸시 알림이 가요
+        </div>
+      </div>
       <div id="expiry-list"><div class="empty-small">로딩 중...</div></div>
     </div>
 
@@ -495,7 +503,8 @@ async function enablePush() {
     if (perm !== "granted") { renderPushCard(); return; }
     await registerFcmToken(cu.uid);
     renderPushCard();
-    showToast("✅ 알림이 활성화되었습니다");
+    const infoBox = document.getElementById("push-info-box");
+    if (infoBox) infoBox.style.display = "block";
   } catch (e) {
     statusEl.textContent = "❌ 알림 등록 실패: " + e.message;
     btn.disabled = false;
