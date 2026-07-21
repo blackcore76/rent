@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1E2D3D">
@@ -10,25 +10,21 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
 <title>🏠 PlusHome 세상 편한 임대관리</title>
+<meta name="description" content="임대 현황, 월세 납부, 계약 만료를 한눈에 관리하는 PlusHome — 설치되는 웹앱(PWA)으로 어디서든 바로 사용하세요.">
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://rent-4d521-default-rtdb.firebaseio.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="common.css?v=1">
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
-<script src="shared.js?v=2"></script>
-<script src="db-paths.js"></script>
 <style>
 body{overflow-x:hidden}
 /* 로그인 모달: 불투명 그라데이션 대신 뒤에 데모 대시보드가 살짝 비치도록(약 70~80%) */
 #login-screen{background:rgba(10,22,40,.25)}
 /* 로그인 박스는 배경과 분리되도록 진하게 유지 */
 .login-box{background:rgba(15,28,45,.94)}
+/* 로그인 배경용 데모 대시보드: 뷰포트에 고정해서 body 문서 흐름 높이에 영향 안 주게(CLS 방지) */
+#app.app-backdrop{position:fixed;inset:0;overflow:hidden}
 .login-privacy{background:rgba(15,28,45,.85)}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
 .kpi{background:var(--card);border-radius:12px;padding:12px 4px;text-align:center;box-shadow:var(--shadow);cursor:pointer;transition:transform .12s,box-shadow .12s}
@@ -403,6 +399,13 @@ body{overflow-x:hidden}
 
 <div id="toast"></div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+<script src="shared.js?v=2"></script>
+<script src="db-paths.js"></script>
 <script>
 const storage = firebase.storage();
 let cu=null,mUid="",mName="",readOnly=false;
@@ -509,15 +512,20 @@ async function enterDemoMode(){
   await _loadDemoIntoApp();
   readOnly=true;sessionStorage.setItem("guestDemo","1");
   document.getElementById("login-screen").style.display="none";
-  document.getElementById("app").style.display="block";
+  const appEl=document.getElementById("app");
+  appEl.classList.remove("app-backdrop");
+  appEl.style.display="block";
   showDemoBanner();setSS("ok");
 }
 
 // 로그인 모달 뒤에 살짝 비치는 배경용 — 게스트 모드 진입 없이 데모 대시보드만 렌더링
+// app-backdrop으로 고정 레이어화해서, 배경이 나중에 채워져도 body 높이가 흔들리지 않게(CLS 방지) 함
 async function showLoginBackdrop(){
   try{
     await _loadDemoIntoApp();
-    document.getElementById("app").style.display="block";
+    const appEl=document.getElementById("app");
+    appEl.classList.add("app-backdrop");
+    appEl.style.display="block";
   }catch(e){}
 }
 
@@ -563,7 +571,7 @@ auth.onAuthStateChanged(async user=>{
 
     if(readOnly){enterDemoMode();return;}
 
-    ls.style.display="none";app.style.display="block";
+    ls.style.display="none";app.classList.remove("app-backdrop");app.style.display="block";
 
     // 실제 로그인 계정 본인 화면일 때만 푸시 알림 등록 (관리자가 남의 화면 열람 중일 땐 스킵)
     if(targetUid===user.uid) initPushNotif(user.uid);
