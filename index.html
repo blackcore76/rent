@@ -18,13 +18,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="common.css?v=1">
 <style>
-body{overflow-x:hidden;min-height:100vh}
+body{overflow-x:hidden}
 /* 로그인 모달: 불투명 그라데이션 대신 뒤에 데모 대시보드가 살짝 비치도록(약 70~80%) */
 #login-screen{background:rgba(10,22,40,.25)}
 /* 로그인 박스는 배경과 분리되도록 진하게 유지 */
 .login-box{background:rgba(15,28,45,.94)}
 /* 로그인 배경용 데모 대시보드: 뷰포트에 고정해서 body 문서 흐름 높이에 영향 안 주게(CLS 방지) */
 #app.app-backdrop{position:fixed;inset:0;overflow:hidden}
+/* app-backdrop이 문서 흐름을 차지 안 하므로, 흐름에 남는 유일한 요소인 하단 푸터가
+   헤더 바로 밑으로 붙어버림 → 배경 모드일 땐 푸터를 숨겨서 방지 */
+body:has(#app.app-backdrop) .ph-footer{display:none}
 .login-privacy{background:rgba(15,28,45,.85)}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
 .kpi{background:var(--card);border-radius:12px;padding:12px 4px;text-align:center;box-shadow:var(--shadow);cursor:pointer;transition:transform .12s,box-shadow .12s}
