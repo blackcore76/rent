@@ -158,6 +158,36 @@
     document.body.insertAdjacentHTML('beforeend', html);
   }
 
+  // ── 노출 타이밍 조정 ──
+  // footer.js는 body 맨 끝에서 동기 실행되지만, 실제 화면(#login-screen/#app)은
+  // Firebase Auth의 비동기 콜백이 응답해야 보인다. 그대로 두면 푸터가 먼저 반짝이고
+  // 한 박자 뒤에 나머지가 뜨는 것처럼 보여서, 둘 중 하나가 실제로 화면에 나타나는
+  // 순간까지 푸터도 같이 숨겨둔다. (login-screen/#app 자체가 없는 정적 페이지는 그대로 즉시 표시)
+  (function(){
+    var footerEl = document.querySelector('.ph-footer');
+    var loginEl = document.getElementById('login-screen');
+    var appEl = document.getElementById('app');
+    if (!footerEl || (!loginEl && !appEl)) return;
+
+    function isShown(el){ return !!el && getComputedStyle(el).display !== 'none'; }
+    if (isShown(loginEl) || isShown(appEl)) return;
+
+    footerEl.style.display = 'none';
+    var revealed = false;
+    function reveal(){
+      if (revealed) return;
+      revealed = true;
+      footerEl.style.display = '';
+      obs.disconnect();
+    }
+    var obs = new MutationObserver(function(){
+      if (isShown(loginEl) || isShown(appEl)) reveal();
+    });
+    if (loginEl) obs.observe(loginEl, {attributes:true, attributeFilter:['style','class']});
+    if (appEl) obs.observe(appEl, {attributes:true, attributeFilter:['style','class']});
+    setTimeout(reveal, 4000); // 안전장치: 무슨 이유로든 안 뜨면 4초 뒤 그냥 표시
+  })();
+
   function showToast(msg){
     var t = document.createElement('div');
     t.textContent = msg;
