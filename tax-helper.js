@@ -273,6 +273,40 @@
   document.getElementById('taxh-close-x').addEventListener('click', thClose);
   overlay.addEventListener('click', thClose);
 
+  /* ── 사이드 버튼 스택 일괄 배치 ─────────────────────────────
+     원래 구조: 각 버튼이 아래 버튼 위에 OVERLAP(px)만큼 살짝 물리며 쌓임.
+     tax-helper.js가 가장 마지막에 로드되므로 네 버튼이 모두 존재.
+     수수료(#bc-side-btn)를 앵커로 잡고, 위→아래로
+        가이드(lg) · 수수료(bc) · 세금(taxh) · 모드전환(em)
+     을 한 번에 일괄 재계산한다(폰트 로드로 높이가 바뀌어도 매 패스 최신값 반영).
+     세금 버튼 높이는 수수료 버튼과 통일. */
+  function layoutSideStack() {
+    const OVERLAP = 6;
+    const lg = document.getElementById('lg-side-btn');
+    const bc = document.getElementById('bc-side-btn');
+    const th = sideBtn;
+    const em = document.getElementById('em-side-btn');
+    if (!bc) return; // 수수료 버튼 없는 페이지면 CSS 기본값 유지
+    const bcBottom = parseFloat(getComputedStyle(bc).bottom) || 280;
+    const bcH = bc.getBoundingClientRect().height;
+    // 세금 버튼 높이를 수수료 버튼과 동일하게
+    th.style.boxSizing = 'border-box';
+    th.style.minHeight = bcH + 'px';
+    const thH = th.getBoundingClientRect().height;
+    // 위(가이드) → 아래(모드전환) 순으로 배치
+    if (lg) lg.style.bottom = (bcBottom + bcH - OVERLAP) + 'px';        // 수수료 위
+    const thBottom = bcBottom - thH + OVERLAP;                          // 수수료 아래
+    th.style.bottom = thBottom + 'px';
+    if (em) {
+      const emH = em.getBoundingClientRect().height;
+      em.style.bottom = (thBottom - emH + OVERLAP) + 'px';             // 세금 아래
+    }
+  }
+  layoutSideStack();
+  window.addEventListener('load', layoutSideStack);
+  window.addEventListener('resize', layoutSideStack);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layoutSideStack);
+
   /* ── 사이드 버튼 터치 / 마우스 분기 (brokerage-calc 패턴) ── */
   (function () {
     var peeking = false, peekTimer = null, lastTouch = 0, tx = 0, ty = 0, tmoved = false;
