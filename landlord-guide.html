@@ -944,7 +944,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <script>
-// admin.html에 iframe으로 embed될 땐 부모 문서가 이미 수수료 계산기 버튼을 띄우므로 중복 로드 방지
+// admin.html에 iframe으로 embed될 땐 부모 문서가 이미 수수료·세금 버튼과 푸터를 띄우므로 중복 로드 방지
+// (임대가이드 탭에서 iframe 자체 푸터 + admin 전체 푸터가 겹치던 문제 방지)
 if (window.self === window.top) {
   const bcScript = document.createElement('script');
   bcScript.src = 'brokerage-calc.js';
@@ -952,8 +953,15 @@ if (window.self === window.top) {
   const thScript = document.createElement('script');
   thScript.src = 'tax-helper.js';
   document.body.appendChild(thScript);
+  const ftScript = document.createElement('script');
+  ftScript.src = 'footer.js?v=4';
+  document.body.appendChild(ftScript);
+} else {
+  // admin.html iframe 임베드(임대가이드 탭)에선 부모가 전체 푸터를 그리므로
+  // 가이드 자체 푸터(.guide-footer)를 숨겨 이중 푸터 방지
+  var gf = document.querySelector('.guide-footer');
+  if (gf) gf.style.display = 'none';
 }
 </script>
-<script src="footer.js?v=4"></script>
 </body>
 </html>
