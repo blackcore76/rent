@@ -286,6 +286,13 @@
     const bc = document.getElementById('bc-side-btn');
     const th = sideBtn;
     const em = document.getElementById('em-side-btn');
+    // 겹침 앞뒤 순서: 가이드(앞) > 수수료 > 세금 > 모드전환(뒤)
+    // → 위 버튼이 아래 버튼의 상단을 덮는다(세금 버튼 상단이 수수료 밑으로 들어감).
+    //   대기·확장 상태 모두 동일하게 적용.
+    if (lg) lg.style.zIndex = 503;
+    if (bc) bc.style.zIndex = 502;
+    th.style.zIndex = 501;
+    if (em) em.style.zIndex = 500;
     if (!bc) return; // 수수료 버튼 없는 페이지면 CSS 기본값 유지
     const bcBottom = parseFloat(getComputedStyle(bc).bottom) || 280;
     const bcH = bc.getBoundingClientRect().height;
