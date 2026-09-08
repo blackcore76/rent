@@ -189,6 +189,67 @@ body.em-on .page-btn{background:#0e1422;border-color:#1e2d45}
 body.em-on .page-info{color:#7a91a8}
 body.em-on .empty-st{color:rgba(255,255,255,.3)}
 body.em-on .fab{background:#1e2d45;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+/* 🧾 세금 도우미 */
+.tax-body{overflow:hidden;transition:max-height .35s ease;max-height:2200px}
+.tax-body.collapsed{max-height:0}
+.tax-note{background:var(--amber-lt);border:1px solid #FCD9A5;color:var(--amber-t);font-size:11.5px;line-height:1.65;border-radius:10px;padding:10px 12px;margin-bottom:12px}
+.tax-controls{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.tax-field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:120px}
+.tax-field>label{font-size:10px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.4px}
+.tax-field select{border:2px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;background:#fff;color:var(--text);outline:none}
+.tax-toggle{display:flex;border:2px solid var(--border);border-radius:8px;overflow:hidden}
+.tax-tg{flex:1;padding:8px 6px;border:none;background:#fff;font-size:13px;font-weight:700;color:var(--sub);cursor:pointer;font-family:inherit}
+.tax-tg.on{background:var(--hdr);color:#fff}
+.tax-rent-box{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#F8FAFC;border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.tax-rent-box .trb-lbl{font-size:12px;font-weight:700;color:var(--sub);flex:1;min-width:150px;line-height:1.4}
+.tax-rent-box input{width:130px;border:2px solid var(--border);border-radius:8px;padding:7px 10px;font-size:14px;font-weight:800;text-align:right;font-family:inherit;color:var(--text);outline:none;background:#fff}
+.tax-rent-box input:focus{border-color:var(--sky)}
+.tax-rent-box .trb-reset{font-size:11px;font-weight:700;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--sub);cursor:pointer;font-family:inherit;white-space:nowrap}
+.tax-reg{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:12px;cursor:pointer;user-select:none;-webkit-user-select:none}
+.tax-reg input{width:17px;height:17px;accent-color:var(--hdr);flex-shrink:0}
+.tax-result{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.tax-badge{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:8px;margin-bottom:10px}
+.tax-badge.ok{background:var(--green-lt);color:var(--green-t)}
+.tax-badge.warn{background:var(--amber-lt);color:var(--amber-t)}
+.tax-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:5px 0;color:var(--sub);gap:10px}
+.tax-row b{color:var(--text);font-weight:800}
+.tax-row.sub{font-size:12px;color:var(--hint)}
+.tax-total{display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--border);margin-top:8px;padding-top:10px;gap:10px}
+.tax-total .tt-lbl{font-size:13px;font-weight:800;color:var(--hdr)}
+.tax-total .tt-val{font-size:19px;font-weight:900;color:var(--red);white-space:nowrap}
+.tax-mini{font-size:11px;line-height:1.65;color:var(--hint);margin-top:10px}
+.tax-mini b{color:var(--sub)}
+.tax-vat{background:var(--blue-lt);border:1px solid #BAE6FD;border-radius:10px;padding:11px 12px;margin-bottom:12px}
+.tax-vat .tv-t{font-size:12px;font-weight:800;color:var(--blue-t);margin-bottom:4px}
+.tax-vat .tv-v{font-size:17px;font-weight:900;color:var(--blue-t)}
+.tax-vat .tv-n{font-size:11px;color:var(--blue-t);opacity:.9;margin-top:5px;line-height:1.55}
+.tax-cal-t{font-size:12px;font-weight:800;color:var(--sub);margin:2px 0 6px}
+.tax-cal-row{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--border)}
+.tax-cal-when{font-size:12px;font-weight:800;color:var(--hdr);background:var(--bg);border-radius:7px;padding:4px 8px;white-space:nowrap;flex-shrink:0;min-width:52px;text-align:center}
+.tax-cal-txt{font-size:12px;color:var(--text);line-height:1.5}
+.tax-cal-txt .tc-sub{color:var(--hint);font-size:11px}
+body.em-on .tax-note{background:rgba(217,119,6,.12);border-color:rgba(217,119,6,.3);color:#fbbf24}
+body.em-on .tax-field>label{color:rgba(255,255,255,.5)}
+body.em-on .tax-field select,body.em-on .tax-toggle,body.em-on .tax-tg{background:#0e1422;border-color:#1e2d45;color:#c8d6e8}
+body.em-on .tax-tg.on{background:var(--gold);color:#000}
+body.em-on .tax-rent-box{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)}
+body.em-on .tax-rent-box .trb-lbl{color:rgba(255,255,255,.7)}
+body.em-on .tax-rent-box input,body.em-on .tax-rent-box .trb-reset{background:#0e1422;border-color:#1e2d45;color:#c8d6e8}
+body.em-on .tax-reg{color:rgba(255,255,255,.8)}
+body.em-on .tax-result{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1)}
+body.em-on .tax-row{color:rgba(255,255,255,.6)}
+body.em-on .tax-row b{color:rgba(255,255,255,.92)}
+body.em-on .tax-total{border-top-color:rgba(255,255,255,.15)}
+body.em-on .tax-total .tt-lbl{color:rgba(255,255,255,.9)}
+body.em-on .tax-total .tt-val{color:#ff6b6b}
+body.em-on .tax-mini{color:rgba(255,255,255,.4)}
+body.em-on .tax-mini b{color:rgba(255,255,255,.6)}
+body.em-on .tax-vat{background:rgba(2,132,199,.14);border-color:rgba(2,132,199,.3)}
+body.em-on .tax-vat .tv-t,body.em-on .tax-vat .tv-v,body.em-on .tax-vat .tv-n{color:#7dd3fc}
+body.em-on .tax-cal-row{border-top-color:rgba(255,255,255,.1)}
+body.em-on .tax-cal-when{background:rgba(255,255,255,.08);color:#c8d6e8}
+body.em-on .tax-cal-txt{color:rgba(255,255,255,.8)}
+body.em-on .tax-cal-txt .tc-sub{color:rgba(255,255,255,.4)}
 </style>
 </head>
 <body>
@@ -257,6 +318,15 @@ body.em-on .fab{background:#1e2d45;box-shadow:0 4px 20px rgba(0,0,0,.5)}
       </div>
       <div class="pie-body" id="pie-body">
         <div id="pie-content"></div>
+      </div>
+    </div>
+    <div class="pie-section" id="tax-section">
+      <div class="pie-hd" onclick="toggleTax()">
+        <span class="pie-hd-title">🧾 세금 도우미 <span style="font-size:10px;font-weight:800;color:var(--gold);border:1px solid var(--gold);border-radius:8px;padding:1px 6px;margin-left:3px">참고용</span></span>
+        <button class="pie-tog" id="tax-tog-lbl">펼치기 ▼</button>
+      </div>
+      <div class="tax-body collapsed" id="tax-body">
+        <div id="tax-content"></div>
       </div>
     </div>
     <div class="view-tabs">
@@ -662,6 +732,7 @@ function renderFeed(){
   nEl.innerHTML=(net>=0?"":"−")+fmtN(Math.abs(net))+'<span class="won-sfx">원</span>';
   nEl.style.color=net>0?"var(--green)":net<0?"var(--red)":"var(--blue)";
   renderPie(list);
+  if(typeof updateTaxAuto==='function')updateTaxAuto();
 
   const total=list.length,tp=Math.max(1,Math.ceil(total/PS));
   if(curPage>tp)curPage=tp;
@@ -998,6 +1069,144 @@ function togglePie(){
   _pieCollapsed=!_pieCollapsed;
   document.getElementById('pie-body').classList.toggle('collapsed',_pieCollapsed);
   document.getElementById('pie-tog-lbl').textContent=_pieCollapsed?'펼치기 ▼':'접기 ▲';
+}
+
+// ── 🧾 세금 도우미 (참고용) ────────────────────────────────
+let _taxOpen=false,_taxBuilt=false,_taxType='house',_taxReg=false,_taxRentOverride=null,_taxYear=String(new Date().getFullYear());
+
+function toggleTax(){
+  _taxOpen=!_taxOpen;
+  if(_taxOpen&&!_taxBuilt)buildTaxShell();
+  document.getElementById('tax-body').classList.toggle('collapsed',!_taxOpen);
+  document.getElementById('tax-tog-lbl').textContent=_taxOpen?'접기 ▲':'펼치기 ▼';
+  if(_taxOpen)recalcTax();
+}
+// 선택 연도의 연간 임대수입(월세 기준) 자동 합산 — 자동 월세내역 + 카테고리 '월세' 수입
+function taxAnnualRent(year){
+  let sum=0;const unitsLoaded=Object.keys(unitsData).length>0;
+  Object.entries(rentHistData).forEach(([roomId,roomH])=>{
+    if(unitsLoaded&&!unitsData[roomId])return;
+    Object.entries(roomH).forEach(([ym,rec])=>{
+      if(!ym||!ym.startsWith(year))return;
+      if(!rec||(!rec.paid&&!rec.partial))return;
+      sum+=rec.amount||(unitsData[roomId]?.monthlyRent||0)*10000||0;
+    });
+  });
+  allTx.forEach(t=>{
+    if(t.type!=='income'||!t.date||!t.date.startsWith(year))return;
+    if((t.category||'').includes('월세'))sum+=t.amount||0;
+  });
+  return sum;
+}
+function taxAnnualExpense(year){
+  return allTx.filter(t=>t.type==='expense'&&t.date&&t.date.startsWith(year)).reduce((s,t)=>s+(t.amount||0),0);
+}
+function buildTaxShell(){
+  const nowY=new Date().getFullYear();
+  let opts='';for(let y=nowY;y>=nowY-4;y--)opts+=`<option value="${y}"${String(y)===_taxYear?' selected':''}>${y}년</option>`;
+  document.getElementById('tax-content').innerHTML=`
+    <div class="tax-note">⚠️ 아래 금액은 이해를 돕기 위한 <b>대략적인 참고용</b> 계산이에요. 실제 세액은 다른 소득·공제·감면에 따라 달라집니다. 정확한 금액은 <b>홈택스</b>나 <b>세무사</b>로 확인하세요.</div>
+    <div class="tax-controls">
+      <div class="tax-field"><label>연도</label><select id="tax-year" onchange="onTaxYear(this.value)">${opts}</select></div>
+      <div class="tax-field"><label>물건 유형</label>
+        <div class="tax-toggle">
+          <button class="tax-tg on" id="tax-tg-h" onclick="setTaxType('house')">🏠 주택</button>
+          <button class="tax-tg" id="tax-tg-s" onclick="setTaxType('store')">🏢 상가</button>
+        </div>
+      </div>
+    </div>
+    <div class="tax-rent-box">
+      <span class="trb-lbl">연간 임대수입<br><span style="font-size:10px;font-weight:600;color:var(--hint)">월세 기준 자동합산 · 관리비/보증금 제외</span></span>
+      <input type="number" id="tax-rent" inputmode="numeric" oninput="onTaxRentInput(this.value)">
+      <button class="trb-reset" onclick="resetTaxRent()">↺ 자동</button>
+    </div>
+    <label class="tax-reg" id="tax-reg-wrap"><input type="checkbox" id="tax-reg" onchange="onTaxReg(this.checked)">임대사업자(렌트홈) 등록됨<span style="font-size:10px;color:var(--hint)"> · 필요경비·공제↑</span></label>
+    <div class="tax-result" id="tax-result"></div>
+    <div id="tax-cal"></div>`;
+  _taxBuilt=true;
+  const inp=document.getElementById('tax-rent');
+  inp.value=(_taxRentOverride!=null?_taxRentOverride:taxAnnualRent(_taxYear))||'';
+}
+function setTaxType(t){
+  _taxType=t;
+  document.getElementById('tax-tg-h').classList.toggle('on',t==='house');
+  document.getElementById('tax-tg-s').classList.toggle('on',t==='store');
+  document.getElementById('tax-reg-wrap').style.display=t==='house'?'flex':'none';
+  recalcTax();
+}
+function onTaxYear(v){
+  _taxYear=v;_taxRentOverride=null;
+  document.getElementById('tax-rent').value=taxAnnualRent(_taxYear)||'';
+  recalcTax();
+}
+function onTaxRentInput(v){_taxRentOverride=parseInt(v)||0;recalcTax();}
+function resetTaxRent(){_taxRentOverride=null;document.getElementById('tax-rent').value=taxAnnualRent(_taxYear)||'';recalcTax();}
+function onTaxReg(c){_taxReg=c;recalcTax();}
+function updateTaxAuto(){
+  if(!_taxOpen||!_taxBuilt)return;
+  if(_taxRentOverride==null){const inp=document.getElementById('tax-rent');if(inp)inp.value=taxAnnualRent(_taxYear)||'';}
+  recalcTax();
+}
+// 종합소득세 누진세율(2023~) — 이 소득만 단독 계산 시의 대략치
+function _taxComp(income){
+  const B=[[14000000,.06,0],[50000000,.15,1260000],[88000000,.24,5760000],[150000000,.35,15440000],[300000000,.38,19940000],[500000000,.40,25940000],[1000000000,.42,35940000],[Infinity,.45,65940000]];
+  let rate=.06,ded=0;for(const [cap,r,d] of B){if(income<=cap){rate=r;ded=d;break;}}
+  const tax=Math.max(0,Math.round(income*rate-ded)),local=Math.round(tax*0.1);
+  return{tax,local,total:tax+local};
+}
+function recalcTax(){
+  if(!_taxBuilt)return;
+  const won=v=>fmtN(v)+'<span class="won-sfx">원</span>';
+  const rent=_taxRentOverride!=null?_taxRentOverride:taxAnnualRent(_taxYear);
+  const res=document.getElementById('tax-result');
+  if(!rent){res.innerHTML=`<div class="tax-mini" style="text-align:center;padding:6px 0">${_taxYear}년에 잡히는 임대수입이 없어요.<br>위 칸에 직접 입력해 확인해 볼 수 있어요.</div>`;renderTaxCal();return;}
+  let html='';
+  if(_taxType==='house'){
+    if(rent<=20000000){
+      const er=_taxReg?0.6:0.5,ded=_taxReg?4000000:2000000;
+      const income=Math.round(rent*(1-er));
+      const base=Math.max(0,income-ded);
+      const tax=Math.round(base*0.14),local=Math.round(tax*0.1),total=tax+local;
+      html=`<span class="tax-badge ok">연 2천만원 이하 · 분리과세(14%) 선택 가능</span>
+        <div class="tax-row"><span>연간 임대수입</span><b>${won(rent)}</b></div>
+        <div class="tax-row sub"><span>− 필요경비 (${_taxReg?'60':'50'}%)</span><span>−${won(rent-income)}</span></div>
+        <div class="tax-row sub"><span>− 기본공제</span><span>−${won(ded)}</span></div>
+        <div class="tax-row"><span>과세표준</span><b>${won(base)}</b></div>
+        <div class="tax-row sub"><span>소득세 (14%)</span><span>${won(tax)}</span></div>
+        <div class="tax-row sub"><span>지방소득세 (10%)</span><span>${won(local)}</span></div>
+        <div class="tax-total"><span class="tt-lbl">예상 세금 합계</span><span class="tt-val">${won(total)}</span></div>
+        <div class="tax-mini">• 다른 소득과 합치는 <b>종합과세</b>가 더 유리하면 그쪽을 선택할 수도 있어요.<br>• 임대사업자로 등록하면 세액감면(30~75%)이 추가될 수 있어요.<br>• 기본공제 200만원은 임대 외 종합소득이 2천만원 이하일 때 적용돼요.</div>`;
+    }else{
+      const er=_taxReg?0.6:0.5,income=Math.round(rent*(1-er)),c=_taxComp(income);
+      html=`<span class="tax-badge warn">연 2천만원 초과 · 종합과세 대상</span>
+        <div class="tax-row"><span>연간 임대수입</span><b>${won(rent)}</b></div>
+        <div class="tax-row sub"><span>− 필요경비 추정 (${_taxReg?'60':'50'}%)</span><span>−${won(rent-income)}</span></div>
+        <div class="tax-row"><span>임대 소득금액</span><b>${won(income)}</b></div>
+        <div class="tax-total"><span class="tt-lbl">이 소득만 단독 계산 시</span><span class="tt-val">약 ${won(c.total)}</span></div>
+        <div class="tax-mini">• 종합과세는 <b>근로·사업 등 다른 소득과 합산</b>해 누진세율(6~45%)이 적용돼요. 실제 세금은 위 금액보다 <b>더 나올 수 있어요.</b><br>• 정확한 계산은 세무사 상담을 권장해요.</div>`;
+    }
+  }else{
+    const vat=Math.round(rent*0.1),exp=taxAnnualExpense(_taxYear),income=Math.max(0,rent-exp),c=_taxComp(income);
+    html=`<div class="tax-vat"><div class="tv-t">부가가치세 (상가)</div><div class="tv-v">연 약 ${won(vat)}</div><div class="tv-n">임대료의 10%예요. 보통 세입자에게 <b>따로 받아서</b> 납부하니 임대인 부담은 아니에요. 매년 <b>1월·7월</b> 신고. 간이과세자는 다를 수 있어요.</div></div>
+      <span class="tax-badge warn">상가 임대소득 · 종합과세 대상</span>
+      <div class="tax-row"><span>연간 임대수입</span><b>${won(rent)}</b></div>
+      <div class="tax-row sub"><span>− 장부상 지출 (${_taxYear}년)</span><span>−${won(exp)}</span></div>
+      <div class="tax-row"><span>임대 소득금액</span><b>${won(income)}</b></div>
+      <div class="tax-total"><span class="tt-lbl">이 소득만 단독 계산 시</span><span class="tt-val">약 ${won(c.total)}</span></div>
+      <div class="tax-mini">• 상가는 금액과 무관하게 <b>종합과세</b>예요(다른 소득과 합산, 6~45%). 실제 세금은 더 나올 수 있어요.<br>• 필요경비는 이 장부의 지출 합계로 잡았어요. 실제 인정 경비와 다를 수 있어요.<br>• 정확한 계산은 세무사 상담을 권장해요.</div>`;
+  }
+  res.innerHTML=html;
+  renderTaxCal();
+}
+function renderTaxCal(){
+  const el=document.getElementById('tax-cal');if(!el)return;
+  const rows=[
+    ['5월','종합소득세 신고·납부','작년 한 해 임대소득을 신고해요 (홈택스)'],
+    ['7·9월','재산세','지자체가 고지서를 보내줘요. 직접 계산할 필요 없어요'],
+  ];
+  if(_taxType==='store')rows.push(['1·7월','부가가치세 신고','상가 임대는 반기마다 신고해요']);
+  rows.push(['12월','종합부동산세','보유 부동산 공시가 합계가 기준을 넘으면 대상이에요']);
+  el.innerHTML=`<div class="tax-cal-t">🗓 세금 달력</div>`+rows.map(r=>`<div class="tax-cal-row"><span class="tax-cal-when">${r[0]}</span><span class="tax-cal-txt">${r[1]}<br><span class="tc-sub">${r[2]}</span></span></div>`).join('');
 }
 
 </script>
