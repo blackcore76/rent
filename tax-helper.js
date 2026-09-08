@@ -63,6 +63,9 @@
     .taxh-total .tt-val{font-size:21px;font-weight:900;color:#DC2626;white-space:nowrap;font-variant-numeric:tabular-nums}
     .taxh-mini{font-size:11.5px;line-height:1.7;color:#94A3B8;margin-top:11px}
     .taxh-mini b{color:#64748B}
+    .taxh-ref-link{display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:13px;padding:12px 14px;background:linear-gradient(135deg,#1E2D3D,#334155);border-radius:11px;text-align:center;text-decoration:none;color:#fff;font-size:12.5px;font-weight:800;transition:opacity .15s}
+    .taxh-ref-link:active{opacity:.85}
+    .taxh-ref-link span{font-size:10.5px;font-weight:500;color:rgba(255,255,255,.62)}
     .taxh-vat{background:#E0F2FE;border:1px solid #BAE6FD;border-radius:11px;padding:12px 13px;margin-bottom:13px}
     .taxh-vat .tv-t{font-size:12px;font-weight:800;color:#0C4A6E;margin-bottom:5px}
     .taxh-vat .tv-v{font-size:18px;font-weight:900;color:#0C4A6E;font-variant-numeric:tabular-nums}
@@ -230,6 +233,8 @@
           <div class="taxh-total"><span class="tt-lbl">이 소득만 단독 계산 시</span><span class="tt-val">약 ${fmt(c.total)}원</span></div>
           <div class="taxh-mini">• 종합과세는 <b>근로·사업 등 다른 소득과 합산</b>해 누진세율(6~45%)이 적용돼요. 실제 세금은 위 금액보다 <b>더 나올 수 있어요.</b><br>• 정확한 계산은 세무사 상담을 권장해요.</div>`;
       }
+      // 국세청 공식 안내 (주택분 전용 · 상가분은 대응 페이지 없음)
+      html += `<a class="taxh-ref-link" href="https://b.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2253&cntntsId=7684" target="_blank" rel="noopener noreferrer">📖 국세청 · 주택임대 소득세 계산<span>공식 계산 방법 안내 보기 →</span></a>`;
     } else {
       const vat = Math.round(rent * 0.1), exp = thAnnualExpense(_thYear), income = Math.max(0, rent - exp), c = thComp(income);
       html = `<div class="taxh-vat"><div class="tv-t">부가가치세 (상가)</div><div class="tv-v">연 약 ${fmt(vat)}원</div><div class="tv-n">임대료의 10%예요. 보통 세입자에게 <b>따로 받아서</b> 납부하니 임대인 부담은 아니에요. 매년 <b>1월·7월</b> 신고. 간이과세자는 다를 수 있어요.</div></div>
