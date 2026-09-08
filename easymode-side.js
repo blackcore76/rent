@@ -11,7 +11,7 @@
   var s = document.createElement('style');
   s.textContent = `
     #em-side-btn{
-      position:fixed;left:-52px;bottom:200px;z-index:500;
+      position:fixed;left:-52px;bottom:120px;z-index:500;
       width:80px;padding:16px 6px 16px 8px;
       background:rgba(255,202,40,.8);
       border:1.5px solid rgba(255,202,40,.8);border-left:none;
