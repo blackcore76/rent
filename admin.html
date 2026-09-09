@@ -121,6 +121,9 @@
 .rooms-input:focus{border-color:var(--sky)}
 .gen-inp{border:2px solid var(--border);border-radius:8px;padding:8px 6px;font-size:13px;font-family:inherit;outline:none;color:var(--text);background:#fff;width:100%;text-align:center}
 .gen-inp:focus{border-color:var(--sky)}
+.bldg-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.bldg-grid.two{grid-template-columns:1fr 1fr}
+.bldg-grid .bldg-card{margin-bottom:0}
 .bldg-card{background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:16px;margin-bottom:10px;box-shadow:0 4px 16px rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.06)}
 .bldg-card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.1)}
 .bldg-card-name{font-size:15px;font-weight:900;color:#fff}
@@ -761,7 +764,9 @@ function renderBldDetails(){
   const el=document.getElementById("buildings-list");if(!el)return;
   const list=Object.values(bldgDetails).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""));
   if(!list.length){el.innerHTML='<div class="empty-st"><div class="ei">🏠</div><div class="et">등록된 건물 정보가 없습니다<br>+ 추가 버튼으로 등록하세요</div></div>';return}
-  el.innerHTML=list.map(b=>`<div class="bldg-card">
+  // 카드 개수가 짝수면 좌우 2열(1 2 / 3 4), 홀수면 1열
+  const twoCol=list.length%2===0;
+  el.innerHTML=`<div class="bldg-grid${twoCol?" two":""}">`+list.map(b=>`<div class="bldg-card">
     <div class="bldg-card-hd">
       <span class="bldg-card-name">🏠 ${esc(b.name)}</span>
       <div class="bldg-card-btns">
@@ -769,13 +774,13 @@ function renderBldDetails(){
         <button class="bldg-ic del" onclick="delBuilding('${b.id}')">✕</button>
       </div>
     </div>
-    ${b.entranceCode||b.masterCode?`<div style="display:grid;grid-template-columns:${b.entranceCode&&b.masterCode?"1fr 1fr":"1fr"};gap:12px;margin-bottom:8px">
+    ${b.entranceCode||b.masterCode?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:12px;margin-bottom:8px">
       ${b.entranceCode?`<div class="bldg-row" style="margin-bottom:0"><span class="bldg-icon">🔐</span><div class="bldg-body"><div class="bldg-lbl">1층 현관</div><div class="bldg-val">${esc(b.entranceCode)}</div></div></div>`:""}
       ${b.masterCode?`<div class="bldg-row" style="margin-bottom:0"><span class="bldg-icon">🗝️</span><div class="bldg-body"><div class="bldg-lbl">세대 마스터</div><div class="bldg-val">${esc(b.masterCode)}</div></div></div>`:""}
     </div>`:""}
     ${b.manageFee?`<div class="bldg-row"><span class="bldg-icon">🏦</span><div class="bldg-body"><div class="bldg-lbl">관리비 계좌</div><div class="bldg-val-muted">${esc(b.manageFee)}</div></div></div>`:""}
     ${b.address?`<div class="bldg-row" style="margin-bottom:0"><span class="bldg-icon">📍</span><div class="bldg-body"><div class="bldg-lbl">주소</div><div class="bldg-val-muted">${esc(b.address)}</div></div></div>`:""}
-  </div>`).join("");
+  </div>`).join("")+`</div>`;
 }
 function openAddBuilding(){
   document.getElementById("bldg-sheet-title").textContent="건물 정보 추가";

@@ -786,17 +786,17 @@ function checkContractAlerts(){
   else sessionStorage.removeItem("ca_alerts");
   maybeShowAlerts();
 }
-function _bldCardsHtml(bids) {
-  return bids.flatMap(bid => {
+function _bldCardsHtml(bids, twoColWhenEven=true) {
+  const cards = bids.flatMap(bid => {
     const bldInfo = (allBldData[bid]||{}).bldInfo||{};
     return Object.values(bldInfo).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).map(b=>
-      `<div style="background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:18px 20px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.06)">
+      `<div style="background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:18px 20px;box-shadow:0 4px 16px rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.06)">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1)">
           <span style="font-size:20px">🏠</span>
           <span style="font-size:16px;font-weight:900;color:#fff">${esc(b.name)}</span>
         </div>
         <div style="display:flex;flex-direction:column;gap:12px">
-          ${b.entranceCode||b.masterCode?`<div style="display:grid;grid-template-columns:${b.entranceCode&&b.masterCode?"1fr 1fr":"1fr"};gap:12px">
+          ${b.entranceCode||b.masterCode?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:12px">
             ${b.entranceCode?`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">🔐</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">1층 현관</div><div style="font-size:15px;font-weight:900;color:#4DD0E1;letter-spacing:1px">${esc(b.entranceCode)}</div></div></div>`:""}
             ${b.masterCode?`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">🗝️</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">세대 마스터</div><div style="font-size:15px;font-weight:900;color:#4DD0E1;letter-spacing:1px">${esc(b.masterCode)}</div></div></div>`:""}
           </div>`:""}
@@ -804,14 +804,18 @@ function _bldCardsHtml(bids) {
           ${b.address?`<div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)"><span style="font-size:16px;flex-shrink:0">📍</span><div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.75);line-height:1.6">${esc(b.address)}</div></div>`:""}
         </div>
       </div>`);
-  }).join("");
+  });
+  if(!cards.length) return "";
+  // 카드 개수가 짝수면 좌우 2열(1 2 / 3 4), 홀수면 1열
+  const cols=(twoColWhenEven && cards.length%2===0)?"1fr 1fr":"1fr";
+  return `<div style="display:grid;grid-template-columns:${cols};gap:12px;align-items:start">${cards.join("")}</div>`;
 }
 function renderBldCards(){
-  const el=document.getElementById("buildings-wrap");if(!el)return;
-  const html=_bldCardsHtml(sortedBids(bldgsData));
-  el.innerHTML=html;
+  const bids=sortedBids(bldgsData);
+  const el=document.getElementById("buildings-wrap");
+  if(el) el.innerHTML=_bldCardsHtml(bids,true);          // 메인 일반: 짝수→2열
   const emEl=document.getElementById("em-buildings-wrap");
-  if(emEl) emEl.innerHTML=html;
+  if(emEl) emEl.innerHTML=_bldCardsHtml(bids,false);     // 이지모드: 항상 1열
 }
 
 function renderNotes(){
@@ -1025,7 +1029,7 @@ function renderEasyMode() {
 
   // 건물정보 카드 동기화
   const emBldEl = document.getElementById('em-buildings-wrap');
-  if (emBldEl) emBldEl.innerHTML = _bldCardsHtml(sortedBids(bldgsData));
+  if (emBldEl) emBldEl.innerHTML = _bldCardsHtml(sortedBids(bldgsData), false); // 이지모드: 항상 1열
 
 }
 
