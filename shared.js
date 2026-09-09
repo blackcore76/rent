@@ -36,18 +36,20 @@ async function migrateToMultiBldg(uid){
 }
 
 // ── 사용자 접근 제어 ──
+// 무료 셀프서브 전환(2026-09): 관리자 승인제 폐기.
+//   · 신규 가입 → 즉시 active (승인 대기 없음)
+//   · 기존 pending → 접속 시 자동 active 승격 (모두 active여야 RTDB 데이터 규칙 통과)
+//   · rejected → 여전히 차단 (악용자 차단용 마스터 권한 유지)
 async function checkUserAccess(user){
   const ref=db.ref("_users/"+user.uid);
   const snap=await ref.once("value");
-  let status;
+  const now=new Date().toISOString();
   if(!snap.exists()){
-    await ref.set({uid:user.uid,displayName:user.displayName||"",email:user.email||"",photoURL:user.photoURL||"",status:"pending",createdAt:new Date().toISOString()});
-    status="pending";
-  }else{
-    status=snap.val().status||"pending";
+    await ref.set({uid:user.uid,displayName:user.displayName||"",email:user.email||"",photoURL:user.photoURL||"",status:"active",createdAt:now,activatedAt:now});
+    return true;
   }
-  if(status==="active")return true;
-  if(status==="rejected"){
+  const val=snap.val()||{};
+  if(val.status==="rejected"){
     const ss=document.getElementById("status-screen");
     document.getElementById("ss-email").textContent=user.email||"";
     document.getElementById("ss-icon").textContent="🚫";
@@ -56,7 +58,10 @@ async function checkUserAccess(user){
     ss.style.display="flex";
     return false;
   }
-  return "readonly";
+  if(val.status!=="active"){
+    try{await ref.update({status:"active",activatedAt:now});}catch(e){}
+  }
+  return true;
 }
 
 // ── 계약 만료 알림 ──
