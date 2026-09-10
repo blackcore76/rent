@@ -60,7 +60,7 @@
   btn.innerHTML =
     '<span id="apply-side-ring"></span>' +
     '<span id="apply-stxt">이용신청</span>' +
-    '<span id="apply-stxt-hid">신청</span>';
+    '<span id="apply-stxt-hid">이용신청</span>';
   document.body.appendChild(btn);
 
   /* ── 안내 모달 ────────────────────────────────────────── */
