@@ -56,7 +56,7 @@
   const btn = document.createElement('div');
   btn.id = 'lg-side-btn';
   btn.innerHTML = `
-    <span id="lg-stxt-hid">가이드</span>
+    <span id="lg-stxt-hid">임대가이드</span>
     <span id="lg-stxt">임대가이드</span>
     <span id="lg-side-ring"></span>
   `;
