@@ -614,6 +614,7 @@ auth.onAuthStateChanged(async user=>{
       // Sync per-building listeners
       bids.forEach(bid=>{if(!bldListeners[bid])setupBldListeners(targetUid,bid)});
       Object.keys(bldListeners).forEach(bid=>{if(!bldgsData[bid])teardownBldListeners(bid)});
+      if(!bids.length)_unitsSeen=true; // 건물이 없으면 세대 리스너가 안 뜨므로 여기서 로드완료로 간주
       schedRenderDash();schedRenderBldCards();
     });
     setSS("ok");
@@ -626,6 +627,8 @@ auth.onAuthStateChanged(async user=>{
 });
 
 let _rdTm=null,_rbTm=null;
+// 세대 데이터가 실제로 한 번이라도 로드됐는지 — 온보딩 카드 조기 깜빡임 방지용
+let _unitsSeen=false;
 function schedRenderDash(){clearTimeout(_rdTm);_rdTm=setTimeout(renderDash,60);}
 function schedRenderBldCards(){clearTimeout(_rbTm);_rbTm=setTimeout(renderBldCards,60);}
 
@@ -634,7 +637,7 @@ function setupBldListeners(uid,bid){
   if(!allBldData[bid])allBldData[bid]={};
   const base=db.ref(DBPath.bldData(uid, bid));
   const uRef=base.child("units"),hRef=base.child("rent_history"),biRef=base.child("buildings"),rlRef=base.child("config/roomLayout");
-  const uL=uRef.on("value",snap=>{allBldData[bid].units=snap.val()||{};schedRenderDash();setSS("ok")},()=>setSS("err"));
+  const uL=uRef.on("value",snap=>{allBldData[bid].units=snap.val()||{};_unitsSeen=true;schedRenderDash();setSS("ok")},()=>setSS("err"));
   const hL=hRef.on("value",snap=>{allBldData[bid].history=snap.val()||{};schedRenderDash()});
   const biL=biRef.on("value",snap=>{allBldData[bid].bldInfo=snap.val()||{};schedRenderBldCards()});
   const rlL=rlRef.on("value",snap=>{allBldData[bid].roomLayout=snap.val()||null;schedRenderDash()});
@@ -700,7 +703,7 @@ function renderDash(){
 
   // 첫 사용 온보딩: 로그인한 실사용자가 아직 세대를 하나도 안 만든 상태에서만 안내
   const fr=document.getElementById("first-run");
-  if(fr)fr.style.display=(!readOnly&&cu&&!mUid&&tot===0)?"block":"none";
+  if(fr)fr.style.display=(_unitsSeen&&!readOnly&&cu&&!mUid&&tot===0)?"block":"none";
 
   // Unpaid
   let uHtml="";
