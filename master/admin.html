@@ -17,6 +17,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="../shared.js?v=2"></script>
 <script src="../db-paths.js"></script>
 <style>
@@ -296,6 +297,8 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 
 <script>
 let usersRef=null,pendingUsersRef=null,allUsersData={},masterUsersData={};
+const fs=firebase.firestore();     // 유료 엔타이틀먼트(entitlements)
+let entMap={};                     // { uid: {paidUntil, plan, ...} }
 let viewingUid=sessionStorage.getItem("master_view_uid")||null;
 let viewingName=sessionStorage.getItem("master_view_name")||null;
 let ucTotalList=[],ucPage=1,_usrDrop=null;
@@ -321,8 +324,48 @@ auth.onAuthStateChanged(user=>{
   usersRef.on("value",snap=>{masterUsersData=snap.val()||{};renderUsers();});
   pendingUsersRef=db.ref(DBPath.pendingUsers());
   pendingUsersRef.on("value",snap=>{allUsersData=snap.val()||{};renderPendingUsers();renderUsers();});
+  // 유료(Plus) 엔타이틀먼트 실시간 구독 → 사용자 카드의 유료 배지/버튼 자동 갱신 (규칙상 마스터만 읽기)
+  fs.collection("entitlements").onSnapshot(s=>{
+    entMap={};s.forEach(d=>entMap[d.id]=d.data());
+    renderUsers();
+  },e=>console.warn("entitlements 구독 실패",e));
   updateCtxBtn();
 });
+
+// ── 유료(사진 Plus) 엔타이틀먼트 ──
+function paidInfo(uid){
+  const e=entMap[uid];
+  if(!e||!e.paidUntil)return{active:false,days:0};
+  const until=e.paidUntil.toDate?e.paidUntil.toDate():new Date(e.paidUntil);
+  const ms=until.getTime()-Date.now();
+  return{active:ms>0,days:Math.max(0,Math.ceil(ms/86400000)),until};
+}
+async function grantPaid(uid,name){
+  try{
+    let base=Date.now();
+    const cur=entMap[uid];
+    if(cur&&cur.paidUntil){
+      const u=cur.paidUntil.toDate?cur.paidUntil.toDate():new Date(cur.paidUntil);
+      if(u.getTime()>base)base=u.getTime();   // 남은 기간이 있으면 거기서 +30일 연장
+    }
+    const until=new Date(base+30*86400000);
+    await fs.collection("entitlements").doc(uid).set({
+      plan:"plus",
+      paidUntil:firebase.firestore.Timestamp.fromDate(until),
+      payerName:(allUsersData[uid]?.displayName||name||""),
+      note:(document.getElementById("pm-"+uid)?.value.trim()||""),
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedBy:"master"
+    },{merge:true});
+    showToast("💳 유료 30일 적용 · ~"+until.toLocaleDateString("ko-KR"));
+  }catch(e){showToast("❗ 실패: "+e.message)}
+}
+async function revokePaid(uid){
+  try{
+    await fs.collection("entitlements").doc(uid).delete();
+    showToast("⚪ 유료 해제됨");
+  }catch(e){showToast("❗ 실패: "+e.message)}
+}
 
 function toggleMasterMenu(){
   const el=document.getElementById("master-menu");
@@ -793,10 +836,14 @@ function renderUsersPage(){
     const typeBadge=`<span class="uc-type-badge ${userType}" onclick="event.stopPropagation();toggleUserType('${esc(u.uid)}','${userType}')">${typeLabel}</span>`;
     const isRej=u.status==="rejected";
     const stBadge=isRej?`<span class="uc-status-badge rejected">🚫 거부</span>`:`<span class="uc-status-badge active">✅ 활성</span>`;
+    const pi=paidInfo(u.uid);
+    const paidBadge=pi.active
+      ?`<span class="uc-status-badge" style="background:rgba(5,150,105,.15);color:#059669;border:1px solid rgba(5,150,105,.3)">🟢 유료 D-${pi.days}</span>`
+      :`<span class="uc-status-badge" style="background:rgba(148,163,184,.15);color:#64748B;border:1px solid rgba(148,163,184,.25)">⚪ 무료</span>`;
     const dt=u.createdAt?new Date(u.createdAt).toLocaleString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit"}):"";
     const cardCls=`user-card${isV?" active open":""}${isRej?" rejected":""}`;
     return`<div class="${cardCls}" id="uc-${esc(u.uid)}">
-      <div class="uc-top" onclick="toggleCard(this)"><div class="uc-name">${esc(showName)}${typeBadge}${stBadge}${alias?`<span style="font-size:11px;color:var(--sub);font-weight:400">(${esc(alias)})</span>`:""}</div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><div class="uc-num">#${start+i+1}</div><span class="uc-chevron">▼</span></div></div>
+      <div class="uc-top" onclick="toggleCard(this)"><div class="uc-name">${esc(showName)}${typeBadge}${stBadge}${paidBadge}${alias?`<span style="font-size:11px;color:var(--sub);font-weight:400">(${esc(alias)})</span>`:""}</div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><div class="uc-num">#${start+i+1}</div><span class="uc-chevron">▼</span></div></div>
       <div class="uc-meta">${u.email?`📧 ${esc(u.email)}`:""}${u.email&&dt?" · ":""}${dt?`🕐 승인: ${esc(dt)}`:""}</div>
       <div class="uc-expand">
         <div class="uc-uid">${esc(u.uid)}</div>
@@ -804,6 +851,10 @@ function renderUsersPage(){
           <input class="pc-memo-inp" id="pm-${esc(u.uid)}" type="text" value="${esc(u.memo||"")}" placeholder="메모 (결제일, 건물명 등)">
           <button style="padding:8px 12px;background:rgba(14,165,233,.1);color:var(--sky);border:1px solid rgba(14,165,233,.25);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap" onclick="saveUcMemo('${esc(u.uid)}')">저장</button>
           <button style="padding:8px 10px;background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0" onclick="deleteUcMemo('${esc(u.uid)}')">🗑</button>
+        </div>
+        <div class="pc-btn-row" style="margin-top:8px;display:flex;gap:8px">
+          <button style="flex:1;padding:9px 4px;background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.3);border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit" onclick="grantPaid('${esc(u.uid)}','${esc(showName)}')">💳 사진 유료 30일 ${pi.active?"연장":"부여"}</button>
+          ${pi.active?`<button style="padding:9px 12px;background:rgba(148,163,184,.12);color:#64748B;border:1px solid rgba(148,163,184,.3);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="revokePaid('${esc(u.uid)}')">해제</button>`:""}
         </div>
         <div class="uc-actions">
           ${!isRej?`<button class="uc-btn btn-main" onclick="setAndGo('${esc(u.uid)}','${esc(showName)}','units')">🏠 세대</button>
