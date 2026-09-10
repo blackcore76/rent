@@ -55,21 +55,21 @@
   const btn = document.createElement('div');
   btn.id = 'apply-side-btn';
   btn.setAttribute('role', 'button');
-  btn.setAttribute('aria-label', '이용신청');
+  btn.setAttribute('aria-label', '시작하기');
   btn.style.display = 'none'; // 인증 상태 확인 전까지 숨김
   btn.innerHTML =
     '<span id="apply-side-ring"></span>' +
-    '<span id="apply-stxt">이용신청</span>' +
-    '<span id="apply-stxt-hid">이용신청</span>';
+    '<span id="apply-stxt">시작하기</span>' +
+    '<span id="apply-stxt-hid">시작하기</span>';
   document.body.appendChild(btn);
 
   /* ── 안내 모달 ────────────────────────────────────────── */
   const ov = document.createElement('div');
   ov.id = 'apply-overlay';
   ov.innerHTML = `
-    <div id="apply-modal" role="dialog" aria-modal="true" aria-label="플러스홈 이용 신청">
+    <div id="apply-modal" role="dialog" aria-modal="true" aria-label="플러스홈 시작하기">
       <div class="apply-hdr">
-        <div class="apply-title">🏠 플러스홈 이용 신청</div>
+        <div class="apply-title">🏠 플러스홈 시작하기</div>
         <button class="apply-close-x" aria-label="닫기">✕</button>
       </div>
       <div class="apply-body">
@@ -83,10 +83,10 @@
           <div class="apply-step"><span class="n">3</span><span class="t"><b>💸 장부 탭</b>에서 월세 · 수입 · 지출을 기록해요</span></div>
         </div>
         <div class="apply-note">
-          아래 <b>신청확인</b>을 누르면 <b>구글 계정으로 로그인</b>되고, 이름·이메일로 사용자 등록이 이뤄져요
+          아래 <b>시작하기</b>를 누르면 <b>구글 계정으로 로그인</b>되고, 이름·이메일로 사용자 등록이 이뤄져요
           그때부터 바로 이용할 수 있어요 <br><b>승인 대기 없이 즉시 시작!</b>
         </div>
-        <button class="apply-cta">✅ 신청확인 · 구글로 시작하기</button>
+        <button class="apply-cta">✅ 구글로 시작하기</button>
         <button class="apply-later">나중에 할게요</button>
         <div class="apply-foot">모든 저장 데이터는 사용자가 직접 백업해야 해요<br>개인정보는 본인 확인용(이름·이메일)으로만 사용해요</div>
       </div>
@@ -128,10 +128,14 @@
   ov.addEventListener('click', e => { if (e.target === ov) closeModal(); });
   ov.querySelector('.apply-cta').addEventListener('click', () => {
     closeModal();
+    try { sessionStorage.removeItem('guestDemo'); } catch (e) {} // 구경 모드에서 신청 시 데모 플래그 해제
     if (typeof signInGoogle === 'function') signInGoogle();
     else if (typeof auth !== 'undefined' && typeof gProv !== 'undefined')
       auth.signInWithPopup(gProv).catch(() => {});
   });
+
+  // 다른 진입점(로그인 화면·구경 배너의 '로그인')도 이 모달을 거치도록 전역 노출
+  window.openApplyModal = openModal;
 
   /* ── 인증 상태에 따라 노출/숨김 ─────────────────────────
      비로그인(로그인 화면 · 구경 모드) → 표시,  로그인 → 숨김 */

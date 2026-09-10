@@ -102,7 +102,7 @@ function showDemoBanner(){
   b.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(14,165,233,.18),rgba(14,165,233,.06));border-bottom:1px solid rgba(14,165,233,.35);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
   const btn=cu
     ?`<button onclick="auth.signOut()" style="background:rgba(14,165,233,.2);border:1px solid rgba(14,165,233,.4);border-radius:8px;padding:5px 12px;color:#0EA5E9;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🚪 로그아웃</button>`
-    :`<button onclick="sessionStorage.removeItem('guestDemo');location.reload()" style="background:rgba(14,165,233,.2);border:1px solid rgba(14,165,233,.4);border-radius:8px;padding:5px 12px;color:#0EA5E9;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🔑 로그인</button>`;
+    :`<button onclick="startSignIn()" style="background:rgba(14,165,233,.2);border:1px solid rgba(14,165,233,.4);border-radius:8px;padding:5px 12px;color:#0EA5E9;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🔑 시작하기</button>`;
   b.innerHTML=`<span style="font-size:12px;font-weight:700;color:#0EA5E9">👀 구경 모드 · 데모 데이터 표시 중</span>${btn}`;
   document.body.appendChild(b);
   document.querySelector(".content").style.marginTop="136px";
@@ -153,6 +153,11 @@ function signInGoogle(){
     return;
   }
   auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message));
+}
+// 로그인 진입 일원화: 이용신청 모달이 있으면 그 2단 확인을 거치고, 없으면(백업/복구 등) 바로 로그인
+function startSignIn(){
+  if(typeof window!=="undefined" && typeof window.openApplyModal==="function"){window.openApplyModal();return;}
+  signInGoogle();
 }
 
 // ── 메뉴 유틸 ──
