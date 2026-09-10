@@ -909,7 +909,7 @@ function toggleCard(el){
 
 // ── 삭제 ──
 function delUser(uid,name){
-  showCM("사용자 삭제",`"${name}"을 앱 내에서 완전히 삭제할까요?\n\n• 관리자 메모·자율/대행 설정 모두 제거\n• 사용자의 임대 데이터(세대·장부)는 보존\n• Firebase 인증 계정 자체는 유지됨\n• 사용자가 다시 로그인하면 신규 승인 대기로 등록`,()=>{
+  showCM("목록에서 삭제",`"${name}"을 관리 목록에서 삭제할까요?\n\n• 관리자 메모·자율/대행 설정만 제거 (목록 정리용)\n• 임대 데이터(세대·장부)·로그인 계정은 그대로\n• ⚠️ 접속 중이거나 다시 로그인하면 무료 계정으로 자동 재등록돼요\n\n※ 분탕·강퇴는 삭제가 아니라 [🚫 거부]를 쓰세요 — 거부는 영구 차단됩니다`,()=>{
     Promise.all([
       db.ref(DBPath.masterUser(uid)).remove(),
       db.ref(DBPath.pendingUser(uid)).remove(),

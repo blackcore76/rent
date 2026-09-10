@@ -145,7 +145,7 @@
       '</style>' +
       '<div class="ph-footer-inner">' +
         '<div class="ph-footer-name">플러스홈 (104-46-02119)</div>' +
-        '<div class="ph-footer-line">대전광역시 중구 유천로42번길 6, 302호<span class="ph-sep">/</span><a href="tel:010-3309-6321">010-3309-6321</a></div>' +
+        '<div class="ph-footer-line">대전광역시 중구 유천로42번길 6<span class="ph-sep">/</span><a href="tel:010-3309-6321">010-3309-6321</a></div>' +
         '<div class="ph-footer-line"><span class="ph-kakao" id="ph-kakao-btn">카톡 ' + KAKAO_ID + '</span><span class="ph-sep">/</span><a href="mailto:admin@plushome.kr">메일 admin@plushome.kr</a></div>' +
         '<div class="ph-footer-copy">© ' + year + ' PlusHome. All rights reserved.<span class="ph-sep">·</span><span class="ph-privacy-link" id="ph-privacy-btn">개인정보처리방침</span></div>' +
       '</div>' +
