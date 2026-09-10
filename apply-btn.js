@@ -74,21 +74,21 @@
       </div>
       <div class="apply-body">
         <div class="apply-intro">
-          <b>플러스홈</b>은 월세·임대 현황을 한 곳에서 관리하는 <b>무료</b> 서비스예요.<br>
-          아래 순서대로 입력하면 바로 사용할 수 있어요.
+          <b>플러스홈</b>은 월세·임대 현황을 한 곳에서 관리하는 <b>무료</b> 서비스예요<br>
+          아래 순서대로 입력하면 바로 사용할 수 있어요(일부 유료 기능)
         </div>
         <div class="apply-steps">
-          <div class="apply-step"><span class="n">1</span><span class="t"><b>🗂 관리 탭</b>에서 <b>건물 정보</b>를 입력해요<br><span class="sub">현관 비밀번호 · 관리비 계좌 · 주소 등</span></span></div>
+          <div class="apply-step"><span class="n">1</span><span class="t"><b>🗂 관리 탭</b>에서 <b>임대 건물 목록</b> 작성으로 시작해요<br><span class="sub">해당 건물 명칭 · 층수 · 호실 등</span></span></div>
           <div class="apply-step"><span class="n">2</span><span class="t"><b>🏠 세대 탭</b>에서 호실과 임대 현황을 입력해요</span></div>
           <div class="apply-step"><span class="n">3</span><span class="t"><b>💸 장부 탭</b>에서 월세 · 수입 · 지출을 기록해요</span></div>
         </div>
         <div class="apply-note">
-          아래 <b>신청확인</b>을 누르면 <b>구글 계정으로 로그인</b>되고, 이름·이메일로 사용자 등록이 이뤄져요.
-          그때부터 바로 이용할 수 있어요. <b>승인 대기 없이 즉시 시작!</b>
+          아래 <b>신청확인</b>을 누르면 <b>구글 계정으로 로그인</b>되고, 이름·이메일로 사용자 등록이 이뤄져요
+          그때부터 바로 이용할 수 있어요 <br><b>승인 대기 없이 즉시 시작!</b>
         </div>
         <button class="apply-cta">✅ 신청확인 · 구글로 시작하기</button>
         <button class="apply-later">나중에 할게요</button>
-        <div class="apply-foot">모든 기능 무료 · 개인정보는 본인 확인용(이름·이메일)만 사용해요</div>
+        <div class="apply-foot">모든 저장 데이터는 사용자가 직접 백업해야 해요<br>개인정보는 본인 확인용(이름·이메일)으로만 사용해요</div>
       </div>
     </div>`;
   document.body.appendChild(ov);
