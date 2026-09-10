@@ -425,6 +425,7 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 <script src="shared.js?v=2"></script>
 <script src="db-paths.js"></script>
@@ -595,6 +596,9 @@ auth.onAuthStateChanged(async user=>{
     if(readOnly){enterDemoMode();return;}
 
     ls.style.display="none";app.classList.remove("app-backdrop");app.style.display="block";
+
+    // 계약서 사진(Plus) 접근권한 미리 확인 — 이지모드 유닛 상세의 업로드/잠금 분기에 사용
+    checkPhotoAccess();
 
     // 실제 로그인 계정 본인 화면일 때만 푸시 알림 등록 (관리자가 남의 화면 열람 중일 땐 스킵)
     if(targetUid===user.uid) initPushNotif(user.uid);
@@ -1154,10 +1158,10 @@ function euBodyHtml(bid, roomId, u) {
   <div class="eu-photo-grid" id="eu-photo-grid">
     ${photos.map(p=>`<div class="eu-ph-thumb"><img src="${esc(p.url)}" onclick="openEuPV('${esc(p.url)}')" loading="eager"></div>`).join('')}
   </div>
-  <div class="eu-upload-row">
+  ${__photoAccess===true?`<div class="eu-upload-row">
     <button class="eu-upload-btn" onclick="document.getElementById('eu-photo-input').click()">📁 사진 추가</button>
     <button class="eu-upload-btn" onclick="document.getElementById('eu-camera-input').click()">📸 카메라</button>
-  </div>
+  </div>`:photoLockBox("계약서 사진")}
   <button onclick="closeEmUnit()" style="margin-top:20px;width:100%;padding:13px;background:#F1F5F9;border:none;border-radius:12px;font-size:14px;font-weight:700;color:var(--sub);cursor:pointer;font-family:inherit">✕ 닫기</button>`;
 
   return html;

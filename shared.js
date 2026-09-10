@@ -111,6 +111,33 @@ function showDemoBanner(){
 // ── 쓰기 권한 확인 ──
 function guardWrite(){if(!readOnly)return true;showToast("⏳ 승인 후 이용 가능합니다");return false;}
 
+// ── 사진(Plus) 엔타이틀먼트 확인 ──
+// 계약서·증빙 사진 업/다운은 유료(Plus) 기능. 서버(Storage 규칙)가 하드락하고,
+// 여기서는 클라이언트 UX용으로 접근 가능 여부만 조회한다.
+//   · 마스터 → 항상 가능(원격지원)
+//   · 일반 유저 → Firestore entitlements/{uid}.paidUntil 이 미래면 가능
+//   ※ firebase-firestore-compat.js 를 로드한 페이지에서만 호출할 것.
+let __photoAccess; // undefined=미확인, true/false=확정
+async function checkPhotoAccess(){
+  if(__photoAccess!==undefined)return __photoAccess;
+  try{
+    const u=firebase.auth().currentUser;
+    if(!u){__photoAccess=false;return false;}
+    if(u.uid===MASTER_UID){__photoAccess=true;return true;}
+    const doc=await firebase.firestore().collection("entitlements").doc(u.uid).get();
+    const pu=doc.exists?doc.data().paidUntil:null;
+    const until=pu&&pu.toDate?pu.toDate():(pu?new Date(pu):null);
+    __photoAccess=!!(until&&until.getTime()>Date.now());
+  }catch(e){__photoAccess=false;}
+  return __photoAccess;
+}
+// 무료 유저 안내 박스 HTML
+function photoLockBox(feature){
+  return `<div class="photo-lock" style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:11px;padding:13px 14px;font-size:12.5px;color:#075985;line-height:1.65">`+
+    `<div style="font-weight:800;margin-bottom:3px">🔒 ${feature||"사진"}은 <b>Plus 기능</b>이에요</div>`+
+    `사진 업로드·보관은 유료(Plus) 기능입니다. 이용을 원하시면 관리자에게 문의해 주세요.</div>`;
+}
+
 // ── 인증 유틸 ──
 function isInAppBrowser(){
   const ua=navigator.userAgent;

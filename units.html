@@ -21,6 +21,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="shared.js?v=2"></script>
 <script src="db-paths.js"></script>
 <style>
@@ -535,6 +536,18 @@ auth.onAuthStateChanged(async user=>{
     if(readOnly){enterDemoMode();return;}
 
     ls.style.display="none";app.style.display="block";
+
+    // 계약서 사진(Plus) 게이트 — 무료 유저면 업로드 UI를 잠금 안내로 교체
+    checkPhotoAccess().then(ok=>{
+      if(ok)return;
+      const row=document.getElementById("m-sect-photo");
+      if(row&&!row.dataset.locked){
+        row.dataset.locked="1";
+        row.style.display="none";
+        if(row.nextElementSibling)row.nextElementSibling.style.display="none";
+        row.insertAdjacentHTML("afterend",photoLockBox("계약서 사진"));
+      }
+    });
 
     // Load building registry for switcher
     bldgsRef=db.ref(DBPath.bldList(targetUid));

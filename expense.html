@@ -20,6 +20,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="shared.js?v=2"></script>
 <script src="db-paths.js"></script>
 <style>
@@ -313,7 +314,7 @@ body.em-on .fab{background:#1e2d45;box-shadow:0 4px 20px rgba(0,0,0,.5)}
       <div class="photo-grid" id="tx-photo-grid"></div>
       <input type="file" id="tx-photo-input" accept="image/*" multiple style="display:none" onchange="onTxPhotos(event)">
       <input type="file" id="tx-camera-input" accept="image/*" capture="environment" style="display:none" onchange="onTxPhotos(event)">
-      <div class="photo-btn-row">
+      <div class="photo-btn-row" id="tx-sect-photo">
         <button class="upload-btn" id="tx-upload-btn" onclick="document.getElementById('tx-photo-input').click()">📁 사진 추가</button>
         <button class="upload-btn camera-btn" id="tx-camera-btn" onclick="document.getElementById('tx-camera-input').click()">📸 카메라</button>
       </div>
@@ -473,6 +474,17 @@ auth.onAuthStateChanged(async user=>{
 
     ls.style.display="none";app.style.display="block";
     try{if(localStorage.getItem(_emKey(targetUid))==='1')applyEasyMode();}catch(e){}
+
+    // 증빙 사진(Plus) 게이트 — 무료 유저면 업로드 UI를 잠금 안내로 교체
+    checkPhotoAccess().then(ok=>{
+      if(ok)return;
+      const row=document.getElementById("tx-sect-photo");
+      if(row&&!row.dataset.locked){
+        row.dataset.locked="1";
+        row.style.display="none";
+        row.insertAdjacentHTML("afterend",photoLockBox("증빙 사진"));
+      }
+    });
 
     bldgsRef=db.ref(DBPath.bldList(targetUid));
     bldgsL=bldgsRef.on("value",snap=>{
