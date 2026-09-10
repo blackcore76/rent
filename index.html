@@ -291,6 +291,17 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
   </div>
 
   <div class="content" id="normal-content">
+    <div id="first-run" style="display:none;background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:16px;padding:22px 20px;margin-bottom:16px;box-shadow:0 6px 20px rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.06)">
+      <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px">🎉 플러스홈에 오신 걸 환영해요!</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:16px">가입이 끝났어요. 아직 등록된 세대가 없네요 — <b style="color:#4DD0E1">3단계</b>면 바로 시작할 수 있어요.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
+        <div style="display:flex;align-items:flex-start;gap:10px"><span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(77,208,225,.15);color:#4DD0E1;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center">1</span><div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.5"><b>🗂 관리 탭</b>에서 <b>건물 정보 카드</b>를 만들어요<br><span style="font-size:11.5px;color:rgba(255,255,255,.5)">현관 비밀번호 · 관리비 계좌 · 주소 등</span></div></div>
+        <div style="display:flex;align-items:flex-start;gap:10px"><span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(77,208,225,.15);color:#4DD0E1;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center">2</span><div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.5"><b>🏠 세대 탭</b>에서 호실과 임대 현황을 입력해요</div></div>
+        <div style="display:flex;align-items:flex-start;gap:10px"><span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(77,208,225,.15);color:#4DD0E1;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center">3</span><div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.5"><b>💸 장부 탭</b>에서 월세 · 수입 · 지출을 기록해요</div></div>
+      </div>
+      <a href="admin.html" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;box-sizing:border-box;padding:13px;background:#4DD0E1;color:#0F1C2D;font-size:14px;font-weight:900;text-decoration:none;border-radius:11px">🗂 관리 탭에서 건물 정보 만들기 →</a>
+      <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.4);margin-top:12px">모든 기능은 무료예요 · 궁금하면 상단 <b>❓ 도움말</b>을 눌러보세요</div>
+    </div>
     <div class="stats-grid">
       <div class="kpi total" onclick="goUnits()"><div class="kpi-val" id="s-total">—</div><div class="kpi-lbl">전체</div></div>
       <div class="kpi rented" onclick="goUnits('rented')"><div class="kpi-val" id="s-rented">—</div><div class="kpi-lbl">임대중</div></div>
@@ -686,6 +697,10 @@ function renderDash(){
   document.getElementById("s-rented").textContent=rented;
   document.getElementById("s-vacant").textContent=vacant;
   document.getElementById("s-unpaid").textContent=unpaidCnt;
+
+  // 첫 사용 온보딩: 로그인한 실사용자가 아직 세대를 하나도 안 만든 상태에서만 안내
+  const fr=document.getElementById("first-run");
+  if(fr)fr.style.display=(!readOnly&&cu&&!mUid&&tot===0)?"block":"none";
 
   // Unpaid
   let uHtml="";
