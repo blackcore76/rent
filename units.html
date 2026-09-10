@@ -537,14 +537,16 @@ auth.onAuthStateChanged(async user=>{
 
     ls.style.display="none";app.style.display="block";
 
-    // 계약서 사진(Plus) 게이트 — 무료 유저면 업로드 UI를 잠금 안내로 교체
+    // 계약서 사진(Plus) 게이트 — 무료 유저면 사진 영역 전체(썸네일+업로드)를 잠금 안내로 교체
     checkPhotoAccess().then(ok=>{
       if(ok)return;
       const row=document.getElementById("m-sect-photo");
       if(row&&!row.dataset.locked){
         row.dataset.locked="1";
-        row.style.display="none";
-        if(row.nextElementSibling)row.nextElementSibling.style.display="none";
+        const grid=document.getElementById("photo-grid");
+        if(grid)grid.style.display="none";           // 기존 썸네일(깨진 이미지) 숨김
+        row.style.display="none";                     // 업로드 버튼 숨김
+        if(row.nextElementSibling)row.nextElementSibling.style.display="none"; // 업로드 안내문
         row.insertAdjacentHTML("afterend",photoLockBox("계약서 사진"));
       }
     });

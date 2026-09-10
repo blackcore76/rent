@@ -1152,17 +1152,21 @@ function euBodyHtml(bid, roomId, u) {
   html += `<div class="eu-slbl">📅 월세 납부 이력 <span style="font-size:10px;font-weight:400;color:var(--hint);margin-left:4px">최근 12개월</span></div>
   <div class="rent-hist-wrap"><div class="rent-hist-grid" id="eu-hist-grid"></div></div>`;
 
-  // 계약서 사진 (편집 가능)
+  // 계약서 사진 — Plus 유저만 썸네일+업로드, 무료(만료) 유저는 잠금 안내로 대체
   const photos = Object.values(u.photos||{}).sort((a,b)=>a.id-b.id);
-  html += `<div class="eu-slbl">📷 계약서 사진</div>
-  <div class="eu-photo-grid" id="eu-photo-grid">
-    ${photos.map(p=>`<div class="eu-ph-thumb"><img src="${esc(p.url)}" onclick="openEuPV('${esc(p.url)}')" loading="eager"></div>`).join('')}
-  </div>
-  ${__photoAccess===true?`<div class="eu-upload-row">
-    <button class="eu-upload-btn" onclick="document.getElementById('eu-photo-input').click()">📁 사진 추가</button>
-    <button class="eu-upload-btn" onclick="document.getElementById('eu-camera-input').click()">📸 카메라</button>
-  </div>`:photoLockBox("계약서 사진")}
-  <button onclick="closeEmUnit()" style="margin-top:20px;width:100%;padding:13px;background:#F1F5F9;border:none;border-radius:12px;font-size:14px;font-weight:700;color:var(--sub);cursor:pointer;font-family:inherit">✕ 닫기</button>`;
+  html += `<div class="eu-slbl">📷 계약서 사진</div>`;
+  if(__photoAccess===true){
+    html += `<div class="eu-photo-grid" id="eu-photo-grid">
+      ${photos.map(p=>`<div class="eu-ph-thumb"><img src="${esc(p.url)}" onclick="openEuPV('${esc(p.url)}')" loading="eager"></div>`).join('')}
+    </div>
+    <div class="eu-upload-row">
+      <button class="eu-upload-btn" onclick="document.getElementById('eu-photo-input').click()">📁 사진 추가</button>
+      <button class="eu-upload-btn" onclick="document.getElementById('eu-camera-input').click()">📸 카메라</button>
+    </div>`;
+  }else{
+    html += photoLockBox("계약서 사진");
+  }
+  html += `<button onclick="closeEmUnit()" style="margin-top:20px;width:100%;padding:13px;background:#F1F5F9;border:none;border-radius:12px;font-size:14px;font-weight:700;color:var(--sub);cursor:pointer;font-family:inherit">✕ 닫기</button>`;
 
   return html;
 }

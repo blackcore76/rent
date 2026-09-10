@@ -131,11 +131,11 @@ async function checkPhotoAccess(){
   }catch(e){__photoAccess=false;}
   return __photoAccess;
 }
-// 무료 유저 안내 박스 HTML
+// 무료 유저 안내 박스 HTML (미가입·만료 공용)
 function photoLockBox(feature){
   return `<div class="photo-lock" style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:11px;padding:13px 14px;font-size:12.5px;color:#075985;line-height:1.65">`+
     `<div style="font-weight:800;margin-bottom:3px">🔒 ${feature||"사진"}은 <b>Plus 기능</b>이에요</div>`+
-    `사진 업로드·보관은 유료(Plus) 기능입니다. 이용을 원하시면 관리자에게 문의해 주세요.</div>`;
+    `사진 업로드·보기·다운로드는 유료(Plus) 기능이에요. 기존에 올린 사진은 <b>재구독 시 그대로 복원</b>돼요. 이용 문의는 관리자에게.</div>`;
 }
 
 // ── 인증 유틸 ──

@@ -21,6 +21,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="shared.js?v=2"></script>
 <script src="db-paths.js"></script>
 <style>
@@ -904,6 +905,9 @@ function delContact(id){
 // ── CONTRACTS (계약서 사진 관리) ──
 function renderContracts(){
   const el=document.getElementById("contracts-list");
+  // Plus 게이트: 무료(만료) 유저는 계약서 사진 영역 전체를 잠금 안내로 대체
+  if(__photoAccess===undefined){checkPhotoAccess().then(()=>renderContracts());return;}
+  if(__photoAccess===false){el.innerHTML=photoLockBox("계약서 사진");return;}
   const allEmpty=ROOMS.every(r=>!units[r]||!units[r].photos||!Object.keys(units[r].photos).length);
   if(allEmpty){el.innerHTML='<div class="empty-st"><div class="ei">📷</div><div class="et">업로드된 계약서 사진이 없습니다<br>세대 탭에서 사진을 추가하세요</div></div>';return}
   el.innerHTML=ROOMS.map(r=>{
