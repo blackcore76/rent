@@ -192,35 +192,10 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       </div>
     </div>
 
-    <!-- 신규 사용자 승인 -->
-    <div class="sec-title" style="margin-bottom:8px">🔔 신규 사용자 승인</div>
-    <div class="filter-tabs">
-      <button class="filter-tab on" id="ft-pending" onclick="setFilter('pending')">⏳ 대기중</button>
-      <button class="filter-tab" id="ft-all" onclick="setFilter('all')">전체</button>
-    </div>
-    <div id="pending-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
-
-    <!-- 사용자 등록 -->
-    <div class="add-card">
-      <div class="sec-title">➕ 사용자 등록</div>
-      <div class="field">
-        <label>표시 이름 (담당자 · 건물명)</label>
-        <input type="text" id="inp-name" placeholder="예: 홍길동 · 강남빌라">
-      </div>
-      <div class="field">
-        <label>Firebase UID</label>
-        <input type="text" id="inp-uid" placeholder="Authentication에서 복사한 UID">
-      </div>
-      <div class="field">
-        <label>메모 (선택)</label>
-        <input type="text" id="inp-memo" placeholder="연락처, 주소 등">
-      </div>
-      <button class="btn-add" onclick="addUser()">➕ 등록하기</button>
-    </div>
-
-    <!-- 사용자 목록 -->
-    <div class="sec-title" style="margin-bottom:10px">👥 관리 사용자 목록</div>
-    <div class="users-list" id="users-list"></div>
+    <!-- 전체 사용자 (유·무료 통합) -->
+    <div class="sec-title" style="margin-bottom:8px">👥 전체 사용자 <span id="user-count" style="font-size:12px;color:var(--sub);font-weight:400"></span></div>
+    <input type="text" id="user-search" oninput="onUserSearch()" placeholder="🔍 이름 · 이메일 · 메모 검색" autocomplete="off" style="width:100%;box-sizing:border-box;padding:11px 13px;margin-bottom:12px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:rgba(255,255,255,.06);color:#fff;font-size:13px;font-family:inherit;outline:none">
+    <div id="users-all-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px"></div>
     <div id="uc-pagination" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 0;margin-bottom:20px"></div>
 
   </div>
@@ -239,11 +214,12 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 <div id="toast"></div>
 
 <script>
-let usersRef=null,pendingUsersRef=null,allUsersData={},pendingFilter="pending";
+let pendingUsersRef=null,allUsersData={};
 let viewingUid=null,viewingName=null;
 const fs=firebase.firestore();     // 유료 엔타이틀먼트(entitlements) 읽기/쓰기용
 let entMap={};                      // { uid: {paidUntil, plan, ...} }
-let ucTotalList=[],ucPage=1;
+let userSearch="";                 // 사용자 검색어
+let ucPage=1;
 
 // ── 인증 ──
 auth.onAuthStateChanged(user=>{
@@ -273,15 +249,14 @@ auth.onAuthStateChanged(user=>{
     ?`<img class="av-img" src="${user.photoURL}">`
     :`<div class="av-txt">${(user.displayName||"A")[0]}</div>`;
 
-  usersRef=db.ref(DBPath.masterUsers());
-  usersRef.on("value",snap=>renderUsers(snap.val()||{}));
+  // 전체 사용자(_users) 실시간 구독 → 통합 목록 렌더
   pendingUsersRef=db.ref(DBPath.pendingUsers());
-  pendingUsersRef.on("value",snap=>{allUsersData=snap.val()||{};renderPendingUsers();renderUsersPage()});
+  pendingUsersRef.on("value",snap=>{allUsersData=snap.val()||{};renderAllUsers()});
 
   // 유료 엔타이틀먼트 실시간 구독 → 상태 배지/버튼 자동 갱신 (규칙상 마스터만 읽기)
   fs.collection("entitlements").onSnapshot(s=>{
     entMap={};s.forEach(d=>entMap[d.id]=d.data());
-    renderPendingUsers();
+    renderAllUsers();
   },e=>console.warn("entitlements 구독 실패",e));
 });
 
@@ -318,6 +293,71 @@ async function revokePaid(uid){
     await fs.collection("entitlements").doc(uid).delete();
     showToast("⚪ 유료 해제됨");
   }catch(e){showToast("❗ 실패: "+e.message)}
+}
+
+// ── 전체 사용자 통합 목록 (_users 기반) ──
+function onUserSearch(){userSearch=(document.getElementById("user-search").value||"").trim().toLowerCase();ucPage=1;renderAllUsers();}
+function renderAllUsers(){
+  const el=document.getElementById("users-all-list");if(!el)return;
+  const pgEl=document.getElementById("uc-pagination");
+  const cntEl=document.getElementById("user-count");
+  let all=Object.values(allUsersData).filter(u=>u&&u.uid&&u.uid!==MASTER_UID);
+  if(userSearch)all=all.filter(u=>((u.displayName||"")+" "+(u.email||"")+" "+(u.memo||"")).toLowerCase().includes(userSearch));
+  all.sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""));
+  if(cntEl)cntEl.textContent=all.length?`(${all.length}명)`:"";
+  if(!all.length){el.innerHTML=`<div class="empty-state" style="padding:24px 0"><div class="empty-icon" style="font-size:32px">👥</div><div class="empty-txt">${userSearch?"검색 결과 없음":"사용자가 없습니다"}</div></div>`;if(pgEl)pgEl.innerHTML="";return;}
+  const total=all.length,totalPages=Math.ceil(total/10);
+  if(ucPage<1)ucPage=1;if(ucPage>totalPages)ucPage=totalPages;
+  const start=(ucPage-1)*10;
+  el.innerHTML=all.slice(start,start+10).map((u,i)=>{
+    const name=u.displayName||"(이름없음)";
+    const blocked=(u.status||"active")==="rejected";
+    const pi=paidInfo(u.uid);
+    const isV=viewingUid===u.uid;
+    const dt=u.createdAt?new Date(u.createdAt).toLocaleDateString("ko-KR",{year:"numeric",month:"2-digit",day:"2-digit"}):"";
+    const paidBadge=pi.active
+      ?`<span class="pc-badge" style="background:rgba(5,150,105,.15);color:#059669">🟢 유료 D-${pi.days}</span>`
+      :`<span class="pc-badge" style="background:rgba(148,163,184,.15);color:#64748B">⚪ 무료</span>`;
+    return`<div class="pending-card user-card${isV?" active":""}${blocked?" card-rejected":""}" id="uc-${esc(u.uid)}">
+      <div class="pc-top"><div class="pc-name">${esc(name)}</div><div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap">${paidBadge}${blocked?`<span class="pc-badge badge-rejected">🚫 차단됨</span>`:""}</div></div>
+      <div class="pc-email">📧 ${esc(u.email||"")}</div>
+      <div class="pc-time">🕐 가입: ${esc(dt)} · #${start+i+1}</div>
+      <div class="uc-uid">${esc(u.uid)}</div>
+      <div class="pc-btn-row" style="margin-top:8px">
+        <button style="flex:1;padding:9px 4px;background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.3);border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit" onclick="grantPaid('${esc(u.uid)}','${esc(name)}')">💳 사진 유료 30일 ${pi.active?"연장":"부여"}</button>
+        ${pi.active?`<button style="padding:9px 12px;background:rgba(148,163,184,.12);color:#64748B;border:1px solid rgba(148,163,184,.3);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" onclick="revokePaid('${esc(u.uid)}')">해제</button>`:""}
+      </div>
+      <div class="pc-memo-row">
+        <input class="pc-memo-inp" id="pm-${esc(u.uid)}" type="text" value="${esc(u.memo||"")}" placeholder="메모 (결제일, 건물명 등)">
+        <button style="padding:8px 12px;background:rgba(14,165,233,.1);color:var(--sky);border:1px solid rgba(14,165,233,.25);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap" onclick="savePendingMemo('${esc(u.uid)}')">저장</button>
+        <button style="padding:8px 10px;background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0" onclick="deletePendingMemo('${esc(u.uid)}')">🗑</button>
+      </div>
+      <div class="uc-actions">
+        <button class="uc-btn btn-main" onclick="quickGo('${esc(u.uid)}','${esc(name)}','index')">📊 메인</button>
+        <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(name)}','units')">🏠 세대</button>
+        <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(name)}','expense')" style="background:rgba(124,58,237,.12);color:#7C3AED;border:1px solid rgba(124,58,237,.25)">💸 장부</button>
+        <button class="uc-btn btn-units" onclick="quickGo('${esc(u.uid)}','${esc(name)}','admin')" style="background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.25)">🗂 관리</button>
+      </div>
+      <div style="margin-top:8px">
+        ${blocked
+          ?`<button class="uc-btn" style="width:100%;background:rgba(5,150,105,.12);color:#059669;border:1px solid rgba(5,150,105,.3)" onclick="unblockUser('${esc(u.uid)}','${esc(name)}')">✅ 차단 해제</button>`
+          :`<div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 차단</div><button class="btn-reject" style="width:100%" onclick="blockUser('${esc(u.uid)}','${esc(name)}')">🚫 차단</button></div>`}
+      </div>
+    </div>`;
+  }).join("");
+  if(pgEl){
+    if(totalPages<=1)pgEl.innerHTML="";
+    else pgEl.innerHTML=`<button class="page-btn" onclick="ucSetPage(${ucPage-1})" ${ucPage<=1?"disabled":""}>◀</button><span class="page-info">${ucPage} / ${totalPages}</span><button class="page-btn" onclick="ucSetPage(${ucPage+1})" ${ucPage>=totalPages?"disabled":""}>▶</button>`;
+  }
+}
+// ── 차단 / 차단해제 (악용자 사용중지 — checkUserAccess가 rejected를 막음) ──
+function blockUser(uid,name){
+  showCM("사용자 차단",`"${name}" 을(를) 차단할까요?\n차단되면 로그인해도 앱 사용이 막힙니다.`,()=>{
+    db.ref(DBPath.pendingUser(uid)).update({status:"rejected"}).then(()=>{if(viewingUid===uid)clearViewing();showToast("🚫 차단됨: "+name)}).catch(()=>showToast("❗ 실패"));
+  });
+}
+function unblockUser(uid,name){
+  db.ref(DBPath.pendingUser(uid)).update({status:"active"}).then(()=>showToast("✅ 차단 해제: "+(name||""))).catch(()=>showToast("❗ 실패"));
 }
 
 // ── 신규 승인 ──
@@ -461,7 +501,7 @@ function renderUsersPage(){
   if(totalPages<=1){pgEl.innerHTML="";return;}
   pgEl.innerHTML=`<button class="page-btn" onclick="ucSetPage(${ucPage-1})" ${ucPage<=1?"disabled":""}>◀</button><span class="page-info">${ucPage} / ${totalPages}</span><button class="page-btn" onclick="ucSetPage(${ucPage+1})" ${ucPage>=totalPages?"disabled":""}>▶</button>`;
 }
-function ucSetPage(p){ucPage=p;renderUsersPage()}
+function ucSetPage(p){ucPage=p;renderAllUsers()}
 
 // ── 사용자 선택 ──
 function setViewing(uid,name){
