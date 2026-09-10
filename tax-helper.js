@@ -82,7 +82,7 @@
   const wrap = document.createElement('div');
   wrap.innerHTML = `
     <div id="taxh-side-btn">
-      <span id="taxh-stxt-hid">세금</span>
+      <span id="taxh-stxt-hid">세금도우미</span>
       <span id="taxh-stxt">세금도우미</span>
       <span id="taxh-side-ring"></span>
     </div>

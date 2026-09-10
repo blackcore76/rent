@@ -236,7 +236,7 @@
   const wrap = document.createElement('div');
   wrap.innerHTML = `
     <div id="bc-side-btn">
-      <span id="bc-stxt-hid">수수료</span>
+      <span id="bc-stxt-hid">중개수수료</span>
       <span id="bc-stxt">수수료계산</span>
       <span id="bc-side-ring"></span>
     </div>
