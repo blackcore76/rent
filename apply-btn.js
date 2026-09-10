@@ -9,19 +9,21 @@
   /* ── CSS ─────────────────────────────────────────────── */
   const s = document.createElement('style');
   s.textContent = `
-    /* 좌측 엣지 부착: 본체 폭 80px 중 52px는 화면 밖(translateX -52px), 28px만 삐죽 노출.
-       peek/hover 시 translateX(0)으로 완전히 펼쳐짐. */
-    #apply-side-btn{position:fixed;left:0;top:150px;z-index:7100;width:80px;padding:16px 8px 16px 6px;background:linear-gradient(135deg,#0EA5E9,#0284C7);border:1.5px solid #0EA5E9;border-left:none;border-radius:0 16px 16px 0;cursor:pointer;transform:translateX(-52px);transition:transform .28s cubic-bezier(.4,0,.2,1);box-shadow:2px 2px 12px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-    #apply-side-btn.peeking{transform:translateX(0)}
-    @media(hover:hover){#apply-side-btn:hover{transform:translateX(0)}}
+    /* 좌측 상단 엣지 부착 — 기존 사이드 탭(세금/수수료 등)과 동일한 peek 방식.
+       대기: left:-52px(28px만 삐죽) · 펼침(.peeking/hover): left:0 */
+    #apply-side-btn{position:fixed;left:-52px;top:150px;z-index:7100;width:80px;padding:16px 8px 16px 6px;background:linear-gradient(135deg,#0EA5E9,#0284C7);border:1.5px solid #0EA5E9;border-left:none;border-radius:0 16px 16px 0;cursor:pointer;transition:left .28s cubic-bezier(.4,0,.2,1);box-shadow:2px 2px 12px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:flex-end;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+    #apply-side-btn.peeking{left:0;justify-content:center}
+    @media(hover:hover){#apply-side-btn:hover{left:0;justify-content:center}}
     #apply-stxt,#apply-stxt-hid{writing-mode:vertical-rl;font-weight:900;color:#fff;font-family:'Noto Sans KR',sans-serif}
     #apply-stxt{font-size:12px;letter-spacing:2px;display:none}
     #apply-stxt-hid{font-size:11px;letter-spacing:2px}
     #apply-side-btn.peeking #apply-stxt{display:inline}
     #apply-side-btn.peeking #apply-stxt-hid{display:none}
     @media(hover:hover){#apply-side-btn:hover #apply-stxt{display:inline}#apply-side-btn:hover #apply-stxt-hid{display:none}}
-    #apply-side-ring{position:absolute;left:50%;top:50%;width:34px;height:34px;margin-left:-17px;margin-top:-17px;border:2px solid rgba(255,255,255,.75);border-radius:50%;pointer-events:none;animation:applyPulse 1.5s ease-in-out infinite}
-    @keyframes applyPulse{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.2);opacity:1}}
+    #apply-side-ring{position:absolute;left:50%;top:50%;width:32px;height:32px;margin-left:-16px;margin-top:-16px;border:2px solid rgba(255,255,255,.7);border-radius:50%;pointer-events:none;display:none;animation:applyPulse 1.5s ease-in-out infinite}
+    #apply-side-btn.peeking #apply-side-ring{display:block}
+    @media(hover:hover){#apply-side-btn:hover #apply-side-ring{display:block}}
+    @keyframes applyPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.18);opacity:1}}
 
     #apply-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:7200;align-items:center;justify-content:center;padding:18px;overflow-y:auto}
     #apply-overlay.show{display:flex}
@@ -61,14 +63,6 @@
     '<span id="apply-stxt-hid">신청</span>';
   document.body.appendChild(btn);
 
-  // 모바일에서 잠깐 삐져나오게(peek) 살짝 보여주는 애니메이션
-  let _peekTm;
-  function peekOnce() {
-    btn.classList.add('peeking');
-    clearTimeout(_peekTm);
-    _peekTm = setTimeout(() => btn.classList.remove('peeking'), 2600);
-  }
-
   /* ── 안내 모달 ────────────────────────────────────────── */
   const ov = document.createElement('div');
   ov.id = 'apply-overlay';
@@ -99,10 +93,36 @@
     </div>`;
   document.body.appendChild(ov);
 
-  function openModal() { ov.classList.add('show'); }
+  function openModal() { btn.classList.remove('peeking'); ov.classList.add('show'); }
   function closeModal() { ov.classList.remove('show'); }
 
-  btn.addEventListener('click', openModal);
+  /* 사이드 버튼 터치/마우스 분기 — 기존 사이드 탭과 동일한 패턴(brokerage-calc):
+     모바일 첫 탭=펼침(2초 후 자동 닫힘)·둘째 탭=열기 / 데스크톱 hover=펼침·click=열기 */
+  (function () {
+    var peeking = false, peekTimer = null, lastTouch = 0, tx = 0, ty = 0, tmoved = false;
+    btn.addEventListener('touchstart', function (e) {
+      tx = e.touches[0].clientX; ty = e.touches[0].clientY; tmoved = false;
+    }, { passive: true });
+    btn.addEventListener('touchmove', function (e) {
+      if (Math.abs(e.touches[0].clientX - tx) > 8 || Math.abs(e.touches[0].clientY - ty) > 8) tmoved = true;
+    }, { passive: true });
+    btn.addEventListener('touchend', function (e) {
+      if (tmoved) return;
+      e.preventDefault();
+      lastTouch = Date.now();
+      clearTimeout(peekTimer);
+      if (peeking) { peeking = false; btn.classList.remove('peeking'); openModal(); }
+      else {
+        peeking = true; btn.classList.add('peeking');
+        peekTimer = setTimeout(function () { peeking = false; btn.classList.remove('peeking'); }, 2000);
+      }
+    }, { passive: false });
+    btn.addEventListener('click', function () {
+      if (Date.now() - lastTouch < 300) return;
+      openModal();
+    });
+  })();
+
   ov.querySelector('.apply-close-x').addEventListener('click', closeModal);
   ov.querySelector('.apply-later').addEventListener('click', closeModal);
   ov.addEventListener('click', e => { if (e.target === ov) closeModal(); });
@@ -121,13 +141,9 @@
   }
   try {
     if (typeof firebase !== 'undefined' && firebase.auth) {
-      firebase.auth().onAuthStateChanged(u => {
-        setVisible(!u);
-        if (!u) peekOnce();
-      });
+      firebase.auth().onAuthStateChanged(u => { setVisible(!u); });
     } else {
       setVisible(true); // 인증 라이브러리 없으면 일단 표시
-      peekOnce();
     }
   } catch (e) {
     setVisible(true);
