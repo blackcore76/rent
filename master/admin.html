@@ -190,6 +190,9 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
 .usr-drop-uid{font-size:10px;color:var(--hint);font-family:monospace}
 .usr-drop-none{padding:11px 14px;font-size:12px;color:var(--hint);cursor:pointer;border-bottom:1px solid var(--border)}
 .usr-drop-none:active{background:rgba(255,255,255,.04)}
+.ic{width:20px;height:20px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.nav-tab{display:flex;align-items:center;justify-content:center;gap:4px}
+.nav-tab .ic{margin:-4px 0}
 </style>
 </head>
 <body>
@@ -220,11 +223,11 @@ html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background
       </div>
     </div>
     <nav class="nav">
-      <a href="admin.html" class="nav-tab on">📊 메인(관리)</a>
-      <a href="main.html" class="nav-tab">🏡 메인</a>
-      <a href="units.html" class="nav-tab">🏠 세대</a>
-      <a href="expense.html" class="nav-tab">💸 장부</a>
-      <a href="manage.html" class="nav-tab">🗂 관리</a>
+      <a href="admin.html" class="nav-tab on"><svg class="ic" aria-hidden="true"><use href="../icons.svg#ic-console"/></svg><span>메인(관리)</span></a>
+      <a href="main.html" class="nav-tab"><svg class="ic" aria-hidden="true"><use href="../icons.svg#ic-dashboard"/></svg><span>메인</span></a>
+      <a href="units.html" class="nav-tab"><svg class="ic" aria-hidden="true"><use href="../icons.svg#ic-rooms"/></svg><span>세대</span></a>
+      <a href="expense.html" class="nav-tab"><svg class="ic" aria-hidden="true"><use href="../icons.svg#ic-ledger"/></svg><span>장부</span></a>
+      <a href="manage.html" class="nav-tab"><svg class="ic" aria-hidden="true"><use href="../icons.svg#ic-manage"/></svg><span>관리</span></a>
     </nav>
   </div>
 

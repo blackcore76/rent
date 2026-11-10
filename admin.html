@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://rent-4d521-default-rtdb.firebaseio.com" crossorigin>
 <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="common.css?v=1">
+<link rel="stylesheet" href="common.css?v=2">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -32,7 +32,7 @@
 .login-privacy{background:rgba(15,28,45,.85)}
 /* SUB TABS */
 .sub-tabs{display:flex;background:var(--card);border-radius:12px;padding:4px;margin-bottom:14px;box-shadow:var(--shadow);gap:4px}
-.sub-tab{flex:1;padding:9px 8px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--sub);background:transparent;transition:all .2s}
+.sub-tab{display:flex;align-items:center;justify-content:center;gap:5px;flex:1;padding:9px 8px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--sub);background:transparent;transition:all .2s}
 .sub-tab.on{background:var(--hdr);color:#fff}
 /* PAGE */
 .sub-page{display:none}
@@ -143,6 +143,7 @@
 .btn-blind{position:absolute;inset:0;border-radius:6px;background:#475569;border:1.5px solid #334155;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;z-index:2;font-family:inherit;transition:opacity .2s,transform .22s cubic-bezier(.4,0,.2,1);user-select:none}
 .btn-blind.lifted{opacity:0;transform:translateY(-7px);pointer-events:none}
 /* 이지모드 사이드 버튼 → easymode-side.js */
+.sub-tab{flex-direction:column;gap:3px;white-space:nowrap;padding:8px 2px;font-size:12px}
 </style>
 </head>
 <body>
@@ -187,10 +188,10 @@
       </div>
     </div>
     <div class="nav">
-      <a href="index.html" class="nav-tab">📊 메인</a>
-      <a href="units.html" class="nav-tab">🏠 세대</a>
-      <a href="expense.html" class="nav-tab">💸 장부</a>
-      <a href="admin.html" class="nav-tab on">🗂 관리</a>
+      <a href="index.html" class="nav-tab"><svg class="ic" aria-hidden="true"><use href="icons.svg#ic-dashboard"/></svg><span>메인</span></a>
+      <a href="units.html" class="nav-tab"><svg class="ic" aria-hidden="true"><use href="icons.svg#ic-rooms"/></svg><span>세대</span></a>
+      <a href="expense.html" class="nav-tab"><svg class="ic" aria-hidden="true"><use href="icons.svg#ic-ledger"/></svg><span>장부</span></a>
+      <a href="admin.html" class="nav-tab on"><svg class="ic" aria-hidden="true"><use href="icons.svg#ic-manage"/></svg><span>관리</span></a>
     </div>
   </div>
   <div id="user-menu" class="user-menu">
@@ -202,10 +203,10 @@
   <div class="content">
     <!-- 서브 탭 -->
     <div class="sub-tabs">
-      <button class="sub-tab on" onclick="setSubTab(0,this)" id="st0">📞 전화번호부</button>
-      <button class="sub-tab" onclick="setSubTab(1,this)" id="st1">📷 계약서</button>
-      <button class="sub-tab" onclick="setSubTab(2,this)" id="st2">🏠 건물 정보</button>
-      <button class="sub-tab" onclick="setSubTab(3,this)" id="st3">📋 임대 가이드</button>
+      <button class="sub-tab on" onclick="setSubTab(0,this)" id="st0"><svg class="ic" aria-hidden="true"><use href="icons.svg#ic-contacts"/></svg><span>전화번호부</span></button>
+      <button class="sub-tab" onclick="setSubTab(1,this)" id="st1"><svg class="ic" aria-hidden="true"><use href="icons.svg#ic-contract"/></svg><span>계약서</span></button>
+      <button class="sub-tab" onclick="setSubTab(2,this)" id="st2"><svg class="ic" aria-hidden="true"><use href="icons.svg#ic-building"/></svg><span>건물 정보</span></button>
+      <button class="sub-tab" onclick="setSubTab(3,this)" id="st3"><svg class="ic" aria-hidden="true"><use href="icons.svg#ic-guide"/></svg><span>임대 가이드</span></button>
     </div>
 
     <!-- 전화번호부 -->
