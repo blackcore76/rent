@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://rent-4d521-default-rtdb.firebaseio.com" crossorigin>
 <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="common.css?v=2">
+<link rel="stylesheet" href="common.css?v=3">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -84,7 +84,7 @@ html,body{overscroll-behavior:none}
         </a>
       </div>
       <div class="hdr-actions">
-        <button class="guide-btn" onclick="openHelp()">❓ 도움말</button>
+        <button class="guide-btn" onclick="openHelp()"><svg class=ici><use href=icons.svg#ic-circle-question-mark></use></svg> 도움말</button>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
     </div>
@@ -98,14 +98,14 @@ html,body{overscroll-behavior:none}
   <div id="user-menu" class="user-menu">
     <div class="um-name" id="um-name">—</div>
     <div class="um-email" id="um-email">—</div>
-    <button class="logout-btn" onclick="auth.signOut().then(()=>location.reload())">🚪 로그아웃</button>
+    <button class="logout-btn" onclick="auth.signOut().then(()=>location.reload())"><svg class=ici><use href=icons.svg#ic-log-out></use></svg> 로그아웃</button>
   </div>
 
   <div class="content">
 
     <div class="section-hd">현재 건물</div>
     <div class="bld-row">
-      <span style="font-size:22px">🏢</span>
+      <span style="font-size:22px"><svg class=ici><use href=icons.svg#ic-building-2></use></svg></span>
       <div>
         <div style="font-size:14px;font-weight:800;color:var(--blue-t)" id="cur-bld-name">로딩 중…</div>
         <div style="font-size:11px;color:var(--sub);margin-top:2px">이 건물의 데이터를 내보냅니다</div>
@@ -113,7 +113,7 @@ html,body{overscroll-behavior:none}
     </div>
 
     <!-- 세대 데이터 -->
-    <div class="section-hd">🏠 세대 데이터</div>
+    <div class="section-hd"><svg class=ici><use href=icons.svg#ic-house></use></svg> 세대 데이터</div>
     <div class="card" id="card-units">
       <div class="stat-row" id="units-stats">
         <div class="stat-box"><div class="stat-val" id="s-total">—</div><div class="stat-lbl">전체 세대</div></div>
@@ -121,13 +121,13 @@ html,body{overscroll-behavior:none}
         <div class="stat-box"><div class="stat-val" id="s-vacant">—</div><div class="stat-lbl">공실</div></div>
       </div>
       <div class="exp-row">
-        <button class="exp-btn blue" onclick="exportUnitsCSV()">📥 CSV</button>
-        <button class="exp-btn green" onclick="exportUnitsJSON()">📦 JSON</button>
+        <button class="exp-btn blue" onclick="exportUnitsCSV()"><svg class=ici><use href=icons.svg#ic-download></use></svg> CSV</button>
+        <button class="exp-btn green" onclick="exportUnitsJSON()"><svg class=ici><use href=icons.svg#ic-package></use></svg> JSON</button>
       </div>
     </div>
 
     <!-- 장부 데이터 -->
-    <div class="section-hd">💸 장부 데이터 (전체-사용자 입력 데이터만 표시합니다)</div>
+    <div class="section-hd"><svg class=ici><use href=icons.svg#ic-banknote></use></svg> 장부 데이터 (전체-사용자 입력 데이터만 표시합니다)</div>
     <div class="card" id="card-tx">
       <div class="stat-row">
         <div class="stat-box"><div class="stat-val" id="s-tx">—</div><div class="stat-lbl">총 건수</div></div>
@@ -135,13 +135,13 @@ html,body{overscroll-behavior:none}
         <div class="stat-box"><div class="stat-val" id="s-expense">—</div><div class="stat-lbl">지출 건</div></div>
       </div>
       <div class="exp-row">
-        <button class="exp-btn blue" onclick="exportTxCSV()">📥 CSV (월세 수입 자동 데이터 포함)</button>
-        <button class="exp-btn green" onclick="exportTxJSON()">📦 JSON (월세 수입 자동 데이터 포함X)</button>
+        <button class="exp-btn blue" onclick="exportTxCSV()"><svg class=ici><use href=icons.svg#ic-download></use></svg> CSV (월세 수입 자동 데이터 포함)</button>
+        <button class="exp-btn green" onclick="exportTxJSON()"><svg class=ici><use href=icons.svg#ic-package></use></svg> JSON (월세 수입 자동 데이터 포함X)</button>
       </div>
     </div>
 
     <!-- 계약서 사진 -->
-    <div class="section-hd">📸 계약서 사진</div>
+    <div class="section-hd"><svg class=ici><use href=icons.svg#ic-camera></use></svg> 계약서 사진</div>
     <div class="card" id="card-photos">
       <div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:4px">
         <div>
@@ -151,7 +151,7 @@ html,body{overscroll-behavior:none}
         <div style="flex:1"></div>
         <div style="font-size:11px;color:var(--hint);text-align:right;line-height:1.5">호실별 폴더로<br>ZIP 압축 다운로드</div>
       </div>
-      <button class="zip-btn" id="zip-btn" onclick="downloadPhotosZip()" disabled>📦 사진 전체 ZIP 다운로드</button>
+      <button class="zip-btn" id="zip-btn" onclick="downloadPhotosZip()" disabled><svg class=ici><use href=icons.svg#ic-package></use></svg> 사진 전체 ZIP 다운로드</button>
       <div id="zip-prog" style="display:none">
         <div class="prog-bar"><div class="prog-fill" id="zip-fill"></div></div>
         <div class="prog-msg" id="zip-msg">준비 중…</div>
@@ -287,10 +287,10 @@ function exportUnitsJSON(){
     const u=unitsData[r];if(!u)return null;
     const {photos,...rest}=u;return rest;
   }).filter(Boolean);
-  if(!units.length){showToast("❗ 세대 데이터 없음");return}
+  if(!units.length){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 세대 데이터 없음");return}
   const data={exportedAt:new Date().toISOString(),units,rentHistory};
   dlBlob(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),`월세관리_세대_${fmtDate()}.json`);
-  showToast("✅ 세대 JSON 내려받기 완료");
+  showToast("<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 세대 JSON 내려받기 완료");
 }
 function exportUnitsCSV(){
   const months=getLastNMonths(12);
@@ -304,19 +304,19 @@ function exportUnitsCSV(){
       u.depositAmount||0,u.monthlyRent||0,u.contractStart||"",u.contractEnd||"",
       (u.memo||"").replace(/\n/g," "),...mCols];
   }).filter(Boolean);
-  if(!rows.length){showToast("❗ 세대 데이터 없음");return}
+  if(!rows.length){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 세대 데이터 없음");return}
   const csv=[header,...rows].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
   dlBlob(new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"}),`월세관리_세대_${fmtDate()}.csv`);
-  showToast("✅ 세대 CSV 내려받기 완료");
+  showToast("<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 세대 CSV 내려받기 완료");
 }
 
 // ── TX EXPORT ──
 function exportTxJSON(){
-  if(!allTx.length){showToast("❗ 장부 데이터 없음");return}
+  if(!allTx.length){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 장부 데이터 없음");return}
   const hasCats=(customCats.income.length||customCats.expense.length);
   const data=hasCats?{version:2,transactions:allTx,categories:customCats}:allTx;
   dlBlob(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),`월세관리_장부전체_${fmtDate()}.json`);
-  showToast("✅ 장부 JSON 내려받기 완료");
+  showToast("<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 장부 JSON 내려받기 완료");
 }
 function getAutoRentRows(){
   const rows=[];
@@ -334,7 +334,7 @@ function getAutoRentRows(){
 }
 function exportTxCSV(){
   const auto=getAutoRentRows();
-  if(!allTx.length&&!auto.length){showToast("❗ 장부 데이터 없음");return}
+  if(!allTx.length&&!auto.length){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 장부 데이터 없음");return}
   const all=[
     ...allTx.map(t=>({date:t.date,type:t.type==="income"?"수입":"지출",category:t.category||"",amount:t.amount||0,memo:t.memo||""})),
     ...auto.map(r=>({date:r.date,type:"수입",category:r.category,amount:r.amount,memo:r.memo})),
@@ -342,7 +342,7 @@ function exportTxCSV(){
   const hdr="날짜,유형,카테고리,금액,메모\n";
   const body=all.map(t=>`${t.date},${t.type},${t.category},${t.amount},"${(t.memo||"").replace(/"/g,"'")}"`).join("\n");
   dlBlob(new Blob(["﻿"+hdr+body],{type:"text/csv"}),`월세관리_장부전체_${fmtDate()}.csv`);
-  showToast(`✅ 장부 CSV 완료 (수동 ${allTx.length}건 + 자동 ${auto.length}건)`);
+  showToast(`<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 장부 CSV 완료 (수동 ${allTx.length}건 + 자동 ${auto.length}건)`);
 }
 
 // ── PHOTO ZIP ──
@@ -351,7 +351,7 @@ async function downloadPhotosZip(){
   Object.entries(unitsData).forEach(([room,u])=>{
     Object.values(u.photos||{}).forEach(p=>photos.push({...p,room}));
   });
-  if(!photos.length){showToast("❗ 사진이 없습니다");return}
+  if(!photos.length){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 사진이 없습니다");return}
 
   const btn=document.getElementById("zip-btn");
   const prog=document.getElementById("zip-prog");
@@ -391,7 +391,7 @@ async function downloadPhotosZip(){
   fill.style.width="100%";msg.textContent="완료!";
   dlBlob(zipBlob,`계약서사진_${fmtDate()}.zip`);
   const okCount=photos.length-failed;
-  showToast(failed?`⚠️ ${okCount}/${photos.length}장 ZIP 완료 (${failed}장 실패)`:`✅ 사진 ${photos.length}장 ZIP 완료`);
+  showToast(failed?`<svg class=ici><use href=icons.svg#ic-triangle-alert></use></svg> ${okCount}/${photos.length}장 ZIP 완료 (${failed}장 실패)`:`<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 사진 ${photos.length}장 ZIP 완료`);
   btn.disabled=false;
 }
 

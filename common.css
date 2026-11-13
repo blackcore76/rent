@@ -89,3 +89,6 @@ body:has(.chg-bg.show){overflow:hidden}
 .ic{width:20px;height:20px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .nav-tab{display:flex;align-items:center;justify-content:center;gap:4px}
 .nav-tab .ic{margin:-4px 0}
+
+/* 본문 인라인 아이콘 (이모지 대체) — 글자 크기에 맞춰 1.15em */
+.ici{display:inline-block;width:1.15em;height:1.15em;vertical-align:-.2em;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}

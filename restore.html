@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://rent-4d521-default-rtdb.firebaseio.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="common.css?v=2">
+<link rel="stylesheet" href="common.css?v=3">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -93,7 +93,7 @@ html,body{overscroll-behavior:none}
         </a>
       </div>
       <div class="hdr-actions">
-        <button class="guide-btn" onclick="openHelp()">❓ 도움말</button>
+        <button class="guide-btn" onclick="openHelp()"><svg class=ici><use href=icons.svg#ic-circle-question-mark></use></svg> 도움말</button>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
     </div>
@@ -107,14 +107,14 @@ html,body{overscroll-behavior:none}
   <div id="user-menu" class="user-menu">
     <div class="um-name" id="um-name">—</div>
     <div class="um-email" id="um-email">—</div>
-    <button class="logout-btn" onclick="auth.signOut().then(()=>location.reload())">🚪 로그아웃</button>
+    <button class="logout-btn" onclick="auth.signOut().then(()=>location.reload())"><svg class=ici><use href=icons.svg#ic-log-out></use></svg> 로그아웃</button>
   </div>
 
   <div class="content">
 
     <div class="section-hd">현재 건물</div>
     <div class="bld-info">
-      <span style="font-size:22px">🏢</span>
+      <span style="font-size:22px"><svg class=ici><use href=icons.svg#ic-building-2></use></svg></span>
       <div>
         <div class="bld-info-name" id="cur-bld-name">—</div>
         <div class="bld-info-sub">이 건물의 데이터에 복구가 적용됩니다</div>
@@ -125,7 +125,7 @@ html,body{overscroll-behavior:none}
     <div class="card" style="padding:0">
       <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
            ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
-        <div class="drop-icon" id="drop-icon">📂</div>
+        <div class="drop-icon" id="drop-icon"><svg class=ici><use href=icons.svg#ic-folder-open></use></svg></div>
         <div class="drop-label" id="drop-label">파일을 여기에 드래그하거나 탭하여 선택</div>
         <div class="drop-sub" id="drop-sub">세대 JSON 또는 수지 JSON 지원 · 자동 감지</div>
       </div>
@@ -144,20 +144,20 @@ html,body{overscroll-behavior:none}
       <div class="mode-row">
         <label class="mode-card selected" id="mode-merge-card" onclick="selectMode('merge')">
           <input type="radio" name="mode" value="merge" checked>
-          <div class="mode-icon">🔀</div>
+          <div class="mode-icon"><svg class=ici><use href=icons.svg#ic-shuffle></use></svg></div>
           <div class="mode-title">병합</div>
           <div class="mode-desc">기존 데이터 유지<br>파일 내용으로 덮어씀</div>
         </label>
         <label class="mode-card" id="mode-replace-card" onclick="selectMode('replace')">
           <input type="radio" name="mode" value="replace">
-          <div class="mode-icon">♻️</div>
+          <div class="mode-icon"><svg class=ici><use href=icons.svg#ic-recycle></use></svg></div>
           <div class="mode-title">전체 교체</div>
           <div class="mode-desc">기존 데이터 삭제 후<br>파일 내용으로 교체</div>
         </label>
       </div>
-      <div class="warn-box" id="warn-box">⚠️ 전체 교체를 선택하면 현재 건물의 기존 데이터가 모두 삭제됩니다. 신중하게 진행하세요.</div>
+      <div class="warn-box" id="warn-box"><svg class=ici><use href=icons.svg#ic-triangle-alert></use></svg> 전체 교체를 선택하면 현재 건물의 기존 데이터가 모두 삭제됩니다. 신중하게 진행하세요.</div>
 
-      <button class="apply-btn" id="apply-btn" onclick="applyRestore()">✅ 복구 적용하기</button>
+      <button class="apply-btn" id="apply-btn" onclick="applyRestore()"><svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 복구 적용하기</button>
 
       <div id="progress-area">
         <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
@@ -235,13 +235,13 @@ function onFileSelect(e){
 }
 
 function readFile(file){
-  if(!file.name.endsWith(".json")){showToast("❗ JSON 파일만 지원합니다");return}
+  if(!file.name.endsWith(".json")){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> JSON 파일만 지원합니다");return}
   const reader=new FileReader();
   reader.onload=ev=>{
     try{
       const json=JSON.parse(ev.target.result);
       processJson(json,file.name);
-    }catch{showToast("❗ 파일을 읽을 수 없습니다 (JSON 형식 오류)")}
+    }catch{showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 파일을 읽을 수 없습니다 (JSON 형식 오류)")}
   };
   reader.readAsText(file,"UTF-8");
 }
@@ -255,12 +255,12 @@ function detectType(json){
 
 function processJson(json,fileName){
   const type=detectType(json);
-  if(!type){showToast("❗ 지원하지 않는 파일 형식입니다");return}
+  if(!type){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 지원하지 않는 파일 형식입니다");return}
   parsedData=json;detectedType=type;
   // Update drop zone
   const dz=document.getElementById("drop-zone");
   dz.classList.add("loaded");
-  document.getElementById("drop-icon").textContent=type==="units"?"🏠":"💸";
+  document.getElementById("drop-icon").innerHTML=type==="units"?"<svg class=ici><use href=icons.svg#ic-house></use></svg>":"<svg class=ici><use href=icons.svg#ic-banknote></use></svg>";
   document.getElementById("drop-label").textContent=fileName;
   document.getElementById("drop-sub").textContent="파일 인식 완료";
   // Badge
@@ -311,8 +311,8 @@ function selectMode(mode){
 
 // ── APPLY ──
 async function applyRestore(){
-  if(!parsedData||!detectedType){showToast("❗ 파일을 먼저 선택하세요");return}
-  if(!cu){showToast("❗ 로그인이 필요합니다");return}
+  if(!parsedData||!detectedType){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 파일을 먼저 선택하세요");return}
+  if(!cu){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 로그인이 필요합니다");return}
   const targetUid=(cu.uid===MASTER_UID&&mUid)?mUid:cu.uid;
   const btn=document.getElementById("apply-btn");
   const prog=document.getElementById("progress-area");
@@ -331,11 +331,11 @@ async function applyRestore(){
     }
     fill.style.width="100%";
     msg.textContent="완료!";
-    showToast("✅ 복구가 완료됐습니다");
+    showToast("<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 복구가 완료됐습니다");
     btn.disabled=false;
   }catch(e){
     msg.textContent="오류: "+e.message;
-    showToast("❗ 복구 실패: "+e.message);
+    showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 복구 실패: "+e.message);
     btn.disabled=false;
   }
 }
@@ -402,7 +402,7 @@ function resetAll(){
   parsedData=null;detectedType=null;selectedMode="merge";
   const dz=document.getElementById("drop-zone");
   dz.classList.remove("loaded","over");
-  document.getElementById("drop-icon").textContent="📂";
+  document.getElementById("drop-icon").innerHTML="<svg class=ici><use href=icons.svg#ic-folder-open></use></svg>";
   document.getElementById("drop-label").textContent="파일을 여기에 드래그하거나 탭하여 선택";
   document.getElementById("drop-sub").textContent="세대 JSON 또는 수지 JSON 지원 · 자동 감지";
   document.getElementById("preview-card").style.display="none";

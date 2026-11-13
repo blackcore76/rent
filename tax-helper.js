@@ -89,7 +89,7 @@
     <div id="taxh-overlay"></div>
     <div id="taxh-sheet">
       <div class="taxh-hdr">
-        <span class="taxh-title">🧾 세금 도우미 <span class="taxh-ref">참고용</span></span>
+        <span class="taxh-title"><svg class=ici><use href=icons.svg#ic-receipt></use></svg> 세금 도우미 <span class="taxh-ref">참고용</span></span>
         <button class="taxh-close-x" id="taxh-close-x">✕</button>
       </div>
       <div class="taxh-body"><div class="taxh-in" id="taxh-content"></div></div>
@@ -143,13 +143,13 @@
     for (let y = nowY; y >= nowY - 4; y--) opts += `<option value="${y}"${String(y) === _thYear ? ' selected' : ''}>${y}년</option>`;
     const autoHint = thHasLedger() ? '월세 기준 자동합산 · 관리비/보증금 제외' : '직접 입력하세요 (장부 페이지에선 자동 반영)';
     document.getElementById('taxh-content').innerHTML = `
-      <div class="taxh-note">⚠️ 아래 금액은 이해를 돕기 위한 <b>대략적인 참고용</b> 계산이에요. 실제 세액은 다른 소득·공제·감면에 따라 달라집니다. 정확한 금액은 <b>홈택스</b>나 <b>세무사</b>로 확인하세요.</div>
+      <div class="taxh-note"><svg class=ici><use href=icons.svg#ic-triangle-alert></use></svg> 아래 금액은 이해를 돕기 위한 <b>대략적인 참고용</b> 계산이에요. 실제 세액은 다른 소득·공제·감면에 따라 달라집니다. 정확한 금액은 <b>홈택스</b>나 <b>세무사</b>로 확인하세요.</div>
       <div class="taxh-controls">
         <div class="taxh-field"><label>연도</label><select id="taxh-year">${opts}</select></div>
         <div class="taxh-field"><label>물건 유형</label>
           <div class="taxh-toggle">
-            <button class="taxh-tg on" id="taxh-tg-h">🏠 주택</button>
-            <button class="taxh-tg" id="taxh-tg-s">🏢 상가</button>
+            <button class="taxh-tg on" id="taxh-tg-h"><svg class=ici><use href=icons.svg#ic-house></use></svg> 주택</button>
+            <button class="taxh-tg" id="taxh-tg-s"><svg class=ici><use href=icons.svg#ic-building-2></use></svg> 상가</button>
           </div>
         </div>
       </div>
@@ -234,7 +234,7 @@
           <div class="taxh-mini">• 종합과세는 <b>근로·사업 등 다른 소득과 합산</b>해 누진세율(6~45%)이 적용돼요. 실제 세금은 위 금액보다 <b>더 나올 수 있어요.</b><br>• 정확한 계산은 세무사 상담을 권장해요.</div>`;
       }
       // 국세청 공식 안내 (주택분 전용 · 상가분은 대응 페이지 없음)
-      html += `<a class="taxh-ref-link" href="https://b.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2253&cntntsId=7684" target="_blank" rel="noopener noreferrer">📖 국세청 · 주택임대 소득세 계산<span>공식 계산 방법 안내 보기 →</span></a>`;
+      html += `<a class="taxh-ref-link" href="https://b.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2253&cntntsId=7684" target="_blank" rel="noopener noreferrer"><svg class=ici><use href=icons.svg#ic-book-open></use></svg> 국세청 · 주택임대 소득세 계산<span>공식 계산 방법 안내 보기 →</span></a>`;
     } else {
       const vat = Math.round(rent * 0.1), exp = thAnnualExpense(_thYear), income = Math.max(0, rent - exp), c = thComp(income);
       html = `<div class="taxh-vat"><div class="tv-t">부가가치세 (상가)</div><div class="tv-v">연 약 ${fmt(vat)}원</div><div class="tv-n">임대료의 10%예요. 보통 세입자에게 <b>따로 받아서</b> 납부하니 임대인 부담은 아니에요. 매년 <b>1월·7월</b> 신고. 간이과세자는 다를 수 있어요.</div></div>
@@ -256,7 +256,7 @@
     ];
     if (_thType === 'store') rows.push(['1·7월', '부가가치세 신고', '상가 임대는 반기마다 신고해요']);
     rows.push(['12월', '종합부동산세', '보유 부동산 공시가 합계가 기준을 넘으면 대상이에요']);
-    el.innerHTML = `<div class="taxh-cal-t">🗓 세금 달력</div>` + rows.map(r =>
+    el.innerHTML = `<div class="taxh-cal-t"><svg class=ici><use href=icons.svg#ic-calendar-days></use></svg> 세금 달력</div>` + rows.map(r =>
       `<div class="taxh-cal-row"><span class="taxh-cal-when">${r[0]}</span><span class="taxh-cal-txt">${r[1]}<br><span class="tc-sub">${r[2]}</span></span></div>`).join('');
   }
 

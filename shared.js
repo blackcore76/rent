@@ -52,7 +52,7 @@ async function checkUserAccess(user){
   if(val.status==="rejected"){
     const ss=document.getElementById("status-screen");
     document.getElementById("ss-email").textContent=user.email||"";
-    document.getElementById("ss-icon").textContent="🚫";
+    document.getElementById("ss-icon").innerHTML="<svg class=ici><use href=icons.svg#ic-ban></use></svg>";
     document.getElementById("ss-title").textContent="사용 승인이 거부됐습니다";
     document.getElementById("ss-msg").textContent="자세한 사항은 관리자에게 문의하세요.";
     ss.style.display="flex";
@@ -82,7 +82,7 @@ function showContractToasts(alerts){
   alerts.forEach((a,i)=>{
     const el=document.createElement("div");
     const room=a.bldName?`${a.bldName} ${a.room}호`:`${a.room}호`;
-    el.textContent=`⚠ ${room} · ${a.name} · D-${a.dl}`;
+    el.innerHTML=`<svg class=ici><use href=icons.svg#ic-triangle-alert></use></svg> ${esc(room)} · ${esc(a.name)} · D-${a.dl}`;
     el.style.cssText="background:#e74c3c;color:#fff;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.25);white-space:nowrap;opacity:0;transition:opacity .3s";
     wrap.appendChild(el);
     setTimeout(()=>el.style.opacity="1",i*120);
@@ -101,15 +101,15 @@ function showDemoBanner(){
   b.id="demo-banner";
   b.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(14,165,233,.18),rgba(14,165,233,.06));border-bottom:1px solid rgba(14,165,233,.35);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
   const btn=cu
-    ?`<button onclick="auth.signOut()" style="background:rgba(14,165,233,.2);border:1px solid rgba(14,165,233,.4);border-radius:8px;padding:5px 12px;color:#0EA5E9;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🚪 로그아웃</button>`
-    :`<button onclick="startSignIn()" style="background:rgba(14,165,233,.2);border:1px solid rgba(14,165,233,.4);border-radius:8px;padding:5px 12px;color:#0EA5E9;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">🔑 시작하기</button>`;
-  b.innerHTML=`<span style="font-size:12px;font-weight:700;color:#0EA5E9">👀 구경 모드 · 데모 데이터 표시 중</span>${btn}`;
+    ?`<button onclick="auth.signOut()" style="background:rgba(14,165,233,.2);border:1px solid rgba(14,165,233,.4);border-radius:8px;padding:5px 12px;color:#0EA5E9;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit"><svg class=ici><use href=icons.svg#ic-log-out></use></svg> 로그아웃</button>`
+    :`<button onclick="startSignIn()" style="background:rgba(14,165,233,.2);border:1px solid rgba(14,165,233,.4);border-radius:8px;padding:5px 12px;color:#0EA5E9;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit"><svg class=ici><use href=icons.svg#ic-key></use></svg> 시작하기</button>`;
+  b.innerHTML=`<span style="font-size:12px;font-weight:700;color:#0EA5E9"><svg class=ici><use href=icons.svg#ic-eye></use></svg> 구경 모드 · 데모 데이터 표시 중</span>${btn}`;
   document.body.appendChild(b);
   document.querySelector(".content").style.marginTop="136px";
 }
 
 // ── 쓰기 권한 확인 ──
-function guardWrite(){if(!readOnly)return true;showToast("⏳ 승인 후 이용 가능합니다");return false;}
+function guardWrite(){if(!readOnly)return true;showToast("<svg class=ici><use href=icons.svg#ic-hourglass></use></svg> 승인 후 이용 가능합니다");return false;}
 
 // ── 사진(Plus) 엔타이틀먼트 확인 ──
 // 계약서·증빙 사진 업/다운은 유료(Plus) 기능. 서버(Storage 규칙)가 하드락하고,
@@ -134,7 +134,7 @@ async function checkPhotoAccess(){
 // 무료 유저 안내 박스 HTML (미가입·만료 공용)
 function photoLockBox(feature){
   return `<div class="photo-lock" style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:11px;padding:13px 14px;font-size:12.5px;color:#075985;line-height:1.65">`+
-    `<div style="font-weight:800;margin-bottom:3px">🔒 ${feature||"사진"}은 <b>Plus 기능</b>이에요</div>`+
+    `<div style="font-weight:800;margin-bottom:3px"><svg class=ici><use href=icons.svg#ic-lock></use></svg> ${feature||"사진"}은 <b>Plus 기능</b>이에요</div>`+
     `사진 업로드·보기·다운로드는 유료(Plus) 기능이에요. 기존에 올린 사진은 <b>재구독 시 그대로 복원</b>돼요. 이용 문의는 관리자에게.</div>`;
 }
 
@@ -149,10 +149,10 @@ function isInAppBrowser(){
 }
 function signInGoogle(){
   if(isInAppBrowser()){
-    showToast("⚠️ 앱 내 브라우저에서는 구글 로그인이 차단됩니다.<br>Chrome 또는 Safari로 열어주세요.",5000);
+    showToast("<svg class=ici><use href=icons.svg#ic-triangle-alert></use></svg> 앱 내 브라우저에서는 구글 로그인이 차단됩니다.<br>Chrome 또는 Safari로 열어주세요.",5000);
     return;
   }
-  auth.signInWithPopup(gProv).catch(e=>showToast("❗ "+e.message));
+  auth.signInWithPopup(gProv).catch(e=>showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> "+e.message));
 }
 // 로그인 진입 일원화: 이용신청 모달이 있으면 그 2단 확인을 거치고, 없으면(백업/복구 등) 바로 로그인
 function startSignIn(){
@@ -171,7 +171,7 @@ function toggleMenu(){
       btn.id="um-admin-btn";
       btn.href="master/admin.html";
       btn.style.cssText="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;margin-bottom:8px;background:rgba(245,158,11,.12);border:1.5px solid rgba(245,158,11,.4);border-radius:10px;color:#D97706;font-size:13px;font-weight:700;text-decoration:none;font-family:inherit;box-sizing:border-box;";
-      btn.innerHTML="🔧 <span>관리자 페이지</span>";
+      btn.innerHTML="<svg class=ici><use href=icons.svg#ic-wrench></use></svg> <span>관리자 페이지</span>";
       const logout=el.querySelector(".logout-btn");
       if(logout)el.insertBefore(btn,logout);else el.appendChild(btn);
     }

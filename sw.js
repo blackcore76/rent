@@ -2,7 +2,7 @@
 // 정적 자산 캐시 + 외부 SDK/폰트 캐시 + Firebase API는 항상 네트워크
 // + FCM 백그라운드 푸시 (계약 만료 알림)
 
-const VERSION = 'v8';
+const VERSION = 'v9';
 const CACHE_NAME = `rent-app-${VERSION}`;
 
 // ══════════════════════════════════════════
@@ -56,7 +56,7 @@ const APP_SHELL = [
   './backup.html',
   './restore.html',
   './guide.html',
-  './common.css?v=2',
+  './common.css?v=3',
   './shared.js?v=2',
   './db-paths.js',
   './manifest.json',

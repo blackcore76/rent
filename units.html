@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://rent-4d521-default-rtdb.firebaseio.com" crossorigin>
 <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="common.css?v=2">
+<link rel="stylesheet" href="common.css?v=3">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -182,14 +182,14 @@
       <svg class="g-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Google로 로그인
     </button>
-    <button onclick="enterDemoMode()" style="margin-top:10px;width:100%;padding:11px;background:rgba(14,165,233,.15);border:1.5px solid rgba(14,165,233,.4);border-radius:12px;color:#7DD3FC;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">👀 로그인 없이 구경하기</button>
+    <button onclick="enterDemoMode()" style="margin-top:10px;width:100%;padding:11px;background:rgba(14,165,233,.15);border:1.5px solid rgba(14,165,233,.4);border-radius:12px;color:#7DD3FC;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><svg class=ici><use href=icons.svg#ic-eye></use></svg> 로그인 없이 구경하기</button>
     <div class="login-footer">데이터는 본인 Google 계정에만 저장됩니다</div>
   </div>
 </div>
 
 <div id="status-screen" style="display:none;position:fixed;inset:0;background:linear-gradient(160deg,#0F1C2D,#1E2D3D 50%,#2A3F55);z-index:7000;align-items:center;justify-content:center;padding:20px">
   <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:36px 28px;max-width:320px;width:100%;text-align:center;backdrop-filter:blur(16px);box-shadow:0 20px 60px rgba(0,0,0,.4)">
-    <div style="font-size:52px;margin-bottom:14px" id="ss-icon">⏳</div>
+    <div style="font-size:52px;margin-bottom:14px;color:#fff;line-height:1" id="ss-icon"><svg class=ici><use href=icons.svg#ic-hourglass></use></svg></div>
     <div style="font-size:20px;font-weight:900;color:#fff;margin-bottom:8px" id="ss-title"></div>
     <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;line-height:1.7;white-space:pre-line" id="ss-msg"></div>
     <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:24px" id="ss-email"></div>
@@ -206,7 +206,7 @@
         </a>
       </div>
       <div class="hdr-actions">
-        <button class="guide-btn" onclick="openHelp()">❓ 도움말</button>
+        <button class="guide-btn" onclick="openHelp()"><svg class=ici><use href=icons.svg#ic-circle-question-mark></use></svg> 도움말</button>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
     </div>
@@ -220,7 +220,7 @@
   <div id="user-menu" class="user-menu">
     <div class="um-name" id="um-name">—</div>
     <div class="um-email" id="um-email">—</div>
-    <button class="logout-btn" onclick="doSignOut()">🚪 로그아웃</button>
+    <button class="logout-btn" onclick="doSignOut()"><svg class=ici><use href=icons.svg#ic-log-out></use></svg> 로그아웃</button>
   </div>
   <div class="content">
     <div class="tabs-row" id="tabs-row">
@@ -274,7 +274,7 @@
     </div><!-- /m-sect-tg -->
     <div class="divider"></div>
     <div class="section-label" style="justify-content:space-between">
-      <span>👤 임차인 ①</span>
+      <span><svg class=ici><use href=icons.svg#ic-user></use></svg> 임차인 ①</span>
       <div class="clear-blind-wrap" id="m-sect-tenant">
         <div class="clear-blind" id="clear-blind" onclick="liftClearBlind()">퇴실했나요?</div>
         <button class="clear-contract-btn" onclick="clearContractFields()">계약내용 지우기</button>
@@ -284,13 +284,13 @@
       <div class="field"><label>이름</label><input type="text" id="m-name" placeholder="홍길동"></div>
       <div class="field"><label>연락처</label><input type="tel" id="m-phone" placeholder="010-0000-0000"></div>
     </div>
-    <div class="section-label">👤 임차인 ②</div>
+    <div class="section-label"><svg class=ici><use href=icons.svg#ic-user></use></svg> 임차인 ②</div>
     <div class="field-row">
       <div class="field"><label>이름</label><input type="text" id="m-name2" placeholder="홍길순 (선택)"></div>
       <div class="field"><label>연락처</label><input type="tel" id="m-phone2" placeholder="010-0000-0000 (선택)"></div>
     </div>
     <div class="divider"></div>
-    <div class="section-label">💰 계약 정보</div>
+    <div class="section-label"><svg class=ici><use href=icons.svg#ic-coins></use></svg> 계약 정보</div>
     <div class="field-row">
       <div class="field"><label>보증금 (만원)</label><input type="number" id="m-deposit" placeholder="0"></div>
       <div class="field"><label>월세 (만원)</label><input type="number" id="m-rent" placeholder="0"></div>
@@ -300,27 +300,27 @@
       <div class="field"><label>계약 종료일</label><input type="date" id="m-end"></div>
     </div>
     <div id="m-sect-chg" style="margin-top:10px">
-      <button class="upload-btn" onclick="openRentChangeSheet()" style="border-style:solid;border-color:#C7D2FE;color:var(--indigo);background:#F5F3FF;font-size:13px">📋 임대 조건 변경 기록하기</button>
+      <button class="upload-btn" onclick="openRentChangeSheet()" style="border-style:solid;border-color:#C7D2FE;color:var(--indigo);background:#F5F3FF;font-size:13px"><svg class=ici><use href=icons.svg#ic-clipboard-list></use></svg> 임대 조건 변경 기록하기</button>
       <div class="rc-chg-wrap" id="rc-chg-list"></div>
     </div>
     <div class="field"><label>특이사항 메모</label><textarea id="m-memo" rows="2" placeholder="수리 요청, 계약 관련 특이사항 등..."></textarea></div>
     <div class="divider"></div>
-    <div class="section-label">📅 월세 납부 이력 <span style="font-size:10px;font-weight:400;color:var(--hint);margin-left:4px">최근 12개월</span></div>
+    <div class="section-label"><svg class=ici><use href=icons.svg#ic-calendar></use></svg> 월세 납부 이력 <span style="font-size:10px;font-weight:400;color:var(--hint);margin-left:4px">최근 12개월</span></div>
     <div class="rent-hist-wrap" id="m-sect-hist">
       <div class="rent-hist-grid" id="rent-hist-grid"></div>
-      <div class="rh-legend"><span>✅ 완납</span><span>❌ 미납</span><span>🔶 부분납부</span><span style="opacity:.5">— 기록없음</span></div>
+      <div class="rh-legend"><span><svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 완납</span><span><svg class=ici><use href=icons.svg#ic-circle-x></use></svg> 미납</span><span><svg class=ici><use href=icons.svg#ic-circle-dashed></use></svg> 부분납부</span><span style="opacity:.5">— 기록없음</span></div>
     </div>
     <div class="divider"></div>
-    <div class="section-label">📷 계약서 사진</div>
+    <div class="section-label"><svg class=ici><use href=icons.svg#ic-camera></use></svg> 계약서 사진</div>
     <div class="photo-grid" id="photo-grid"></div>
     <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="onPhotos(event)">
     <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none" onchange="onPhotos(event)">
     <div class="photo-btn-row" id="m-sect-photo">
-      <button class="upload-btn" id="upload-btn" onclick="document.getElementById('photo-input').click()">📁 사진 추가<br><span style="font-size:10px;opacity:.7">(계약서, 신분증 등)</span></button>
-      <button class="upload-btn camera-btn" id="camera-btn" onclick="document.getElementById('camera-input').click()">📸 카메라 촬영<br><span style="font-size:10px;opacity:.7">(바로 찍기)</span></button>
+      <button class="upload-btn" id="upload-btn" onclick="document.getElementById('photo-input').click()"><svg class=ici><use href=icons.svg#ic-folder-open></use></svg> 사진 추가<br><span style="font-size:10px;opacity:.7">(계약서, 신분증 등)</span></button>
+      <button class="upload-btn camera-btn" id="camera-btn" onclick="document.getElementById('camera-input').click()"><svg class=ici><use href=icons.svg#ic-camera></use></svg> 카메라 촬영<br><span style="font-size:10px;opacity:.7">(바로 찍기)</span></button>
     </div>
     <div style="margin-top:8px;font-size:11px;color:var(--hint);line-height:1.6;text-align:center">
-      ⚠️ 사진 촬영 및 추가 후 업로드까지 약간의 시간이 소요되니 업로드 완료 후 저장하세요.
+      <svg class=ici><use href=icons.svg#ic-triangle-alert></use></svg> 사진 촬영 및 추가 후 업로드까지 약간의 시간이 소요되니 업로드 완료 후 저장하세요.
     </div>
     <div class="prog-bar" id="prog-bar">
       <div class="prog-fill" id="prog-fill"></div>
@@ -328,7 +328,7 @@
     </div>
     <div class="divider"></div>
     <div class="sheet-btn-row">
-      <button class="btn-save" onclick="saveRoom()">💾 저장하기</button>
+      <button class="btn-save" onclick="saveRoom()"><svg class=ici><use href=icons.svg#ic-save></use></svg> 저장하기</button>
       <button class="btn-close-sheet" onclick="closeSheet()">✕ 닫기</button>
     </div>
   </div>
@@ -339,7 +339,7 @@
 <div class="chg-bg" id="chg-bg" onclick="closeRentChangeSheet()"></div>
 <div class="chg-sheet" id="chg-sheet">
   <div class="sheet-hd">
-    <h3 class="chg-sheet-title" style="font-size:16px;font-weight:900">📋 임대 조건 변경</h3>
+    <h3 class="chg-sheet-title" style="font-size:16px;font-weight:900"><svg class=ici><use href=icons.svg#ic-clipboard-list></use></svg> 임대 조건 변경</h3>
     <button class="sheet-close" onclick="closeRentChangeSheet()">✕</button>
   </div>
   <div class="chg-cols">
@@ -357,7 +357,7 @@
   <div class="field" style="margin-top:10px"><label>적용일</label><input type="date" id="chg-date"></div>
   <div class="field" style="margin-top:10px"><label>변경 사유 <span style="font-size:10px;font-weight:400;color:var(--hint)">(선택)</span></label><input type="text" id="chg-reason" placeholder="예: 재계약, 협의 인상, 인하 등"></div>
   <div class="sheet-btn-row" style="margin-top:16px">
-    <button class="btn-save" onclick="saveRentChange()">💾 기록하기</button>
+    <button class="btn-save" onclick="saveRentChange()"><svg class=ici><use href=icons.svg#ic-save></use></svg> 기록하기</button>
     <button class="btn-close-sheet" onclick="closeRentChangeSheet()">✕ 닫기</button>
   </div>
 </div>
@@ -516,7 +516,7 @@ auth.onAuthStateChanged(async user=>{
       const banner=document.createElement("div");
       banner.id="master-view-banner";
       banner.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(245,158,11,.05));border-bottom:1px solid rgba(245,158,11,.3);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
-      banner.innerHTML=`<span style="font-size:12px;font-weight:700;color:#F59E0B">🔧 열람 중: ${esc(mName||mUid)}</span><button onclick="location.href='master/admin.html'" style="font-size:11px;font-weight:700;background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#F59E0B;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit">← 관리자 페이지</button>`;
+      banner.innerHTML=`<span style="font-size:12px;font-weight:700;color:#F59E0B"><svg class=ici><use href=icons.svg#ic-wrench></use></svg> 열람 중: ${esc(mName||mUid)}</span><button onclick="location.href='master/admin.html'" style="font-size:11px;font-weight:700;background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#F59E0B;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit">← 관리자 페이지</button>`;
       document.body.appendChild(banner);
       document.querySelector(".content").style.marginTop="136px";
       document.querySelectorAll(".nav-tab").forEach(a=>{
@@ -632,7 +632,7 @@ function listenUnits(){
       if(f("m-phone"))  units[curRoom].tenantPhone   = f("m-phone").value;
     }
     _unitsReady=true;schedRenderGrid();
-  },()=>showToast("❗ 연결 오류"));
+  },()=>showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 연결 오류"));
 }
 function listenHistory(){
   hL=hRef.on("value",snap=>{
@@ -652,7 +652,7 @@ function tryOpenURLParam(){
     } else {
       curFilter=filter;
       updateFilterBtns();
-      document.getElementById("filter-banner-txt").textContent="🔍 "+filter;
+      document.getElementById("filter-banner-txt").innerHTML="<svg class=ici><use href=icons.svg#ic-search></use></svg> "+esc(filter);
       document.getElementById("filter-banner").style.display="flex";renderGrid();
     }
   }
@@ -673,9 +673,9 @@ function renderHistory(roomId){
     const rec=roomH[ym];
     let cls,icon;
     if(!rec){cls="rh-none";icon="—";}
-    else if(rec.paid){cls="rh-paid";icon="✅";}
-    else if(rec.partial){cls="rh-partial";icon="🔶";}
-    else{cls="rh-unpaid";icon="❌";}
+    else if(rec.paid){cls="rh-paid";icon="<svg class=ici><use href=icons.svg#ic-circle-check></use></svg>";}
+    else if(rec.partial){cls="rh-partial";icon="<svg class=ici><use href=icons.svg#ic-circle-dashed></use></svg>";}
+    else{cls="rh-unpaid";icon="<svg class=ici><use href=icons.svg#ic-circle-x></use></svg>";}
     const mLabel=ym.split("-")[1]+"월";
     const amtTitle=rec&&rec.amount?" · "+rec.amount.toLocaleString()+"원":"";
     return`<div class="rh-cell ${cls}" onclick="openHistDrop(event,'${roomId}','${ym}')" title="${ym}${amtTitle}">
@@ -693,20 +693,20 @@ function openHistDrop(e,roomId,ym){
   const drop=document.createElement("div");
   drop.className="rh-drop";
   const opts=[
-    {label:"✅ 납부완료",status:"paid"},
-    {label:"❌ 미납",status:"unpaid"},
-    {label:"🔶 부분납부",status:"partial"},
+    {label:"<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 납부완료",status:"paid"},
+    {label:"<svg class=ici><use href=icons.svg#ic-circle-x></use></svg> 미납",status:"unpaid"},
+    {label:"<svg class=ici><use href=icons.svg#ic-circle-dashed></use></svg> 부분납부",status:"partial"},
     {label:"— 기록없음",status:"none"},
   ];
   opts.forEach(opt=>{
     const btn=document.createElement("button");
-    btn.className="rh-dd-btn";btn.textContent=opt.label;
+    btn.className="rh-dd-btn";btn.innerHTML=opt.label;
     if(opt.status==="partial"){
       btn.onclick=(ev)=>{
         ev.stopPropagation();
         drop.innerHTML="";
         const wrap=document.createElement("div");wrap.className="rh-partial-input";
-        const lbl=document.createElement("div");lbl.style.cssText="font-size:11px;font-weight:700;color:#92400E";lbl.textContent="🔶 부분납부 금액 (원)";
+        const lbl=document.createElement("div");lbl.style.cssText="font-size:11px;font-weight:700;color:#92400E";lbl.innerHTML="<svg class=ici><use href=icons.svg#ic-circle-dashed></use></svg> 부분납부 금액 (원)";
         const inp=document.createElement("input");inp.type="number";inp.value=rentAmt;inp.min=0;
         const cfm=document.createElement("button");cfm.textContent="확인";
         cfm.onclick=(ev)=>{
@@ -742,10 +742,10 @@ function setHistStatus(roomId,ym,status,amount){
     delete rentHistory[roomId][ym];
     renderHistory(roomId);renderGrid();
     ref.remove()
-      .then(()=>showToast("🗑 기록 삭제됨"))
+      .then(()=>showToast("<svg class=ici><use href=icons.svg#ic-trash-2></use></svg> 기록 삭제됨"))
       .catch(()=>{
         if(prev)rentHistory[roomId][ym]=prev;
-        renderHistory(roomId);renderGrid();showToast("❗ 저장 실패");
+        renderHistory(roomId);renderGrid();showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 저장 실패");
       });
     return;
   }
@@ -758,11 +758,11 @@ function setHistStatus(roomId,ym,status,amount){
   const prev=rentHistory[roomId][ym];
   rentHistory[roomId][ym]=data;
   renderHistory(roomId);renderGrid();
-  showToast({paid:"✅ 완납 기록됨",unpaid:"❌ 미납 기록됨",partial:"🔶 부분납부 기록됨"}[status]);
+  showToast({paid:"<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 완납 기록됨",unpaid:"<svg class=ici><use href=icons.svg#ic-circle-x></use></svg> 미납 기록됨",partial:"<svg class=ici><use href=icons.svg#ic-circle-dashed></use></svg> 부분납부 기록됨"}[status]);
   ref.set(data).catch(()=>{
     if(prev)rentHistory[roomId][ym]=prev;
     else delete rentHistory[roomId][ym];
-    renderHistory(roomId);renderGrid();showToast("❗ 저장 실패 (되돌림)");
+    renderHistory(roomId);renderGrid();showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 저장 실패 (되돌림)");
   });
 }
 async function ensureRooms(ex){
@@ -826,9 +826,9 @@ function renderGrid(){
     const rentTxt=isR&&u.monthlyRent?fmtWon(u.monthlyRent)+"/월":"—";
     let pBadge="";
     if(isR){const ps=computePaidStatus(u.room);
-      if(ps===false) pBadge=`<span class="rc-paid badge-unpaid">❌ 미납</span>`;
-      else if(ps==="partial") pBadge=`<span class="rc-paid" style="background:#FEF3C7;color:#92400E">🔶 부분납부</span>`;
-      else if(ps===true) pBadge=`<span class="rc-paid badge-paid">✅ 완납</span>`;
+      if(ps===false) pBadge=`<span class="rc-paid badge-unpaid"><svg class=ici><use href=icons.svg#ic-circle-x></use></svg> 미납</span>`;
+      else if(ps==="partial") pBadge=`<span class="rc-paid" style="background:#FEF3C7;color:#92400E"><svg class=ici><use href=icons.svg#ic-circle-dashed></use></svg> 부분납부</span>`;
+      else if(ps===true) pBadge=`<span class="rc-paid badge-paid"><svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 완납</span>`;
       else pBadge=`<span class="rc-paid" style="background:#F1F5F9;color:var(--hint)">— 이력없음</span>`;}
     let ddayHtml="";
     if(isR&&u.contractEnd){
@@ -842,9 +842,9 @@ function renderGrid(){
     return`<div class="room-card status-${u.status}" onclick="openSheet('${u.room}')">
       <div class="rc-top"><span class="rc-num">${u.room}호</span><div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">${rentTypeBadge}${rtBadge}${sBadge}</div></div>
       <div class="rc-names">${esc(namesTxt)}</div>
-      ${phonesTxt?`<div class="rc-phones">📞 ${esc(phonesTxt)}</div>`:""}
+      ${phonesTxt?`<div class="rc-phones"><svg class=ici><use href=icons.svg#ic-phone></use></svg> ${esc(phonesTxt)}</div>`:""}
       <div class="rc-rent">${rentTxt}</div>
-      ${memoTxt?`<div class="rc-memo">💬 ${esc(memoTxt)}</div>`:""}
+      ${memoTxt?`<div class="rc-memo"><svg class=ici><use href=icons.svg#ic-message-circle></use></svg> ${esc(memoTxt)}</div>`:""}
       ${ddayHtml}${pBadge}</div>`;
   }).join("");
 }
@@ -899,9 +899,9 @@ async function saveRentChange(){
   const monNewStr=document.getElementById("chg-mon-new").value;
   const depFilled=depNewStr!==""&&!isNaN(parseInt(depNewStr));
   const monFilled=monNewStr!==""&&!isNaN(parseInt(monNewStr));
-  if(!depFilled&&!monFilled){showToast("❗ 보증금 또는 월세 변경 금액을 입력하세요");return;}
+  if(!depFilled&&!monFilled){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 보증금 또는 월세 변경 금액을 입력하세요");return;}
   const date=document.getElementById("chg-date").value;
-  if(!date){showToast("❗ 적용일을 선택하세요");return;}
+  if(!date){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 적용일을 선택하세요");return;}
   const u=units[_chgRoomId]||{};
   const reason=document.getElementById("chg-reason").value.trim();
   const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
@@ -932,11 +932,11 @@ async function saveRentChange(){
       if(depFilled) document.getElementById("m-deposit").value=parseInt(depNewStr);
       if(monFilled) document.getElementById("m-rent").value=parseInt(monNewStr);
     }
-    showToast("✅ 변동 이력 기록됨");
+    showToast("<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 변동 이력 기록됨");
     closeRentChangeSheet();
     renderRentChanges(_chgRoomId);
     renderGrid();
-  }catch(e){showToast("❗ 저장 실패");}
+  }catch(e){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 저장 실패");}
 }
 function deleteRentChange(roomId,id){
   showCM("변동 이력 삭제","이 변동 이력을 삭제하시겠습니까?",async()=>{
@@ -944,8 +944,8 @@ function deleteRentChange(roomId,id){
       const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
       await db.ref(DBPath.rentChanges(targetUid, curBid, roomId, id)).remove();
       if(units[roomId]?.rentChanges)delete units[roomId].rentChanges[id];
-      showToast("🗑 삭제됨");renderRentChanges(roomId);
-    }catch(e){showToast("❗ 실패");}
+      showToast("<svg class=ici><use href=icons.svg#ic-trash-2></use></svg> 삭제됨");renderRentChanges(roomId);
+    }catch(e){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 실패");}
   });
 }
 function renderRentChanges(roomId){
@@ -996,7 +996,7 @@ function clearContractFields(){
   // 블라인드 복원
   const blind=document.getElementById("clear-blind");
   if(blind)blind.classList.remove("lifted");
-  showToast("🗑 계약 내용이 지워졌습니다");
+  showToast("<svg class=ici><use href=icons.svg#ic-trash-2></use></svg> 계약 내용이 지워졌습니다");
 }
 function saveRoom(){
   if(!curRoom)return;
@@ -1026,10 +1026,10 @@ function saveRoom(){
     memo:document.getElementById("m-memo").value.trim()};
   const prev=units[roomId]?{...units[roomId]}:null;
   units[roomId]={...(units[roomId]||{}), ...data};
-  closeSheet();showToast(autoRented?"✅ 저장됨 · 임대중으로 자동 변경":"✅ 저장됨");renderGrid();
+  closeSheet();showToast(autoRented?"<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 저장됨 · 임대중으로 자동 변경":"<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 저장됨");renderGrid();
   uRef.child(roomId).update(data).catch(()=>{
     if(prev)units[roomId]=prev;else delete units[roomId];
-    showToast("❗ 저장 실패");renderGrid();
+    showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 저장 실패");renderGrid();
   });
 }
 function renderPhotos(photos){
@@ -1046,8 +1046,8 @@ async function onPhotos(e){
   btn.disabled=true;camBtn.disabled=true;if(saveBtn)saveBtn.disabled=true;bar.style.display="block";
   for(let i=0;i<files.length;i++){
     const file=files[i];
-    if(!file.type.startsWith("image/")){showToast("❗ 이미지만 가능");continue}
-    if(file.size>50*1024*1024){showToast("❗ 50MB 이하만 가능");continue}
+    if(!file.type.startsWith("image/")){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 이미지만 가능");continue}
+    if(file.size>50*1024*1024){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 50MB 이하만 가능");continue}
     const ts=Date.now(),path=`rent_app/${cu.uid}/contracts/${curRoom}/${ts}_${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
     const label=files.length>1?`(${i+1}/${files.length}) `:"";
     try{
@@ -1081,7 +1081,7 @@ async function onPhotos(e){
         }catch(e){
           const isTimeout=e.code==="storage/canceled";
           if(attempt===MAX_TRIES-1)throw e;
-          pct.textContent=isTimeout?`${label}⏱ 응답 없음 — 재시도 중...`:`${label}❗ 실패 — 재시도 중...`;
+          pct.innerHTML=isTimeout?`${label}<svg class=ici><use href=icons.svg#ic-timer></use></svg> 응답 없음 — 재시도 중...`:`${label}<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 실패 — 재시도 중...`;
         }
       }
       fill.style.width="100%";pct.textContent=`${label}완료!`;
@@ -1090,10 +1090,10 @@ async function onPhotos(e){
       await db.ref(DBPath.unitPhoto(targetUid, curBid, curRoom, pid)).set({id:pid,url,storagePath:path,uploadedAt:new Date().toISOString()});
       if(!units[curRoom].photos)units[curRoom].photos={};
       units[curRoom].photos[pid]={id:pid,url,storagePath:path};
-      renderPhotos(units[curRoom].photos);showToast("✅ 업로드 완료");
+      renderPhotos(units[curRoom].photos);showToast("<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 업로드 완료");
     }catch(err){
       const msg=err.code==="storage/canceled"?"네트워크 오류 — 잠시 후 다시 시도하세요":"업로드 실패: "+err.message;
-      showToast("❗ "+msg);
+      showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> "+msg);
     }
   }
   btn.disabled=false;camBtn.disabled=false;if(saveBtn)saveBtn.disabled=false;bar.style.display="none";fill.style.width="0%";pct.textContent="";e.target.value="";
@@ -1106,8 +1106,8 @@ function delPhoto(pid,spath){
       const targetUid=(cu.uid===MASTER_UID&&mUid)?mUid:cu.uid;
       await db.ref(DBPath.unitPhoto(targetUid, curBid, curRoom, pid)).remove();
       if(units[curRoom]&&units[curRoom].photos)delete units[curRoom].photos[pid];
-      renderPhotos(units[curRoom]&&units[curRoom].photos||{});showToast("🗑 삭제됨");
-    }catch(e){showToast("❗ 삭제 실패")}});
+      renderPhotos(units[curRoom]&&units[curRoom].photos||{});showToast("<svg class=ici><use href=icons.svg#ic-trash-2></use></svg> 삭제됨");
+    }catch(e){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 삭제 실패")}});
 }
 function openPV(url){document.getElementById("pv-img").src=url;document.getElementById("pv").classList.add("show")}
 function closePV(){document.getElementById("pv").classList.remove("show");document.getElementById("pv-img").src=""}
@@ -1132,7 +1132,7 @@ function exportJSON(){
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);
   a.download=`월세관리_세대_${fmtDate()}.json`;a.click();URL.revokeObjectURL(a.href);
-  showToast("✅ JSON 내려받기 완료");
+  showToast("<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> JSON 내려받기 완료");
 }
 function exportCSV(){
   const months=getLastNMonths(12);
@@ -1153,7 +1153,7 @@ function exportCSV(){
   const blob=new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);
   a.download=`월세관리_세대_${fmtDate()}.csv`;a.click();URL.revokeObjectURL(a.href);
-  showToast("✅ CSV 내려받기 완료");
+  showToast("<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> CSV 내려받기 완료");
 }
 
 // ── COACH MARK HELP ──
@@ -1161,10 +1161,10 @@ const CM_DATA={
   'floor-tabs':{title:'층별 · 유형 필터',body:'층별 보기 또는 <b>임대중 · 공실</b> 등 구분해서 볼수 있습니다.<br>탭을 탭하면 해당 조건의 세대만 표시됩니다.'},
   'rooms-grid':{title:'세대 카드 목록',body:'각 호실카드를 탭하면 <b>세대 입력 화면</b>이 열립니다.<br>임대중·공실·월세 납부 여부가 한눈에 구분됩니다.<br>다수 건물 관리시 우측 상단 <b>건물명</b>을 탭하면 건물을 전환할 수 있습니다.'},
   'sheet-tg':{title:'임대 구조 · 상태 · 형태',body:'<b>원룸·투베이·투룸·쓰리룸</b> 구조와 <br>임대중 · 공실 상태, 월세 · 전세 임대 형태를 선택합니다.<br>반드시 체크해야 메인화면의 대시보드도 정확히 표시됩니다'},
-  'sheet-tenant':{title:'퇴실했나요? 버튼',body:'세입자 퇴실 시 <b>🚪 퇴실했나요?</b> 버튼을 탭하면 블라인드가 벗겨지며 <b>계약내용 지우기</b> 버튼이 나타납니다.<br>누르면 이름·연락처·보증금·월세·계약기간이 한번에 지워지고 임대 상태가 <b>공실로 자동 전환</b>됩니다.<br>특이사항 메모와 계약서 사진은 그대로 유지됩니다.'},
+  'sheet-tenant':{title:'퇴실했나요? 버튼',body:'세입자 퇴실 시 <b><svg class=ici><use href=icons.svg#ic-log-out></use></svg> 퇴실했나요?</b> 버튼을 탭하면 블라인드가 벗겨지며 <b>계약내용 지우기</b> 버튼이 나타납니다.<br>누르면 이름·연락처·보증금·월세·계약기간이 한번에 지워지고 임대 상태가 <b>공실로 자동 전환</b>됩니다.<br>특이사항 메모와 계약서 사진은 그대로 유지됩니다.'},
   'sheet-chg':{title:'임대조건 변경 기록',body:'보증금·월세 변경시 이력을 남깁니다.<br>변경 사유와 날짜가 기록되어 계약 이력 추적이 쉬워집니다.'},
   'sheet-hist':{title:'월세 납부 이력',body:'최근 12개월 납부 현황을 확인합니다.<br>각각 월을 탭하여 <b>완납·미납·부분납부</b>를 기록할 수 있습니다.'},
-  'sheet-photo':{title:'계약서 사진',body:'계약서·신분증 등을 사진으로 보관합니다.<br>📁 사진 추가 또는 📸 카메라로 바로 촬영하여 저장하세요.<br>각각의 사진은 10MB이하로 제한되며 세입자 퇴실 정산후 내 휴대폰에 내려받기하고 목록에서 삭제하심 관리가 편합니다.'}
+  'sheet-photo':{title:'계약서 사진',body:'계약서·신분증 등을 사진으로 보관합니다.<br><svg class=ici><use href=icons.svg#ic-folder-open></use></svg> 사진 추가 또는 <svg class=ici><use href=icons.svg#ic-camera></use></svg> 카메라로 바로 촬영하여 저장하세요.<br>각각의 사진은 10MB이하로 제한되며 세입자 퇴실 정산후 내 휴대폰에 내려받기하고 목록에서 삭제하심 관리가 편합니다.'}
 };
 function openHelp(){
   const sheetOpen=document.getElementById('room-sheet').classList.contains('show');

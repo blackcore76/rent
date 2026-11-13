@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://rent-4d521-default-rtdb.firebaseio.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="common.css?v=2">
+<link rel="stylesheet" href="common.css?v=3">
 <style>
 body{overflow-x:hidden}
 /* 로그인 모달: 불투명 그라데이션 대신 뒤에 데모 대시보드가 살짝 비치도록(약 70~80%) */
@@ -211,19 +211,19 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
       <svg class="g-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Google로 로그인
     </button>
-    <button onclick="enterDemoMode()" style="margin-top:10px;width:100%;padding:11px;background:rgba(14,165,233,.15);border:1.5px solid rgba(14,165,233,.4);border-radius:12px;color:#7DD3FC;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">👀 로그인 없이 구경하기</button>
+    <button onclick="enterDemoMode()" style="margin-top:10px;width:100%;padding:11px;background:rgba(14,165,233,.15);border:1.5px solid rgba(14,165,233,.4);border-radius:12px;color:#7DD3FC;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><svg class=ici><use href=icons.svg#ic-eye></use></svg> 로그인 없이 구경하기</button>
 
     <!-- 인앱 브라우저 안내 (카카오톡·네이버 등 감지 시 표시) -->
     <div id="inapp-notice" style="display:none;margin-top:16px;background:#F0F4F8;border-radius:14px;padding:14px;">
-      <div style="font-size:12px;font-weight:800;color:#1E2D3D;text-align:center;margin-bottom:10px;">⚠️ 외부 브라우저에서 열어주세요</div>
+      <div style="font-size:12px;font-weight:800;color:#1E2D3D;text-align:center;margin-bottom:10px;"><svg class=ici><use href=icons.svg#ic-triangle-alert></use></svg> 외부 브라우저에서 열어주세요</div>
       <div style="font-size:11px;color:#555;text-align:center;margin-bottom:10px;line-height:1.6;">카카오톡·네이버 앱에서는 로그인이<br>정상 작동하지 않을 수 있습니다.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
         <div style="background:#fff;border-radius:10px;padding:10px;">
-          <div style="font-size:12px;font-weight:800;color:#1E2D3D;margin-bottom:6px;">🤖 Android</div>
+          <div style="font-size:12px;font-weight:800;color:#1E2D3D;margin-bottom:6px;"><svg class=ici><use href=icons.svg#ic-smartphone></use></svg> Android</div>
           <div style="font-size:11px;color:#444;line-height:1.9;">우측 하단 <b>⋯</b><br>↓<br><b>다른 브라우저로<br>열기</b> 선택</div>
         </div>
         <div style="background:#fff;border-radius:10px;padding:10px;">
-          <div style="font-size:12px;font-weight:800;color:#1E2D3D;margin-bottom:6px;">🍎 iPhone</div>
+          <div style="font-size:12px;font-weight:800;color:#1E2D3D;margin-bottom:6px;"><svg class=ici><use href=icons.svg#ic-smartphone></use></svg> iPhone</div>
           <div style="font-size:11px;color:#444;line-height:1.9;">우측 하단 <b>⋯</b><br>↓<br><b>Safari로<br>열기</b> 선택</div>
         </div>
       </div>
@@ -232,7 +232,7 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
 
   </div>
   <div class="login-privacy">
-    <div class="lp-title">🔒 개인정보 보호 안내</div>
+    <div class="lp-title"><svg class=ici><use href=icons.svg#ic-lock></use></svg> 개인정보 보호 안내</div>
     <ul class="lp-list">
       <li>본 사이트는 Google 로그인으로 <b>본인 확인만</b> 받습니다</li>
       <li>비밀번호는 Google이 관리, <b>관리자도 알 수 없음</b></li>
@@ -254,7 +254,7 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
 
 <div id="status-screen" style="display:none;position:fixed;inset:0;background:linear-gradient(160deg,#0F1C2D,#1E2D3D 50%,#2A3F55);z-index:7000;align-items:center;justify-content:center;padding:20px">
   <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:36px 28px;max-width:320px;width:100%;text-align:center;backdrop-filter:blur(16px);box-shadow:0 20px 60px rgba(0,0,0,.4)">
-    <div style="font-size:52px;margin-bottom:14px" id="ss-icon">⏳</div>
+    <div style="font-size:52px;margin-bottom:14px;color:#fff;line-height:1" id="ss-icon"><svg class=ici><use href=icons.svg#ic-hourglass></use></svg></div>
     <div style="font-size:20px;font-weight:900;color:#fff;margin-bottom:8px" id="ss-title"></div>
     <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;line-height:1.7;white-space:pre-line" id="ss-msg"></div>
     <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:24px" id="ss-email"></div>
@@ -273,7 +273,7 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
       <div class="hdr-actions">
         <span id="sync-st" style="font-size:10px"></span>
 
-        <button class="guide-btn" onclick="openHelp()">❓ 도움말</button>
+        <button class="guide-btn" onclick="openHelp()"><svg class=ici><use href=icons.svg#ic-circle-question-mark></use></svg> 도움말</button>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
     </div>
@@ -287,20 +287,20 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
   <div id="user-menu" class="user-menu">
     <div class="um-name" id="um-name">—</div>
     <div class="um-email" id="um-email">—</div>
-    <button class="logout-btn" onclick="doSignOut()">🚪 로그아웃</button>
+    <button class="logout-btn" onclick="doSignOut()"><svg class=ici><use href=icons.svg#ic-log-out></use></svg> 로그아웃</button>
   </div>
 
   <div class="content" id="normal-content">
     <div id="first-run" style="display:none;background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:16px;padding:22px 20px;margin-bottom:16px;box-shadow:0 6px 20px rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.06)">
-      <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px">🎉 플러스홈에 오신 걸 환영해요!</div>
+      <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px"><svg class=ici><use href=icons.svg#ic-party-popper></use></svg> 플러스홈에 오신 걸 환영해요!</div>
       <div style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:16px">가입이 끝났어요. 아직 등록된 세대가 없네요 — <b style="color:#4DD0E1">3단계</b>면 바로 시작할 수 있어요.</div>
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
-        <div style="display:flex;align-items:flex-start;gap:10px"><span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(77,208,225,.15);color:#4DD0E1;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center">1</span><div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.5"><b>🗂 관리 탭</b>에서 <b>건물 정보 카드</b>를 만들어요<br><span style="font-size:11.5px;color:rgba(255,255,255,.5)">관리 건물명 · 층수 · 호실 등</span></div></div>
-        <div style="display:flex;align-items:flex-start;gap:10px"><span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(77,208,225,.15);color:#4DD0E1;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center">2</span><div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.5"><b>🏠 세대 탭</b>에서 호실과 임대 현황을 입력해요</div></div>
-        <div style="display:flex;align-items:flex-start;gap:10px"><span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(77,208,225,.15);color:#4DD0E1;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center">3</span><div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.5"><b>💸 장부 탭</b>에서 월세 · 수입 · 지출을 기록해요</div></div>
+        <div style="display:flex;align-items:flex-start;gap:10px"><span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(77,208,225,.15);color:#4DD0E1;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center">1</span><div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.5"><b><svg class=ici><use href=icons.svg#ic-folder-cog></use></svg> 관리 탭</b>에서 <b>건물 정보 카드</b>를 만들어요<br><span style="font-size:11.5px;color:rgba(255,255,255,.5)">관리 건물명 · 층수 · 호실 등</span></div></div>
+        <div style="display:flex;align-items:flex-start;gap:10px"><span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(77,208,225,.15);color:#4DD0E1;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center">2</span><div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.5"><b><svg class=ici><use href=icons.svg#ic-house></use></svg> 세대 탭</b>에서 호실과 임대 현황을 입력해요</div></div>
+        <div style="display:flex;align-items:flex-start;gap:10px"><span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(77,208,225,.15);color:#4DD0E1;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center">3</span><div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.5"><b><svg class=ici><use href=icons.svg#ic-banknote></use></svg> 장부 탭</b>에서 월세 · 수입 · 지출을 기록해요</div></div>
       </div>
-      <a href="admin.html" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;box-sizing:border-box;padding:13px;background:#4DD0E1;color:#0F1C2D;font-size:14px;font-weight:900;text-decoration:none;border-radius:11px">🗂 관리 탭에서 건물 정보 만들기 →</a>
-      <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.4);margin-top:12px">대부분 기능은 무료예요 · 화면 표시중 사용법이 궁금할땐 <b>❓ 도움말</b>을 눌러보세요</div>
+      <a href="admin.html" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;box-sizing:border-box;padding:13px;background:#4DD0E1;color:#0F1C2D;font-size:14px;font-weight:900;text-decoration:none;border-radius:11px"><svg class=ici><use href=icons.svg#ic-folder-cog></use></svg> 관리 탭에서 건물 정보 만들기 →</a>
+      <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.4);margin-top:12px">대부분 기능은 무료예요 · 화면 표시중 사용법이 궁금할땐 <b><svg class=ici><use href=icons.svg#ic-circle-question-mark></use></svg> 도움말</b>을 눌러보세요</div>
     </div>
     <div class="stats-grid">
       <div class="kpi total" onclick="goUnits()"><div class="kpi-val" id="s-total">—</div><div class="kpi-lbl">전체</div></div>
@@ -310,26 +310,26 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
     </div>
 
     <div class="card" id="card-unpaid">
-      <div class="card-hd">🔴 미납 현황 (최근 1년)</div>
+      <div class="card-hd"><svg class=ici style=color:#EF4444><use href=icons.svg#ic-dot></use></svg> 미납 현황 (최근 1년)</div>
       <div id="unpaid-list"><div class="empty-small">로딩 중...</div></div>
     </div>
 
     <div class="card" id="card-vacant">
-      <div class="card-hd">🟣 공실 현황</div>
+      <div class="card-hd"><svg class=ici style=color:#8B5CF6><use href=icons.svg#ic-dot></use></svg> 공실 현황</div>
       <div id="vacant-list"><div class="empty-small">로딩 중...</div></div>
     </div>
 
     <div class="card" id="card-expiry">
       <div class="card-hd">
-        <span>⚠️ 계약 만료 임박 (30일 이내)</span>
+        <span><svg class=ici><use href=icons.svg#ic-triangle-alert></use></svg> 계약 만료 임박 (30일 이내)</span>
         <span style="margin-left:auto;display:flex;align-items:center;gap:6px;font-weight:500">
           <span id="push-status" style="font-size:11px;color:#64748B"></span>
-          <button class="btn-add" id="push-btn" onclick="enablePush()" style="display:none;padding:4px 10px;font-size:11px;border-radius:7px">🔔 알림받기</button>
+          <button class="btn-add" id="push-btn" onclick="enablePush()" style="display:none;padding:4px 10px;font-size:11px;border-radius:7px"><svg class=ici><use href=icons.svg#ic-bell></use></svg> 알림받기</button>
         </span>
       </div>
       <div id="push-info-box" style="display:none;position:relative;margin-bottom:12px;padding:12px 26px 12px 14px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px">
         <button onclick="document.getElementById('push-info-box').style.display='none'" aria-label="닫기" style="position:absolute;top:6px;right:6px;width:22px;height:22px;border:none;background:transparent;color:#64748B;font-size:14px;cursor:pointer;line-height:1;border-radius:50%">✕</button>
-        <div style="font-size:12px;font-weight:700;color:#1E3A8A;margin-bottom:4px">🔔 알림이 이렇게 와요</div>
+        <div style="font-size:12px;font-weight:700;color:#1E3A8A;margin-bottom:4px"><svg class=ici><use href=icons.svg#ic-bell></use></svg> 알림이 이렇게 와요</div>
         <div style="font-size:11.5px;color:#334155;line-height:1.6">
           · 접속(로그인)할 때마다 화면 위쪽에 작은 알림이 <b>최대 3번</b> 떠요<br>
           · 계약 만료가 다가오면 <b>만료 30·14·7·3·1일 전, 당일</b>에 휴대폰·브라우저로 푸시 알림이 가요
@@ -339,7 +339,7 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
     </div>
 
     <div class="card" id="card-notes">
-      <div class="card-hd">📝 특이사항 메모</div>
+      <div class="card-hd"><svg class=ici><use href=icons.svg#ic-notebook-pen></use></svg> 특이사항 메모</div>
       <div class="note-input-row">
         <textarea class="note-ta" id="note-input" rows="2" placeholder="임차인 요청사항, 수리 필요 사항 등..."></textarea>
         <button class="btn-add" onclick="addNote()">추가</button>
@@ -397,7 +397,7 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
 <!-- EDIT NOTE MODAL -->
 <div class="modal-bg" id="edit-note-modal">
   <div class="modal">
-    <h3>✏️ 메모 수정</h3>
+    <h3><svg class=ici><use href=icons.svg#ic-pencil></use></svg> 메모 수정</h3>
     <input type="hidden" id="edit-note-id">
     <div class="field">
       <label>내용</label>
@@ -467,7 +467,7 @@ if (messaging) {
         renotify: true,
       });
     } catch (e) {
-      showToast(`🔔 ${title}${body ? " · " + body : ""}`, 6000);
+      showToast(`<svg class=ici><use href=icons.svg#ic-bell></use></svg> ${title}${body ? " · " + body : ""}`, 6000);
     }
   });
 }
@@ -478,10 +478,10 @@ function renderPushCard() {
   if (!statusEl || !btn || !messaging || !("Notification" in window)) return;
   const perm = Notification.permission;
   if (perm === "granted") {
-    statusEl.textContent = "🔔 알림 ON";
+    statusEl.innerHTML = "<svg class=ici><use href=icons.svg#ic-bell></use></svg> 알림 ON";
     btn.style.display = "none";
   } else if (perm === "denied") {
-    statusEl.textContent = "🔕 브라우저에서 차단됨";
+    statusEl.innerHTML = "<svg class=ici><use href=icons.svg#ic-bell-off></use></svg> 브라우저에서 차단됨";
     btn.style.display = "none";
   } else {
     statusEl.textContent = "";
@@ -518,7 +518,7 @@ async function enablePush() {
     const infoBox = document.getElementById("push-info-box");
     if (infoBox) infoBox.style.display = "block";
   } catch (e) {
-    statusEl.textContent = "❌ 알림 등록 실패: " + e.message;
+    statusEl.innerHTML = "<svg class=ici><use href=icons.svg#ic-circle-x></use></svg> 알림 등록 실패: " + esc(e.message);
     btn.disabled = false;
   }
 }
@@ -575,7 +575,7 @@ auth.onAuthStateChanged(async user=>{
         const banner=document.createElement("div");
         banner.id="master-view-banner";
         banner.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(245,158,11,.05));border-bottom:1px solid rgba(245,158,11,.3);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
-        banner.innerHTML=`<span style="font-size:12px;font-weight:700;color:#F59E0B">🔧 열람 중: ${esc(mName||mUid)}</span><button onclick="location.href='master/admin.html'" style="background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);border-radius:8px;padding:5px 12px;color:#F59E0B;font-size:11px;font-weight:700;cursor:pointer">← 관리자</button>`;
+        banner.innerHTML=`<span style="font-size:12px;font-weight:700;color:#F59E0B"><svg class=ici><use href=icons.svg#ic-wrench></use></svg> 열람 중: ${esc(mName||mUid)}</span><button onclick="location.href='master/admin.html'" style="background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);border-radius:8px;padding:5px 12px;color:#F59E0B;font-size:11px;font-weight:700;cursor:pointer">← 관리자</button>`;
         document.body.appendChild(banner);
         document.querySelector(".content").style.marginTop="136px";
         document.querySelectorAll(".nav-tab").forEach(a=>{
@@ -721,13 +721,13 @@ function renderDash(){
     uHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
     uHtml+=up.map(u=>{
       const ps=computePaidStatus(bid,u.room);
-      const pBadge=ps==="partial"?`<span class="badge" style="background:#FEF3C7;color:#92400E">🔶 부분납부</span>`:`<span class="badge badge-unpaid">❌ 미납</span>`;
+      const pBadge=ps==="partial"?`<span class="badge" style="background:#FEF3C7;color:#92400E"><svg class=ici><use href=icons.svg#ic-circle-dashed></use></svg> 부분납부</span>`:`<span class="badge badge-unpaid"><svg class=ici><use href=icons.svg#ic-circle-x></use></svg> 미납</span>`;
       return`<div class="status-row" onclick="goToUnit('${bid}','${u.room}')">
       <div class="sr-top"><span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}${pBadge}<span class="sr-arrow">›</span></div>
       <div class="sr-sub sr-amt-row"><span class="sr-name">${esc(names(u))}</span><span class="sr-amt">${unpaidAmtTxt(u)}</span></div>
       </div>`;}).join("");
   });
-  document.getElementById("unpaid-list").innerHTML=uHtml||'<div class="empty-small">✅ 이달 미납 없음</div>';
+  document.getElementById("unpaid-list").innerHTML=uHtml||'<div class="empty-small"><svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 이달 미납 없음</div>';
 
   // Vacant
   let vHtml="";
@@ -752,7 +752,7 @@ function renderDash(){
       ${unit?.memo?`<div class="sr-sub">${esc(unit.memo.split('\n')[0])}</div>`:''}
       </div>`).join("");
   });
-  document.getElementById("vacant-list").innerHTML=vHtml||'<div class="empty-small">🏠 공실 없음</div>';
+  document.getElementById("vacant-list").innerHTML=vHtml||'<div class="empty-small"><svg class=ici><use href=icons.svg#ic-house></use></svg> 공실 없음</div>';
 
   // Expiry
   const today=new Date();today.setHours(0,0,0,0);
@@ -776,7 +776,7 @@ function renderDash(){
       ${m2?`<div class="sr-sub">${esc(m2)}</div>`:''}
       </div>`;}).join("");
   });
-  document.getElementById("expiry-list").innerHTML=eHtml||'<div class="empty-small">✅ 30일 내 만료 없음</div>';
+  document.getElementById("expiry-list").innerHTML=eHtml||'<div class="empty-small"><svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 30일 내 만료 없음</div>';
   clearTimeout(_alertTimer);_alertTimer=setTimeout(checkContractAlerts,900);
   // 저장된 모드 복원 (최초 1회) + 이지모드 활성 시 항상 최신 데이터로 재렌더
   if (!_emRestored) {
@@ -814,16 +814,16 @@ function _bldCardsHtml(bids, twoColWhenEven=true) {
     return Object.values(bldInfo).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).map(b=>
       `<div style="background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:18px 20px;box-shadow:0 4px 16px rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.06)">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1)">
-          <span style="font-size:20px">🏠</span>
+          <span style="font-size:20px;color:#4DD0E1;display:flex"><svg class=ici><use href=icons.svg#ic-house></use></svg></span>
           <span style="font-size:16px;font-weight:900;color:#fff">${esc(b.name)}</span>
         </div>
         <div style="display:flex;flex-direction:column;gap:12px">
           ${b.entranceCode||b.masterCode?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:12px">
-            ${b.entranceCode?`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">🔐</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">1층 현관</div><div style="font-size:15px;font-weight:900;color:#4DD0E1;letter-spacing:1px">${esc(b.entranceCode)}</div></div></div>`:""}
-            ${b.masterCode?`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">🗝️</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">세대 마스터</div><div style="font-size:15px;font-weight:900;color:#4DD0E1;letter-spacing:1px">${esc(b.masterCode)}</div></div></div>`:""}
+            ${b.entranceCode?`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px;color:#4DD0E1;display:flex"><svg class=ici><use href=icons.svg#ic-lock-keyhole></use></svg></span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">1층 현관</div><div style="font-size:15px;font-weight:900;color:#4DD0E1;letter-spacing:1px">${esc(b.entranceCode)}</div></div></div>`:""}
+            ${b.masterCode?`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px;color:#4DD0E1;display:flex"><svg class=ici><use href=icons.svg#ic-key-round></use></svg></span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">세대 마스터</div><div style="font-size:15px;font-weight:900;color:#4DD0E1;letter-spacing:1px">${esc(b.masterCode)}</div></div></div>`:""}
           </div>`:""}
-          ${b.manageFee?`<div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)"><span style="font-size:16px;flex-shrink:0">🏦</span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">관리비 계좌</div><div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.85)">${esc(b.manageFee)}</div></div></div>`:""}
-          ${b.address?`<div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)"><span style="font-size:16px;flex-shrink:0">📍</span><div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.75);line-height:1.6">${esc(b.address)}</div></div>`:""}
+          ${b.manageFee?`<div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)"><span style="font-size:16px;flex-shrink:0;color:rgba(255,255,255,.55);display:flex"><svg class=ici><use href=icons.svg#ic-landmark></use></svg></span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">관리비 계좌</div><div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.85)">${esc(b.manageFee)}</div></div></div>`:""}
+          ${b.address?`<div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)"><span style="font-size:16px;flex-shrink:0;color:rgba(255,255,255,.55);display:flex"><svg class=ici><use href=icons.svg#ic-map-pin></use></svg></span><div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.75);line-height:1.6">${esc(b.address)}</div></div>`:""}
         </div>
       </div>`);
   });
@@ -849,7 +849,7 @@ function renderNotes(){
     <div class="note-footer">
       <span class="note-date">${fmtDt(n.createdAt)}</span>
       <div class="note-btns">
-        <button class="note-btn edit" onclick="startEdit(${n.id})">✏️</button>
+        <button class="note-btn edit" onclick="startEdit(${n.id})"><svg class=ici><use href=icons.svg#ic-pencil></use></svg></button>
         <button class="note-btn del" onclick="delNote(${n.id})">✕</button>
       </div>
     </div>
@@ -858,11 +858,11 @@ function renderNotes(){
 function addNote(){
   if(!guardWrite())return;
   const ta=document.getElementById("note-input"),c=ta.value.trim();
-  if(!c){showToast("❗ 내용을 입력하세요");return}
+  if(!c){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 내용을 입력하세요");return}
   const id=Date.now();setSS("ing");
   nRef.child(String(id)).set({id,content:c,createdAt:new Date().toISOString()})
-    .then(()=>{ta.value="";showToast("✅ 메모 추가됨");setSS("ok")})
-    .catch(()=>{setSS("err");showToast("❗ 저장 실패")});
+    .then(()=>{ta.value="";showToast("<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 메모 추가됨");setSS("ok")})
+    .catch(()=>{setSS("err");showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 저장 실패")});
 }
 function startEdit(id){
   const n=notes[id];if(!n)return;
@@ -874,14 +874,14 @@ function closeEditNote(){document.getElementById("edit-note-modal").classList.re
 function saveEditNote(){if(!guardWrite())return;
   const id=document.getElementById("edit-note-id").value;
   const c=document.getElementById("edit-note-content").value.trim();
-  if(!c){showToast("❗ 내용을 입력하세요");return}
+  if(!c){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 내용을 입력하세요");return}
   setSS("ing");
-  nRef.child(String(id)).update({content:c}).then(()=>{closeEditNote();showToast("✅ 수정됨");setSS("ok")}).catch(()=>{setSS("err");showToast("❗ 실패")});
+  nRef.child(String(id)).update({content:c}).then(()=>{closeEditNote();showToast("<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 수정됨");setSS("ok")}).catch(()=>{setSS("err");showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 실패")});
 }
 function delNote(id){
   if(!guardWrite())return;
   showConfirm("메모 삭제","이 메모를 삭제하시겠습니까?",()=>{
-    setSS("ing");nRef.child(String(id)).remove().then(()=>{showToast("🗑 삭제됨");setSS("ok")}).catch(()=>{setSS("err");showToast("❗ 실패")});
+    setSS("ing");nRef.child(String(id)).remove().then(()=>{showToast("<svg class=ici><use href=icons.svg#ic-trash-2></use></svg> 삭제됨");setSS("ok")}).catch(()=>{setSS("err");showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 실패")});
   });
 }
 function showConfirm(title,msg,cb){
@@ -922,8 +922,8 @@ const CM_DATA={
   stats:{title:'현황 통계 대시보드',body:'자동차의 계기반이라 생각하면 됩니다.<br><b>전체 · 임대중 · 공실 · 미납</b>세대 수를 한눈에 확인합니다.<br>각 카드를 탭하면 해당 상태 세대만 필터링해서 세대 목록으로 이동합니다.'},
   'card-unpaid':{title:'미납 현황 (최근 1년)',body:'최근 12개월 이내 월세 납부 이력에서 <br><b>미납·부분납부</b> 기록이 있는 세대 목록입니다.<br><b>세대 탭 -> 호실 -> 월세납부이력</b> 항목의 입력에 따라 자동 갱신됩니다.'},
   'card-vacant':{title:'공실 현황',body:'현재 비어있는 세대 목록입니다.<br><b>세대 탭 -> 호실 -> 임대상태</b> 항목의 선택에 따라 <b>공실</b>이 있을 경우에만 <br>해당 호실을 표시합니다.'},
-  'card-expiry':{title:'계약 만료 임박',body:'<b>30일 이내</b> 계약이 종료되는 세대 목록입니다.<br><b>세대 탭 -> 호실 -> 계약 종료일</b> 기준  일자에 따라 <br>만료 7일 이내 🔴빨간색, 8~30일 🟠주황색으로 구분하여 표시합니다.'},
-  'card-notes':{title:'특이사항 메모',body:'수리 요청 · 특이사항 등 건물 관련 메모를 남깁니다.<br>✏️ 버튼으로 수정, ✕ 버튼으로 삭제할 수 있습니다.<br>각각의 호실 메모는 <b>세대 탭 -> 호실 -> 특이사항 메모</b>에서 입력합니다.'},
+  'card-expiry':{title:'계약 만료 임박',body:'<b>30일 이내</b> 계약이 종료되는 세대 목록입니다.<br><b>세대 탭 -> 호실 -> 계약 종료일</b> 기준  일자에 따라 <br>만료 7일 이내 <svg class=ici style=color:#EF4444><use href=icons.svg#ic-dot></use></svg>빨간색, 8~30일 <svg class=ici style=color:#F97316><use href=icons.svg#ic-dot></use></svg>주황색으로 구분하여 표시합니다.'},
+  'card-notes':{title:'특이사항 메모',body:'수리 요청 · 특이사항 등 건물 관련 메모를 남깁니다.<br><svg class=ici><use href=icons.svg#ic-pencil></use></svg> 버튼으로 수정, ✕ 버튼으로 삭제할 수 있습니다.<br>각각의 호실 메모는 <b>세대 탭 -> 호실 -> 특이사항 메모</b>에서 입력합니다.'},
   'buildings-wrap':{title:'건물정보 카드',body:'현관 비밀번호 · 관리비 계좌 · 주소 등 건물정보를 한눈에 확인합니다.<br><b>관리 탭 -> 건물정보 -> 건물정보카드</b>에서 입력 · 수정합니다.<br>관리 건물이 여러개일 경우 각각 따로 입력하면 한눈에 확인하기 편리합니다.'}
 };
 function openHelp(){
@@ -1096,7 +1096,7 @@ function euBodyHtml(bid, roomId, u) {
   let html = '';
 
   // 임대 구조/형태
-  html += `<div class="eu-slbl">🏠 임대 구조 / 형태</div>
+  html += `<div class="eu-slbl"><svg class=ici><use href=icons.svg#ic-house></use></svg> 임대 구조 / 형태</div>
   <div class="eu-card">
     <div class="eu-row"><span class="eu-lbl">임대 형태</span><span class="eu-val">${RT[u.rentType]||'월세'}</span></div>
     <div class="eu-row"><span class="eu-lbl">임대 구조</span><span class="eu-val">${RTYPE_LBL[u.roomType]||'—'}</span></div>
@@ -1105,7 +1105,7 @@ function euBodyHtml(bid, roomId, u) {
 
   // 임차인
   if (u.tenantName || u.tenantName2) {
-    html += `<div class="eu-slbl">👤 임차인</div><div class="eu-card">`;
+    html += `<div class="eu-slbl"><svg class=ici><use href=icons.svg#ic-user></use></svg> 임차인</div><div class="eu-card">`;
     if (u.tenantName) {
       html += `<div class="eu-row"><span class="eu-lbl">임차인①</span><span class="eu-val">${esc(u.tenantName)}</span></div>`;
       if (u.tenantPhone) html += `<div class="eu-row"><span class="eu-lbl">연락처①</span><span class="eu-val"><a href="tel:${esc(u.tenantPhone)}" style="color:var(--blue);text-decoration:none">${esc(u.tenantPhone)}</a></span></div>`;
@@ -1118,7 +1118,7 @@ function euBodyHtml(bid, roomId, u) {
   }
 
   // 계약 정보
-  html += `<div class="eu-slbl">💰 계약 정보</div><div class="eu-card">`;
+  html += `<div class="eu-slbl"><svg class=ici><use href=icons.svg#ic-coins></use></svg> 계약 정보</div><div class="eu-card">`;
   if (u.rentType==='jeonse') {
     html += `<div class="eu-row"><span class="eu-lbl">전세보증금</span><span class="eu-val">${(u.depositAmount||0).toLocaleString()}만원</span></div>`;
   } else {
@@ -1134,7 +1134,7 @@ function euBodyHtml(bid, roomId, u) {
   const changes = Object.values(u.rentChanges||{}).sort((a,b)=>(b.effectiveDate||'').localeCompare(a.effectiveDate||''));
   if (changes.length) {
     const typeMap = {deposit:'보증금 변경', monthly:'월세 변경', both:'보증금+월세 변경'};
-    html += `<div class="eu-slbl">📋 임대 조건 변경</div>`;
+    html += `<div class="eu-slbl"><svg class=ici><use href=icons.svg#ic-clipboard-list></use></svg> 임대 조건 변경</div>`;
     changes.forEach(c => {
       html += `<div class="eu-chg-item">
         <div class="eu-chg-date">${esc(c.effectiveDate||'')} · ${typeMap[c.type]||c.type||''}</div>
@@ -1144,24 +1144,24 @@ function euBodyHtml(bid, roomId, u) {
   }
 
   // 특이사항 메모 (편집 가능)
-  html += `<div class="eu-slbl">📝 특이사항 메모</div>
+  html += `<div class="eu-slbl"><svg class=ici><use href=icons.svg#ic-notebook-pen></use></svg> 특이사항 메모</div>
   <textarea class="eu-memo-ta" id="eu-memo" rows="3" placeholder="메모 없음">${esc(u.memo||'')}</textarea>
-  <button class="eu-save-btn" onclick="saveEuMemo()">💾 메모 저장</button>`;
+  <button class="eu-save-btn" onclick="saveEuMemo()"><svg class=ici><use href=icons.svg#ic-save></use></svg> 메모 저장</button>`;
 
   // 납부이력 (편집 가능)
-  html += `<div class="eu-slbl">📅 월세 납부 이력 <span style="font-size:10px;font-weight:400;color:var(--hint);margin-left:4px">최근 12개월</span></div>
+  html += `<div class="eu-slbl"><svg class=ici><use href=icons.svg#ic-calendar></use></svg> 월세 납부 이력 <span style="font-size:10px;font-weight:400;color:var(--hint);margin-left:4px">최근 12개월</span></div>
   <div class="rent-hist-wrap"><div class="rent-hist-grid" id="eu-hist-grid"></div></div>`;
 
   // 계약서 사진 — Plus 유저만 썸네일+업로드, 무료(만료) 유저는 잠금 안내로 대체
   const photos = Object.values(u.photos||{}).sort((a,b)=>a.id-b.id);
-  html += `<div class="eu-slbl">📷 계약서 사진</div>`;
+  html += `<div class="eu-slbl"><svg class=ici><use href=icons.svg#ic-camera></use></svg> 계약서 사진</div>`;
   if(__photoAccess===true){
     html += `<div class="eu-photo-grid" id="eu-photo-grid">
       ${photos.map(p=>`<div class="eu-ph-thumb"><img src="${esc(p.url)}" onclick="openEuPV('${esc(p.url)}')" loading="eager"></div>`).join('')}
     </div>
     <div class="eu-upload-row">
-      <button class="eu-upload-btn" onclick="document.getElementById('eu-photo-input').click()">📁 사진 추가</button>
-      <button class="eu-upload-btn" onclick="document.getElementById('eu-camera-input').click()">📸 카메라</button>
+      <button class="eu-upload-btn" onclick="document.getElementById('eu-photo-input').click()"><svg class=ici><use href=icons.svg#ic-folder-open></use></svg> 사진 추가</button>
+      <button class="eu-upload-btn" onclick="document.getElementById('eu-camera-input').click()"><svg class=ici><use href=icons.svg#ic-camera></use></svg> 카메라</button>
     </div>`;
   }else{
     html += photoLockBox("계약서 사진");
@@ -1179,9 +1179,9 @@ function renderEuHist() {
     const rec = roomH[ym];
     let cls, icon;
     if (!rec)             { cls='rh-none';    icon='—'; }
-    else if (rec.paid)    { cls='rh-paid';    icon='✅'; }
-    else if (rec.partial) { cls='rh-partial'; icon='🔶'; }
-    else                  { cls='rh-unpaid';  icon='❌'; }
+    else if (rec.paid)    { cls='rh-paid';    icon='<svg class=ici><use href=icons.svg#ic-circle-check></use></svg>'; }
+    else if (rec.partial) { cls='rh-partial'; icon='<svg class=ici><use href=icons.svg#ic-circle-dashed></use></svg>'; }
+    else                  { cls='rh-unpaid';  icon='<svg class=ici><use href=icons.svg#ic-circle-x></use></svg>'; }
     const mLabel = ym.split('-')[1]+'월';
     const amtTitle = rec?.amount ? ' · '+rec.amount.toLocaleString()+'원' : '';
     return `<div class="rh-cell ${cls}" onclick="openEuHistDrop(event,'${ym}')" title="${ym}${amtTitle}">
@@ -1196,14 +1196,14 @@ function openEuHistDrop(e, ym) {
   const u = ((allBldData[_euBid]||{}).units||{})[_euRoom] || {};
   const rentAmt = (u.monthlyRent||0)*10000;
   const drop = document.createElement('div'); drop.className='rh-drop';
-  [{label:'✅ 납부완료',status:'paid'},{label:'❌ 미납',status:'unpaid'},{label:'🔶 부분납부',status:'partial'},{label:'— 기록없음',status:'none'}]
+  [{label:'<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 납부완료',status:'paid'},{label:'<svg class=ici><use href=icons.svg#ic-circle-x></use></svg> 미납',status:'unpaid'},{label:'<svg class=ici><use href=icons.svg#ic-circle-dashed></use></svg> 부분납부',status:'partial'},{label:'— 기록없음',status:'none'}]
   .forEach(opt => {
-    const btn = document.createElement('button'); btn.className='rh-dd-btn'; btn.textContent=opt.label;
+    const btn = document.createElement('button'); btn.className='rh-dd-btn'; btn.innerHTML=opt.label;
     if (opt.status==='partial') {
       btn.onclick = ev => {
         ev.stopPropagation(); drop.innerHTML='';
         const wrap=document.createElement('div'); wrap.className='rh-partial-input';
-        const lbl=document.createElement('div'); lbl.style.cssText='font-size:11px;font-weight:700;color:#92400E'; lbl.textContent='🔶 부분납부 금액 (원)';
+        const lbl=document.createElement('div'); lbl.style.cssText='font-size:11px;font-weight:700;color:#92400E'; lbl.innerHTML='<svg class=ici><use href=icons.svg#ic-circle-dashed></use></svg> 부분납부 금액 (원)';
         const inp=document.createElement('input'); inp.type='number'; inp.value=rentAmt; inp.min=0;
         const cfm=document.createElement('button'); cfm.textContent='확인';
         cfm.onclick=ev=>{ ev.stopPropagation(); setEuHistStatus(ym,'partial',parseInt(inp.value)||0); drop.remove(); _euRhDrop=null; };
@@ -1232,20 +1232,20 @@ function setEuHistStatus(ym, status, amount) {
     const prev=allBldData[_euBid].history[_euRoom][ym];
     delete allBldData[_euBid].history[_euRoom][ym];
     renderEuHist(); schedRenderDash();
-    ref.remove().then(()=>showToast('🗑 기록 삭제됨')).catch(()=>{
+    ref.remove().then(()=>showToast('<svg class=ici><use href=icons.svg#ic-trash-2></use></svg> 기록 삭제됨')).catch(()=>{
       if(prev) allBldData[_euBid].history[_euRoom][ym]=prev;
-      renderEuHist(); showToast('❗ 저장 실패');
+      renderEuHist(); showToast('<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 저장 실패');
     }); return;
   }
   const data={room:_euRoom,yearMonth:ym,paid:status==='paid',partial:status==='partial',amount,updatedAt:new Date().toISOString()};
   const prev=allBldData[_euBid].history[_euRoom][ym];
   allBldData[_euBid].history[_euRoom][ym]=data;
   renderEuHist(); schedRenderDash();
-  showToast({paid:'✅ 완납 기록됨',unpaid:'❌ 미납 기록됨',partial:'🔶 부분납부 기록됨'}[status]);
+  showToast({paid:'<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 완납 기록됨',unpaid:'<svg class=ici><use href=icons.svg#ic-circle-x></use></svg> 미납 기록됨',partial:'<svg class=ici><use href=icons.svg#ic-circle-dashed></use></svg> 부분납부 기록됨'}[status]);
   ref.set(data).catch(()=>{
     if(prev) allBldData[_euBid].history[_euRoom][ym]=prev;
     else delete allBldData[_euBid].history[_euRoom][ym];
-    renderEuHist(); showToast('❗ 저장 실패');
+    renderEuHist(); showToast('<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 저장 실패');
   });
 }
 
@@ -1255,9 +1255,9 @@ function saveEuMemo() {
   const memo=document.getElementById('eu-memo').value;
   setSS('ing');
   db.ref(DBPath.unit(uid,_euBid,_euRoom)+'/memo').set(memo)
-    .then(()=>{ showToast('✅ 메모 저장됨'); setSS('ok');
+    .then(()=>{ showToast('<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 메모 저장됨'); setSS('ok');
       if(allBldData[_euBid]?.units?.[_euRoom]) allBldData[_euBid].units[_euRoom].memo=memo;
-    }).catch(()=>{ setSS('err'); showToast('❗ 저장 실패'); });
+    }).catch(()=>{ setSS('err'); showToast('<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 저장 실패'); });
 }
 
 async function onEuPhotos(e) {
@@ -1266,11 +1266,11 @@ async function onEuPhotos(e) {
   const files=Array.from(e.target.files||[]); e.target.value='';
   if (!files.length) return;
   for (const file of files) {
-    if (!file.type.startsWith('image/')) { showToast('❗ 이미지만 가능'); continue; }
+    if (!file.type.startsWith('image/')) { showToast('<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 이미지만 가능'); continue; }
     try {
       const ts=Date.now(), pid=String(ts);
       const path=`rent_app/${uid}/contracts/${_euRoom}/${ts}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
-      showToast('⏳ 업로드 중...');
+      showToast('<svg class=ici><use href=icons.svg#ic-hourglass></use></svg> 업로드 중...');
       const ref=storage.ref(path);
       await ref.put(file,{contentType:file.type,cacheControl:'public,max-age=86400'});
       const url=await ref.getDownloadURL();
@@ -1279,8 +1279,8 @@ async function onEuPhotos(e) {
       if (!allBldData[_euBid]?.units?.[_euRoom]) return;
       if (!allBldData[_euBid].units[_euRoom].photos) allBldData[_euBid].units[_euRoom].photos={};
       allBldData[_euBid].units[_euRoom].photos[pid]=pd;
-      renderEuPhotos(); showToast('✅ 업로드 완료');
-    } catch(err){ showToast('❗ 업로드 실패'); console.error(err); }
+      renderEuPhotos(); showToast('<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 업로드 완료');
+    } catch(err){ showToast('<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 업로드 실패'); console.error(err); }
   }
 }
 

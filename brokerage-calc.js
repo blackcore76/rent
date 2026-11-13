@@ -175,7 +175,6 @@
       font-size:14px;font-weight:900;color:#1E2D3D;margin-bottom:14px;
       display:flex;align-items:center;gap:6px;
     }
-    .bc-ref-title::before{content:'📋';font-size:15px;}
     .bc-ref-tbl{
       width:100%;border-collapse:collapse;font-size:11.5px;
       border:1.5px solid #CBD5E1;border-radius:10px;
@@ -244,7 +243,7 @@
     <div id="bc-overlay"></div>
     <div id="bc-sheet">
       <div class="bc-hdr">
-        <span class="bc-title">🏠 중개수수료 계산기</span>
+        <span class="bc-title"><svg class=ici><use href=icons.svg#ic-house></use></svg> 중개수수료 계산기</span>
         <button class="bc-close-x" id="bc-close-x">✕</button>
       </div>
       <div class="bc-body">
@@ -280,7 +279,7 @@
         <button id="bc-reset-btn">초기화</button>
 
         <div class="bc-ref-section">
-          <div class="bc-ref-title">중개수수료 요율표</div>
+          <div class="bc-ref-title"><svg class=ici><use href=icons.svg#ic-clipboard-list></use></svg>중개수수료 요율표</div>
 
         <table class="bc-ref-tbl">
             <thead>
@@ -351,7 +350,7 @@
           </table>
 
           <a class="bc-ref-law" href="https://www.law.go.kr/%EB%B2%95%EB%A0%B9/%EA%B3%B5%EC%9D%B8%EC%A4%91%EA%B0%9C%EC%82%AC%EB%B2%95%EC%8B%9C%ED%96%89%EA%B7%9C%EC%B9%99/(20240710,01349,20240702)/%EC%A0%9C20%EC%A1%B0" target="_blank" rel="noopener noreferrer">
-            📖 공인중개사법 시행규칙 제20조 (중개보수 및 실비의 한도 등)
+            <svg class=ici><use href=icons.svg#ic-book-open></use></svg> 공인중개사법 시행규칙 제20조 (중개보수 및 실비의 한도 등)
             <span>법령 원문 보기 →</span>
           </a>
         </div>

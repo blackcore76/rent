@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://rent-4d521-default-rtdb.firebaseio.com" crossorigin>
 <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="common.css?v=2">
+<link rel="stylesheet" href="common.css?v=3">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -133,7 +133,7 @@
 .bldg-ic.edit{background:rgba(255,255,255,.15);color:#fff}
 .bldg-ic.del{background:rgba(220,38,38,.18);color:#B91C1C}
 .bldg-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px}
-.bldg-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.bldg-icon{color:#4DD0E1;display:flex;font-size:14px;flex-shrink:0;margin-top:1px}
 .bldg-body{flex:1;min-width:0}
 .bldg-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px}
 .bldg-val{font-size:13px;font-weight:700;color:#4DD0E1;letter-spacing:.3px;word-break:break-all}
@@ -158,14 +158,14 @@
       <svg class="g-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Google로 로그인
     </button>
-    <button onclick="enterDemoMode()" style="margin-top:10px;width:100%;padding:11px;background:rgba(14,165,233,.15);border:1.5px solid rgba(14,165,233,.4);border-radius:12px;color:#7DD3FC;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">👀 로그인 없이 구경하기</button>
+    <button onclick="enterDemoMode()" style="margin-top:10px;width:100%;padding:11px;background:rgba(14,165,233,.15);border:1.5px solid rgba(14,165,233,.4);border-radius:12px;color:#7DD3FC;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><svg class=ici><use href=icons.svg#ic-eye></use></svg> 로그인 없이 구경하기</button>
     <div class="login-footer">데이터는 본인 Google 계정에만 저장됩니다</div>
   </div>
 </div>
 
 <div id="status-screen" style="display:none;position:fixed;inset:0;background:linear-gradient(160deg,#0F1C2D,#1E2D3D 50%,#2A3F55);z-index:7000;align-items:center;justify-content:center;padding:20px">
   <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:36px 28px;max-width:320px;width:100%;text-align:center;backdrop-filter:blur(16px);box-shadow:0 20px 60px rgba(0,0,0,.4)">
-    <div style="font-size:52px;margin-bottom:14px" id="ss-icon">⏳</div>
+    <div style="font-size:52px;margin-bottom:14px;color:#fff;line-height:1" id="ss-icon"><svg class=ici><use href=icons.svg#ic-hourglass></use></svg></div>
     <div style="font-size:20px;font-weight:900;color:#fff;margin-bottom:8px" id="ss-title"></div>
     <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;line-height:1.7;white-space:pre-line" id="ss-msg"></div>
     <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:24px" id="ss-email"></div>
@@ -183,7 +183,7 @@
       </div>
       <div class="hdr-actions">
 
-        <button class="guide-btn" onclick="openHelp()">❓ 도움말</button>
+        <button class="guide-btn" onclick="openHelp()"><svg class=ici><use href=icons.svg#ic-circle-question-mark></use></svg> 도움말</button>
         <div id="av-wrap" onclick="toggleMenu()" style="display:none"></div>
       </div>
     </div>
@@ -197,7 +197,7 @@
   <div id="user-menu" class="user-menu">
     <div class="um-name" id="um-name">—</div>
     <div class="um-email" id="um-email">—</div>
-    <button class="logout-btn" onclick="doSignOut()">🚪 로그아웃</button>
+    <button class="logout-btn" onclick="doSignOut()"><svg class=ici><use href=icons.svg#ic-log-out></use></svg> 로그아웃</button>
   </div>
 
   <div class="content">
@@ -212,7 +212,7 @@
     <!-- 전화번호부 -->
     <div class="sub-page on" id="sp0">
       <div class="search-bar">
-        <input class="search-input" id="pb-search" placeholder="🔍 이름, 번호 검색..." oninput="renderPhonebook()">
+        <input class="search-input" id="pb-search" placeholder="이름, 번호 검색..." oninput="renderPhonebook()">
         <button class="btn-add" onclick="openAddContact()">+ 추가</button>
       </div>
       <div id="phonebook-list"></div>
@@ -228,16 +228,16 @@
       <!-- 건물 목록 관리 -->
       <div class="layout-section" id="sp2-registry" style="margin-bottom:12px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <span style="font-size:14px;font-weight:800;color:var(--hdr)">🏢 임대 건물 목록</span>
+          <span style="font-size:14px;font-weight:800;color:var(--hdr)"><svg class=ici><use href=icons.svg#ic-building-2></use></svg> 임대 건물 목록</span>
           <button class="btn-add" onclick="openAddBldSheet()">+ 건물 추가</button>
         </div>
         <div id="bld-registry-list"></div>
       </div>
       <!-- 백업 / 복구 -->
       <div id="sp2-backup">
-      <div style="font-size:11px;font-weight:800;color:var(--sub);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px">💾 백업 / 복구</div>
+      <div style="font-size:11px;font-weight:800;color:var(--sub);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px"><svg class=ici><use href=icons.svg#ic-save></use></svg> 백업 / 복구</div>
       <a href="backup.html" style="display:flex;align-items:center;gap:10px;background:#F0FDF4;border:1.5px solid #A7F3D0;border-radius:12px;padding:12px 14px;margin-bottom:8px;text-decoration:none">
-        <span style="font-size:22px">💾</span>
+        <span style="font-size:22px"><svg class=ici><use href=icons.svg#ic-save></use></svg></span>
         <div style="flex:1">
           <div style="font-size:13px;font-weight:800;color:#065F46">백업 내보내기</div>
           <div style="font-size:11px;color:#059669;margin-top:2px">세대 · 장부 CSV · JSON 및 사진 ZIP 다운로드</div>
@@ -245,7 +245,7 @@
         <span style="color:#A7F3D0;font-size:16px">›</span>
       </a>
       <a href="restore.html" style="display:flex;align-items:center;gap:10px;background:#EFF6FF;border:1.5px solid #BAE6FD;border-radius:12px;padding:12px 14px;margin-bottom:8px;text-decoration:none">
-        <span style="font-size:22px">🔄</span>
+        <span style="font-size:22px"><svg class=ici><use href=icons.svg#ic-refresh-cw></use></svg></span>
         <div style="flex:1">
           <div style="font-size:13px;font-weight:800;color:#0C4A6E">데이터 복구</div>
           <div style="font-size:11px;color:#0284C7;margin-top:2px">JSON 백업 파일로 세대 · 장부 데이터 복원</div>
@@ -255,7 +255,7 @@
       </div><!-- /sp2-backup -->
       <!-- 건물정보카드 -->
       <div class="bldg-hd-row">
-        <span style="font-size:14px;font-weight:800;color:var(--hdr)">🏠 건물정보카드<br><span style="font-size:11px;font-weight:500;color:var(--sub)">- 메인화면 하단에 표시하는 건물정보카드입니다</span></span>
+        <span style="font-size:14px;font-weight:800;color:var(--hdr)"><svg class=ici><use href=icons.svg#ic-house></use></svg> 건물정보카드<br><span style="font-size:11px;font-weight:500;color:var(--sub)">- 메인화면 하단에 표시하는 건물정보카드입니다</span></span>
         <button class="btn-add" onclick="openAddBuilding()">+ 추가</button>
       </div>
       <div id="buildings-list"></div>
@@ -272,7 +272,7 @@
 <div class="sheet-bg" id="edit-bld-sheet">
   <div class="sheet">
     <div class="sheet-hd">
-      <h3 id="edit-bld-sheet-title">🏢 건물 수정</h3>
+      <h3 id="edit-bld-sheet-title"><svg class=ici><use href=icons.svg#ic-building-2></use></svg> 건물 수정</h3>
       <button class="sheet-close" onclick="closeEditBldSheet()">✕</button>
     </div>
     <div class="field" id="edit-bld-name-field">
@@ -280,7 +280,7 @@
       <input type="text" id="edit-bld-name" placeholder="조아빌, 행복한빌...">
     </div>
     <div style="font-size:11px;font-weight:800;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">호실 구조</div>
-    <div style="background:#FFF7ED;border:1.5px solid #FCD34D;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#92400E;font-weight:600">⚠️ 저장 시 기존 호실 구조가 교체됩니다</div>
+    <div style="background:#FFF7ED;border:1.5px solid #FCD34D;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#92400E;font-weight:600"><svg class=ici><use href=icons.svg#ic-triangle-alert></use></svg> 저장 시 기존 호실 구조가 교체됩니다</div>
     <div id="edit-gen-box" style="background:#F0F9FF;border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid #BAE6FD">
       <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">빠른 자동 생성</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
@@ -288,11 +288,11 @@
         <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">끝 층</div><input class="gen-inp" type="number" id="edit-gen-to" value="4" min="1" max="30"></div>
         <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">층당 호실 수</div><input class="gen-inp" type="number" id="edit-gen-count" value="6" min="1" max="30"></div>
       </div>
-      <button onclick="generateEditLayout()" style="width:100%;padding:9px;background:var(--sky);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">⚡ 자동 생성 (기존 설정 교체)</button>
+      <button onclick="generateEditLayout()" style="width:100%;padding:9px;background:var(--sky);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><svg class=ici><use href=icons.svg#ic-zap></use></svg> 자동 생성 (기존 설정 교체)</button>
     </div>
     <div id="edit-floor-rows"></div>
     <button onclick="addEditFloorRow()" style="width:100%;padding:9px;background:#F1F5F9;color:var(--sub);border:2px dashed var(--border);border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:12px">+ 층 추가</button>
-    <button class="btn-save" onclick="saveEditBld()">💾 저장</button>
+    <button class="btn-save" onclick="saveEditBld()"><svg class=ici><use href=icons.svg#ic-save></use></svg> 저장</button>
   </div>
 </div>
 
@@ -300,7 +300,7 @@
 <div class="sheet-bg" id="add-bld-sheet">
   <div class="sheet">
     <div class="sheet-hd">
-      <h3>🏢 건물 추가</h3>
+      <h3><svg class=ici><use href=icons.svg#ic-building-2></use></svg> 건물 추가</h3>
       <button class="sheet-close" onclick="closeAddBldSheet()">✕</button>
     </div>
     <div class="field">
@@ -308,7 +308,7 @@
       <input type="text" id="add-bld-name" placeholder="조아빌, 행복한빌...">
     </div>
     <p style="font-size:12px;color:var(--hint);margin-bottom:12px;line-height:1.6">건물 추가 후 호실 구조 설정에서 층과 호실을 설정하세요.</p>
-    <button class="btn-save" onclick="saveNewBld()">✅ 추가하기</button>
+    <button class="btn-save" onclick="saveNewBld()"><svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 추가하기</button>
   </div>
 </div>
 
@@ -347,7 +347,7 @@
       <label>메모</label>
       <textarea id="c-memo" rows="2" placeholder="호실, 담당 업무 등..."></textarea>
     </div>
-    <button class="btn-save" onclick="saveContact()">💾 저장</button>
+    <button class="btn-save" onclick="saveContact()"><svg class=ici><use href=icons.svg#ic-save></use></svg> 저장</button>
   </div>
 </div>
 
@@ -379,7 +379,7 @@
       <label>관리비 계좌</label>
       <input type="text" id="b-fee" placeholder="국민은행 123-45-6789-012">
     </div>
-    <button class="btn-save" onclick="saveBuilding()">💾 저장</button>
+    <button class="btn-save" onclick="saveBuilding()"><svg class=ici><use href=icons.svg#ic-save></use></svg> 저장</button>
   </div>
 </div>
 
@@ -468,7 +468,7 @@ if(pbL&&pbRef)pbRef.off("value",pbL);
       const banner=document.createElement("div");
       banner.id="master-view-banner";
       banner.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(245,158,11,.05));border-bottom:1px solid rgba(245,158,11,.3);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
-      banner.innerHTML=`<span style="font-size:12px;font-weight:700;color:#F59E0B">🔧 열람 중: ${esc(mName||mUid)}</span><button onclick="location.href='master/admin.html'" style="font-size:11px;font-weight:700;background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#F59E0B;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit">← 관리자 페이지</button>`;
+      banner.innerHTML=`<span style="font-size:12px;font-weight:700;color:#F59E0B"><svg class=ici><use href=icons.svg#ic-wrench></use></svg> 열람 중: ${esc(mName||mUid)}</span><button onclick="location.href='master/admin.html'" style="font-size:11px;font-weight:700;background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#F59E0B;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit">← 관리자 페이지</button>`;
       document.body.appendChild(banner);
       document.querySelector(".content").style.marginTop="136px";
       document.querySelectorAll(".nav-tab, a[href^='backup.html'], a[href^='restore.html']").forEach(a=>{
@@ -529,7 +529,7 @@ function loadBldData(uid,bid){
   bldgDetailRef=db.ref(DBPath.buildings(uid, bid));
   configRef=db.ref(DBPath.roomLayout(uid, bid));
   uL=uRef.on("value",snap=>{units=snap.val()||{};if(curSub===1)renderContracts()},()=>{});
-  bldgDetailL=bldgDetailRef.on("value",snap=>{bldgDetails=snap.val()||{};if(curSub===2)renderBldDetails()},()=>showToast("❗ 연결 오류"));
+  bldgDetailL=bldgDetailRef.on("value",snap=>{bldgDetails=snap.val()||{};if(curSub===2)renderBldDetails()},()=>showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 연결 오류"));
   cL=configRef.on("value",snap=>{
     roomLayout=snap.val()||DEFAULT_LAYOUT;
     ROOMS=Object.values(roomLayout).flat().map(String);
@@ -593,7 +593,7 @@ async function renderBldRegistry(){
       </div>
       <button onclick="switchBldAndStay('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:${isCur?"var(--blue)":"var(--hdr)"};color:#fff;cursor:pointer;font-family:inherit">전환</button>
       <button onclick="openEditBldSheet('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:#F1F5F9;color:var(--sub);cursor:pointer;font-family:inherit">수정</button>
-      <div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)">🔒 삭제</div><button onclick="delBld('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:var(--red-lt);color:var(--red);cursor:pointer;font-family:inherit">삭제</button></div>
+      <div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)"><svg class=ici><use href=icons.svg#ic-lock></use></svg> 삭제</div><button onclick="delBld('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:var(--red-lt);color:var(--red);cursor:pointer;font-family:inherit">삭제</button></div>
     </div>`;
   }).join("");
   const curCnt=counts[curBid]||0;
@@ -602,7 +602,7 @@ async function renderBldRegistry(){
     const srcBid=dataBuildings[0];
     const srcName=esc(bldgsData[srcBid]?.name||"다른 건물");
     html+=`<div style="background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:10px;padding:12px 14px;margin-top:6px;font-size:12px;color:#92400E;line-height:1.6">
-      💡 <b>"${srcName}"</b>에 ${counts[srcBid]}개 세대 데이터가 있습니다.<br>
+      <svg class=ici><use href=icons.svg#ic-lightbulb></use></svg> <b>"${srcName}"</b>에 ${counts[srcBid]}개 세대 데이터가 있습니다.<br>
       현재 선택된 건물로 데이터를 가져올 수 있습니다.
       <div style="margin-top:8px"><button onclick="mergeFromBld('${srcBid}')" style="padding:6px 14px;background:#F59E0B;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">이 건물로 데이터 가져오기</button></div>
     </div>`;
@@ -638,7 +638,7 @@ async function mergeFromBld(srcBid){
       }catch(e){}
     }
     await db.ref(DBPath.bld(targetUid, srcBid)).remove();
-    showToast("✅ 데이터 이관 완료");
+    showToast("<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 데이터 이관 완료");
     renderBldRegistry();
   });
 }
@@ -650,20 +650,20 @@ function closeAddBldSheet(){document.getElementById("add-bld-sheet").classList.r
 function saveNewBld(){
   if(!guardWrite())return;
   const name=document.getElementById("add-bld-name").value.trim();
-  if(!name){showToast("❗ 건물명을 입력하세요");return}
+  if(!name){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 건물명을 입력하세요");return}
   const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
   const bid=Date.now().toString(36);
   const order=Object.keys(bldgsData).length;
   db.ref(DBPath.bld(targetUid, bid)).set({id:bid,name,order,createdAt:new Date().toISOString()})
-    .then(()=>{closeAddBldSheet();showToast("✅ 건물 추가됨");switchBld(bid)})
-    .catch(()=>showToast("❗ 저장 실패"));
+    .then(()=>{closeAddBldSheet();showToast("<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 건물 추가됨");switchBld(bid)})
+    .catch(()=>showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 저장 실패"));
 }
 let editBid=null,editRoomLayout={};
 async function openEditBldSheet(bid){document.body.style.overscrollBehavior='none';document.documentElement.style.overscrollBehavior='none';
   if(!guardWrite())return;
   editBid=bid;
   document.getElementById("edit-bld-name").value=bldgsData[bid]?.name||"";
-  document.getElementById("edit-bld-sheet-title").textContent="🏢 "+esc(bldgsData[bid]?.name||"건물")+" 수정";
+  document.getElementById("edit-bld-sheet-title").innerHTML="<svg class=ici><use href=icons.svg#ic-building-2></use></svg> "+esc(bldgsData[bid]?.name||"건물")+" 수정";
   editRoomLayout={};
   document.getElementById("edit-floor-rows").innerHTML='<div style="font-size:12px;color:var(--hint);text-align:center;padding:10px">불러오는 중...</div>';
   document.getElementById("edit-bld-sheet").classList.add("show");
@@ -701,23 +701,23 @@ function generateEditLayout(){
   const from=parseInt(document.getElementById("edit-gen-from").value)||2;
   const to=parseInt(document.getElementById("edit-gen-to").value)||4;
   const cnt=parseInt(document.getElementById("edit-gen-count").value)||6;
-  if(from>to){showToast("❗ 시작 층이 끝 층보다 큽니다");return}
+  if(from>to){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 시작 층이 끝 층보다 큽니다");return}
   const nl={};
   for(let f=from;f<=to;f++)nl[String(f)]=Array.from({length:cnt},(_,i)=>String(f*100+i+1));
   editRoomLayout=nl;renderEditFloorRows();
-  showToast("⚡ 미리보기 생성됨 — 저장 버튼으로 확정하세요");
+  showToast("<svg class=ici><use href=icons.svg#ic-zap></use></svg> 미리보기 생성됨 — 저장 버튼으로 확정하세요");
 }
 async function saveEditBld(){
   if(!guardWrite())return;
   const name=document.getElementById("edit-bld-name").value.trim();
-  if(!name){showToast("❗ 건물명을 입력하세요");return}
+  if(!name){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 건물명을 입력하세요");return}
   const rows=document.querySelectorAll("#edit-bld-sheet .floor-edit-row"),nl={};
   rows.forEach(row=>{
     const floor=row.dataset.floor,val=row.querySelector(".rooms-input").value;
     const rooms=val.split(",").map(r=>r.trim()).filter(Boolean);
     if(rooms.length)nl[floor]=rooms;
   });
-  if(!Object.keys(nl).length){showToast("❗ 최소 1개 층 이상 설정하세요");return}
+  if(!Object.keys(nl).length){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 최소 1개 층 이상 설정하세요");return}
   const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
   const newRooms=Object.values(nl).flat().map(String);
   try{
@@ -737,9 +737,9 @@ async function saveEditBld(){
       ])));
     }
     if(editBid===curBid){roomLayout=nl;ROOMS=Object.values(nl).flat().map(String);}
-    closeEditBldSheet();showToast("✅ 저장됨");
+    closeEditBldSheet();showToast("<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 저장됨");
     renderBldRegistry();
-  }catch(e){showToast("❗ 저장 실패");}
+  }catch(e){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 저장 실패");}
 }
 function delBld(bid){
   if(!guardWrite())return;
@@ -749,13 +749,13 @@ function delBld(bid){
     await db.ref(DBPath.bldData(targetUid, bid)).remove();
     const remaining=sortedBids(bldgsData).filter(b=>b!==bid);
     if(remaining.length){
-      showToast("🗑 건물 삭제됨");
+      showToast("<svg class=ici><use href=icons.svg#ic-trash-2></use></svg> 건물 삭제됨");
       switchBld(remaining[0]);
     }else{
       // 마지막 건물 삭제 시 빈 건물 자동 생성
       const newBid="main";
       await db.ref(DBPath.bld(targetUid, newBid)).set({id:newBid,name:"내 건물",order:0,createdAt:new Date().toISOString()});
-      showToast("🗑 삭제됨 — 새 건물이 생성됐습니다");
+      showToast("<svg class=ici><use href=icons.svg#ic-trash-2></use></svg> 삭제됨 — 새 건물이 생성됐습니다");
       switchBld(newBid);
     }
   });
@@ -765,23 +765,23 @@ function delBld(bid){
 function renderBldDetails(){
   const el=document.getElementById("buildings-list");if(!el)return;
   const list=Object.values(bldgDetails).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""));
-  if(!list.length){el.innerHTML='<div class="empty-st"><div class="ei">🏠</div><div class="et">등록된 건물 정보가 없습니다<br>+ 추가 버튼으로 등록하세요</div></div>';return}
+  if(!list.length){el.innerHTML='<div class="empty-st"><div class="ei"><svg class=ici><use href=icons.svg#ic-house></use></svg></div><div class="et">등록된 건물 정보가 없습니다<br>+ 추가 버튼으로 등록하세요</div></div>';return}
   // 카드 개수가 짝수면 좌우 2열(1 2 / 3 4), 홀수면 1열
   const twoCol=list.length%2===0;
   el.innerHTML=`<div class="bldg-grid${twoCol?" two":""}">`+list.map(b=>`<div class="bldg-card">
     <div class="bldg-card-hd">
-      <span class="bldg-card-name">🏠 ${esc(b.name)}</span>
+      <span class="bldg-card-name"><svg class=ici><use href=icons.svg#ic-house></use></svg> ${esc(b.name)}</span>
       <div class="bldg-card-btns">
-        <button class="bldg-ic edit" onclick="startEditBuilding('${b.id}')">✏️</button>
+        <button class="bldg-ic edit" onclick="startEditBuilding('${b.id}')"><svg class=ici><use href=icons.svg#ic-pencil></use></svg></button>
         <button class="bldg-ic del" onclick="delBuilding('${b.id}')">✕</button>
       </div>
     </div>
     ${b.entranceCode||b.masterCode?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:12px;margin-bottom:8px">
-      ${b.entranceCode?`<div class="bldg-row" style="margin-bottom:0"><span class="bldg-icon">🔐</span><div class="bldg-body"><div class="bldg-lbl">1층 현관</div><div class="bldg-val">${esc(b.entranceCode)}</div></div></div>`:""}
-      ${b.masterCode?`<div class="bldg-row" style="margin-bottom:0"><span class="bldg-icon">🗝️</span><div class="bldg-body"><div class="bldg-lbl">세대 마스터</div><div class="bldg-val">${esc(b.masterCode)}</div></div></div>`:""}
+      ${b.entranceCode?`<div class="bldg-row" style="margin-bottom:0"><span class="bldg-icon"><svg class=ici><use href=icons.svg#ic-lock-keyhole></use></svg></span><div class="bldg-body"><div class="bldg-lbl">1층 현관</div><div class="bldg-val">${esc(b.entranceCode)}</div></div></div>`:""}
+      ${b.masterCode?`<div class="bldg-row" style="margin-bottom:0"><span class="bldg-icon"><svg class=ici><use href=icons.svg#ic-key-round></use></svg></span><div class="bldg-body"><div class="bldg-lbl">세대 마스터</div><div class="bldg-val">${esc(b.masterCode)}</div></div></div>`:""}
     </div>`:""}
-    ${b.manageFee?`<div class="bldg-row"><span class="bldg-icon">🏦</span><div class="bldg-body"><div class="bldg-lbl">관리비 계좌</div><div class="bldg-val-muted">${esc(b.manageFee)}</div></div></div>`:""}
-    ${b.address?`<div class="bldg-row" style="margin-bottom:0"><span class="bldg-icon">📍</span><div class="bldg-body"><div class="bldg-lbl">주소</div><div class="bldg-val-muted">${esc(b.address)}</div></div></div>`:""}
+    ${b.manageFee?`<div class="bldg-row"><span class="bldg-icon"><svg class=ici><use href=icons.svg#ic-landmark></use></svg></span><div class="bldg-body"><div class="bldg-lbl">관리비 계좌</div><div class="bldg-val-muted">${esc(b.manageFee)}</div></div></div>`:""}
+    ${b.address?`<div class="bldg-row" style="margin-bottom:0"><span class="bldg-icon"><svg class=ici><use href=icons.svg#ic-map-pin></use></svg></span><div class="bldg-body"><div class="bldg-lbl">주소</div><div class="bldg-val-muted">${esc(b.address)}</div></div></div>`:""}
   </div>`).join("")+`</div>`;
 }
 function openAddBuilding(){
@@ -805,7 +805,7 @@ function startEditBuilding(id){
 function closeBuildingSheet(){document.getElementById("building-sheet").classList.remove("show")}
 function saveBuilding(){if(!guardWrite())return;
   const name=document.getElementById("b-name").value.trim();
-  if(!name){showToast("❗ 건물명을 입력하세요");return}
+  if(!name){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 건물명을 입력하세요");return}
   const existId=document.getElementById("b-id").value;
   const id=existId||String(Date.now());
   const now=new Date().toISOString();
@@ -817,34 +817,34 @@ function saveBuilding(){if(!guardWrite())return;
     createdAt:existId?(bldgDetails[existId]?.createdAt||now):now,
     updatedAt:now};
   bldgDetailRef.child(id).set(data)
-    .then(()=>{closeBuildingSheet();showToast("✅ 저장됨")})
-    .catch(()=>showToast("❗ 저장 실패"));
+    .then(()=>{closeBuildingSheet();showToast("<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 저장됨")})
+    .catch(()=>showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 저장 실패"));
 }
 function delBuilding(id){
   if(!guardWrite())return;
   showCM("건물 정보 삭제","이 건물 정보를 삭제하시겠습니까?",()=>{
-    bldgDetailRef.child(id).remove().then(()=>showToast("🗑 삭제됨")).catch(()=>showToast("❗ 실패"));
+    bldgDetailRef.child(id).remove().then(()=>showToast("<svg class=ici><use href=icons.svg#ic-trash-2></use></svg> 삭제됨")).catch(()=>showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 실패"));
   });
 }
 
 // ── PHONEBOOK ──
 function listenPB(){
-  pbL=pbRef.on("value",snap=>{contacts=snap.val()||{};renderPhonebook()},()=>showToast("❗ 연결 오류"));
+  pbL=pbRef.on("value",snap=>{contacts=snap.val()||{};renderPhonebook()},()=>showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 연결 오류"));
 }
 function renderPhonebook(){
   const q=(document.getElementById("pb-search").value||"").toLowerCase();
   let list=Object.values(contacts).sort((a,b)=>(a.name||"").localeCompare(b.name||"","ko"));
   if(q)list=list.filter(c=>(c.name||"").toLowerCase().includes(q)||(c.phone||"").includes(q)||(c.phone2||"").includes(q));
   const el=document.getElementById("phonebook-list");
-  if(!list.length){el.innerHTML='<div class="empty-st"><div class="ei">📞</div><div class="et">연락처가 없습니다<br>+ 추가 버튼으로 등록하세요</div></div>';return}
+  if(!list.length){el.innerHTML='<div class="empty-st"><div class="ei"><svg class=ici><use href=icons.svg#ic-phone></use></svg></div><div class="et">연락처가 없습니다<br>+ 추가 버튼으로 등록하세요</div></div>';return}
   el.innerHTML=list.map(c=>{
     const bg=CAT_BG[c.category||"other"];
     const catCls=CAT_COLOR[c.category||"other"];
     const catLbl=CAT_LABEL[c.category||"other"];
     const init=(c.name||"?")[0];
     const phoneLinks=[
-      c.phone  ? `<a href="tel:${c.phone}"  class="phone-link">📞 ${esc(c.phone)}</a>`  : "",
-      c.phone2 ? `<a href="tel:${c.phone2}" class="phone-link">📞 ${esc(c.phone2)}</a>` : ""
+      c.phone  ? `<a href="tel:${c.phone}"  class="phone-link"><svg class=ici><use href=icons.svg#ic-phone></use></svg> ${esc(c.phone)}</a>`  : "",
+      c.phone2 ? `<a href="tel:${c.phone2}" class="phone-link"><svg class=ici><use href=icons.svg#ic-phone></use></svg> ${esc(c.phone2)}</a>` : ""
     ].filter(Boolean).join("");
     return`<div class="contact-card">
       <div class="contact-top">
@@ -853,10 +853,10 @@ function renderPhonebook(){
           <div class="contact-name">${esc(c.name)}</div>
           <span class="contact-cat ${catCls}">${catLbl}</span>
           ${phoneLinks?`<div class="phone-links">${phoneLinks}</div>`:""}
-          ${c.memo?`<div class="contact-memo">💬 ${esc(c.memo)}</div>`:""}
+          ${c.memo?`<div class="contact-memo"><svg class=ici><use href=icons.svg#ic-message-circle></use></svg> ${esc(c.memo)}</div>`:""}
         </div>
         <div class="contact-btns">
-          <button class="ic-btn edit" onclick="startEditContact('${c.id}')">✏️</button>
+          <button class="ic-btn edit" onclick="startEditContact('${c.id}')"><svg class=ici><use href=icons.svg#ic-pencil></use></svg></button>
           <button class="ic-btn del" onclick="delContact('${c.id}')">✕</button>
         </div>
       </div>
@@ -888,18 +888,18 @@ function closeContactSheet(){document.getElementById("contact-sheet").classList.
 function saveContact(){
   if(!guardWrite())return;
   const name=document.getElementById("c-name").value.trim();
-  if(!name){showToast("❗ 이름을 입력하세요");return}
+  if(!name){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 이름을 입력하세요");return}
   const existId=document.getElementById("c-id").value;
   const id=existId||String(Date.now());
   const data={id,name,category:document.getElementById("c-cat").value,phone:document.getElementById("c-phone").value.trim(),phone2:document.getElementById("c-phone2").value.trim(),memo:document.getElementById("c-memo").value.trim(),updatedAt:new Date().toISOString()};
   pbRef.child(id).set(data)
-    .then(()=>{closeContactSheet();showToast("✅ 저장됨")})
-    .catch(()=>showToast("❗ 저장 실패"));
+    .then(()=>{closeContactSheet();showToast("<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 저장됨")})
+    .catch(()=>showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 저장 실패"));
 }
 function delContact(id){
   if(!guardWrite())return;
   showCM("연락처 삭제","이 연락처를 삭제하시겠습니까?",()=>{
-    pbRef.child(id).remove().then(()=>showToast("🗑 삭제됨")).catch(()=>showToast("❗ 실패"));
+    pbRef.child(id).remove().then(()=>showToast("<svg class=ici><use href=icons.svg#ic-trash-2></use></svg> 삭제됨")).catch(()=>showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 실패"));
   });
 }
 
@@ -910,7 +910,7 @@ function renderContracts(){
   if(__photoAccess===undefined){checkPhotoAccess().then(()=>renderContracts());return;}
   if(__photoAccess===false){el.innerHTML=photoLockBox("계약서 사진");return;}
   const allEmpty=ROOMS.every(r=>!units[r]||!units[r].photos||!Object.keys(units[r].photos).length);
-  if(allEmpty){el.innerHTML='<div class="empty-st"><div class="ei">📷</div><div class="et">업로드된 계약서 사진이 없습니다<br>세대 탭에서 사진을 추가하세요</div></div>';return}
+  if(allEmpty){el.innerHTML='<div class="empty-st"><div class="ei"><svg class=ici><use href=icons.svg#ic-camera></use></svg></div><div class="et">업로드된 계약서 사진이 없습니다<br>세대 탭에서 사진을 추가하세요</div></div>';return}
   el.innerHTML=ROOMS.map(r=>{
     const u=units[r];
     const photos=u&&u.photos?Object.values(u.photos).sort((a,b)=>a.id-b.id):[];
@@ -930,7 +930,7 @@ function renderContracts(){
             </div>`).join("")}
         </div>`:'<div class="no-photos">사진 없음</div>'}
       <input type="file" id="fu-${r}" accept="image/*" multiple style="display:none" onchange="uploadContractPhoto('${r}',event)">
-      <button class="upload-btn" id="ub-${r}" onclick="document.getElementById('fu-${r}').click()">📷 사진 추가</button>
+      <button class="upload-btn" id="ub-${r}" onclick="document.getElementById('fu-${r}').click()"><svg class=ici><use href=icons.svg#ic-camera></use></svg> 사진 추가</button>
       <div class="prog-bar" id="pb-${r}"><div class="prog-fill" id="pf-${r}"></div></div>
     </div>`;
   }).filter((html,i)=>{
@@ -938,7 +938,7 @@ function renderContracts(){
     const u=units[r];
     const hasPhotos=u&&u.photos&&Object.keys(u.photos).length>0;
     return hasPhotos;
-  }).join("")||'<div class="empty-st"><div class="ei">📷</div><div class="et">업로드된 계약서 사진이 없습니다</div></div>';
+  }).join("")||'<div class="empty-st"><div class="ei"><svg class=ici><use href=icons.svg#ic-camera></use></svg></div><div class="et">업로드된 계약서 사진이 없습니다</div></div>';
 
   // 실제로는 모든 호실 표시 (사진 없는 것도 포함, 업로드 가능)
   el.innerHTML=ROOMS.map(r=>{
@@ -965,10 +965,10 @@ function renderContracts(){
             </div>`).join("")}
         </div>`:'<div class="no-photos">사진 없음</div>'}
       <input type="file" id="fu-${r}" accept="image/*" multiple style="display:none" onchange="uploadContractPhoto('${r}',event)">
-      <button class="upload-btn" id="ub-${r}" onclick="document.getElementById('fu-${r}').click()">📷 사진 추가</button>
+      <button class="upload-btn" id="ub-${r}" onclick="document.getElementById('fu-${r}').click()"><svg class=ici><use href=icons.svg#ic-camera></use></svg> 사진 추가</button>
       <div class="prog-bar" id="pb-${r}"><div class="prog-fill" id="pf-${r}"></div></div>
     </div>`;
-  }).filter(Boolean).join("")||'<div class="empty-st"><div class="ei">📷</div><div class="et">임대중인 세대가 없거나 사진이 없습니다</div></div>';
+  }).filter(Boolean).join("")||'<div class="empty-st"><div class="ei"><svg class=ici><use href=icons.svg#ic-camera></use></svg></div><div class="et">임대중인 세대가 없거나 사진이 없습니다</div></div>';
 }
 
 async function uploadContractPhoto(room,e){
@@ -982,12 +982,12 @@ async function uploadContractPhoto(room,e){
   btn.disabled=true;bar.style.display="block";
   for(let i=0;i<files.length;i++){
     const file=files[i];
-    if(!file.type.startsWith("image/")){showToast("❗ 이미지만 가능");continue}
-    if(file.size>50*1024*1024){showToast("❗ 50MB 이하만 가능");continue}
+    if(!file.type.startsWith("image/")){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 이미지만 가능");continue}
+    if(file.size>50*1024*1024){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 50MB 이하만 가능");continue}
     const ts=Date.now();
     const path=`rent_app/${cu.uid}/contracts/${room}/${ts}_${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
     try{
-      fill.style.width="0%";showToast("🔄 압축 중...");
+      fill.style.width="0%";showToast("<svg class=ici><use href=icons.svg#ic-refresh-cw></use></svg> 압축 중...");
       const blob=await compressImage(file);
       const ref=storage.ref(path);
       let url=null;
@@ -996,14 +996,14 @@ async function uploadContractPhoto(room,e){
           const task=ref.put(blob);
           await new Promise((res,rej)=>task.on("state_changed",s=>{fill.style.width=`${Math.round(s.bytesTransferred/s.totalBytes*100)||0}%`},rej,res));
           url=await ref.getDownloadURL();break;
-        }catch(e){if(attempt===1)throw e;fill.style.width="0%";showToast("❗ 업로드 실패 — 재시도 중...");await new Promise(r=>setTimeout(r,1800));}
+        }catch(e){if(attempt===1)throw e;fill.style.width="0%";showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 업로드 실패 — 재시도 중...");await new Promise(r=>setTimeout(r,1800));}
       }
       fill.style.width="100%";
       const pid=String(ts+(i*10));
       const targetUid=(cu.uid===MASTER_UID&&mUid)?mUid:cu.uid;
       await db.ref(DBPath.unitPhoto(targetUid, curBid, room, pid)).set({id:pid,url,storagePath:path,uploadedAt:new Date().toISOString()});
-      showToast("✅ 업로드 완료");
-    }catch(err){showToast("❗ 업로드 실패: "+err.message)}
+      showToast("<svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 업로드 완료");
+    }catch(err){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 업로드 실패: "+err.message)}
   }
   btn.disabled=false;bar.style.display="none";fill.style.width="0%";e.target.value="";
 }
@@ -1015,8 +1015,8 @@ function delContractPhoto(room,pid,spath){
       if(spath)await storage.ref(spath).delete().catch(()=>{});
       const targetUid=(cu.uid===MASTER_UID&&mUid)?mUid:cu.uid;
       await db.ref(DBPath.unitPhoto(targetUid, curBid, room, pid)).remove();
-      showToast("🗑 삭제됨");
-    }catch(e){showToast("❗ 삭제 실패")}
+      showToast("<svg class=ici><use href=icons.svg#ic-trash-2></use></svg> 삭제됨");
+    }catch(e){showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 삭제 실패")}
   });
 }
 
@@ -1028,10 +1028,10 @@ const CM_DATA={
   'sub-tabs':{title:'관리 메뉴 탭',body:'<b>전화번호부·계약서·건물정보</b>를 관리하는 페이지 입니다.'},
   'sp0':{title:'전화번호부',body:'부동산 · 수리업체 등 연락처를 저장합니다.<br>우측 <b>+ 추가</b> 버튼으로 새 연락처를 등록하고 스마트폰에서 연락처를 누르면 전화가 연결됩니다.'},
   'sp1':{title:'계약서 사진 관리',body:'세대별 계약서 사진을 쉽게 확인할수 있습니다.<br>사진 업로드는 이곳과 세대관리 입력 창에서도 가능합니다.<br>전체 계약서 사진 다운로드는 건물정보 - 백업 내보내기에서 ZIP파일로 가능합니다.'},
-  'sp2-registry':{title:'임대 건물 목록',body:'관리중인 건물간 추가·전환·수정·삭제 페이지 입니다.<br>✏️ 버튼으로 건물명과 <b>호실 구조</b>를 수정할 수 있습니다.'},
+  'sp2-registry':{title:'임대 건물 목록',body:'관리중인 건물간 추가·전환·수정·삭제 페이지 입니다.<br><svg class=ici><use href=icons.svg#ic-pencil></use></svg> 버튼으로 건물명과 <b>호실 구조</b>를 수정할 수 있습니다.'},
   'sp2-backup':{title:'백업 / 복구',body:'세대·장부 데이터를 CSV·JSON 파일로 다운 받거나<br>백업 파일로 데이터 복구를 합니다.<br>정기적으로 백업 파일을 스마트폰이나 PC로 다운 받아 보관하는 것을 권장합니다.'},
   'edit-bld-name-field':{title:'건물명 입력',body:'관리할 건물의 이름을 입력합니다.'},
-  'edit-gen-box':{title:'호실 자동 생성',body:'시작층·끝층·층당 호실 수를 입력하고 ⚡ 자동 생성을 탭합니다.<br>예시...<br>2~4층, 층당 6호실 → 201~206, 301~306, 401~406<br>1층,4층,5층 층당 3호실 → 101~103, 401~403, 501~503 <br>추가할 호실 제외 2,3층은 삭제하세요.'},
+  'edit-gen-box':{title:'호실 자동 생성',body:'시작층·끝층·층당 호실 수를 입력하고 <svg class=ici><use href=icons.svg#ic-zap></use></svg> 자동 생성을 탭합니다.<br>예시...<br>2~4층, 층당 6호실 → 201~206, 301~306, 401~406<br>1층,4층,5층 층당 3호실 → 101~103, 401~403, 501~503 <br>추가할 호실 제외 2,3층은 삭제하세요.'},
   'edit-floor-rows':{title:'호실 구조 편집',body:'각 층의 호실 번호를 쉼표로 직접 입력합니다.<br>✕ 버튼으로 층 삭제, <b>+ 층 추가</b>로 새로운 층을 추가합니다.'}
 };
 function openHelp(){
