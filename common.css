@@ -97,3 +97,28 @@ body:has(.chg-bg.show){overflow:hidden}
 b,strong{font-weight:600}
 input::placeholder,textarea::placeholder{color:var(--hint)}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+
+/* ── 공통 컴포넌트: 메인 기준 (body 접두로 페이지 스타일보다 우선, 이지모드 body.em-on 규칙은 그대로 우선) ── */
+body .field label,body .tg-label,body .section-label{font-size:12px;font-weight:500;color:var(--sub)}
+body .field input,body .field select,body .field textarea,body .search-input,body .rooms-input,body .gen-inp,body .cat-add-inp,body .filter-year,body .toolbar input[type=month]{border:1px solid var(--border);background:#fff;transition:border-color .15s,box-shadow .15s}
+body .field input:focus,body .field select:focus,body .field textarea:focus,body .search-input:focus,body .rooms-input:focus,body .gen-inp:focus,body .cat-add-inp:focus,body .filter-year:focus,body .toolbar input[type=month]:focus{border-color:var(--hdr2);box-shadow:0 0 0 3px rgba(30,45,61,.08);background:#fff}
+body .toggle-group{border:1px solid var(--border)}
+body .tg-btn{font-weight:500}
+body .sheet,body .chg-sheet{border-radius:16px 16px 0 0;box-shadow:0 -4px 24px rgba(15,23,42,.12)}
+body .sheet-hd h3{color:var(--text)}
+body .sheet-close{background:#F1F5F9;color:var(--sub);border-radius:8px}
+body .btn-save{font-size:15px;padding:14px;border-radius:12px}
+body .btn-close-sheet{border:none;padding:14px;font-size:15px}
+body .confirm-box{border-radius:16px;box-shadow:0 8px 32px rgba(15,23,42,.16)}
+body .confirm-box h3{font-size:16px;font-weight:600;color:var(--text)}
+body .confirm-btns button{font-weight:500;padding:8px 16px}
+body .upload-btn{border:1px dashed #CBD5E1;background:#fff;font-weight:500}
+body .upload-btn:hover,body .camera-btn{border-color:var(--hdr2);color:var(--hdr2)}
+body .bld-drop-item{font-weight:500}
+body .bld-drop-item.active{color:var(--hdr);font-weight:600}
+body .fab{box-shadow:0 4px 12px rgba(15,23,42,.2)}
+body .prog-fill{background:var(--hdr2)}
+body .view-tabs,body .sub-tabs{box-shadow:none;border:1px solid rgba(15,23,42,.06)}
+body .view-tab,body .sub-tab{font-weight:500}
+body .empty-st .ei{font-size:40px;color:var(--hint)}
+body .btn-exp,body .export-btn{border:1px solid var(--border);font-weight:500}

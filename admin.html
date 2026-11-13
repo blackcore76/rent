@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://rent-4d521-default-rtdb.firebaseio.com" crossorigin>
 <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="common.css?v=5">
+<link rel="stylesheet" href="common.css?v=6">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -144,6 +144,30 @@
 .btn-blind.lifted{opacity:0;transform:translateY(-7px);pointer-events:none}
 /* 이지모드 사이드 버튼 → easymode-side.js */
 .sub-tab{flex-direction:column;gap:4px;white-space:nowrap;padding:8px 2px;font-size:12px}
+
+/* ── 메인 디자인 기준 (unslop) ── */
+.contact-card{box-shadow:none;border:1px solid rgba(15,23,42,.06);border-radius:16px;padding:16px}
+.contact-avatar{background:#EEF2F6;color:var(--hdr2);font-weight:500;border-radius:12px}
+.contact-cat{font-size:12px;padding:2px 6px;border-radius:6px}
+.cat-tenant,.cat-vendor,.cat-agency{background:#F1F5F9;color:var(--sub)}
+.ic-btn.edit,.ic-btn.del{background:transparent;color:var(--hint)}
+.phone-link{background:#F1F5F9;color:var(--text);font-variant-numeric:tabular-nums}
+.room-section,.layout-section{box-shadow:none;border:1px solid rgba(15,23,42,.06);border-radius:16px}
+.room-section-title{font-size:15px;color:var(--text)}
+.floor-edit-row{border:1px solid var(--border)}
+.bldg-card{box-shadow:none;border-radius:16px;padding:20px}
+.bldg-icon{color:rgba(255,255,255,.55)}
+.bldg-lbl{font-size:12px;font-weight:400;color:rgba(255,255,255,.55);margin-bottom:4px}
+.bldg-val{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:17px;color:#F59E0B;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.bldg-val-muted{font-weight:400;color:rgba(255,255,255,.85)}
+.bldg-ic.edit{background:rgba(255,255,255,.08);color:rgba(255,255,255,.85)}
+.bldg-ic.del{background:rgba(255,255,255,.08);color:#FCA5A5}
+.link-row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid rgba(15,23,42,.06);border-radius:12px;padding:12px 16px;margin-bottom:8px;text-decoration:none;transition:background-color .15s}
+.link-row:active{background:#F8FAFC}
+.link-ic{width:36px;height:36px;border-radius:10px;background:#F1F5F9;color:var(--sub);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.link-t{font-size:14px;font-weight:500;color:var(--text)}
+.link-d{font-size:12px;color:var(--sub);margin-top:2px}
+.link-arr{color:var(--hint);font-size:16px}
 </style>
 </head>
 <body>
@@ -235,22 +259,22 @@
       </div>
       <!-- 백업 / 복구 -->
       <div id="sp2-backup">
-      <div style="font-size:11px;font-weight:600;color:var(--sub);margin-bottom:10px"><svg class=ici><use href=icons.svg#ic-save></use></svg> 백업 / 복구</div>
-      <a href="backup.html" style="display:flex;align-items:center;gap:10px;background:#F0FDF4;border:1.5px solid #A7F3D0;border-radius:12px;padding:12px 14px;margin-bottom:8px;text-decoration:none">
-        <span style="font-size:22px"><svg class=ici><use href=icons.svg#ic-save></use></svg></span>
+      <div style="font-size:12px;font-weight:500;color:var(--sub);margin-bottom:8px">백업 / 복구</div>
+      <a href="backup.html" class="link-row">
+        <span class="link-ic"><svg class=ici><use href=icons.svg#ic-save></use></svg></span>
         <div style="flex:1">
-          <div style="font-size:13px;font-weight:600;color:#065F46">백업 내보내기</div>
-          <div style="font-size:11px;color:#059669;margin-top:2px">세대 · 장부 CSV · JSON 및 사진 ZIP 다운로드</div>
+          <div class="link-t">백업 내보내기</div>
+          <div class="link-d">세대 · 장부 CSV · JSON 및 사진 ZIP 다운로드</div>
         </div>
-        <span style="color:#A7F3D0;font-size:16px">›</span>
+        <span class="link-arr">›</span>
       </a>
-      <a href="restore.html" style="display:flex;align-items:center;gap:10px;background:#EFF6FF;border:1.5px solid #BAE6FD;border-radius:12px;padding:12px 14px;margin-bottom:8px;text-decoration:none">
-        <span style="font-size:22px"><svg class=ici><use href=icons.svg#ic-refresh-cw></use></svg></span>
+      <a href="restore.html" class="link-row">
+        <span class="link-ic"><svg class=ici><use href=icons.svg#ic-refresh-cw></use></svg></span>
         <div style="flex:1">
-          <div style="font-size:13px;font-weight:600;color:#0C4A6E">데이터 복구</div>
-          <div style="font-size:11px;color:#0284C7;margin-top:2px">JSON 백업 파일로 세대 · 장부 데이터 복원</div>
+          <div class="link-t">데이터 복구</div>
+          <div class="link-d">JSON 백업 파일로 세대 · 장부 데이터 복원</div>
         </div>
-        <span style="color:#BAE6FD;font-size:16px">›</span>
+        <span class="link-arr">›</span>
       </a>
       </div><!-- /sp2-backup -->
       <!-- 건물정보카드 -->
@@ -848,7 +872,7 @@ function renderPhonebook(){
     ].filter(Boolean).join("");
     return`<div class="contact-card">
       <div class="contact-top">
-        <div class="contact-avatar" style="background:${bg}">${esc(init)}</div>
+        <div class="contact-avatar">${esc(init)}</div>
         <div class="contact-info">
           <div class="contact-name">${esc(c.name)}</div>
           <span class="contact-cat ${catCls}">${catLbl}</span>

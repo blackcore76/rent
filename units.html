@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://rent-4d521-default-rtdb.firebaseio.com" crossorigin>
 <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="common.css?v=5">
+<link rel="stylesheet" href="common.css?v=6">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -161,6 +161,24 @@
 .clear-blind{position:absolute;inset:0;border-radius:7px;background:#475569;border:1.5px solid #334155;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;z-index:2;font-family:inherit;transition:opacity .2s,transform .22s cubic-bezier(.4,0,.2,1);user-select:none;white-space:nowrap;padding:0 8px;}
 .clear-blind.lifted{opacity:0;transform:translateY(-6px);pointer-events:none}
 .clear-contract-btn{padding:4px 10px;border:none;border-radius:7px;background:var(--red-lt);color:var(--red);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+
+/* ── 메인 디자인 기준 (unslop) ── */
+.tab-rect{border:1px solid var(--border);font-weight:500;padding:8px 12px}
+.tab-rect.on.rented,.tab-rect.on.vacant,.tab-rect.on.unpaid{background:var(--hdr);border-color:var(--hdr)}
+.room-card{border:1px solid rgba(15,23,42,.06);box-shadow:none;border-radius:16px;padding:16px 12px}
+.room-card.status-vacant{border-color:#FDE68A}
+.room-card.status-rented{border-color:rgba(15,23,42,.06)}
+.rc-top{margin-bottom:8px}
+.rc-sbadge,.rc-paid,.rc-dday,.rc-chg-badge{font-size:12px;font-weight:500;padding:2px 6px;border-radius:6px;line-height:16px}
+.rc-names{font-size:14px}.rc-phones{font-size:12px;font-variant-numeric:tabular-nums}.rc-memo{font-size:12px}
+.rc-rent{font-size:13px;color:var(--text);font-variant-numeric:tabular-nums}
+.dday-safe{background:#F1F5F9;color:var(--sub)}
+.rc-chg-badge.deposit,.rc-chg-badge.monthly,.chg-col-dep .chg-col-hd,.chg-col-mon .chg-col-hd{background:#F1F5F9;color:var(--sub)}
+.rc-chg-del{background:transparent;color:var(--hint)}
+.chg-cols{border:1px solid var(--border)}
+.rh-tip{color:var(--hint);font-weight:400}
+.rh-partial-input button{background:var(--hdr)}
+.filter-banner{font-weight:500}
 </style>
 </head>
 <body>
