@@ -25,56 +25,56 @@
     #taxh-overlay.show{display:block}
     #taxh-sheet{position:fixed;left:0;right:0;bottom:0;z-index:601;background:#fff;border-radius:20px 20px 0 0;max-height:92vh;max-height:92dvh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:0 -4px 32px rgba(0,0,0,.2)}
     #taxh-sheet.show{transform:translateY(0)}
-    .taxh-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 13px;border-bottom:1px solid #E2E8F0;flex-shrink:0}
-    .taxh-title{font-size:16px;font-weight:900;color:#1E2D3D;display:flex;align-items:center;gap:7px}
-    .taxh-title .taxh-ref{font-size:10px;font-weight:800;color:#D97706;border:1px solid #D97706;border-radius:8px;padding:1px 6px}
+    .taxh-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid #E2E8F0;flex-shrink:0}
+    .taxh-title{font-size:16px;font-weight:600;color:#1E2D3D;display:flex;align-items:center;gap:8px}
+    .taxh-title .taxh-ref{font-size:11px;font-weight:600;color:#D97706;border:1px solid #D97706;border-radius:8px;padding:1px 6px}
     .taxh-close-x{width:32px;height:32px;border-radius:50%;background:#F1F5F9;border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#64748B;flex-shrink:0}
     .taxh-close-x:active{background:#E2E8F0}
     .taxh-body{overflow-y:auto;padding:16px 18px 52px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
     .taxh-in{max-width:540px;margin:0 auto}
 
-    .taxh-note{background:#FEF3C7;border:1px solid #FCD9A5;color:#92400E;font-size:12px;line-height:1.65;border-radius:10px;padding:11px 13px;margin-bottom:14px}
+    .taxh-note{background:#FEF3C7;border:1px solid #FCD9A5;color:#92400E;font-size:12px;line-height:1.65;border-radius:10px;padding:12px 12px;margin-bottom:14px}
     .taxh-controls{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-    .taxh-field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:130px}
-    .taxh-field>label{font-size:10px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.4px}
-    .taxh-field select{border:2px solid #E2E8F0;border-radius:9px;padding:10px 11px;font-size:14px;font-family:inherit;background:#fff;color:#1E293B;outline:none}
+    .taxh-field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:130px}
+    .taxh-field>label{font-size:11px;font-weight:500;color:#64748B;}
+    .taxh-field select{border:2px solid #E2E8F0;border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit;background:#fff;color:#1E293B;outline:none}
     .taxh-field select:focus{border-color:#0EA5E9}
     .taxh-toggle{display:flex;border:2px solid #E2E8F0;border-radius:9px;overflow:hidden}
-    .taxh-tg{flex:1;padding:10px 6px;border:none;background:#fff;font-size:14px;font-weight:700;color:#64748B;cursor:pointer;font-family:inherit}
+    .taxh-tg{flex:1;padding:10px 6px;border:none;background:#fff;font-size:14px;font-weight:500;color:#64748B;cursor:pointer;font-family:inherit}
     .taxh-tg.on{background:#1E2D3D;color:#fff}
-    .taxh-rent-box{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:11px;padding:11px 13px;margin-bottom:10px}
-    .taxh-rent-box .trb-lbl{font-size:12px;font-weight:700;color:#64748B;flex:1;min-width:150px;line-height:1.4}
-    .taxh-rent-box input{width:140px;border:2px solid #E2E8F0;border-radius:9px;padding:9px 11px;font-size:15px;font-weight:800;text-align:right;font-family:inherit;color:#1E293B;outline:none;background:#fff;font-variant-numeric:tabular-nums}
+    .taxh-rent-box{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:11px;padding:12px 12px;margin-bottom:10px}
+    .taxh-rent-box .trb-lbl{font-size:12px;font-weight:500;color:#64748B;flex:1;min-width:150px;line-height:1.4}
+    .taxh-rent-box input{width:140px;border:2px solid #E2E8F0;border-radius:9px;padding:8px 12px;font-size:15px;font-weight:600;text-align:right;font-family:inherit;color:#1E293B;outline:none;background:#fff;font-variant-numeric:tabular-nums}
     .taxh-rent-box input:focus{border-color:#0EA5E9}
-    .taxh-rent-box .trb-reset{font-size:11px;font-weight:700;padding:8px 11px;border:1px solid #E2E8F0;border-radius:9px;background:#fff;color:#64748B;cursor:pointer;font-family:inherit;white-space:nowrap}
+    .taxh-rent-box .trb-reset{font-size:11px;font-weight:500;padding:8px 12px;border:1px solid #E2E8F0;border-radius:9px;background:#fff;color:#64748B;cursor:pointer;font-family:inherit;white-space:nowrap}
     .taxh-rent-box .trb-reset:active{background:#F1F5F9}
     .taxh-reg{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#1E293B;margin-bottom:14px;cursor:pointer;user-select:none;-webkit-user-select:none}
     .taxh-reg input{width:18px;height:18px;accent-color:#1E2D3D;flex-shrink:0}
-    .taxh-result{background:#fff;border:1px solid #E2E8F0;border-radius:13px;padding:15px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.05)}
-    .taxh-badge{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:8px;margin-bottom:11px}
+    .taxh-result{background:#fff;border:1px solid #E2E8F0;border-radius:13px;padding:16px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.05)}
+    .taxh-badge{display:inline-block;font-size:11px;font-weight:600;padding:4px 8px;border-radius:8px;margin-bottom:12px}
     .taxh-badge.ok{background:#D1FAE5;color:#065F46}
     .taxh-badge.warn{background:#FEF3C7;color:#92400E}
-    .taxh-row{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;padding:5px 0;color:#64748B;gap:10px}
-    .taxh-row b{color:#1E293B;font-weight:800;font-variant-numeric:tabular-nums}
-    .taxh-row.sub{font-size:12.5px;color:#94A3B8}
+    .taxh-row{display:flex;justify-content:space-between;align-items:center;font-size:14px;padding:4px 0;color:#64748B;gap:10px}
+    .taxh-row b{color:#1E293B;font-weight:600;font-variant-numeric:tabular-nums}
+    .taxh-row.sub{font-size:13px;color:#94A3B8}
     .taxh-row.sub span:last-child{font-variant-numeric:tabular-nums}
-    .taxh-total{display:flex;justify-content:space-between;align-items:center;border-top:2px solid #E2E8F0;margin-top:9px;padding-top:11px;gap:10px}
-    .taxh-total .tt-lbl{font-size:13.5px;font-weight:800;color:#1E2D3D}
-    .taxh-total .tt-val{font-size:21px;font-weight:900;color:#DC2626;white-space:nowrap;font-variant-numeric:tabular-nums}
-    .taxh-mini{font-size:11.5px;line-height:1.7;color:#94A3B8;margin-top:11px}
+    .taxh-total{display:flex;justify-content:space-between;align-items:center;border-top:2px solid #E2E8F0;margin-top:8px;padding-top:12px;gap:10px}
+    .taxh-total .tt-lbl{font-size:14px;font-weight:600;color:#1E2D3D}
+    .taxh-total .tt-val{font-size:21px;font-weight:600;color:#DC2626;white-space:nowrap;font-variant-numeric:tabular-nums}
+    .taxh-mini{font-size:12px;line-height:1.7;color:#94A3B8;margin-top:12px}
     .taxh-mini b{color:#64748B}
-    .taxh-ref-link{display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:13px;padding:12px 14px;background:linear-gradient(135deg,#1E2D3D,#334155);border-radius:11px;text-align:center;text-decoration:none;color:#fff;font-size:12.5px;font-weight:800;transition:opacity .15s}
+    .taxh-ref-link{display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:12px;padding:12px 14px;background:linear-gradient(135deg,#1E2D3D,#334155);border-radius:11px;text-align:center;text-decoration:none;color:#fff;font-size:13px;font-weight:600;transition:opacity .15s}
     .taxh-ref-link:active{opacity:.85}
-    .taxh-ref-link span{font-size:10.5px;font-weight:500;color:rgba(255,255,255,.62)}
-    .taxh-vat{background:#E0F2FE;border:1px solid #BAE6FD;border-radius:11px;padding:12px 13px;margin-bottom:13px}
-    .taxh-vat .tv-t{font-size:12px;font-weight:800;color:#0C4A6E;margin-bottom:5px}
-    .taxh-vat .tv-v{font-size:18px;font-weight:900;color:#0C4A6E;font-variant-numeric:tabular-nums}
-    .taxh-vat .tv-n{font-size:11.5px;color:#0C4A6E;opacity:.9;margin-top:6px;line-height:1.55}
-    .taxh-cal-t{font-size:12.5px;font-weight:800;color:#64748B;margin:6px 0 8px}
-    .taxh-cal-row{display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-top:1px solid #E2E8F0}
-    .taxh-cal-when{font-size:12px;font-weight:800;color:#1E2D3D;background:#F0F4F8;border-radius:8px;padding:4px 9px;white-space:nowrap;flex-shrink:0;min-width:54px;text-align:center}
-    .taxh-cal-txt{font-size:12.5px;color:#1E293B;line-height:1.5}
-    .taxh-cal-txt .tc-sub{color:#94A3B8;font-size:11.5px}
+    .taxh-ref-link span{font-size:11px;font-weight:500;color:rgba(255,255,255,.62)}
+    .taxh-vat{background:#E0F2FE;border:1px solid #BAE6FD;border-radius:11px;padding:12px 12px;margin-bottom:12px}
+    .taxh-vat .tv-t{font-size:12px;font-weight:600;color:#0C4A6E;margin-bottom:4px}
+    .taxh-vat .tv-v{font-size:18px;font-weight:600;color:#0C4A6E;font-variant-numeric:tabular-nums}
+    .taxh-vat .tv-n{font-size:12px;color:#0C4A6E;opacity:.9;margin-top:6px;line-height:1.55}
+    .taxh-cal-t{font-size:13px;font-weight:600;color:#64748B;margin:6px 0 8px}
+    .taxh-cal-row{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-top:1px solid #E2E8F0}
+    .taxh-cal-when{font-size:12px;font-weight:600;color:#1E2D3D;background:#F0F4F8;border-radius:8px;padding:4px 8px;white-space:nowrap;flex-shrink:0;min-width:54px;text-align:center}
+    .taxh-cal-txt{font-size:13px;color:#1E293B;line-height:1.5}
+    .taxh-cal-txt .tc-sub{color:#94A3B8;font-size:12px}
   `;
   document.head.appendChild(s);
 
@@ -154,11 +154,11 @@
         </div>
       </div>
       <div class="taxh-rent-box">
-        <span class="trb-lbl">연간 임대수입<br><span style="font-size:10px;font-weight:600;color:#94A3B8">${autoHint}</span></span>
+        <span class="trb-lbl">연간 임대수입<br><span style="font-size:11px;font-weight:600;color:#94A3B8">${autoHint}</span></span>
         <input type="text" id="taxh-rent" inputmode="numeric" placeholder="0">
         <button class="trb-reset" id="taxh-reset">↺ 자동</button>
       </div>
-      <label class="taxh-reg" id="taxh-reg-wrap"><input type="checkbox" id="taxh-reg">임대사업자(렌트홈) 등록됨<span style="font-size:10px;color:#94A3B8"> · 필요경비·공제↑</span></label>
+      <label class="taxh-reg" id="taxh-reg-wrap"><input type="checkbox" id="taxh-reg">임대사업자(렌트홈) 등록됨<span style="font-size:11px;color:#94A3B8"> · 필요경비·공제↑</span></label>
       <div class="taxh-result" id="taxh-result"></div>
       <div id="taxh-cal"></div>`;
     // 리스너

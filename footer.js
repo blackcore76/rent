@@ -132,8 +132,8 @@
     '<footer class="ph-footer">' +
       '<style>' +
         '.ph-footer{margin-top:20px;padding:14px 16px 16px;background:linear-gradient(135deg,#0A1628,#1A2B3C);text-align:center}' +
-        '.ph-footer-inner{max-width:640px;margin:0 auto;color:#CBD5E1;font-size:12.5px;line-height:1.65}' +
-        '.ph-footer-name{font-weight:700;color:#E2E8F0;font-size:14.5px;margin-bottom:2px}' +
+        '.ph-footer-inner{max-width:640px;margin:0 auto;color:#CBD5E1;font-size:13px;line-height:1.65}' +
+        '.ph-footer-name{font-weight:500;color:#E2E8F0;font-size:14.5px;margin-bottom:2px}' +
         '.ph-footer-copy{margin-top:10px;color:#64748B;font-size:11px}' +
         '.ph-footer a{color:#F5A623;text-decoration:underline}' +
         '.ph-footer a:hover{color:#FFC069}' +
@@ -215,10 +215,10 @@
       '<style>' +
         '.ph-privacy-box{max-width:640px;margin:0 auto;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.4);overflow:hidden}' +
         '.ph-privacy-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #E2E8F0;position:sticky;top:0;background:#fff}' +
-        '.ph-privacy-hd h2{font-size:15px;font-weight:700;color:#1E293B;margin:0}' +
+        '.ph-privacy-hd h2{font-size:15px;font-weight:500;color:#1E293B;margin:0}' +
         '.ph-privacy-close{cursor:pointer;border:none;background:#F0F4F8;color:#64748B;width:30px;height:30px;border-radius:50%;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center}' +
         '.ph-privacy-close:hover{background:#E2E8F0;color:#1E293B}' +
-        '.ph-privacy-body{padding:20px;white-space:pre-wrap;font-size:12.5px;line-height:1.75;color:#334155;max-height:70vh;overflow-y:auto}' +
+        '.ph-privacy-body{padding:20px;white-space:pre-wrap;font-size:13px;line-height:1.75;color:#334155;max-height:70vh;overflow-y:auto}' +
       '</style>' +
       '<div class="ph-privacy-box">' +
         '<div class="ph-privacy-hd"><h2>개인정보처리방침</h2><button class="ph-privacy-close" id="ph-privacy-close" aria-label="닫기">✕</button></div>' +

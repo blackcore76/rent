@@ -9,20 +9,20 @@
 <link rel="icon" href="favicon.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
-<title>🏠 PlusHome 세상 편한 임대관리 · 세대</title>
+<title>PlusHome 세상 편한 임대관리 · 세대</title>
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://rent-4d521-default-rtdb.firebaseio.com" crossorigin>
 <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="common.css?v=4">
+<link rel="stylesheet" href="common.css?v=5">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="shared.js?v=3"></script>
+<script src="shared.js?v=4"></script>
 <script src="db-paths.js"></script>
 <style>
 /* 로그인 모달: 불투명 그라데이션 대신 뒤에 데모 대시보드가 살짝 비치도록(약 70~80%) */
@@ -32,72 +32,65 @@
 .login-privacy{background:rgba(15,28,45,.85)}
 .tabs-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap}
 .bld-row{margin-bottom:14px}
-.tab-rect{padding:7px 14px;border-radius:8px;border:2px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;transition:all .15s}
+.tab-rect{padding:8px 14px;border-radius:8px;border:2px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;transition:background-color .15s,color .15s,border-color .15s,opacity .15s,transform .15s}
 .tab-rect.on{background:var(--hdr);color:#fff;border-color:var(--hdr)}
 .tab-rect.on.rented{background:var(--blue-t);border-color:var(--blue-t)}
 .tab-rect.on.vacant{background:#6366F1;border-color:#6366F1}
 .tab-rect.on.unpaid{background:var(--red);border-color:var(--red)}
-.export-btn{padding:7px 12px;border-radius:8px;border:2px solid var(--border);font-size:12px;font-weight:600;cursor:default;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;flex-shrink:0}
+.export-btn{padding:8px 12px;border-radius:8px;border:2px solid var(--border);font-size:12px;font-weight:600;cursor:default;background:#fff;color:var(--sub);font-family:inherit;white-space:nowrap;flex-shrink:0}
 .bld-drop{position:fixed;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.18);border:1px solid var(--border);z-index:600;min-width:140px;overflow:hidden}
-.bld-drop-item{display:block;width:100%;padding:11px 16px;border:none;background:transparent;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;text-align:left;color:var(--text);transition:background .12s}
+.bld-drop-item{display:block;width:100%;padding:12px 16px;border:none;background:transparent;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;text-align:left;color:var(--text);transition:background .12s}
 .bld-drop-item:active{background:var(--bg)}
 .bld-drop-item.active{color:var(--sky)}
-.badge-oneroom{background:#FEF3C7;color:#92400E}
-.badge-twobay{background:#F3E8FF;color:#6B21A8}
-.badge-tworoom{background:#CCFBF1;color:#0F766E}
-.badge-threeroom{background:#EEF2FF;color:#3730A3}
-.tg-btn.on-rtype{background:var(--sky);color:#fff}
+.badge-oneroom,.badge-twobay,.badge-tworoom,.badge-threeroom,.badge-monthly,.badge-jeonse{background:#F1F5F9;color:var(--sub)}
+.tg-btn.on-rtype{background:var(--hdr);color:#fff}
 .rooms-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 @media(min-width:600px){.rooms-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .room-card{background:var(--card);border-radius:var(--radius);padding:14px 12px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s;border:2px solid transparent;min-width:0;overflow:hidden}
 .room-card:active{transform:scale(.97)}
-.room-card.status-vacant{border-color:var(--indigo-lt)}
-.room-card.status-rented{border-color:var(--blue-lt)}
+.room-card.status-vacant{border-color:#FDE68A}
+.room-card.status-rented{border-color:transparent}
 .rc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-.rc-num{font-size:18px;font-weight:900;color:var(--hdr)}
-.rc-sbadge{font-size:11px;font-weight:700;padding:3px 7px;border-radius:6px}
-.badge-rented{background:var(--blue-lt);color:var(--blue-t)}
-.badge-vacant{background:var(--red-lt);color:var(--red-t)}
+.rc-num{font-size:18px;font-weight:600;color:var(--hdr);white-space:nowrap;font-variant-numeric:tabular-nums}
+.rc-sbadge{font-size:11px;font-weight:500;padding:4px 8px;border-radius:6px}
+.badge-rented{background:#F1F5F9;color:var(--sub)}
+.badge-vacant{background:#FEF9C3;color:#854D0E}
 .badge-paid{background:var(--green-lt);color:var(--green-t)}
 .badge-unpaid{background:var(--red-lt);color:var(--red-t)}
-.rc-names{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-names{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rc-phones{font-size:11px;color:var(--sub);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rc-rent{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:4px}
+.rc-rent{font-size:12px;font-weight:500;color:var(--sub);margin-bottom:4px}
 .rc-memo{font-size:11px;color:var(--hint);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rc-paid{font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;display:inline-block}
+.rc-paid{font-size:11px;font-weight:500;padding:2px 8px;border-radius:5px;display:inline-block}
 .sheet-bg{position:fixed;top:100px;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:500;display:none;align-items:flex-end;justify-content:center;overflow:hidden}
 .sheet-bg.show{display:flex}
 .sheet{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 36px;width:100%;max-width:540px;box-shadow:0 -4px 32px rgba(0,0,0,.2);max-height:calc(100vh - 100px);max-height:calc(100dvh - 100px);overflow-y:auto;overscroll-behavior:contain}
 .sheet-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.sheet-hd h3{font-size:17px;font-weight:900;color:var(--hdr)}
+.sheet-hd h3{font-size:17px;font-weight:600;color:var(--hdr)}
 .sheet-close{width:32px;height:32px;border:none;background:#F3F4F6;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.tg-label{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;margin-top:14px}
+.tg-label{font-size:11px;font-weight:500;color:var(--sub);margin-bottom:6px;margin-top:14px}
 .toggle-group{display:flex;border:2px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:2px}
-.tg-btn{flex:1;padding:10px 8px;border:none;background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--sub);transition:all .15s}
-.tg-btn.on-blue{background:var(--blue);color:#fff}
-.tg-btn.on-gray{background:var(--indigo);color:#fff}
-.tg-btn.on-amber{background:#D97706;color:#fff}
-.badge-monthly{background:#FFF7ED;color:#C2410C}
-.badge-jeonse{background:#EDE9FE;color:#5B21B6}
+.tg-btn{flex:1;padding:10px 8px;border:none;background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--sub);transition:background-color .15s,color .15s,border-color .15s,opacity .15s,transform .15s}
+.tg-btn.on-blue,.tg-btn.on-gray,.tg-btn.on-amber{background:var(--hdr);color:#fff}
 .divider{height:1px;background:var(--border);margin:16px 0}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
-.field label{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px}
+.field label{font-size:11px;font-weight:500;color:var(--sub);}
 .field input,.field textarea{border:2px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;outline:none;color:var(--text);background:#FAFCFF;width:100%;transition:border-color .2s}
 .field input:focus,.field textarea:focus{border-color:var(--sky);background:#fff}
 .field textarea{resize:none}
-.section-label{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:14px;display:flex;align-items:center;gap:4px}
+.section-label{font-size:11px;font-weight:500;color:var(--sub);margin-bottom:8px;margin-top:14px;display:flex;align-items:center;gap:4px}
 .sheet-btn-row{display:flex;gap:10px;margin-top:4px}
-.btn-save{flex:7;padding:15px;background:var(--hdr);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-save{flex:7;padding:16px;background:var(--hdr);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:500;cursor:pointer;font-family:inherit}
 .btn-save:active{opacity:.85}
-.btn-close-sheet{flex:3;padding:15px;background:#F1F5F9;color:var(--sub);border:2px solid var(--border);border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-close-sheet{flex:3;padding:16px;background:#F1F5F9;color:var(--sub);border:2px solid var(--border);border-radius:12px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit}
 .btn-close-sheet:active{background:#E2E8F0}
 .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
 .rent-hist-wrap{margin-bottom:4px}
-.rent-hist-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:6px}
+.rent-hist-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-bottom:6px}
 .rh-cell{border-radius:8px;padding:6px 2px;text-align:center;cursor:pointer;transition:transform .1s,opacity .1s;user-select:none;-webkit-user-select:none}
 .rh-cell:active{transform:scale(.92);opacity:.75}
-.rh-month{font-size:9px;font-weight:700;color:inherit;opacity:.7;margin-bottom:3px}
+.rh-month{font-size:11px;font-weight:500;color:inherit;opacity:.7;margin-bottom:4px}
 .rh-icon{font-size:13px;line-height:1}
 .rh-paid{background:var(--green-lt);color:var(--green-t)}
 .rh-unpaid{background:var(--red-lt);color:var(--red-t)}
@@ -108,10 +101,10 @@
 .rh-dd-btn:active{background:#F1F5F9}
 .rh-partial-input{padding:8px;display:flex;flex-direction:column;gap:6px}
 .rh-partial-input input{padding:8px 10px;border:1.5px solid #E2E8F0;border-radius:9px;font-size:14px;font-family:inherit;width:100%}
-.rh-partial-input button{padding:9px;background:#F59E0B;color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
-.rh-legend{display:flex;gap:10px;font-size:10px;color:var(--hint);margin-top:2px;flex-wrap:wrap}
-.rh-tip{font-size:10px;color:var(--sky);margin-top:4px;text-align:center;font-weight:600}
-.rc-dday{font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;display:inline-block;margin-bottom:4px}
+.rh-partial-input button{padding:8px;background:#F59E0B;color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
+.rh-legend{display:flex;gap:10px;font-size:11px;color:var(--hint);margin-top:2px;flex-wrap:wrap}
+.rh-tip{font-size:11px;color:var(--sky);margin-top:4px;text-align:center;font-weight:600}
+.rc-dday{font-size:11px;font-weight:500;padding:2px 6px;border-radius:5px;display:inline-block;margin-bottom:4px}
 .dday-safe{background:#D1FAE5;color:#065F46}
 .dday-warn{background:#FEF3C7;color:#92400E}
 .dday-danger{background:#FEE2E2;color:#991B1B}
@@ -119,13 +112,13 @@
 .filter-banner{display:flex;align-items:center;justify-content:space-between;background:var(--hdr);color:#fff;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;font-weight:600}
 .rc-chg-wrap{margin-top:6px}
 .rc-chg-empty{font-size:12px;color:var(--hint);text-align:center;padding:6px 0}
-.rc-chg-item{display:flex;align-items:flex-start;gap:8px;padding:9px 0;border-bottom:1px solid var(--border)}
+.rc-chg-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)}
 .rc-chg-item:last-child{border-bottom:none}
-.rc-chg-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.rc-chg-badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0;margin-top:2px}
 .rc-chg-badge.deposit{background:#EEF2FF;color:#3730A3}
 .rc-chg-badge.monthly{background:#D1FAE5;color:#065F46}
 .rc-chg-body{flex:1;min-width:0}
-.rc-chg-amounts{font-size:13px;font-weight:700;color:var(--text)}
+.rc-chg-amounts{font-size:13px;font-weight:500;color:var(--text)}
 .rc-chg-meta{font-size:11px;color:var(--hint);margin-top:2px}
 .rc-chg-del{width:24px;height:24px;border:none;background:#FEE2E2;color:#991B1B;border-radius:6px;font-size:11px;cursor:pointer;flex-shrink:0;font-family:inherit}
 .chg-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:640;display:none}
@@ -135,22 +128,22 @@
 .chg-cols{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:12px;border:2px solid var(--border);border-radius:12px;overflow:hidden}
 .chg-col{padding:12px}
 .chg-col-dep{border-right:1px solid var(--border)}
-.chg-col-hd{font-size:12px;font-weight:800;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:8px}
+.chg-col-hd{font-size:12px;font-weight:600;padding:4px 8px;border-radius:6px;display:inline-block;margin-bottom:8px}
 .chg-col-dep .chg-col-hd{background:#EEF2FF;color:#3730A3}
 .chg-col-mon .chg-col-hd{background:#D1FAE5;color:#065F46}
-.filter-clear{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.filter-clear{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
 .ph-thumb{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#F0F4F8}
 .ph-thumb img{width:100%;height:100%;object-fit:cover;cursor:pointer}
 .ph-del{position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.upload-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:11px;border:2px dashed var(--border);border-radius:10px;background:#FAFCFF;color:var(--sub);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.upload-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:12px;border:2px dashed var(--border);border-radius:10px;background:#FAFCFF;color:var(--sub);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background-color .15s,color .15s,border-color .15s,opacity .15s,transform .15s}
 .upload-btn:hover{border-color:var(--sky);color:var(--sky)}
 .upload-btn:disabled{opacity:.5;cursor:not-allowed}
 .photo-btn-row{display:flex;gap:8px}
-.photo-btn-row .upload-btn{flex:1;width:auto;font-size:12px;padding:11px 6px;text-align:center}
+.photo-btn-row .upload-btn{flex:1;width:auto;font-size:12px;padding:12px 6px;text-align:center}
 .camera-btn{border-color:var(--sky);color:var(--sky)}
 .prog-bar{height:22px;border-radius:11px;background:#E2E8F0;margin-top:10px;overflow:hidden;display:none;position:relative}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--sky),var(--blue));transition:width .25s;width:0%}
-.prog-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--hdr);letter-spacing:.3px}
+.prog-fill{height:100%;background:var(--sky);transition:width .25s;width:0%}
+.prog-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--hdr);}
 #pv{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:900;display:none;align-items:center;justify-content:center}
 #pv.show{display:flex}
 #pv img{max-width:95%;max-height:90vh;border-radius:8px;object-fit:contain}
@@ -158,16 +151,16 @@
 .confirm-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
 .confirm-bg.show{display:flex}
 .confirm-box{background:#fff;border-radius:20px;padding:24px;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.2)}
-.confirm-box h3{font-size:15px;font-weight:700;color:var(--hdr);margin-bottom:10px}
+.confirm-box h3{font-size:15px;font-weight:500;color:var(--hdr);margin-bottom:10px}
 .confirm-box p{font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.6}
 .confirm-btns{display:flex;gap:10px;justify-content:flex-end}
-.confirm-btns button{padding:9px 18px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.confirm-btns button{padding:8px 18px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
 /* 이지모드 사이드 버튼 → easymode-side.js */
 /* 계약내용 지우기 블라인드 */
 .clear-blind-wrap{position:relative;display:inline-flex}
-.clear-blind{position:absolute;inset:0;border-radius:7px;background:#475569;border:1.5px solid #334155;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;z-index:2;font-family:inherit;transition:opacity .2s,transform .22s cubic-bezier(.4,0,.2,1);user-select:none;white-space:nowrap;padding:0 8px;letter-spacing:.3px}
+.clear-blind{position:absolute;inset:0;border-radius:7px;background:#475569;border:1.5px solid #334155;color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;z-index:2;font-family:inherit;transition:opacity .2s,transform .22s cubic-bezier(.4,0,.2,1);user-select:none;white-space:nowrap;padding:0 8px;}
 .clear-blind.lifted{opacity:0;transform:translateY(-6px);pointer-events:none}
-.clear-contract-btn{padding:5px 10px;border:none;border-radius:7px;background:var(--red-lt);color:var(--red);font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap}
+.clear-contract-btn{padding:4px 10px;border:none;border-radius:7px;background:var(--red-lt);color:var(--red);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -182,18 +175,18 @@
       <svg class="g-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Google로 로그인
     </button>
-    <button onclick="enterDemoMode()" style="margin-top:10px;width:100%;padding:11px;background:rgba(14,165,233,.15);border:1.5px solid rgba(14,165,233,.4);border-radius:12px;color:#7DD3FC;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><svg class=ici><use href=icons.svg#ic-eye></use></svg> 로그인 없이 구경하기</button>
+    <button onclick="enterDemoMode()" style="margin-top:10px;width:100%;padding:12px;background:rgba(14,165,233,.15);border:1.5px solid rgba(14,165,233,.4);border-radius:12px;color:#7DD3FC;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit"><svg class=ici><use href=icons.svg#ic-eye></use></svg> 로그인 없이 구경하기</button>
     <div class="login-footer">데이터는 본인 Google 계정에만 저장됩니다</div>
   </div>
 </div>
 
-<div id="status-screen" style="display:none;position:fixed;inset:0;background:linear-gradient(160deg,#0F1C2D,#1E2D3D 50%,#2A3F55);z-index:7000;align-items:center;justify-content:center;padding:20px">
+<div id="status-screen" style="display:none;position:fixed;inset:0;background:#15212F;z-index:7000;align-items:center;justify-content:center;padding:20px">
   <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:36px 28px;max-width:320px;width:100%;text-align:center;backdrop-filter:blur(16px);box-shadow:0 20px 60px rgba(0,0,0,.4)">
     <div style="font-size:52px;margin-bottom:14px;color:#fff;line-height:1" id="ss-icon"><svg class=ici><use href=icons.svg#ic-hourglass></use></svg></div>
-    <div style="font-size:20px;font-weight:900;color:#fff;margin-bottom:8px" id="ss-title"></div>
+    <div style="font-size:20px;font-weight:600;color:#fff;margin-bottom:8px" id="ss-title"></div>
     <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;line-height:1.7;white-space:pre-line" id="ss-msg"></div>
     <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:24px" id="ss-email"></div>
-    <button onclick="auth.signOut().then(()=>location.reload())" style="width:100%;padding:13px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">로그아웃</button>
+    <button onclick="auth.signOut().then(()=>location.reload())" style="width:100%;padding:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit">로그아웃</button>
   </div>
 </div>
 
@@ -303,9 +296,9 @@
       <button class="upload-btn" onclick="openRentChangeSheet()" style="border-style:solid;border-color:#C7D2FE;color:var(--indigo);background:#F5F3FF;font-size:13px"><svg class=ici><use href=icons.svg#ic-clipboard-list></use></svg> 임대 조건 변경 기록하기</button>
       <div class="rc-chg-wrap" id="rc-chg-list"></div>
     </div>
-    <div class="field"><label>특이사항 메모</label><textarea id="m-memo" rows="2" placeholder="수리 요청, 계약 관련 특이사항 등..."></textarea></div>
+    <div class="field"><label>특이사항 메모</label><textarea id="m-memo" rows="2" placeholder="수리 요청, 계약 특이사항"></textarea></div>
     <div class="divider"></div>
-    <div class="section-label"><svg class=ici><use href=icons.svg#ic-calendar></use></svg> 월세 납부 이력 <span style="font-size:10px;font-weight:400;color:var(--hint);margin-left:4px">최근 12개월</span></div>
+    <div class="section-label"><svg class=ici><use href=icons.svg#ic-calendar></use></svg> 월세 납부 이력 <span style="font-size:11px;font-weight:400;color:var(--hint);margin-left:4px">최근 12개월</span></div>
     <div class="rent-hist-wrap" id="m-sect-hist">
       <div class="rent-hist-grid" id="rent-hist-grid"></div>
       <div class="rh-legend"><span><svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 완납</span><span><svg class=ici><use href=icons.svg#ic-circle-x></use></svg> 미납</span><span><svg class=ici><use href=icons.svg#ic-circle-dashed></use></svg> 부분납부</span><span style="opacity:.5">— 기록없음</span></div>
@@ -316,8 +309,8 @@
     <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="onPhotos(event)">
     <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none" onchange="onPhotos(event)">
     <div class="photo-btn-row" id="m-sect-photo">
-      <button class="upload-btn" id="upload-btn" onclick="document.getElementById('photo-input').click()"><svg class=ici><use href=icons.svg#ic-folder-open></use></svg> 사진 추가<br><span style="font-size:10px;opacity:.7">(계약서, 신분증 등)</span></button>
-      <button class="upload-btn camera-btn" id="camera-btn" onclick="document.getElementById('camera-input').click()"><svg class=ici><use href=icons.svg#ic-camera></use></svg> 카메라 촬영<br><span style="font-size:10px;opacity:.7">(바로 찍기)</span></button>
+      <button class="upload-btn" id="upload-btn" onclick="document.getElementById('photo-input').click()"><svg class=ici><use href=icons.svg#ic-folder-open></use></svg> 사진 추가<br><span style="font-size:11px;opacity:.7">(계약서, 신분증 등)</span></button>
+      <button class="upload-btn camera-btn" id="camera-btn" onclick="document.getElementById('camera-input').click()"><svg class=ici><use href=icons.svg#ic-camera></use></svg> 카메라 촬영<br><span style="font-size:11px;opacity:.7">(바로 찍기)</span></button>
     </div>
     <div style="margin-top:8px;font-size:11px;color:var(--hint);line-height:1.6;text-align:center">
       <svg class=ici><use href=icons.svg#ic-triangle-alert></use></svg> 사진 촬영 및 추가 후 업로드까지 약간의 시간이 소요되니 업로드 완료 후 저장하세요.
@@ -339,7 +332,7 @@
 <div class="chg-bg" id="chg-bg" onclick="closeRentChangeSheet()"></div>
 <div class="chg-sheet" id="chg-sheet">
   <div class="sheet-hd">
-    <h3 class="chg-sheet-title" style="font-size:16px;font-weight:900"><svg class=ici><use href=icons.svg#ic-clipboard-list></use></svg> 임대 조건 변경</h3>
+    <h3 class="chg-sheet-title" style="font-size:16px;font-weight:600"><svg class=ici><use href=icons.svg#ic-clipboard-list></use></svg> 임대 조건 변경</h3>
     <button class="sheet-close" onclick="closeRentChangeSheet()">✕</button>
   </div>
   <div class="chg-cols">
@@ -355,7 +348,7 @@
     </div>
   </div>
   <div class="field" style="margin-top:10px"><label>적용일</label><input type="date" id="chg-date"></div>
-  <div class="field" style="margin-top:10px"><label>변경 사유 <span style="font-size:10px;font-weight:400;color:var(--hint)">(선택)</span></label><input type="text" id="chg-reason" placeholder="예: 재계약, 협의 인상, 인하 등"></div>
+  <div class="field" style="margin-top:10px"><label>변경 사유 <span style="font-size:11px;font-weight:400;color:var(--hint)">(선택)</span></label><input type="text" id="chg-reason" placeholder="예: 재계약, 협의 인상, 인하 등"></div>
   <div class="sheet-btn-row" style="margin-top:16px">
     <button class="btn-save" onclick="saveRentChange()"><svg class=ici><use href=icons.svg#ic-save></use></svg> 기록하기</button>
     <button class="btn-close-sheet" onclick="closeRentChangeSheet()">✕ 닫기</button>
@@ -515,8 +508,8 @@ auth.onAuthStateChanged(async user=>{
       // 열람 배너 표시
       const banner=document.createElement("div");
       banner.id="master-view-banner";
-      banner.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(245,158,11,.05));border-bottom:1px solid rgba(245,158,11,.3);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
-      banner.innerHTML=`<span style="font-size:12px;font-weight:700;color:#F59E0B"><svg class=ici><use href=icons.svg#ic-wrench></use></svg> 열람 중: ${esc(mName||mUid)}</span><button onclick="location.href='master/admin.html'" style="font-size:11px;font-weight:700;background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#F59E0B;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit">← 관리자 페이지</button>`;
+      banner.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:#FFF8EB;border-bottom:1px solid rgba(245,158,11,.3);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
+      banner.innerHTML=`<span style="font-size:12px;font-weight:500;color:#F59E0B"><svg class=ici><use href=icons.svg#ic-wrench></use></svg> 열람 중: ${esc(mName||mUid)}</span><button onclick="location.href='master/admin.html'" style="font-size:11px;font-weight:500;background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#F59E0B;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit">← 관리자 페이지</button>`;
       document.body.appendChild(banner);
       document.querySelector(".content").style.marginTop="136px";
       document.querySelectorAll(".nav-tab").forEach(a=>{
@@ -706,7 +699,7 @@ function openHistDrop(e,roomId,ym){
         ev.stopPropagation();
         drop.innerHTML="";
         const wrap=document.createElement("div");wrap.className="rh-partial-input";
-        const lbl=document.createElement("div");lbl.style.cssText="font-size:11px;font-weight:700;color:#92400E";lbl.innerHTML="<svg class=ici><use href=icons.svg#ic-circle-dashed></use></svg> 부분납부 금액 (원)";
+        const lbl=document.createElement("div");lbl.style.cssText="font-size:11px;font-weight:500;color:#92400E";lbl.innerHTML="<svg class=ici><use href=icons.svg#ic-circle-dashed></use></svg> 부분납부 금액 (원)";
         const inp=document.createElement("input");inp.type="number";inp.value=rentAmt;inp.min=0;
         const cfm=document.createElement("button");cfm.textContent="확인";
         cfm.onclick=(ev)=>{
@@ -1051,9 +1044,9 @@ async function onPhotos(e){
     const ts=Date.now(),path=`rent_app/${cu.uid}/contracts/${curRoom}/${ts}_${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
     const label=files.length>1?`(${i+1}/${files.length}) `:"";
     try{
-      pct.textContent=`${label}압축 중...`;
+      pct.textContent=`${label}압축 중`;
       const blob=await compressImage(file);
-      pct.textContent=`${label}파일 로딩 중...`;
+      pct.textContent=`${label}파일 로딩 중`;
       let uploadBlob=blob;
       try{const ab=await blob.arrayBuffer();uploadBlob=new Blob([ab],{type:blob.type||"image/jpeg"});}catch(e){}
       const ref=storage.ref(path);
@@ -1062,18 +1055,18 @@ async function onPhotos(e){
       for(let attempt=0;attempt<MAX_TRIES;attempt++){
         try{
           if(attempt>0){
-            pct.textContent=`${label}재연결 중... (${attempt}/${MAX_TRIES-1})`;
+            pct.textContent=`${label}재연결 중 (${attempt}/${MAX_TRIES-1})`;
             fill.style.width="0%";
             await new Promise(r=>setTimeout(r,2000));
             await auth.currentUser?.getIdToken(true).catch(()=>{});
           }
-          pct.textContent=`${label}서버 연결 중...`;
+          pct.textContent=`${label}서버 연결 중`;
           const task=ref.put(uploadBlob,{contentType:uploadBlob.type||"image/jpeg"});
           let tmo=null,firstByte=false;
           const resetTmo=()=>{clearTimeout(tmo);tmo=setTimeout(()=>task.cancel(),firstByte?25000:10000);};
           resetTmo();
           await new Promise((res,rej)=>task.on("state_changed",
-            s=>{if(s.bytesTransferred>0)firstByte=true;resetTmo();const p=Math.round(s.bytesTransferred/s.totalBytes*100)||0;fill.style.width=`${p}%`;pct.textContent=`${label}업로드 중... ${p}%`;},
+            s=>{if(s.bytesTransferred>0)firstByte=true;resetTmo();const p=Math.round(s.bytesTransferred/s.totalBytes*100)||0;fill.style.width=`${p}%`;pct.textContent=`${label}업로드 중 ${p}%`;},
             e=>{clearTimeout(tmo);rej(e);},
             ()=>{clearTimeout(tmo);res();}
           ));
@@ -1081,10 +1074,10 @@ async function onPhotos(e){
         }catch(e){
           const isTimeout=e.code==="storage/canceled";
           if(attempt===MAX_TRIES-1)throw e;
-          pct.innerHTML=isTimeout?`${label}<svg class=ici><use href=icons.svg#ic-timer></use></svg> 응답 없음 — 재시도 중...`:`${label}<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 실패 — 재시도 중...`;
+          pct.innerHTML=isTimeout?`${label}<svg class=ici><use href=icons.svg#ic-timer></use></svg> 응답 없음 — 재시도 중`:`${label}<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 실패 — 재시도 중`;
         }
       }
-      fill.style.width="100%";pct.textContent=`${label}완료!`;
+      fill.style.width="100%";pct.textContent=`${label}완료`;
       const pid=String(ts+(i*10));
       const targetUid=(cu.uid===MASTER_UID&&mUid)?mUid:cu.uid;
       await db.ref(DBPath.unitPhoto(targetUid, curBid, curRoom, pid)).set({id:pid,url,storagePath:path,uploadedAt:new Date().toISOString()});
@@ -1190,11 +1183,11 @@ function gotoEasyIndex(){
 }
 </script>
 <script>window.EM_SIDE_ACTION = function(){ gotoEasyIndex(); };</script>
-<script src="easymode-side.js?v=2"></script>
-<script src="brokerage-calc.js?v=2"></script>
-<script src="landlord-guide-side.js?v=2"></script>
-<script src="tax-helper.js?v=2"></script>
-<script src="apply-btn.js?v=2"></script>
-<script src="footer.js?v=5"></script>
+<script src="easymode-side.js?v=3"></script>
+<script src="brokerage-calc.js?v=3"></script>
+<script src="landlord-guide-side.js?v=3"></script>
+<script src="tax-helper.js?v=3"></script>
+<script src="apply-btn.js?v=3"></script>
+<script src="footer.js?v=6"></script>
 </body>
 </html>

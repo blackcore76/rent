@@ -29,25 +29,25 @@
     #apply-overlay.show{display:flex}
     #apply-modal{background:#fff;border-radius:20px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.4);transform:translateY(14px) scale(.98);opacity:0;transition:transform .26s cubic-bezier(.4,0,.2,1),opacity .26s;max-height:92vh;max-height:92dvh;display:flex;flex-direction:column;font-family:'Noto Sans KR',system-ui,-apple-system,sans-serif}
     #apply-overlay.show #apply-modal{transform:translateY(0) scale(1);opacity:1}
-    .apply-hdr{display:flex;align-items:center;justify-content:space-between;padding:17px 18px 14px;border-bottom:1px solid #E2E8F0;flex-shrink:0}
-    .apply-title{font-size:16px;font-weight:900;color:#1E2D3D;display:flex;align-items:center;gap:7px}
+    .apply-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 14px;border-bottom:1px solid #E2E8F0;flex-shrink:0}
+    .apply-title{font-size:16px;font-weight:600;color:#1E2D3D;display:flex;align-items:center;gap:8px}
     .apply-close-x{width:32px;height:32px;border-radius:50%;background:#F1F5F9;border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#64748B;flex-shrink:0}
     .apply-close-x:active{background:#E2E8F0}
     .apply-body{overflow-y:auto;padding:16px 18px 18px;-webkit-overflow-scrolling:touch}
     .apply-intro{font-size:13px;color:#334155;line-height:1.7;margin-bottom:16px}
     .apply-intro b{color:#0284C7}
-    .apply-steps{display:flex;flex-direction:column;gap:11px;margin-bottom:16px}
+    .apply-steps{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
     .apply-step{display:flex;align-items:flex-start;gap:10px}
-    .apply-step .n{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#E0F2FE;color:#0284C7;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center}
+    .apply-step .n{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#E0F2FE;color:#0284C7;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center}
     .apply-step .t{font-size:13px;color:#1E293B;line-height:1.5}
     .apply-step .t b{color:#0F172A}
-    .apply-step .t .sub{font-size:11.5px;color:#94A3B8}
-    .apply-note{background:#F0F9FF;border:1px solid #BAE6FD;border-radius:11px;padding:12px 13px;font-size:12px;color:#075985;line-height:1.65;margin-bottom:16px}
+    .apply-step .t .sub{font-size:12px;color:#94A3B8}
+    .apply-note{background:#F0F9FF;border:1px solid #BAE6FD;border-radius:11px;padding:12px 12px;font-size:12px;color:#075985;line-height:1.65;margin-bottom:16px}
     .apply-note b{color:#0C4A6E}
-    .apply-cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;padding:14px;background:#1E2D3D;color:#fff;font-size:14px;font-weight:900;border:none;border-radius:12px;cursor:pointer;font-family:inherit}
+    .apply-cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;padding:14px;background:#1E2D3D;color:#fff;font-size:14px;font-weight:600;border:none;border-radius:12px;cursor:pointer;font-family:inherit}
     .apply-cta:active{filter:brightness(.94)}
-    .apply-later{display:block;width:100%;margin-top:9px;padding:11px;background:transparent;border:none;color:#94A3B8;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
-    .apply-foot{text-align:center;font-size:10.5px;color:#94A3B8;margin-top:12px;line-height:1.6}
+    .apply-later{display:block;width:100%;margin-top:8px;padding:12px;background:transparent;border:none;color:#94A3B8;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
+    .apply-foot{text-align:center;font-size:11px;color:#94A3B8;margin-top:12px;line-height:1.6}
   `;
   document.head.appendChild(s);
 
@@ -84,7 +84,7 @@
         </div>
         <div class="apply-note">
           아래 <b>시작하기</b>를 누르면 <b>구글 계정으로 로그인</b>되고, 이름·이메일로 사용자 등록이 이뤄져요
-          그때부터 바로 이용할 수 있어요 <br><b>승인 대기 없이 즉시 시작!</b>
+          그때부터 바로 이용할 수 있어요 <br><b>승인 대기 없이 바로 시작</b>
         </div>
         <button class="apply-cta"><svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 구글로 시작하기</button>
         <button class="apply-later">나중에 할게요</button>

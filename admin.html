@@ -9,20 +9,20 @@
 <link rel="icon" href="favicon.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
-<title>🏠 PlusHome 세상 편한 임대관리 · 관리</title>
+<title>PlusHome 세상 편한 임대관리 · 관리</title>
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://rent-4d521-default-rtdb.firebaseio.com" crossorigin>
 <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="common.css?v=4">
+<link rel="stylesheet" href="common.css?v=5">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="shared.js?v=3"></script>
+<script src="shared.js?v=4"></script>
 <script src="db-paths.js"></script>
 <style>
 /* 로그인 모달: 불투명 그라데이션 대신 뒤에 데모 대시보드가 살짝 비치도록(약 70~80%) */
@@ -32,7 +32,7 @@
 .login-privacy{background:rgba(15,28,45,.85)}
 /* SUB TABS */
 .sub-tabs{display:flex;background:var(--card);border-radius:12px;padding:4px;margin-bottom:14px;box-shadow:var(--shadow);gap:4px}
-.sub-tab{display:flex;align-items:center;justify-content:center;gap:5px;flex:1;padding:9px 8px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--sub);background:transparent;transition:all .2s}
+.sub-tab{display:flex;align-items:center;justify-content:center;gap:4px;flex:1;padding:8px 8px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--sub);background:transparent;transition:background-color .15s,color .15s,border-color .15s,opacity .15s,transform .15s}
 .sub-tab.on{background:var(--hdr);color:#fff}
 /* PAGE */
 .sub-page{display:none}
@@ -41,13 +41,13 @@
 .search-bar{display:flex;gap:8px;margin-bottom:12px}
 .search-input{flex:1;border:2px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;font-family:inherit;outline:none;color:var(--text);background:#fff}
 .search-input:focus{border-color:var(--sky)}
-.btn-add{background:var(--hdr);color:#fff;border:none;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn-add{background:var(--hdr);color:#fff;border:none;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;white-space:nowrap}
 .contact-card{background:var(--card);border-radius:12px;padding:14px;margin-bottom:8px;box-shadow:var(--shadow)}
 .contact-top{display:flex;align-items:flex-start;gap:12px}
-.contact-avatar{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;flex-shrink:0}
+.contact-avatar{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:#fff;flex-shrink:0}
 .contact-info{flex:1;min-width:0}
-.contact-name{font-size:15px;font-weight:800;color:var(--text);margin-bottom:2px}
-.contact-cat{font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;display:inline-block;margin-bottom:4px}
+.contact-name{font-size:15px;font-weight:600;color:var(--text);margin-bottom:2px}
+.contact-cat{font-size:11px;font-weight:500;padding:2px 8px;border-radius:5px;display:inline-block;margin-bottom:4px}
 .cat-tenant{background:var(--blue-lt);color:var(--blue-t)}
 .cat-vendor{background:var(--green-lt);color:var(--green-t)}
 .cat-agency{background:var(--purple-lt);color:var(--purple-t)}
@@ -59,22 +59,22 @@
 .ic-btn.edit{background:var(--blue-lt);color:var(--blue)}
 .ic-btn.del{background:var(--red-lt);color:var(--red)}
 /* PHONE LINK */
-.phone-links{display:flex;flex-direction:column;gap:5px;margin-bottom:4px}
+.phone-links{display:flex;flex-direction:column;gap:4px;margin-bottom:4px}
 .phone-link{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;
   background:var(--green-lt);border-radius:8px;text-decoration:none;
-  color:var(--green-t);font-size:13px;font-weight:700;transition:opacity .15s;width:fit-content}
+  color:var(--green-t);font-size:13px;font-weight:500;transition:opacity .15s;width:fit-content}
 .phone-link:active{opacity:.7}
 /* CONTRACTS */
 .room-section{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
 .room-section-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-.room-section-title{font-size:14px;font-weight:800;color:var(--hdr)}
+.room-section-title{font-size:14px;font-weight:600;color:var(--hdr)}
 .room-section-sub{font-size:12px;color:var(--sub)}
 .photos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .ph-wrap{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#F0F4F8}
 .ph-wrap img{width:100%;height:100%;object-fit:cover;cursor:pointer}
 .ph-del{position:absolute;top:4px;right:4px;width:22px;height:22px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.ph-date{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:3px 5px;text-align:center}
-.upload-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border:2px dashed var(--border);border-radius:10px;background:#FAFCFF;color:var(--sub);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;margin-top:8px}
+.ph-date{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:4px 4px;text-align:center}
+.upload-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border:2px dashed var(--border);border-radius:10px;background:#FAFCFF;color:var(--sub);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:background-color .15s,color .15s,border-color .15s,opacity .15s,transform .15s;margin-top:8px}
 .upload-btn:hover{border-color:var(--sky);color:var(--sky)}
 .upload-btn:disabled{opacity:.5;cursor:not-allowed}
 .prog-bar{height:3px;border-radius:2px;background:#E2E8F0;margin-top:6px;overflow:hidden;display:none}
@@ -90,15 +90,15 @@
 .sheet-bg.show{display:flex}
 .sheet{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 36px;width:100%;max-width:520px;box-shadow:0 -4px 32px rgba(0,0,0,.2);max-height:calc(100vh - 100px);overflow-y:auto;overscroll-behavior:contain}
 .sheet-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.sheet-hd h3{font-size:17px;font-weight:900;color:var(--hdr)}
+.sheet-hd h3{font-size:17px;font-weight:600;color:var(--hdr)}
 .sheet-close{width:32px;height:32px;border:none;background:#F3F4F6;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
-.field label{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px}
+.field label{font-size:11px;font-weight:500;color:var(--sub);}
 .field input,.field select,.field textarea{border:2px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;outline:none;color:var(--text);background:#FAFCFF;width:100%;transition:border-color .2s}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--sky);background:#fff}
 .field textarea{resize:none}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.btn-save{width:100%;padding:15px;background:var(--hdr);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px}
+.btn-save{width:100%;padding:16px;background:var(--hdr);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:4px}
 .btn-save:active{opacity:.85}
 .empty-st{text-align:center;padding:40px 20px;color:var(--hint)}
 .empty-st .ei{font-size:44px;margin-bottom:10px}
@@ -107,10 +107,10 @@
 .confirm-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:none;align-items:center;justify-content:center;padding:20px}
 .confirm-bg.show{display:flex}
 .confirm-box{background:#fff;border-radius:20px;padding:24px;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.2)}
-.confirm-box h3{font-size:15px;font-weight:700;color:var(--hdr);margin-bottom:10px}
+.confirm-box h3{font-size:15px;font-weight:500;color:var(--hdr);margin-bottom:10px}
 .confirm-box p{font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.6}
 .confirm-btns{display:flex;gap:10px;justify-content:flex-end}
-.confirm-btns button{padding:9px 18px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.confirm-btns button{padding:8px 18px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
 .fab{position:fixed;bottom:28px;right:20px;width:56px;height:56px;border-radius:50%;background:var(--hdr);color:#fff;border:none;font-size:28px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;z-index:100;transition:transform .15s}
 .fab:active{transform:scale(.92)}
 /* BUILDINGS */
@@ -125,9 +125,9 @@
 .bldg-grid{display:grid;grid-template-columns:1fr;gap:10px}
 .bldg-grid.two{grid-template-columns:1fr 1fr}
 .bldg-grid .bldg-card{margin-bottom:0}
-.bldg-card{background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:16px;margin-bottom:10px;box-shadow:0 4px 16px rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.06)}
+.bldg-card{background:#1E2D3D;border-radius:14px;padding:16px;margin-bottom:10px;box-shadow:0 4px 16px rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.06)}
 .bldg-card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.1)}
-.bldg-card-name{font-size:15px;font-weight:900;color:#fff}
+.bldg-card-name{font-size:15px;font-weight:600;color:#fff}
 .bldg-card-btns{display:flex;gap:6px}
 .bldg-ic{width:28px;height:28px;border:none;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
 .bldg-ic.edit{background:rgba(255,255,255,.15);color:#fff}
@@ -135,15 +135,15 @@
 .bldg-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px}
 .bldg-icon{color:#4DD0E1;display:flex;font-size:14px;flex-shrink:0;margin-top:1px}
 .bldg-body{flex:1;min-width:0}
-.bldg-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px}
-.bldg-val{font-size:13px;font-weight:700;color:#4DD0E1;letter-spacing:.3px;word-break:break-all}
+.bldg-lbl{font-size:11px;font-weight:500;color:rgba(255,255,255,.4);margin-bottom:1px}
+.bldg-val{font-size:13px;font-weight:500;color:#4DD0E1;word-break:break-all}
 .bldg-val-muted{font-size:13px;font-weight:600;color:rgba(255,255,255,.75);word-break:break-all}
 /* 실수 방지 블라인드 덮개 */
 .btn-blind-wrap{position:relative;display:inline-flex}
-.btn-blind{position:absolute;inset:0;border-radius:6px;background:#475569;border:1.5px solid #334155;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;z-index:2;font-family:inherit;transition:opacity .2s,transform .22s cubic-bezier(.4,0,.2,1);user-select:none}
+.btn-blind{position:absolute;inset:0;border-radius:6px;background:#475569;border:1.5px solid #334155;color:#fff;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;z-index:2;font-family:inherit;transition:opacity .2s,transform .22s cubic-bezier(.4,0,.2,1);user-select:none}
 .btn-blind.lifted{opacity:0;transform:translateY(-7px);pointer-events:none}
 /* 이지모드 사이드 버튼 → easymode-side.js */
-.sub-tab{flex-direction:column;gap:3px;white-space:nowrap;padding:8px 2px;font-size:12px}
+.sub-tab{flex-direction:column;gap:4px;white-space:nowrap;padding:8px 2px;font-size:12px}
 </style>
 </head>
 <body>
@@ -158,18 +158,18 @@
       <svg class="g-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Google로 로그인
     </button>
-    <button onclick="enterDemoMode()" style="margin-top:10px;width:100%;padding:11px;background:rgba(14,165,233,.15);border:1.5px solid rgba(14,165,233,.4);border-radius:12px;color:#7DD3FC;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><svg class=ici><use href=icons.svg#ic-eye></use></svg> 로그인 없이 구경하기</button>
+    <button onclick="enterDemoMode()" style="margin-top:10px;width:100%;padding:12px;background:rgba(14,165,233,.15);border:1.5px solid rgba(14,165,233,.4);border-radius:12px;color:#7DD3FC;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit"><svg class=ici><use href=icons.svg#ic-eye></use></svg> 로그인 없이 구경하기</button>
     <div class="login-footer">데이터는 본인 Google 계정에만 저장됩니다</div>
   </div>
 </div>
 
-<div id="status-screen" style="display:none;position:fixed;inset:0;background:linear-gradient(160deg,#0F1C2D,#1E2D3D 50%,#2A3F55);z-index:7000;align-items:center;justify-content:center;padding:20px">
+<div id="status-screen" style="display:none;position:fixed;inset:0;background:#15212F;z-index:7000;align-items:center;justify-content:center;padding:20px">
   <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:36px 28px;max-width:320px;width:100%;text-align:center;backdrop-filter:blur(16px);box-shadow:0 20px 60px rgba(0,0,0,.4)">
     <div style="font-size:52px;margin-bottom:14px;color:#fff;line-height:1" id="ss-icon"><svg class=ici><use href=icons.svg#ic-hourglass></use></svg></div>
-    <div style="font-size:20px;font-weight:900;color:#fff;margin-bottom:8px" id="ss-title"></div>
+    <div style="font-size:20px;font-weight:600;color:#fff;margin-bottom:8px" id="ss-title"></div>
     <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;line-height:1.7;white-space:pre-line" id="ss-msg"></div>
     <div style="font-size:11px;color:rgba(255,255,255,.3);margin-bottom:24px" id="ss-email"></div>
-    <button onclick="auth.signOut().then(()=>location.reload())" style="width:100%;padding:13px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">로그아웃</button>
+    <button onclick="auth.signOut().then(()=>location.reload())" style="width:100%;padding:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit">로그아웃</button>
   </div>
 </div>
 
@@ -212,7 +212,7 @@
     <!-- 전화번호부 -->
     <div class="sub-page on" id="sp0">
       <div class="search-bar">
-        <input class="search-input" id="pb-search" placeholder="이름, 번호 검색..." oninput="renderPhonebook()">
+        <input class="search-input" id="pb-search" placeholder="이름, 번호 검색" oninput="renderPhonebook()">
         <button class="btn-add" onclick="openAddContact()">+ 추가</button>
       </div>
       <div id="phonebook-list"></div>
@@ -228,18 +228,18 @@
       <!-- 건물 목록 관리 -->
       <div class="layout-section" id="sp2-registry" style="margin-bottom:12px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <span style="font-size:14px;font-weight:800;color:var(--hdr)"><svg class=ici><use href=icons.svg#ic-building-2></use></svg> 임대 건물 목록</span>
+          <span style="font-size:14px;font-weight:600;color:var(--hdr)"><svg class=ici><use href=icons.svg#ic-building-2></use></svg> 임대 건물 목록</span>
           <button class="btn-add" onclick="openAddBldSheet()">+ 건물 추가</button>
         </div>
         <div id="bld-registry-list"></div>
       </div>
       <!-- 백업 / 복구 -->
       <div id="sp2-backup">
-      <div style="font-size:11px;font-weight:800;color:var(--sub);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px"><svg class=ici><use href=icons.svg#ic-save></use></svg> 백업 / 복구</div>
+      <div style="font-size:11px;font-weight:600;color:var(--sub);margin-bottom:10px"><svg class=ici><use href=icons.svg#ic-save></use></svg> 백업 / 복구</div>
       <a href="backup.html" style="display:flex;align-items:center;gap:10px;background:#F0FDF4;border:1.5px solid #A7F3D0;border-radius:12px;padding:12px 14px;margin-bottom:8px;text-decoration:none">
         <span style="font-size:22px"><svg class=ici><use href=icons.svg#ic-save></use></svg></span>
         <div style="flex:1">
-          <div style="font-size:13px;font-weight:800;color:#065F46">백업 내보내기</div>
+          <div style="font-size:13px;font-weight:600;color:#065F46">백업 내보내기</div>
           <div style="font-size:11px;color:#059669;margin-top:2px">세대 · 장부 CSV · JSON 및 사진 ZIP 다운로드</div>
         </div>
         <span style="color:#A7F3D0;font-size:16px">›</span>
@@ -247,7 +247,7 @@
       <a href="restore.html" style="display:flex;align-items:center;gap:10px;background:#EFF6FF;border:1.5px solid #BAE6FD;border-radius:12px;padding:12px 14px;margin-bottom:8px;text-decoration:none">
         <span style="font-size:22px"><svg class=ici><use href=icons.svg#ic-refresh-cw></use></svg></span>
         <div style="flex:1">
-          <div style="font-size:13px;font-weight:800;color:#0C4A6E">데이터 복구</div>
+          <div style="font-size:13px;font-weight:600;color:#0C4A6E">데이터 복구</div>
           <div style="font-size:11px;color:#0284C7;margin-top:2px">JSON 백업 파일로 세대 · 장부 데이터 복원</div>
         </div>
         <span style="color:#BAE6FD;font-size:16px">›</span>
@@ -255,7 +255,7 @@
       </div><!-- /sp2-backup -->
       <!-- 건물정보카드 -->
       <div class="bldg-hd-row">
-        <span style="font-size:14px;font-weight:800;color:var(--hdr)"><svg class=ici><use href=icons.svg#ic-house></use></svg> 건물정보카드<br><span style="font-size:11px;font-weight:500;color:var(--sub)">- 메인화면 하단에 표시하는 건물정보카드입니다</span></span>
+        <span style="font-size:14px;font-weight:600;color:var(--hdr)"><svg class=ici><use href=icons.svg#ic-house></use></svg> 건물정보카드<br><span style="font-size:11px;font-weight:500;color:var(--sub)">- 메인화면 하단에 표시하는 건물정보카드입니다</span></span>
         <button class="btn-add" onclick="openAddBuilding()">+ 추가</button>
       </div>
       <div id="buildings-list"></div>
@@ -277,21 +277,21 @@
     </div>
     <div class="field" id="edit-bld-name-field">
       <label>건물명 *</label>
-      <input type="text" id="edit-bld-name" placeholder="조아빌, 행복한빌...">
+      <input type="text" id="edit-bld-name" placeholder="예: 조아빌">
     </div>
-    <div style="font-size:11px;font-weight:800;color:var(--sub);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">호실 구조</div>
+    <div style="font-size:11px;font-weight:600;color:var(--sub);margin-bottom:8px">호실 구조</div>
     <div style="background:#FFF7ED;border:1.5px solid #FCD34D;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#92400E;font-weight:600"><svg class=ici><use href=icons.svg#ic-triangle-alert></use></svg> 저장 시 기존 호실 구조가 교체됩니다</div>
     <div id="edit-gen-box" style="background:#F0F9FF;border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid #BAE6FD">
-      <div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">빠른 자동 생성</div>
+      <div style="font-size:11px;font-weight:500;color:var(--sub);margin-bottom:8px;">빠른 자동 생성</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
         <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">시작 층</div><input class="gen-inp" type="number" id="edit-gen-from" value="2" min="1" max="30"></div>
         <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">끝 층</div><input class="gen-inp" type="number" id="edit-gen-to" value="4" min="1" max="30"></div>
         <div><div style="font-size:11px;color:var(--hint);margin-bottom:4px">층당 호실 수</div><input class="gen-inp" type="number" id="edit-gen-count" value="6" min="1" max="30"></div>
       </div>
-      <button onclick="generateEditLayout()" style="width:100%;padding:9px;background:var(--sky);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><svg class=ici><use href=icons.svg#ic-zap></use></svg> 자동 생성 (기존 설정 교체)</button>
+      <button onclick="generateEditLayout()" style="width:100%;padding:8px;background:var(--sky);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit"><svg class=ici><use href=icons.svg#ic-zap></use></svg> 자동 생성 (기존 설정 교체)</button>
     </div>
     <div id="edit-floor-rows"></div>
-    <button onclick="addEditFloorRow()" style="width:100%;padding:9px;background:#F1F5F9;color:var(--sub);border:2px dashed var(--border);border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:12px">+ 층 추가</button>
+    <button onclick="addEditFloorRow()" style="width:100%;padding:8px;background:#F1F5F9;color:var(--sub);border:2px dashed var(--border);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:12px">+ 층 추가</button>
     <button class="btn-save" onclick="saveEditBld()"><svg class=ici><use href=icons.svg#ic-save></use></svg> 저장</button>
   </div>
 </div>
@@ -305,7 +305,7 @@
     </div>
     <div class="field">
       <label>건물명 *</label>
-      <input type="text" id="add-bld-name" placeholder="조아빌, 행복한빌...">
+      <input type="text" id="add-bld-name" placeholder="예: 조아빌">
     </div>
     <p style="font-size:12px;color:var(--hint);margin-bottom:12px;line-height:1.6">건물 추가 후 호실 구조 설정에서 층과 호실을 설정하세요.</p>
     <button class="btn-save" onclick="saveNewBld()"><svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 추가하기</button>
@@ -345,7 +345,7 @@
     </div>
     <div class="field">
       <label>메모</label>
-      <textarea id="c-memo" rows="2" placeholder="호실, 담당 업무 등..."></textarea>
+      <textarea id="c-memo" rows="2" placeholder="호실, 담당 업무"></textarea>
     </div>
     <button class="btn-save" onclick="saveContact()"><svg class=ici><use href=icons.svg#ic-save></use></svg> 저장</button>
   </div>
@@ -365,7 +365,7 @@
     </div>
     <div class="field">
       <label>주소</label>
-      <input type="text" id="b-addr" placeholder="대전광역시 유성구 월평동...">
+      <input type="text" id="b-addr" placeholder="예: 대전광역시 유성구 월평동">
     </div>
     <div class="field">
       <label>1층 현관 코드</label>
@@ -467,8 +467,8 @@ if(pbL&&pbRef)pbRef.off("value",pbL);
     if(user.uid===MASTER_UID&&mUid){
       const banner=document.createElement("div");
       banner.id="master-view-banner";
-      banner.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(245,158,11,.05));border-bottom:1px solid rgba(245,158,11,.3);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
-      banner.innerHTML=`<span style="font-size:12px;font-weight:700;color:#F59E0B"><svg class=ici><use href=icons.svg#ic-wrench></use></svg> 열람 중: ${esc(mName||mUid)}</span><button onclick="location.href='master/admin.html'" style="font-size:11px;font-weight:700;background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#F59E0B;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit">← 관리자 페이지</button>`;
+      banner.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:#FFF8EB;border-bottom:1px solid rgba(245,158,11,.3);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
+      banner.innerHTML=`<span style="font-size:12px;font-weight:500;color:#F59E0B"><svg class=ici><use href=icons.svg#ic-wrench></use></svg> 열람 중: ${esc(mName||mUid)}</span><button onclick="location.href='master/admin.html'" style="font-size:11px;font-weight:500;background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:#F59E0B;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit">← 관리자 페이지</button>`;
       document.body.appendChild(banner);
       document.querySelector(".content").style.marginTop="136px";
       document.querySelectorAll(".nav-tab, a[href^='backup.html'], a[href^='restore.html']").forEach(a=>{
@@ -584,16 +584,16 @@ async function renderBldRegistry(){
   let html=bids.map(bid=>{
     const b=bldgsData[bid];const isCur=bid===curBid;const rc=roomCounts[bid];
     const cntBadge=rc>0
-      ?`<span style="font-size:10px;font-weight:700;background:${isCur?"var(--blue)":"var(--hdr)"};color:#fff;padding:2px 7px;border-radius:20px">${rc}호실</span>`
-      :`<span style="font-size:10px;font-weight:700;background:#FEF3C7;color:#92400E;padding:2px 7px;border-radius:20px">호실 미설정</span>`;
+      ?`<span style="font-size:11px;font-weight:500;background:${isCur?"var(--blue)":"var(--hdr)"};color:#fff;padding:2px 8px;border-radius:20px">${rc}호실</span>`
+      :`<span style="font-size:11px;font-weight:500;background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:20px">호실 미설정</span>`;
     return`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:${isCur?"var(--blue-lt)":"#F8FAFC"};border-radius:10px;margin-bottom:6px;border:2px solid ${isCur?"var(--blue)":"var(--border)"}">
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:700;color:${isCur?"var(--blue-t)":"var(--text)"};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${isCur?"✓ ":""}${esc(b?.name||"건물")}</div>
-        <div style="margin-top:3px">${cntBadge}</div>
+        <div style="font-size:13px;font-weight:500;color:${isCur?"var(--blue-t)":"var(--text)"};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${isCur?"✓ ":""}${esc(b?.name||"건물")}</div>
+        <div style="margin-top:4px">${cntBadge}</div>
       </div>
-      <button onclick="switchBldAndStay('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:${isCur?"var(--blue)":"var(--hdr)"};color:#fff;cursor:pointer;font-family:inherit">전환</button>
-      <button onclick="openEditBldSheet('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:#F1F5F9;color:var(--sub);cursor:pointer;font-family:inherit">수정</button>
-      <div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)"><svg class=ici><use href=icons.svg#ic-lock></use></svg> 삭제</div><button onclick="delBld('${bid}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:none;background:var(--red-lt);color:var(--red);cursor:pointer;font-family:inherit">삭제</button></div>
+      <button onclick="switchBldAndStay('${bid}')" style="font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;border:none;background:${isCur?"var(--blue)":"var(--hdr)"};color:#fff;cursor:pointer;font-family:inherit">전환</button>
+      <button onclick="openEditBldSheet('${bid}')" style="font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;border:none;background:#F1F5F9;color:var(--sub);cursor:pointer;font-family:inherit">수정</button>
+      <div class="btn-blind-wrap"><div class="btn-blind" onclick="liftBlind(this)"><svg class=ici><use href=icons.svg#ic-lock></use></svg> 삭제</div><button onclick="delBld('${bid}')" style="font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;border:none;background:var(--red-lt);color:var(--red);cursor:pointer;font-family:inherit">삭제</button></div>
     </div>`;
   }).join("");
   const curCnt=counts[curBid]||0;
@@ -604,7 +604,7 @@ async function renderBldRegistry(){
     html+=`<div style="background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:10px;padding:12px 14px;margin-top:6px;font-size:12px;color:#92400E;line-height:1.6">
       <svg class=ici><use href=icons.svg#ic-lightbulb></use></svg> <b>"${srcName}"</b>에 ${counts[srcBid]}개 세대 데이터가 있습니다.<br>
       현재 선택된 건물로 데이터를 가져올 수 있습니다.
-      <div style="margin-top:8px"><button onclick="mergeFromBld('${srcBid}')" style="padding:6px 14px;background:#F59E0B;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">이 건물로 데이터 가져오기</button></div>
+      <div style="margin-top:8px"><button onclick="mergeFromBld('${srcBid}')" style="padding:6px 14px;background:#F59E0B;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit">이 건물로 데이터 가져오기</button></div>
     </div>`;
   }
   el.innerHTML=html;
@@ -665,7 +665,7 @@ async function openEditBldSheet(bid){document.body.style.overscrollBehavior='non
   document.getElementById("edit-bld-name").value=bldgsData[bid]?.name||"";
   document.getElementById("edit-bld-sheet-title").innerHTML="<svg class=ici><use href=icons.svg#ic-building-2></use></svg> "+esc(bldgsData[bid]?.name||"건물")+" 수정";
   editRoomLayout={};
-  document.getElementById("edit-floor-rows").innerHTML='<div style="font-size:12px;color:var(--hint);text-align:center;padding:10px">불러오는 중...</div>';
+  document.getElementById("edit-floor-rows").innerHTML='<div style="font-size:12px;color:var(--hint);text-align:center;padding:10px">불러오는 중</div>';
   document.getElementById("edit-bld-sheet").classList.add("show");
   const targetUid=(cu?.uid===MASTER_UID&&mUid)?mUid:cu?.uid||"";
   const snap=await db.ref(DBPath.roomLayout(targetUid, bid)).once("value");
@@ -680,8 +680,8 @@ function renderEditFloorRows(){
   el.innerHTML=floors.map(f=>`
     <div class="floor-edit-row" data-floor="${f}">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-        <span style="font-size:13px;font-weight:700;color:var(--hdr)">${f}층</span>
-        <button class="bldg-ic del" onclick="removeEditFloorRow(this)" style="width:22px;height:22px;font-size:10px">✕</button>
+        <span style="font-size:13px;font-weight:500;color:var(--hdr)">${f}층</span>
+        <button class="bldg-ic del" onclick="removeEditFloorRow(this)" style="width:22px;height:22px;font-size:11px">✕</button>
       </div>
       <input class="rooms-input" type="text" value="${(editRoomLayout[String(f)]||[]).join(", ")}" placeholder="401, 402, 403">
     </div>`).join("");
@@ -987,7 +987,7 @@ async function uploadContractPhoto(room,e){
     const ts=Date.now();
     const path=`rent_app/${cu.uid}/contracts/${room}/${ts}_${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
     try{
-      fill.style.width="0%";showToast("<svg class=ici><use href=icons.svg#ic-refresh-cw></use></svg> 압축 중...");
+      fill.style.width="0%";showToast("<svg class=ici><use href=icons.svg#ic-refresh-cw></use></svg> 압축 중");
       const blob=await compressImage(file);
       const ref=storage.ref(path);
       let url=null;
@@ -996,7 +996,7 @@ async function uploadContractPhoto(room,e){
           const task=ref.put(blob);
           await new Promise((res,rej)=>task.on("state_changed",s=>{fill.style.width=`${Math.round(s.bytesTransferred/s.totalBytes*100)||0}%`},rej,res));
           url=await ref.getDownloadURL();break;
-        }catch(e){if(attempt===1)throw e;fill.style.width="0%";showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 업로드 실패 — 재시도 중...");await new Promise(r=>setTimeout(r,1800));}
+        }catch(e){if(attempt===1)throw e;fill.style.width="0%";showToast("<svg class=ici><use href=icons.svg#ic-circle-alert></use></svg> 업로드 실패 — 재시도 중");await new Promise(r=>setTimeout(r,1800));}
       }
       fill.style.width="100%";
       const pid=String(ts+(i*10));
@@ -1082,11 +1082,11 @@ function gotoEasyIndex(){
 }
 </script>
 <script>window.EM_SIDE_ACTION = function(){ gotoEasyIndex(); };</script>
-<script src="easymode-side.js?v=2"></script>
-<script src="brokerage-calc.js?v=2"></script>
-<script src="landlord-guide-side.js?v=2"></script>
-<script src="tax-helper.js?v=2"></script>
-<script src="apply-btn.js?v=2"></script>
-<script src="footer.js?v=5"></script>
+<script src="easymode-side.js?v=3"></script>
+<script src="brokerage-calc.js?v=3"></script>
+<script src="landlord-guide-side.js?v=3"></script>
+<script src="tax-helper.js?v=3"></script>
+<script src="apply-btn.js?v=3"></script>
+<script src="footer.js?v=6"></script>
 </body>
 </html>

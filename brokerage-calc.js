@@ -71,10 +71,10 @@
 
     .bc-hdr{
       display:flex;align-items:center;justify-content:space-between;
-      padding:16px 18px 13px;
+      padding:16px 18px 12px;
       border-bottom:1px solid #E2E8F0;flex-shrink:0;
     }
-    .bc-title{font-size:16px;font-weight:900;color:#1E2D3D;}
+    .bc-title{font-size:16px;font-weight:600;color:#1E2D3D;}
     .bc-close-x{
       width:32px;height:32px;border-radius:50%;
       background:#F1F5F9;border:none;font-size:16px;
@@ -89,8 +89,8 @@
     }
 
     .bc-slbl{
-      font-size:11px;font-weight:700;color:#64748B;
-      text-transform:uppercase;letter-spacing:.5px;margin:0 0 6px;
+      font-size:11px;font-weight:500;color:#64748B;
+      margin:0 0 6px;
     }
     .bc-seg{
       display:flex;border:2px solid #E2E8F0;
@@ -108,13 +108,13 @@
 
     .bc-field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
     .bc-field label{
-      font-size:11px;font-weight:700;color:#64748B;
-      letter-spacing:.5px;text-transform:uppercase;
+      font-size:11px;font-weight:500;color:#64748B;
+      
     }
     .bc-iw{position:relative;display:flex;align-items:center;}
     .bc-inp{
       border:2px solid #E2E8F0;border-radius:10px;
-      padding:11px 52px 11px 12px;
+      padding:12px 52px 12px 12px;
       font-size:15px;font-family:inherit;outline:none;
       color:#1E293B;background:#FAFCFF;width:100%;
       transition:border-color .2s;font-variant-numeric:tabular-nums;
@@ -122,12 +122,12 @@
     .bc-inp:focus{border-color:#0EA5E9;background:#fff;}
     .bc-iunit{
       position:absolute;right:12px;font-size:12px;
-      font-weight:700;color:#94A3B8;pointer-events:none;white-space:nowrap;
+      font-weight:500;color:#94A3B8;pointer-events:none;white-space:nowrap;
     }
 
     .bc-btn{
       width:100%;padding:14px;background:#1E2D3D;color:#fff;
-      border:none;border-radius:12px;font-size:15px;font-weight:700;
+      border:none;border-radius:12px;font-size:15px;font-weight:500;
       cursor:pointer;font-family:inherit;margin-top:4px;
     }
     .bc-btn:active{opacity:.85;}
@@ -142,19 +142,19 @@
 
     .bc-rrow{
       display:flex;align-items:baseline;justify-content:space-between;
-      padding:5px 0;border-bottom:1px solid rgba(255,255,255,.1);
+      padding:4px 0;border-bottom:1px solid rgba(255,255,255,.1);
     }
     .bc-rrow:last-child{border-bottom:none;}
     .bc-rlbl{font-size:12px;color:rgba(255,255,255,.6);}
-    .bc-rval{font-size:13px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;}
+    .bc-rval{font-size:13px;font-weight:500;color:#fff;font-variant-numeric:tabular-nums;}
 
     .bc-rmain{
       display:flex;align-items:baseline;justify-content:space-between;
       margin-top:12px;padding-top:12px;
       border-top:1px solid rgba(255,255,255,.25);
     }
-    .bc-rmlbl{font-size:13px;font-weight:700;color:rgba(255,255,255,.8);}
-    .bc-rmval{font-size:24px;font-weight:900;color:#6EE7B7;font-variant-numeric:tabular-nums;}
+    .bc-rmlbl{font-size:13px;font-weight:500;color:rgba(255,255,255,.8);}
+    .bc-rmval{font-size:24px;font-weight:600;color:#6EE7B7;font-variant-numeric:tabular-nums;}
 
     .bc-rnote{
       font-size:11px;color:rgba(255,255,255,.45);
@@ -162,9 +162,9 @@
     }
 
     #bc-reset-btn{
-      display:none;width:100%;padding:11px;
+      display:none;width:100%;padding:12px;
       background:#F1F5F9;color:#64748B;border:none;
-      border-radius:10px;font-size:13px;font-weight:700;
+      border-radius:10px;font-size:13px;font-weight:500;
       cursor:pointer;font-family:inherit;margin-top:10px;
     }
     #bc-reset-btn:active{background:#E2E8F0;}
@@ -172,32 +172,32 @@
     /* 수수료 법령 참조표 */
     .bc-ref-section{margin-top:28px;padding-top:20px;border-top:2px solid #E2E8F0;}
     .bc-ref-title{
-      font-size:14px;font-weight:900;color:#1E2D3D;margin-bottom:14px;
+      font-size:14px;font-weight:600;color:#1E2D3D;margin-bottom:14px;
       display:flex;align-items:center;gap:6px;
     }
     .bc-ref-tbl{
-      width:100%;border-collapse:collapse;font-size:11.5px;
+      width:100%;border-collapse:collapse;font-size:12px;
       border:1.5px solid #CBD5E1;border-radius:10px;
       overflow:hidden;margin-bottom:14px;
     }
     .bc-ref-tbl th{
       background:#064E3B;color:#fff;padding:8px 6px;
-      font-weight:700;text-align:center;font-size:15px;
-      letter-spacing:.3px;border:1px solid #065F46;
+      font-weight:500;text-align:center;font-size:15px;
+      border:1px solid #065F46;
     }
     .bc-ref-tbl th span{font-size:12px;}
     .bc-ref-tbl td{
-      padding:7px 6px;text-align:center;color:#334155;
+      padding:8px 6px;text-align:center;color:#334155;
       border:1px solid #E2E8F0;font-variant-numeric:tabular-nums;
     }
     .bc-ref-tbl .bc-tbl-cat{
-      background:#059669;color:#fff;font-weight:800;
+      background:#059669;color:#fff;font-weight:600;
       font-size:11px;text-align:center;writing-mode:vertical-rl;
       letter-spacing:2px;padding:10px 6px;
       border:1px solid #047857;
     }
     .bc-ref-tbl .bc-tbl-subcat{
-      background:#ECFDF5;color:#065F46;font-weight:700;
+      background:#ECFDF5;color:#065F46;font-weight:500;
       font-size:11px;text-align:center;
     }
     .bc-ref-tbl tbody tr:nth-child(even) td:not(.bc-tbl-cat):not(.bc-tbl-subcat){
@@ -207,12 +207,12 @@
       background:#F0FDF4;
     }
     .bc-ref-tbl .bc-tbl-section-hdr{
-      background:#F1F5F9;font-weight:800;color:#1E2D3D;
-      text-align:center;font-size:11.5px;padding:9px 6px;
+      background:#F1F5F9;font-weight:600;color:#1E2D3D;
+      text-align:center;font-size:12px;padding:8px 6px;
       border:1px solid #CBD5E1;
     }
     .bc-ref-tbl .bc-tbl-note{
-      background:#F8FAFC;color:#64748B;font-size:10.5px;
+      background:#F8FAFC;color:#64748B;font-size:11px;
       text-align:left;padding:8px 10px;line-height:1.6;
     }
     .bc-ref-law{
@@ -220,12 +220,12 @@
       background:linear-gradient(135deg,#064E3B,#047857);
       border-radius:10px;text-align:center;
       text-decoration:none;color:#fff;
-      font-size:12px;font-weight:700;
+      font-size:12px;font-weight:500;
       transition:opacity .15s;
     }
     .bc-ref-law:active{opacity:.8;}
     .bc-ref-law span{
-      display:block;font-size:10.5px;font-weight:400;
+      display:block;font-size:11px;font-weight:400;
       color:rgba(255,255,255,.6);margin-top:4px;
     }
   `;

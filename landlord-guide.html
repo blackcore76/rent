@@ -43,8 +43,8 @@ body {
   background: rgba(240,244,248,0.95);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
-  padding: 14px 20px;
-  display: flex; align-items: center; gap: 10px;
+  padding:14px 20px;
+  display: flex; align-items: center; gap:10px;
 }
 .guide-header .back-btn {
   width: 32px; height: 32px;
@@ -55,35 +55,35 @@ body {
   font-size: 16px;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s;
+  transition:background-color .15s,color .15s,border-color .15s,opacity .15s,transform .15s;
 }
 .guide-header .back-btn:hover { border-color: var(--accent); color: var(--accent); }
 .guide-header h1 {
   font-family: var(--mono);
   font-size: 14px; font-weight: 600;
   color: var(--accent);
-  letter-spacing: 0.5px;
+  
 }
 .guide-header .badge {
   font-family: var(--mono);
-  font-size: 10px; font-weight: 600;
+  font-size:11px; font-weight: 600;
   color: var(--warn);
   background: var(--warn-dim);
-  padding: 2px 8px;
+  padding:2px 8px;
   border-radius: 4px;
-  margin-left: auto;
+  margin-left:auto;
 }
 
 /* ── Container ── */
 .container {
   max-width: 960px;
-  margin: 0 auto;
-  padding: 0 16px 80px;
+  margin:0 auto;
+  padding:0 16px 80px;
 }
 
 /* ── Hero ── */
 .hero {
-  padding: 32px 0 24px;
+  padding:32px 0 24px;
   text-align: center;
 }
 .hero-icon {
@@ -92,12 +92,12 @@ body {
   border: 1px solid rgba(232,145,45,0.25);
   border-radius: 16px;
   display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 16px;
+  margin:0 auto 16px;
   font-size: 26px;
 }
 .hero h2 {
-  font-size: 20px; font-weight: 700;
-  margin-bottom: 8px;
+  font-size: 20px; font-weight:500;
+  margin-bottom:8px;
 }
 .hero p {
   font-size: 13px;
@@ -108,8 +108,8 @@ body {
 /* ── Section Nav ── */
 .section-nav {
   display: flex;
-  gap: 6px;
-  padding: 12px 0 20px;
+  gap:6px;
+  padding:12px 0 20px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -124,9 +124,9 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 6px 12px;
+  padding:6px 12px;
   text-decoration: none;
-  transition: all 0.2s;
+  transition:background-color .15s,color .15s,border-color .15s,opacity .15s,transform .15s;
   white-space: nowrap;
 }
 .section-nav a:hover,
@@ -138,21 +138,21 @@ body {
 
 /* ── Section ── */
 .section {
-  margin-bottom: 28px;
-  scroll-margin-top: 70px;
+  margin-bottom:28px;
+  scroll-margin-top:70px;
 }
 .section-label {
   font-family: var(--mono);
-  font-size: 10px; font-weight: 600;
+  font-size:11px; font-weight: 600;
   color: var(--text-section);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  margin-bottom: 6px;
+  
+  
+  margin-bottom:6px;
 }
 .section-title {
-  font-size: 17px; font-weight: 700;
-  margin-bottom: 14px;
-  display: flex; align-items: center; gap: 8px;
+  font-size: 17px; font-weight:500;
+  margin-bottom:14px;
+  display: flex; align-items: center; gap:8px;
 }
 .section-title .icon { font-size: 18px; }
 
@@ -161,26 +161,26 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 10px;
+  padding:16px;
+  margin-bottom:10px;
   transition: border-color 0.2s;
 }
 .card:hover { border-color: rgba(232,145,45,0.15); }
 .card-title {
-  font-size: 14px; font-weight: 700;
-  margin-bottom: 8px;
-  display: flex; align-items: center; gap: 6px;
+  font-size: 14px; font-weight:500;
+  margin-bottom:8px;
+  display: flex; align-items: center; gap:6px;
 }
 .card p, .card li {
   font-size: 13px;
   color: var(--text-dim);
   line-height: 1.75;
 }
-.card ul { list-style: none; padding: 0; }
+.card ul { list-style: none; padding:0; }
 .card ul li {
   position: relative;
-  padding-left: 16px;
-  margin-bottom: 4px;
+  padding-left:16px;
+  margin-bottom:4px;
 }
 .card ul li::before {
   content: '';
@@ -195,8 +195,8 @@ body {
 /* ── Alert ── */
 .alert {
   border-radius: 10px;
-  padding: 14px 16px;
-  margin-bottom: 10px;
+  padding:14px 16px;
+  margin-bottom:10px;
   font-size: 13px;
   line-height: 1.7;
 }
@@ -222,10 +222,10 @@ body {
 }
 .alert .alert-label {
   font-family: var(--mono);
-  font-size: 10px; font-weight: 700;
-  letter-spacing: 1px;
+  font-size:11px; font-weight:500;
+  
   display: block;
-  margin-bottom: 4px;
+  margin-bottom:4px;
   opacity: 0.8;
 }
 
@@ -233,21 +233,21 @@ body {
 .resp-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap:8px;
+  margin-bottom:10px;
 }
 .resp-col {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 14px;
+  padding:14px;
 }
 .resp-col.owner { border-top: 2px solid var(--warn); }
 .resp-col.renter { border-top: 2px solid #2563eb; }
 .resp-col h4 {
   font-family: var(--mono);
-  font-size: 11px; font-weight: 700;
-  margin-bottom: 8px;
+  font-size: 11px; font-weight:500;
+  margin-bottom:8px;
 }
 .resp-col.owner h4 { color: var(--warn); }
 .resp-col.renter h4 { color: #2563eb; }
@@ -255,18 +255,18 @@ body {
   font-size: 12px;
   color: var(--text-dim);
   line-height: 1.65;
-  margin-bottom: 3px;
-  padding-left: 8px;
+  margin-bottom:4px;
+  padding-left:8px;
 }
 .resp-col ul {
-  padding-left: 10px;
+  padding-left:10px;
 }
 .resp-col li::before { display: none; }
 
 /* ── Timeline ── */
 .timeline {
   position: relative;
-  padding-left: 24px;
+  padding-left:24px;
 }
 .timeline::before {
   content: '';
@@ -278,7 +278,7 @@ body {
 }
 .tl-item {
   position: relative;
-  margin-bottom: 16px;
+  margin-bottom:16px;
 }
 .tl-item::before {
   content: '';
@@ -293,7 +293,7 @@ body {
   font-family: var(--mono);
   font-size: 11px; font-weight: 600;
   color: var(--warn);
-  margin-bottom: 2px;
+  margin-bottom:2px;
 }
 .tl-item p {
   font-size: 13px;
@@ -306,7 +306,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 8px 0;
+  padding:8px 0;
   border-bottom: 1px solid rgba(26,35,54,0.6);
   font-size: 13px;
 }
@@ -315,13 +315,13 @@ body {
 .kv-val { color: var(--text); font-weight: 500; text-align: right; }
 
 /* ── Accordion ── */
-.accordion { margin-bottom: 10px; }
+.accordion { margin-bottom:10px; }
 .accordion-toggle {
   width: 100%;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 14px 16px;
+  padding:14px 16px;
   color: var(--text);
   font-size: 14px; font-weight: 500;
   font-family: var(--sans);
@@ -330,7 +330,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: all 0.2s;
+  transition:background-color .15s,color .15s,border-color .15s,opacity .15s,transform .15s;
 }
 .accordion-toggle:hover { border-color: rgba(232,145,45,0.2); }
 .accordion-toggle .arrow {
@@ -350,7 +350,7 @@ body {
   border: 1px solid var(--border);
   border-top: none;
   border-radius: 0 0 10px 10px;
-  padding: 14px 16px;
+  padding:14px 16px;
   font-size: 13px;
   color: var(--text-dim);
   line-height: 1.75;
@@ -360,9 +360,9 @@ body {
 /* ── Footer ── */
 .guide-footer {
   text-align: center;
-  padding: 24px 0;
+  padding:24px 0;
   border-top: 1px solid var(--border);
-  margin-top: 20px;
+  margin-top:20px;
 }
 .guide-footer p {
   font-size: 11px;
@@ -385,12 +385,12 @@ body {
 .scroll-top:hover{opacity:.85;}
 
 @media (max-width: 480px) {
-  .section-nav { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .section-nav { display: grid; grid-template-columns: 1fr 1fr 1fr; gap:6px; }
   .section-nav a { text-align: center; }
 }
 @media all {
   body.in-iframe .guide-header { display: none; }
-  body.in-iframe .container { padding-top: 0; }
+  body.in-iframe .container { padding-top:0; }
 }
 .ici{display:inline-block;width:1.15em;height:1.15em;vertical-align:-.2em;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 </style>
@@ -410,7 +410,7 @@ body {
   <div class="hero">
     <div class="hero-icon"><svg class=ici><use href=icons.svg#ic-key></use></svg></div>
     <h2>임대인 실무 가이드</h2>
-    <p>계약부터 정산까지, 임대인이 반드시 알아야 할<br>법적 의무·권리·분쟁 대응 체크리스트!!!</p>
+    <p>계약부터 정산까지, 임대인이 반드시 알아야 할<br>법적 의무·권리·분쟁 대응 체크리스트</p>
   </div>
 
   <!-- Section Nav -->
@@ -949,13 +949,13 @@ document.addEventListener('DOMContentLoaded', () => {
 // (임대가이드 탭에서 iframe 자체 푸터 + admin 전체 푸터가 겹치던 문제 방지)
 if (window.self === window.top) {
   const bcScript = document.createElement('script');
-  bcScript.src = 'brokerage-calc.js?v=2';
+  bcScript.src = 'brokerage-calc.js?v=3';
   document.body.appendChild(bcScript);
   const thScript = document.createElement('script');
-  thScript.src = 'tax-helper.js?v=2';
+  thScript.src = 'tax-helper.js?v=3';
   document.body.appendChild(thScript);
   const ftScript = document.createElement('script');
-  ftScript.src = 'footer.js?v=5';
+  ftScript.src = 'footer.js?v=6';
   document.body.appendChild(ftScript);
 } else {
   // admin.html iframe 임베드(임대가이드 탭)에선 부모가 전체 푸터를 그리므로

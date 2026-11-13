@@ -83,7 +83,7 @@ function showContractToasts(alerts){
     const el=document.createElement("div");
     const room=a.bldName?`${a.bldName} ${a.room}호`:`${a.room}호`;
     el.innerHTML=`<svg class=ici><use href=icons.svg#ic-triangle-alert></use></svg> ${esc(room)} · ${esc(a.name)} · D-${a.dl}`;
-    el.style.cssText="background:#e74c3c;color:#fff;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.25);white-space:nowrap;opacity:0;transition:opacity .3s";
+    el.style.cssText="background:#e74c3c;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,.25);white-space:nowrap;opacity:0;transition:opacity .3s";
     wrap.appendChild(el);
     setTimeout(()=>el.style.opacity="1",i*120);
   });
@@ -133,8 +133,8 @@ async function checkPhotoAccess(){
 }
 // 무료 유저 안내 박스 HTML (미가입·만료 공용)
 function photoLockBox(feature){
-  return `<div class="photo-lock" style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:11px;padding:13px 14px;font-size:12.5px;color:#075985;line-height:1.65">`+
-    `<div style="font-weight:800;margin-bottom:3px"><svg class=ici><use href=icons.svg#ic-lock></use></svg> ${feature||"사진"}은 <b>Plus 기능</b>이에요</div>`+
+  return `<div class="photo-lock" style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:11px;padding:12px 14px;font-size:13px;color:#075985;line-height:1.65">`+
+    `<div style="font-weight:600;margin-bottom:4px"><svg class=ici><use href=icons.svg#ic-lock></use></svg> ${feature||"사진"}은 <b>Plus 기능</b>이에요</div>`+
     `사진 업로드·보기·다운로드는 유료(Plus) 기능이에요. 기존에 올린 사진은 <b>재구독 시 그대로 복원</b>돼요. 이용 문의는 관리자에게.</div>`;
 }
 
@@ -170,7 +170,7 @@ function toggleMenu(){
       const btn=document.createElement("a");
       btn.id="um-admin-btn";
       btn.href="master/admin.html";
-      btn.style.cssText="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:9px;margin-bottom:8px;background:rgba(245,158,11,.12);border:1.5px solid rgba(245,158,11,.4);border-radius:10px;color:#D97706;font-size:13px;font-weight:700;text-decoration:none;font-family:inherit;box-sizing:border-box;";
+      btn.style.cssText="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px;margin-bottom:8px;background:rgba(245,158,11,.12);border:1.5px solid rgba(245,158,11,.4);border-radius:10px;color:#D97706;font-size:13px;font-weight:500;text-decoration:none;font-family:inherit;box-sizing:border-box;";
       btn.innerHTML="<svg class=ici><use href=icons.svg#ic-wrench></use></svg> <span>관리자 페이지</span>";
       const logout=el.querySelector(".logout-btn");
       if(logout)el.insertBefore(btn,logout);else el.appendChild(btn);
