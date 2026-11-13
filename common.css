@@ -122,3 +122,12 @@ body .view-tabs,body .sub-tabs{box-shadow:none;border:1px solid rgba(15,23,42,.0
 body .view-tab,body .sub-tab{font-weight:500}
 body .empty-st .ei{font-size:40px;color:var(--hint)}
 body .btn-exp,body .export-btn{border:1px solid var(--border);font-weight:500}
+
+/* ── 이지모드: 같은 디자인 체계의 어두운 테마 (큰 글씨 · 골드 강조 · 상태색 톤다운) ── */
+body.em-on{--bg:#0F141B;--em-card:#18202A;--em-raised:#212B37;--em-line:rgba(255,255,255,.08);--em-text:#E8ECF1;--em-sub:#A3ADBA;--em-hint:#7A8596;--em-gold:#F59E0B;--em-pos:#4CC38A;--em-neg:#E5484D;--em-warn:#E5B33A;background:var(--bg)}
+html:has(body.em-on){background:#0F141B}
+body.em-on .hdr{border-bottom:2px solid var(--em-gold)}
+body.em-on .hdr-actions::before{content:'이지모드';font-size:12px;font-weight:500;line-height:16px;color:#1E2D3D;background:var(--em-gold);border-radius:6px;padding:4px 8px;white-space:nowrap}
+body.em-on #demo-banner{background:#141B24 !important;border-bottom-color:var(--em-line) !important}
+body.em-on #demo-banner span{color:var(--em-sub) !important}
+body.em-on #demo-banner button{background:transparent !important;border-color:rgba(255,255,255,.2) !important;color:var(--em-text) !important}

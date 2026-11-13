@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://rent-4d521-default-rtdb.firebaseio.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="common.css?v=6">
+<link rel="stylesheet" href="common.css?v=7">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -158,9 +158,9 @@ body.em-on .toolbar input[type=month]::-webkit-calendar-picker-indicator{filter:
 .suji-empty{text-align:center;padding:20px 10px;color:var(--hint);font-size:13px}
 /* 이지모드 사이드 버튼 → easymode-side.js */
 .won-sfx{font-size:.7em;font-weight:600;margin-left:1px;}
-body.em-on .kpi{background:#1E2D3D;border:1px solid rgba(255,255,255,.06);box-shadow:none}
+body.em-on .kpi{background:var(--em-card);border:1px solid var(--em-line);box-shadow:none}
 body.em-on .kpi-lbl{color:rgba(255,255,255,.4)}
-body.em-on .pie-section{background:#1E2D3D;border:1px solid rgba(255,255,255,.06);box-shadow:none}
+body.em-on .pie-section{background:var(--em-card);border:1px solid var(--em-line);box-shadow:none}
 body.em-on .pie-hd-title{color:rgba(255,255,255,.9)}
 body.em-on .pie-tog{border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.4)}
 body.em-on .suji-bar-wrap{background:rgba(255,255,255,.08)}
@@ -168,28 +168,44 @@ body.em-on .suji-lbl{color:rgba(255,255,255,.6)}
 body.em-on .suji-net{border-top-color:rgba(255,255,255,.1);color:rgba(255,255,255,.85)}
 body.em-on .suji-pct{color:rgba(255,255,255,.35)}
 body.em-on .suji-empty{color:rgba(255,255,255,.3)}
-body.em-on .view-tabs{background:#1E2D3D;border:1px solid rgba(255,255,255,.06);box-shadow:none}
+body.em-on .view-tabs{background:var(--em-card);border:1px solid var(--em-line);box-shadow:none}
 body.em-on .view-tab{color:rgba(255,255,255,.5);background:transparent}
-body.em-on .view-tab.active{background:var(--gold);color:#000}
-body.em-on #filter-month,body.em-on #filter-year{background:#0e1422;border-color:#1e2d45;color:#c8d6e8}
-body.em-on .btn-exp{background:#0e1422;border-color:#1e2d45;color:#7a91a8}
-body.em-on .card{background:#1E2D3D;border:1px solid rgba(255,255,255,.06);box-shadow:none}
+body.em-on .view-tab.active{background:var(--em-gold);color:#1E2D3D}
+body.em-on #filter-month,body.em-on #filter-year{background:var(--em-raised);border-color:var(--em-line);color:var(--em-text)}
+body.em-on .btn-exp{background:var(--em-raised);border-color:var(--em-line);color:var(--em-sub)}
+body.em-on .card{background:var(--em-card);border:1px solid var(--em-line);box-shadow:none}
 body.em-on .tx-item{border-bottom-color:rgba(255,255,255,.07)}
-body.em-on .tx-icon.income{background:rgba(0,230,118,.12)}
-body.em-on .tx-icon.expense{background:rgba(255,82,82,.12)}
+body.em-on .tx-icon.income{background:rgba(76,195,138,.14)}
+body.em-on .tx-icon.expense{background:rgba(229,72,77,.14)}
 body.em-on .tx-cat{color:rgba(255,255,255,.55)}
 body.em-on .tx-date{color:rgba(255,255,255,.3)}
 body.em-on .tx-memo{color:rgba(255,255,255,.85)}
-body.em-on .tx-amt.income{color:#00e676}
-body.em-on .tx-amt.expense{color:#ff5252}
-body.em-on .tx-auto-badge{background:rgba(0,230,118,.12);color:#00e676}
-body.em-on .tx-item.auto-rent{background:rgba(0,230,118,.04);border-left-color:#00e676}
-body.em-on .tx-edit{background:rgba(59,130,246,.12);color:#60a5fa}
-body.em-on .tx-del{background:rgba(255,82,82,.12);color:#ff5252}
-body.em-on .page-btn{background:#0e1422;border-color:#1e2d45}
-body.em-on .page-info{color:#7a91a8}
+body.em-on .tx-amt.income{color:var(--em-pos)}
+body.em-on .tx-amt.expense{color:var(--em-neg)}
+body.em-on .tx-auto-badge{background:rgba(76,195,138,.14);color:var(--em-pos)}
+body.em-on .tx-item.auto-rent{background:transparent;border-left-color:var(--em-pos)}
+body.em-on .tx-edit{background:transparent;color:var(--em-hint)}
+body.em-on .tx-del{background:rgba(229,72,77,.14);color:var(--em-neg)}
+body.em-on .page-btn{background:var(--em-raised);border-color:var(--em-line);color:var(--em-sub)}
+body.em-on .page-info{color:var(--em-sub)}
 body.em-on .empty-st{color:rgba(255,255,255,.3)}
-body.em-on .fab{background:#1e2d45;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+body.em-on .fab{background:var(--em-gold);color:#1E2D3D;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+body.em-on .kpi-val{font-size:clamp(13px,4.2vw,18px)}
+body.em-on .kpi.net .kpi-val{color:var(--em-text)}
+body.em-on .kpi.income .kpi-val{color:var(--em-pos)}
+body.em-on .kpi.expense .kpi-val{color:var(--em-neg)}
+body.em-on .kpi-lbl{font-size:13px;color:var(--em-sub)}
+body.em-on .pie-hd-title{font-size:16px}
+body.em-on .suji-in{background:var(--em-pos)}
+body.em-on .suji-ex{background:var(--em-neg)}
+body.em-on .tx-cat{font-size:13px}
+body.em-on .tx-memo{font-size:14px}
+body.em-on .tx-amt{font-size:16px}
+body.em-on .tx-date{font-size:13px}
+body.em-on .tx-icon.income,body.em-on .tx-icon.expense{background:rgba(255,255,255,.06);color:var(--em-sub)}
+body.em-on .tx-item.auto-rent{border-left:none}
+body.em-on .tx-del{background:transparent;color:var(--em-hint)}
+body.em-on .tx-auto-badge{background:rgba(255,255,255,.06);color:var(--em-sub)}
 .view-tab .ic{margin:-4px 0}
 
 /* ── 메인 디자인 기준 (unslop) ── */

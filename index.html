@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://rent-4d521-default-rtdb.firebaseio.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="common.css?v=6">
+<link rel="stylesheet" href="common.css?v=7">
 <style>
 body{overflow-x:hidden}
 /* 로그인 모달: 불투명 그라데이션 대신 뒤에 데모 대시보드가 살짝 비치도록(약 70~80%) */
@@ -135,42 +135,49 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
 .fr-cta:active{background:#D97706}
 .fr-foot{text-align:center;font-size:12px;color:rgba(255,255,255,.45);margin-top:12px}
 
-/* ── 이지모드 ── */
-#em-view{background:var(--bg);min-height:100vh;margin-top:91px;padding:14px 12px 40px;}
-.em-bld-name-box{text-align:center;font-size:24px;font-weight:600;color:#fff;background:#1a2332;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;margin-bottom:18px;}
-.em-section-lbl{text-align:center;font-size:18px;font-weight:500;color:rgba(255,255,255,.85);margin:16px 0 10px;position:relative;}
-.em-section-lbl::before,.em-section-lbl::after{content:'';position:absolute;top:50%;width:35%;height:1px;background:rgba(255,255,255,.12);}
+/* ── 이지모드 (어두운 테마, 토큰은 common.css body.em-on) ── */
+#em-view{background:transparent;min-height:100vh;margin-top:91px;padding:16px 12px 48px}
+body:has(#demo-banner) #em-view{margin-top:136px}
+.em-mode-hd{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:4px 4px 16px 24px}
+.em-mode-title{font-size:20px;font-weight:600;color:var(--em-text)}
+.em-mode-sub{font-size:13px;color:var(--em-hint);font-variant-numeric:tabular-nums}
+.em-bld-block{background:var(--em-card);border:1px solid var(--em-line);border-radius:16px;padding:16px 12px 20px;margin-bottom:16px}
+.em-bld-name-box{font-size:22px;font-weight:600;line-height:28px;color:var(--em-text);text-align:center;padding:4px 0 16px;margin-bottom:4px;border-bottom:1px solid var(--em-line)}
+.em-section-lbl{text-align:center;font-size:15px;font-weight:500;color:var(--em-sub);margin:20px 0 12px;position:relative}
+.em-section-lbl::before,.em-section-lbl::after{content:'';position:absolute;top:50%;width:32%;height:1px;background:var(--em-line)}
 .em-section-lbl::before{left:0}.em-section-lbl::after{right:0}
-.em-bld-block{background:#1E2D3D;border-radius:16px;padding:14px 12px;margin-bottom:20px;border:1px solid rgba(255,255,255,.06);}
-.em-chips-grid,.em-floor-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:6px;}
-.em-chip-v{flex:0 0 calc(25% - 7px);background:rgba(234,179,8,.08);border:1.5px solid rgba(234,179,8,.55);color:#fde047;border-radius:10px;padding:8px 4px;text-align:center;font-size:12px;font-weight:500;cursor:pointer;line-height:1.4;}
-.em-chip-u{flex:0 0 calc(25% - 7px);background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.55);color:#fca5a5;border-radius:10px;padding:8px 4px;text-align:center;font-size:12px;font-weight:500;cursor:pointer;line-height:1.4;}
-.em-chip-ok{flex:0 0 calc(25% - 7px);background:rgba(34,197,94,.08);border:1.5px solid rgba(34,197,94,.55);color:#86efac;border-radius:10px;padding:8px 4px;text-align:center;font-size:12px;font-weight:500;cursor:pointer;line-height:1.4;}
-.em-chip-p{flex:0 0 calc(25% - 7px);background:rgba(239,68,68,.08);border:1.5px solid rgba(239,68,68,.55);color:#fca5a5;border-radius:10px;padding:8px 4px;text-align:center;font-size:12px;font-weight:500;cursor:pointer;line-height:1.4;}
-.em-card{background:#202c3e;border-radius:16px;padding:14px;border:2px solid transparent;cursor:pointer;transition:opacity .15s;}
-.em-card:active{opacity:.75;}
-.em-card.rented{border-color:rgba(34,197,94,.65);}
-.em-card.vacant{border-color:rgba(234,179,8,.65);}
-.em-card.unpaid{border-color:rgba(239,68,68,.65);}
-.em-card.partial{border-color:rgba(245,158,11,.65);}
-.em-card-hd{font-size:13px;font-weight:600;color:#e2e8f0;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);}
-.em-tenant-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
-.em-name{font-size:14px;font-weight:500;color:#f1f5f9;}
-.em-phone{font-size:12px;color:#94a3b8;}
-.em-rent{font-size:14px;font-weight:500;color:#f1f5f9;font-variant-numeric:tabular-nums;margin-top:6px;}
-.em-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
-.em-dday{font-size:12px;color:#94a3b8;}
-.em-pay{font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;}
-.em-pay.paid{background:rgba(34,197,94,.15);color:#86efac;}
-.em-pay.partial{background:rgba(245,158,11,.15);color:#fcd34d;}
-.em-pay.unpaid{background:rgba(239,68,68,.15);color:#fca5a5;}
-.em-pay.none{background:rgba(100,116,139,.15);color:#94a3b8;}
+.em-chips-grid,.em-floor-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:4px}
+.em-chip-v,.em-chip-u,.em-chip-ok,.em-chip-p{flex:0 0 calc(25% - 6px);border-radius:10px;padding:8px 4px;text-align:center;font-size:14px;font-weight:500;line-height:20px;cursor:pointer;border:1px solid;font-variant-numeric:tabular-nums;transition:background-color .15s,transform .15s}
+.em-chip-v:active,.em-chip-u:active,.em-chip-ok:active,.em-chip-p:active{transform:scale(.96)}
+.em-chip-v{background:rgba(229,179,58,.12);border-color:rgba(229,179,58,.45);color:#F2CD6B}
+.em-chip-u,.em-chip-p{background:rgba(229,72,77,.12);border-color:rgba(229,72,77,.45);color:#FF9A9D}
+.em-chip-ok{background:rgba(76,195,138,.08);border-color:rgba(76,195,138,.3);color:#8FDDB5}
+.em-card{background:var(--em-raised);border-radius:12px;padding:16px;border:1px solid var(--em-line);cursor:pointer;transition:opacity .15s}
+.em-card:active{opacity:.75}
+.em-card.rented{border-color:rgba(76,195,138,.4)}
+.em-card.vacant{border-color:rgba(229,179,58,.45)}
+.em-card.unpaid{border-color:rgba(229,72,77,.45)}
+.em-card.partial{border-color:rgba(229,179,58,.45)}
+.em-card-hd{font-size:14px;font-weight:600;color:var(--em-text);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--em-line)}
+.em-tenant-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.em-name{font-size:15px;font-weight:500;color:var(--em-text)}
+.em-phone{font-size:13px;color:var(--em-sub);font-variant-numeric:tabular-nums}
+.em-rent{font-size:15px;font-weight:500;color:var(--em-text);margin-top:8px;font-variant-numeric:tabular-nums}
+.em-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.em-dday{font-size:13px;color:var(--em-sub)}
+.em-pay{font-size:12px;font-weight:500;padding:2px 8px;border-radius:6px}
+.em-pay.paid{background:rgba(76,195,138,.14);color:#8FDDB5}
+.em-pay.partial{background:rgba(229,179,58,.14);color:#F2CD6B}
+.em-pay.unpaid{background:rgba(229,72,77,.14);color:#FF9A9D}
+.em-pay.none{background:rgba(255,255,255,.06);color:var(--em-sub)}
+/* 이지모드에서 건물 정보 카드(열쇠표)는 배경과 같은 계열의 한 단계 밝은 면 */
+body.em-on .bld-tag{background:var(--em-card);border:1px solid var(--em-line)}
 /* 이지모드 사이드 버튼 → easymode-side.js */
 /* 이지모드 범례 푸터 */
-#em-legend{display:none;position:fixed;bottom:0;left:0;right:0;z-index:150;height:28px;background:rgba(17,24,39,.95);border-top:1px solid rgba(255,255,255,.12);backdrop-filter:blur(8px);align-items:center;justify-content:center;gap:16px;}
+#em-legend{display:none;position:fixed;bottom:0;left:0;right:0;z-index:150;height:32px;background:#141B24;border-top:1px solid rgba(255,255,255,.08);align-items:center;justify-content:center;gap:16px;}
 #em-legend.show{display:flex;}
-.em-leg{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:500;color:rgba(255,255,255,.7);}
-.em-leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.em-leg{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:500;color:#A3ADBA;}
+.em-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 /* ── 이지모드 유닛 상세 모달 ── */
 #eu-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600}
 #eu-overlay.show{display:block}
@@ -396,9 +403,9 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
 
   <!-- 이지모드 범례 푸터 -->
   <div id="em-legend">
-    <span class="em-leg"><span class="em-leg-dot" style="background:#86efac"></span>임대중</span>
-    <span class="em-leg"><span class="em-leg-dot" style="background:#ef4444"></span>미납/부분납</span>
-    <span class="em-leg"><span class="em-leg-dot" style="background:#fde047"></span>공실</span>
+    <span class="em-leg"><span class="em-leg-dot" style="background:#4CC38A"></span>완납</span>
+    <span class="em-leg"><span class="em-leg-dot" style="background:#E5484D"></span>미납·부분납</span>
+    <span class="em-leg"><span class="em-leg-dot" style="background:#E5B33A"></span>공실</span>
   </div>
 </div>
 
@@ -973,6 +980,7 @@ function toggleEasyMode() {
   sBtn.classList.toggle('on', emOn);
   sTxt.textContent = emOn ? '일반모드' : '이지모드';
   document.getElementById('em-legend').classList.toggle('show', emOn);
+  document.body.classList.toggle('em-on', emOn);
   document.querySelectorAll('.nav-tab').forEach(tab => {
     const href = tab.getAttribute('href') || '';
     if (href.includes('units') || href.includes('admin'))
@@ -1065,7 +1073,9 @@ function renderEasyMode() {
     </div>`;
   });
 
-  el.innerHTML = html || '<div style="color:rgba(255,255,255,.3);text-align:center;padding:60px 20px;">등록된 세대가 없습니다</div>';
+  const _now=new Date();
+  const modeHd=`<div class="em-mode-hd"><span class="em-mode-title">한눈에 보기</span><span class="em-mode-sub">${_now.getFullYear()}년 ${_now.getMonth()+1}월 납부 기준</span></div>`;
+  el.innerHTML = html ? modeHd+html : '<div style="color:#7A8596;text-align:center;padding:64px 20px;">등록된 세대 없음</div>';
 
   // 건물정보 카드 동기화
   const emBldEl = document.getElementById('em-buildings-wrap');
