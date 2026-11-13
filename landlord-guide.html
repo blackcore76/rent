@@ -949,10 +949,10 @@ document.addEventListener('DOMContentLoaded', () => {
 // (임대가이드 탭에서 iframe 자체 푸터 + admin 전체 푸터가 겹치던 문제 방지)
 if (window.self === window.top) {
   const bcScript = document.createElement('script');
-  bcScript.src = 'brokerage-calc.js';
+  bcScript.src = 'brokerage-calc.js?v=2';
   document.body.appendChild(bcScript);
   const thScript = document.createElement('script');
-  thScript.src = 'tax-helper.js';
+  thScript.src = 'tax-helper.js?v=2';
   document.body.appendChild(thScript);
   const ftScript = document.createElement('script');
   ftScript.src = 'footer.js?v=5';

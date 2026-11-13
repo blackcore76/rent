@@ -10,12 +10,12 @@
     #lg-side-btn{
       position:fixed;left:-52px;bottom:360px;z-index:500;
       width:80px;padding:16px 6px 16px 8px;
-      background:rgba(37,99,235,.85);
-      border:1.5px solid rgba(37,99,235,.85);border-left:none;
+      background:#1E2D3D;
+      border:1px solid rgba(255,255,255,.12);border-left:none;
       border-radius:0 16px 16px 0;
       cursor:pointer;
       transition:left .28s cubic-bezier(.4,0,.2,1);
-      box-shadow:2px 2px 12px rgba(0,0,0,.35);
+      box-shadow:0 2px 8px rgba(15,23,42,.16);
       display:flex;align-items:center;justify-content:flex-end;
       user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;
     }
@@ -23,7 +23,7 @@
     @media(hover:hover){#lg-side-btn:hover{left:0;justify-content:center;}}
 
     #lg-stxt,#lg-stxt-hid{
-      writing-mode:vertical-rl;font-weight:900;color:#fff;
+      writing-mode:vertical-rl;font-weight:500;color:#fff;
       font-family:'Noto Sans KR',sans-serif;
     }
     #lg-stxt{font-size:12px;letter-spacing:2px;display:none;}
@@ -43,8 +43,8 @@
       pointer-events:none;display:none;
       animation:lgPulse 1.5s ease-in-out infinite;
     }
-    #lg-side-btn.peeking #lg-side-ring{display:block;}
-    @media(hover:hover){#lg-side-btn:hover #lg-side-ring{display:block;}}
+    #lg-side-btn.peeking #lg-side-ring{display:none;}
+    @media(hover:hover){#lg-side-btn:hover #lg-side-ring{display:none;}}
     @keyframes lgPulse{
       0%,100%{transform:scale(1);opacity:.6;}
       50%{transform:scale(1.18);opacity:1;}

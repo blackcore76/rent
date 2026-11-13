@@ -11,18 +11,18 @@
   s.textContent = `
     /* 좌측 상단 엣지 부착 — 기존 사이드 탭(세금/수수료 등)과 동일한 peek 방식.
        대기: left:-52px(28px만 삐죽) · 펼침(.peeking/hover): left:0 */
-    #apply-side-btn{position:fixed;left:-52px;top:150px;z-index:7100;width:80px;padding:16px 8px 16px 6px;background:linear-gradient(135deg,#0EA5E9,#0284C7);border:1.5px solid #0EA5E9;border-left:none;border-radius:0 16px 16px 0;cursor:pointer;transition:left .28s cubic-bezier(.4,0,.2,1);box-shadow:2px 2px 12px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:flex-end;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+    #apply-side-btn{position:fixed;left:-52px;top:150px;z-index:7100;width:80px;padding:16px 8px 16px 6px;background:#1E2D3D;border:1px solid rgba(255,255,255,.12);border-left:none;border-radius:0 16px 16px 0;cursor:pointer;transition:left .28s cubic-bezier(.4,0,.2,1);box-shadow:0 2px 8px rgba(15,23,42,.16);display:flex;align-items:center;justify-content:flex-end;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
     #apply-side-btn.peeking{left:0;justify-content:center}
     @media(hover:hover){#apply-side-btn:hover{left:0;justify-content:center}}
-    #apply-stxt,#apply-stxt-hid{writing-mode:vertical-rl;font-weight:900;color:#fff;font-family:'Noto Sans KR',sans-serif}
+    #apply-stxt,#apply-stxt-hid{writing-mode:vertical-rl;font-weight:500;color:#fff;font-family:'Noto Sans KR',sans-serif}
     #apply-stxt{font-size:12px;letter-spacing:2px;display:none}
     #apply-stxt-hid{font-size:11px;letter-spacing:2px}
     #apply-side-btn.peeking #apply-stxt{display:inline}
     #apply-side-btn.peeking #apply-stxt-hid{display:none}
     @media(hover:hover){#apply-side-btn:hover #apply-stxt{display:inline}#apply-side-btn:hover #apply-stxt-hid{display:none}}
     #apply-side-ring{position:absolute;left:50%;top:50%;width:32px;height:32px;margin-left:-16px;margin-top:-16px;border:2px solid rgba(255,255,255,.7);border-radius:50%;pointer-events:none;display:none;animation:applyPulse 1.5s ease-in-out infinite}
-    #apply-side-btn.peeking #apply-side-ring{display:block}
-    @media(hover:hover){#apply-side-btn:hover #apply-side-ring{display:block}}
+    #apply-side-btn.peeking #apply-side-ring{display:none}
+    @media(hover:hover){#apply-side-btn:hover #apply-side-ring{display:none}}
     @keyframes applyPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.18);opacity:1}}
 
     #apply-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:7200;align-items:center;justify-content:center;padding:18px;overflow-y:auto}
@@ -44,7 +44,7 @@
     .apply-step .t .sub{font-size:11.5px;color:#94A3B8}
     .apply-note{background:#F0F9FF;border:1px solid #BAE6FD;border-radius:11px;padding:12px 13px;font-size:12px;color:#075985;line-height:1.65;margin-bottom:16px}
     .apply-note b{color:#0C4A6E}
-    .apply-cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;padding:14px;background:linear-gradient(135deg,#0EA5E9,#0284C7);color:#fff;font-size:14px;font-weight:900;border:none;border-radius:12px;cursor:pointer;font-family:inherit}
+    .apply-cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;padding:14px;background:#1E2D3D;color:#fff;font-size:14px;font-weight:900;border:none;border-radius:12px;cursor:pointer;font-family:inherit}
     .apply-cta:active{filter:brightness(.94)}
     .apply-later{display:block;width:100%;margin-top:9px;padding:11px;background:transparent;border:none;color:#94A3B8;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
     .apply-foot{text-align:center;font-size:10.5px;color:#94A3B8;margin-top:12px;line-height:1.6}

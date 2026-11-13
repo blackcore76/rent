@@ -13,28 +13,28 @@
     #em-side-btn{
       position:fixed;left:-52px;bottom:200px;z-index:500;
       width:80px;padding:16px 6px 16px 8px;
-      background:rgba(255,202,40,.8);
-      border:1.5px solid rgba(255,202,40,.8);border-left:none;
+      background:#1E2D3D;
+      border:1px solid rgba(255,255,255,.12);border-left:none;
       border-radius:0 16px 16px 0;
       cursor:pointer;
       transition:left .28s cubic-bezier(.4,0,.2,1);
-      box-shadow:2px 2px 12px rgba(0,0,0,.35);
+      box-shadow:0 2px 8px rgba(15,23,42,.16);
       display:flex;align-items:center;justify-content:flex-end;
       user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;
     }
     #em-side-btn.peeking{left:0;justify-content:center;}
     @media(hover:hover){#em-side-btn:hover{left:0;justify-content:center;}}
-    #em-side-btn.on{background:rgba(255,202,40,.8);}
+    #em-side-btn.on{background:#F59E0B;border-color:#F59E0B;}
 
     #em-side-txt,#em-side-txt-hidden{
-      writing-mode:vertical-rl;font-weight:900;color:#000;
+      writing-mode:vertical-rl;font-weight:500;color:#fff;
       font-family:'Noto Sans KR',sans-serif;
     }
     #em-side-txt{font-size:13px;letter-spacing:3px;display:none;}
     #em-side-txt-hidden{font-size:11px;letter-spacing:2px;}
 
     #em-side-btn.on #em-side-txt,
-    #em-side-btn.on #em-side-txt-hidden{color:#fff;}
+    #em-side-btn.on #em-side-txt-hidden{color:#1E2D3D;}
 
     #em-side-btn.peeking #em-side-txt{display:inline;}
     #em-side-btn.peeking #em-side-txt-hidden{display:none;}
@@ -50,8 +50,8 @@
       pointer-events:none;display:none;
       animation:emRingPulse 1.5s ease-in-out infinite;
     }
-    #em-side-btn.peeking #em-side-ring{display:block;}
-    @media(hover:hover){#em-side-btn:hover #em-side-ring{display:block;}}
+    #em-side-btn.peeking #em-side-ring{display:none;}
+    @media(hover:hover){#em-side-btn:hover #em-side-ring{display:none;}}
     #em-side-btn.on #em-side-ring{border-color:rgba(255,255,255,.75);}
     @keyframes emRingPulse{
       0%,100%{transform:scale(1);opacity:.6;}

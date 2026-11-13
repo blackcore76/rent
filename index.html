@@ -9,14 +9,14 @@
 <link rel="icon" href="favicon.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
-<title>🏠 PlusHome 세상 편한 임대관리</title>
+<title>PlusHome 세상 편한 임대관리</title>
 <meta name="description" content="임대 현황, 월세 납부, 계약 만료를 한눈에 관리하는 PlusHome — 설치되는 웹앱(PWA)으로 어디서든 바로 사용하세요.">
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://rent-4d521-default-rtdb.firebaseio.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="common.css?v=3">
+<link rel="stylesheet" href="common.css?v=4">
 <style>
 body{overflow-x:hidden}
 /* 로그인 모달: 불투명 그라데이션 대신 뒤에 데모 대시보드가 살짝 비치도록(약 70~80%) */
@@ -29,91 +29,111 @@ body{overflow-x:hidden}
    헤더 바로 밑으로 붙어버림 → 배경 모드일 땐 푸터를 숨겨서 방지 */
 body:has(#app.app-backdrop) .ph-footer{display:none}
 .login-privacy{background:rgba(15,28,45,.85)}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
-.kpi{background:var(--card);border-radius:12px;padding:12px 4px;text-align:center;box-shadow:var(--shadow);cursor:pointer;transition:transform .12s,box-shadow .12s}
-.kpi:active{transform:scale(.95);box-shadow:0 1px 4px rgba(0,0,0,.08)}
-.kpi-val{font-size:22px;font-weight:900;line-height:1;margin-bottom:3px}
-.kpi-lbl{font-size:10px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.3px}
-.kpi.total .kpi-val{color:var(--text)}
-.kpi.rented .kpi-val{color:var(--blue)}
-.kpi.vacant .kpi-val{color:var(--indigo)}
+/* ── 메인 대시보드 (unslop 폴리시: 4px 격자 · 중립 표면 · 강조색은 미납 빨강 하나) ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.kpi{background:var(--card);border:1px solid rgba(15,23,42,.06);border-radius:12px;padding:12px 4px;text-align:center;cursor:pointer;transition:background-color .15s cubic-bezier(.2,0,0,1),transform .15s cubic-bezier(.2,0,0,1)}
+.kpi:active{transform:scale(.97);background:#F8FAFC}
+.kpi-val{font-size:24px;font-weight:600;line-height:28px;color:var(--text);font-variant-numeric:tabular-nums}
+.kpi-lbl{font-size:12px;font-weight:500;line-height:16px;color:var(--sub);margin-top:4px}
 .kpi.unpaid .kpi-val{color:var(--red)}
-.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
-.card-hd{font-size:13px;font-weight:700;color:var(--hdr2);margin-bottom:12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);padding-bottom:10px}
-.status-row{display:flex;flex-direction:column;align-items:stretch;padding:10px 4px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:8px;transition:background .12s;overflow:hidden}
-.status-row:last-child{border-bottom:none}
-.status-row:active{background:#F0F4F8}
-.sr-top{display:flex;align-items:center;gap:6px;width:100%;overflow:hidden}
-.sr-sub{font-size:12px;font-weight:600;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;padding-top:5px}
-.sr-sub.sr-amt-row{display:flex;justify-content:space-between;align-items:baseline;gap:18px;overflow:visible}
+.kpi.unpaid.zero .kpi-val{color:var(--text)}
+.card{background:var(--card);border:1px solid rgba(15,23,42,.06);border-radius:16px;padding:16px;margin-bottom:12px;overflow:hidden}
+.card-hd{font-size:15px;font-weight:600;line-height:20px;color:var(--text);display:flex;align-items:center;gap:8px;padding-bottom:12px;margin-bottom:4px;border-bottom:1px solid var(--border)}
+.card-hd .ici{color:var(--hint)}
+.card-meta{font-size:12px;font-weight:400;color:var(--hint)}
+/* 시그니처: 상태 점 (미납 빨강 · 공실 노랑 · 만기 주황) */
+.st-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+.st-unpaid{background:var(--red)}
+.st-vacant{background:#EAB308}
+.st-expiry{background:var(--amber)}
+.status-row,.expiry-row{display:flex;flex-direction:column;align-items:stretch;padding:12px 4px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:8px;transition:background-color .15s cubic-bezier(.2,0,0,1);overflow:hidden}
+.status-row:last-child,.expiry-row:last-child{border-bottom:none}
+.status-row:active,.expiry-row:active{background:#F1F5F9}
+@media(hover:hover){.status-row:hover,.expiry-row:hover{background:#F8FAFC}}
+.sr-top{display:flex;align-items:center;gap:4px;width:100%;overflow:hidden}
+.sr-sub{font-size:13px;font-weight:400;line-height:20px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;padding-top:4px}
+.sr-sub.sr-amt-row{display:flex;justify-content:space-between;align-items:baseline;gap:16px;overflow:visible}
 .sr-sub.sr-amt-row .sr-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sr-sub.sr-amt-row .sr-amt{flex-shrink:0;white-space:nowrap;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
-.sr-sub.sr-name-memo{display:flex;align-items:baseline;gap:14px;overflow:visible}
+.sr-sub.sr-amt-row .sr-amt{flex-shrink:0;white-space:nowrap;font-weight:500;color:var(--text);font-variant-numeric:tabular-nums}
+.sr-sub.sr-name-memo{display:flex;align-items:baseline;gap:12px;overflow:visible}
 .sr-sub.sr-name-memo .sr-name{flex-shrink:0;white-space:nowrap}
-.sr-sub.sr-name-memo .sr-memo{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--sub)}
-.sr-arrow{margin-left:auto;flex-shrink:0;font-size:14px;color:var(--hint)}
-.room-num{font-size:14px;font-weight:800;color:var(--hdr);min-width:40px;flex-shrink:0}
-.badge{display:inline-block;padding:3px 7px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap}
-.badge-vacant{background:var(--red-lt);color:var(--red-t)}
+.sr-sub.sr-name-memo .sr-memo{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--hint)}
+.sr-arrow{margin-left:auto;flex-shrink:0;font-size:16px;color:var(--hint)}
+.sr-dl{font-size:12px;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums;margin-left:4px}
+.room-num{font-size:15px;font-weight:600;color:var(--text);min-width:48px;flex-shrink:0;font-variant-numeric:tabular-nums;margin-right:4px}
+/* 배지: 정보는 회색, 상태(미납·부분납·공실)만 색 */
+.badge{display:inline-block;padding:2px 6px;border-radius:6px;font-size:12px;font-weight:500;line-height:16px;white-space:nowrap;background:#F1F5F9;color:var(--sub)}
 .badge-unpaid{background:var(--red-lt);color:var(--red-t)}
-.badge-warning{background:var(--amber-lt);color:var(--amber-t)}
-.badge-oneroom{background:#FEF3C7;color:#92400E}
-.badge-twobay{background:#F3E8FF;color:#6B21A8}
-.badge-tworoom{background:#CCFBF1;color:#0F766E}
-.badge-threeroom{background:#EEF2FF;color:#3730A3}
-.badge-monthly{background:#FFF7ED;color:#C2410C}
-.badge-jeonse{background:#EDE9FE;color:#5B21B6}
+.badge-partial{background:var(--amber-lt);color:var(--amber-t)}
+.badge-vacant{background:#FEF9C3;color:#854D0E}
+.badge-warning,.badge-oneroom,.badge-twobay,.badge-tworoom,.badge-threeroom,.badge-monthly,.badge-jeonse{background:#F1F5F9;color:var(--sub)}
 /* NOTES */
-.note-input-row{display:flex;gap:8px;margin-bottom:12px}
-.note-ta{flex:1;border:2px solid var(--border);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;resize:none;outline:none;color:var(--text);background:#FAFCFF}
-.note-ta:focus{border-color:var(--sky)}
-.btn-add{background:var(--hdr);color:#fff;border:none;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.note-input-row{display:flex;gap:8px;margin:12px 0}
+.note-ta{flex:1;border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:14px;line-height:20px;font-family:inherit;resize:none;outline:none;color:var(--text);background:#fff;transition:border-color .15s,box-shadow .15s}
+.note-ta::placeholder{color:var(--hint)}
+.note-ta:focus{border-color:var(--hdr2);box-shadow:0 0 0 3px rgba(30,45,61,.08)}
+.btn-add{background:var(--hdr);color:#fff;border:none;border-radius:10px;padding:8px 16px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background-color .15s}
+.btn-add:active{background:var(--hdr2)}
+.btn-add:focus-visible,.note-btn:focus-visible,.kpi:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
 .note-item{background:#F8FAFC;border-radius:10px;padding:12px;margin-bottom:8px}
 .note-item:last-child{margin-bottom:0}
-.note-content{font-size:13px;color:var(--text);line-height:1.6;margin-bottom:6px;white-space:pre-wrap;word-break:break-all}
+.note-content{font-size:14px;color:var(--text);line-height:1.6;margin-bottom:4px;white-space:pre-wrap;word-break:break-all}
 .note-footer{display:flex;align-items:center;justify-content:space-between}
-.note-date{font-size:11px;color:var(--hint)}
+.note-date{font-size:12px;color:var(--hint);font-variant-numeric:tabular-nums}
 .note-btns{display:flex;gap:4px}
-.note-btn{width:28px;height:28px;border:none;border-radius:7px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
-.note-btn.edit{background:var(--blue-lt);color:var(--blue)}
-.note-btn.del{background:var(--red-lt);color:var(--red)}
-.empty-small{text-align:center;padding:20px;color:var(--hint);font-size:13px}
-.expiry-row{display:flex;flex-direction:column;align-items:stretch;padding:10px 4px;border-bottom:1px solid var(--border);cursor:pointer;border-radius:8px;transition:background .12s;overflow:hidden}
-.expiry-row:last-child{border-bottom:none}
-.expiry-row:active{background:#F0F4F8}
+.note-btn{width:28px;height:28px;border:none;border-radius:8px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;background:transparent;color:var(--hint);transition:background-color .15s,color .15s}
+.note-btn:active{background:#E2E8F0}
+@media(hover:hover){.note-btn.edit:hover{background:#EEF2F6;color:var(--sub)}.note-btn.del:hover{background:var(--red-lt);color:var(--red)}}
+.empty-small{text-align:center;padding:20px 0;color:var(--hint);font-size:13px}
 /* MODAL */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-bg.show{display:flex}
-.modal{background:#fff;border-radius:20px;padding:24px;max-width:420px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto}
-.modal h3{font-size:16px;font-weight:700;margin-bottom:14px;color:var(--hdr)}
-.modal p{font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.6;white-space:pre-line}
-.modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:4px}
-.modal-btns button{padding:10px 20px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
-.btn-cancel{background:#F3F4F6;color:var(--sub)}
+.modal{background:#fff;border-radius:16px;padding:24px;max-width:420px;width:100%;box-shadow:0 8px 32px rgba(15,23,42,.16);max-height:90vh;overflow-y:auto}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:12px;color:var(--text);display:flex;align-items:center;gap:8px}
+.modal p{font-size:14px;color:var(--sub);margin-bottom:16px;line-height:1.6;white-space:pre-line}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+.modal-btns button{padding:10px 20px;border-radius:10px;border:none;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit}
+.btn-cancel{background:#F1F5F9;color:var(--sub)}
 .btn-confirm{background:var(--hdr);color:#fff}
-.btn-danger{background:var(--red-lt);color:var(--red)}
+.btn-danger{background:var(--red-lt);color:var(--red-t)}
 .field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
-.field label{font-size:11px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px}
-.field textarea{border:2px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;resize:none;outline:none;color:var(--text);background:#FAFCFF;width:100%}
-.field textarea:focus{border-color:var(--sky)}
+.field label{font-size:12px;font-weight:500;color:var(--sub)}
+.field textarea{border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:14px;font-family:inherit;resize:none;outline:none;color:var(--text);background:#fff;width:100%}
+.field textarea:focus{border-color:var(--hdr2);box-shadow:0 0 0 3px rgba(30,45,61,.08)}
 /* SYNC */
 .sync-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
-.s-ok{background:#4CAF50}.s-err{background:#EF5350}.s-ing{background:#FFA726;animation:blink 1s infinite}
+.s-ok{background:var(--green)}.s-err{background:var(--red)}.s-ing{background:var(--amber);animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-.bld-subhd{font-size:11px;font-weight:800;color:var(--sub);padding:10px 4px 4px;letter-spacing:.5px;border-top:1px solid var(--border);margin-top:4px}
-.bld-subhd:first-child{border-top:none;padding-top:4px;margin-top:0}
+.bld-subhd{font-size:12px;font-weight:500;color:var(--hint);padding:12px 4px 4px;border-top:1px solid var(--border);margin-top:4px}
+.bld-subhd:first-child{border-top:none;padding-top:8px;margin-top:0}
 
-/* ── KPI 카드 왼쪽 액센트 줄 ── */
-.kpi{position:relative;overflow:hidden;}
-.kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:12px 0 0 12px;}
-.kpi.total::before{background:linear-gradient(to bottom,#64748B,transparent)}
-.kpi.rented::before{background:linear-gradient(to bottom,var(--blue),transparent)}
-.kpi.vacant::before{background:linear-gradient(to bottom,var(--indigo),transparent)}
-.kpi.unpaid::before{background:linear-gradient(to bottom,var(--red),transparent)}
-/* ── 섹션 카드 왼쪽 액센트 줄 ── */
-.card{position:relative;}
-.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,var(--sky),transparent);border-radius:var(--radius) 0 0 var(--radius);}
+/* 건물 정보 카드 — 열쇠표: 출입 코드가 이 화면의 모먼트 */
+.bld-grid{display:grid;gap:12px;align-items:start}
+.bld-tag{background:#1E2D3D;border-radius:16px;padding:20px;color:#fff}
+.bld-tag-hd{display:flex;align-items:center;gap:8px;padding-bottom:12px;margin-bottom:16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.bld-tag-hd .ici{color:rgba(255,255,255,.55);font-size:18px}
+.bld-tag-name{font-size:16px;font-weight:600}
+.bld-tag-body{display:flex;flex-direction:column;gap:12px}
+.bld-codes{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px}
+.bld-code{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 12px}
+.bld-lbl{font-size:12px;font-weight:400;color:rgba(255,255,255,.55);line-height:16px;margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.bld-code-val{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:20px;font-weight:500;line-height:24px;color:#F59E0B;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.bld-row{display:flex;align-items:flex-start;gap:8px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)}
+.bld-row>.ici{color:rgba(255,255,255,.55);margin-top:2px}
+.bld-row-val{font-size:14px;font-weight:400;color:rgba(255,255,255,.85);line-height:20px}
+
+/* 첫 사용 안내 */
+.fr-box{background:#1E2D3D;border-radius:16px;padding:20px;margin-bottom:16px;color:#fff}
+.fr-title{font-size:18px;font-weight:600;line-height:24px;margin-bottom:4px}
+.fr-desc{font-size:14px;color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:16px}
+.fr-steps{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.fr-step{display:flex;align-items:flex-start;gap:12px;font-size:14px;color:rgba(255,255,255,.9);line-height:20px}
+.fr-n{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.1);color:#fff;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.fr-step small{display:block;font-size:12px;color:rgba(255,255,255,.5);margin-top:2px}
+.fr-cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:#F59E0B;color:#1E2D3D;font-size:15px;font-weight:600;text-decoration:none;border-radius:10px;transition:background-color .15s}
+.fr-cta:active{background:#D97706}
+.fr-foot{text-align:center;font-size:12px;color:rgba(255,255,255,.45);margin-top:12px}
 
 /* ── 이지모드 ── */
 #em-view{background:var(--bg);min-height:100vh;margin-top:91px;padding:14px 12px 40px;}
@@ -291,16 +311,16 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
   </div>
 
   <div class="content" id="normal-content">
-    <div id="first-run" style="display:none;background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:16px;padding:22px 20px;margin-bottom:16px;box-shadow:0 6px 20px rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.06)">
-      <div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:6px"><svg class=ici><use href=icons.svg#ic-party-popper></use></svg> 플러스홈에 오신 걸 환영해요!</div>
-      <div style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:16px">가입이 끝났어요. 아직 등록된 세대가 없네요 — <b style="color:#4DD0E1">3단계</b>면 바로 시작할 수 있어요.</div>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
-        <div style="display:flex;align-items:flex-start;gap:10px"><span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(77,208,225,.15);color:#4DD0E1;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center">1</span><div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.5"><b><svg class=ici><use href=icons.svg#ic-folder-cog></use></svg> 관리 탭</b>에서 <b>건물 정보 카드</b>를 만들어요<br><span style="font-size:11.5px;color:rgba(255,255,255,.5)">관리 건물명 · 층수 · 호실 등</span></div></div>
-        <div style="display:flex;align-items:flex-start;gap:10px"><span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(77,208,225,.15);color:#4DD0E1;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center">2</span><div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.5"><b><svg class=ici><use href=icons.svg#ic-house></use></svg> 세대 탭</b>에서 호실과 임대 현황을 입력해요</div></div>
-        <div style="display:flex;align-items:flex-start;gap:10px"><span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(77,208,225,.15);color:#4DD0E1;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center">3</span><div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.5"><b><svg class=ici><use href=icons.svg#ic-banknote></use></svg> 장부 탭</b>에서 월세 · 수입 · 지출을 기록해요</div></div>
+    <div id="first-run" class="fr-box" style="display:none">
+      <div class="fr-title">플러스홈 시작하기</div>
+      <div class="fr-desc">가입이 끝났어요. 아직 등록된 세대가 없어서, 아래 3단계면 바로 쓸 수 있어요.</div>
+      <div class="fr-steps">
+        <div class="fr-step"><span class="fr-n">1</span><div><b>관리 탭</b>에서 건물 정보 카드를 만들어요<small>건물명 · 층수 · 호실</small></div></div>
+        <div class="fr-step"><span class="fr-n">2</span><div><b>세대 탭</b>에서 호실과 임대 현황을 입력해요</div></div>
+        <div class="fr-step"><span class="fr-n">3</span><div><b>장부 탭</b>에서 월세 · 수입 · 지출을 기록해요</div></div>
       </div>
-      <a href="admin.html" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;box-sizing:border-box;padding:13px;background:#4DD0E1;color:#0F1C2D;font-size:14px;font-weight:900;text-decoration:none;border-radius:11px"><svg class=ici><use href=icons.svg#ic-folder-cog></use></svg> 관리 탭에서 건물 정보 만들기 →</a>
-      <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.4);margin-top:12px">대부분 기능은 무료예요 · 화면 표시중 사용법이 궁금할땐 <b><svg class=ici><use href=icons.svg#ic-circle-question-mark></use></svg> 도움말</b>을 눌러보세요</div>
+      <a href="admin.html" class="fr-cta"><svg class=ici><use href=icons.svg#ic-folder-cog></use></svg> 건물 정보 만들기</a>
+      <div class="fr-foot">대부분 기능은 무료예요 · 사용법은 위쪽 도움말에서 볼 수 있어요</div>
     </div>
     <div class="stats-grid">
       <div class="kpi total" onclick="goUnits()"><div class="kpi-val" id="s-total">—</div><div class="kpi-lbl">전체</div></div>
@@ -310,38 +330,38 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
     </div>
 
     <div class="card" id="card-unpaid">
-      <div class="card-hd"><svg class=ici style=color:#EF4444><use href=icons.svg#ic-dot></use></svg> 미납 현황 (최근 1년)</div>
-      <div id="unpaid-list"><div class="empty-small">로딩 중...</div></div>
+      <div class="card-hd"><span class="st-dot st-unpaid"></span>미납 현황<span class="card-meta">최근 1년</span></div>
+      <div id="unpaid-list"><div class="empty-small">불러오는 중</div></div>
     </div>
 
     <div class="card" id="card-vacant">
-      <div class="card-hd"><svg class=ici style=color:#8B5CF6><use href=icons.svg#ic-dot></use></svg> 공실 현황</div>
-      <div id="vacant-list"><div class="empty-small">로딩 중...</div></div>
+      <div class="card-hd"><span class="st-dot st-vacant"></span>공실 현황</div>
+      <div id="vacant-list"><div class="empty-small">불러오는 중</div></div>
     </div>
 
     <div class="card" id="card-expiry">
       <div class="card-hd">
-        <span><svg class=ici><use href=icons.svg#ic-triangle-alert></use></svg> 계약 만료 임박 (30일 이내)</span>
-        <span style="margin-left:auto;display:flex;align-items:center;gap:6px;font-weight:500">
-          <span id="push-status" style="font-size:11px;color:#64748B"></span>
-          <button class="btn-add" id="push-btn" onclick="enablePush()" style="display:none;padding:4px 10px;font-size:11px;border-radius:7px"><svg class=ici><use href=icons.svg#ic-bell></use></svg> 알림받기</button>
+        <span class="st-dot st-expiry"></span><span>계약 만료 임박</span><span class="card-meta">30일 이내</span>
+        <span style="margin-left:auto;display:flex;align-items:center;gap:8px;font-weight:400">
+          <span id="push-status" style="font-size:12px;color:var(--hint)"></span>
+          <button class="btn-add" id="push-btn" onclick="enablePush()" style="display:none;padding:4px 8px;font-size:12px;border-radius:8px"><svg class=ici><use href=icons.svg#ic-bell></use></svg> 알림받기</button>
         </span>
       </div>
-      <div id="push-info-box" style="display:none;position:relative;margin-bottom:12px;padding:12px 26px 12px 14px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px">
-        <button onclick="document.getElementById('push-info-box').style.display='none'" aria-label="닫기" style="position:absolute;top:6px;right:6px;width:22px;height:22px;border:none;background:transparent;color:#64748B;font-size:14px;cursor:pointer;line-height:1;border-radius:50%">✕</button>
-        <div style="font-size:12px;font-weight:700;color:#1E3A8A;margin-bottom:4px"><svg class=ici><use href=icons.svg#ic-bell></use></svg> 알림이 이렇게 와요</div>
-        <div style="font-size:11.5px;color:#334155;line-height:1.6">
+      <div id="push-info-box" style="display:none;position:relative;margin:8px 0 12px;padding:12px 32px 12px 12px;background:#F8FAFC;border:1px solid var(--border);border-radius:10px">
+        <button onclick="document.getElementById('push-info-box').style.display='none'" aria-label="닫기" style="position:absolute;top:8px;right:8px;width:24px;height:24px;border:none;background:transparent;color:var(--hint);font-size:14px;cursor:pointer;line-height:0;border-radius:6px"><svg class=ici><use href=icons.svg#ic-x></use></svg></button>
+        <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px">알림이 이렇게 와요</div>
+        <div style="font-size:12px;color:var(--sub);line-height:1.6">
           · 접속(로그인)할 때마다 화면 위쪽에 작은 알림이 <b>최대 3번</b> 떠요<br>
           · 계약 만료가 다가오면 <b>만료 30·14·7·3·1일 전, 당일</b>에 휴대폰·브라우저로 푸시 알림이 가요
         </div>
       </div>
-      <div id="expiry-list"><div class="empty-small">로딩 중...</div></div>
+      <div id="expiry-list"><div class="empty-small">불러오는 중</div></div>
     </div>
 
     <div class="card" id="card-notes">
-      <div class="card-hd"><svg class=ici><use href=icons.svg#ic-notebook-pen></use></svg> 특이사항 메모</div>
+      <div class="card-hd"><svg class=ici><use href=icons.svg#ic-notebook-pen></use></svg>특이사항 메모</div>
       <div class="note-input-row">
-        <textarea class="note-ta" id="note-input" rows="2" placeholder="임차인 요청사항, 수리 필요 사항 등..."></textarea>
+        <textarea class="note-ta" id="note-input" rows="2" placeholder="임차인 요청, 수리할 곳"></textarea>
         <button class="btn-add" onclick="addNote()">추가</button>
       </div>
       <div id="notes-list"></div>
@@ -397,7 +417,7 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
 <!-- EDIT NOTE MODAL -->
 <div class="modal-bg" id="edit-note-modal">
   <div class="modal">
-    <h3><svg class=ici><use href=icons.svg#ic-pencil></use></svg> 메모 수정</h3>
+    <h3>메모 수정</h3>
     <input type="hidden" id="edit-note-id">
     <div class="field">
       <label>내용</label>
@@ -427,7 +447,7 @@ body:has(#app.app-backdrop) .ph-footer{display:none}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
-<script src="shared.js?v=2"></script>
+<script src="shared.js?v=3"></script>
 <script src="db-paths.js"></script>
 <script>
 const storage = firebase.storage();
@@ -704,6 +724,7 @@ function renderDash(){
   document.getElementById("s-rented").textContent=rented;
   document.getElementById("s-vacant").textContent=vacant;
   document.getElementById("s-unpaid").textContent=unpaidCnt;
+  document.querySelector(".kpi.unpaid")?.classList.toggle("zero",unpaidCnt===0);
 
   // 첫 사용 온보딩: 로그인한 실사용자가 아직 세대를 하나도 안 만든 상태에서만 안내
   const fr=document.getElementById("first-run");
@@ -721,13 +742,13 @@ function renderDash(){
     uHtml+=`<div class="bld-subhd">${esc(bldgsData[bid]?.name||"")}</div>`;
     uHtml+=up.map(u=>{
       const ps=computePaidStatus(bid,u.room);
-      const pBadge=ps==="partial"?`<span class="badge" style="background:#FEF3C7;color:#92400E"><svg class=ici><use href=icons.svg#ic-circle-dashed></use></svg> 부분납부</span>`:`<span class="badge badge-unpaid"><svg class=ici><use href=icons.svg#ic-circle-x></use></svg> 미납</span>`;
+      const pBadge=ps==="partial"?`<span class="badge badge-partial">부분납부</span>`:`<span class="badge badge-unpaid">미납</span>`;
       return`<div class="status-row" onclick="goToUnit('${bid}','${u.room}')">
       <div class="sr-top"><span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}${pBadge}<span class="sr-arrow">›</span></div>
       <div class="sr-sub sr-amt-row"><span class="sr-name">${esc(names(u))}</span><span class="sr-amt">${unpaidAmtTxt(u)}</span></div>
       </div>`;}).join("");
   });
-  document.getElementById("unpaid-list").innerHTML=uHtml||'<div class="empty-small"><svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 이달 미납 없음</div>';
+  document.getElementById("unpaid-list").innerHTML=uHtml||'<div class="empty-small">이번 달 미납 없음</div>';
 
   // Vacant
   let vHtml="";
@@ -752,7 +773,7 @@ function renderDash(){
       ${unit?.memo?`<div class="sr-sub">${esc(unit.memo.split('\n')[0])}</div>`:''}
       </div>`).join("");
   });
-  document.getElementById("vacant-list").innerHTML=vHtml||'<div class="empty-small"><svg class=ici><use href=icons.svg#ic-house></use></svg> 공실 없음</div>';
+  document.getElementById("vacant-list").innerHTML=vHtml||'<div class="empty-small">공실 없음</div>';
 
   // Expiry
   const today=new Date();today.setHours(0,0,0,0);
@@ -771,12 +792,12 @@ function renderDash(){
       const ml=(u.memo||"").split('\n');
       const m1=ml[0]||"", m2=ml[1]||"";
       return`<div class="expiry-row" onclick="goToUnit('${bid}','${u.room}')">
-      <div class="sr-top"><span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}<span class="badge badge-warning">${shortDate(u.contractEnd)}</span><span style="font-size:11px;font-weight:700;color:${u.dl<=7?"var(--red)":"var(--amber)"};white-space:nowrap">${u.dl}일 후</span><span class="sr-arrow">›</span></div>
+      <div class="sr-top"><span class="room-num">${u.room}호</span>${rentTypeBadge(u)}${rtBadge(u)}<span class="badge badge-warning">${shortDate(u.contractEnd)} 만료</span><span class="sr-dl" style="color:${u.dl<=7?"var(--red)":"var(--amber-t)"}">${u.dl===0?"오늘":u.dl+"일 후"}</span><span class="sr-arrow">›</span></div>
       <div class="sr-sub sr-name-memo"><span class="sr-name">${esc(truncName(names(u)))}</span>${m1?`<span class="sr-memo">${esc(m1)}</span>`:''}</div>
       ${m2?`<div class="sr-sub">${esc(m2)}</div>`:''}
       </div>`;}).join("");
   });
-  document.getElementById("expiry-list").innerHTML=eHtml||'<div class="empty-small"><svg class=ici><use href=icons.svg#ic-circle-check></use></svg> 30일 내 만료 없음</div>';
+  document.getElementById("expiry-list").innerHTML=eHtml||'<div class="empty-small">30일 안에 만료되는 계약 없음</div>';
   clearTimeout(_alertTimer);_alertTimer=setTimeout(checkContractAlerts,900);
   // 저장된 모드 복원 (최초 1회) + 이지모드 활성 시 항상 최신 데이터로 재렌더
   if (!_emRestored) {
@@ -812,25 +833,22 @@ function _bldCardsHtml(bids, twoColWhenEven=true) {
   const cards = bids.flatMap(bid => {
     const bldInfo = (allBldData[bid]||{}).bldInfo||{};
     return Object.values(bldInfo).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).map(b=>
-      `<div style="background:linear-gradient(135deg,#1E2D3D 0%,#2A3F55 100%);border-radius:14px;padding:18px 20px;box-shadow:0 4px 16px rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.06)">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.1)">
-          <span style="font-size:20px;color:#4DD0E1;display:flex"><svg class=ici><use href=icons.svg#ic-house></use></svg></span>
-          <span style="font-size:16px;font-weight:900;color:#fff">${esc(b.name)}</span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:12px">
-          ${b.entranceCode||b.masterCode?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:12px">
-            ${b.entranceCode?`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px;color:#4DD0E1;display:flex"><svg class=ici><use href=icons.svg#ic-lock-keyhole></use></svg></span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">1층 현관</div><div style="font-size:15px;font-weight:900;color:#4DD0E1;letter-spacing:1px">${esc(b.entranceCode)}</div></div></div>`:""}
-            ${b.masterCode?`<div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px;color:#4DD0E1;display:flex"><svg class=ici><use href=icons.svg#ic-key-round></use></svg></span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">세대 마스터</div><div style="font-size:15px;font-weight:900;color:#4DD0E1;letter-spacing:1px">${esc(b.masterCode)}</div></div></div>`:""}
+      `<div class="bld-tag">
+        <div class="bld-tag-hd"><svg class=ici><use href=icons.svg#ic-house></use></svg><span class="bld-tag-name">${esc(b.name)}</span></div>
+        <div class="bld-tag-body">
+          ${b.entranceCode||b.masterCode?`<div class="bld-codes">
+            ${b.entranceCode?`<div class="bld-code"><div class="bld-lbl"><svg class=ici><use href=icons.svg#ic-lock-keyhole></use></svg>1층 현관</div><div class="bld-code-val">${esc(b.entranceCode)}</div></div>`:""}
+            ${b.masterCode?`<div class="bld-code"><div class="bld-lbl"><svg class=ici><use href=icons.svg#ic-key-round></use></svg>세대 마스터</div><div class="bld-code-val">${esc(b.masterCode)}</div></div>`:""}
           </div>`:""}
-          ${b.manageFee?`<div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)"><span style="font-size:16px;flex-shrink:0;color:rgba(255,255,255,.55);display:flex"><svg class=ici><use href=icons.svg#ic-landmark></use></svg></span><div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">관리비 계좌</div><div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.85)">${esc(b.manageFee)}</div></div></div>`:""}
-          ${b.address?`<div style="display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid rgba(255,255,255,.07)"><span style="font-size:16px;flex-shrink:0;color:rgba(255,255,255,.55);display:flex"><svg class=ici><use href=icons.svg#ic-map-pin></use></svg></span><div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.75);line-height:1.6">${esc(b.address)}</div></div>`:""}
+          ${b.manageFee?`<div class="bld-row"><svg class=ici><use href=icons.svg#ic-landmark></use></svg><div><div class="bld-lbl">관리비 계좌</div><div class="bld-row-val">${esc(b.manageFee)}</div></div></div>`:""}
+          ${b.address?`<div class="bld-row"><svg class=ici><use href=icons.svg#ic-map-pin></use></svg><div class="bld-row-val">${esc(b.address)}</div></div>`:""}
         </div>
       </div>`);
   });
   if(!cards.length) return "";
   // 카드 개수가 짝수면 좌우 2열(1 2 / 3 4), 홀수면 1열
   const cols=(twoColWhenEven && cards.length%2===0)?"1fr 1fr":"1fr";
-  return `<div style="display:grid;grid-template-columns:${cols};gap:12px;align-items:start">${cards.join("")}</div>`;
+  return `<div class="bld-grid" style="grid-template-columns:${cols}">${cards.join("")}</div>`;
 }
 function renderBldCards(){
   const bids=sortedBids(bldgsData);
@@ -843,14 +861,14 @@ function renderBldCards(){
 function renderNotes(){
   const list=Object.values(notes).sort((a,b)=>b.id-a.id);
   const el=document.getElementById("notes-list");
-  if(!list.length){el.innerHTML='<div class="empty-small">메모가 없습니다</div>';return}
+  if(!list.length){el.innerHTML='<div class="empty-small">메모 없음</div>';return}
   el.innerHTML=list.map(n=>`<div class="note-item">
     <div class="note-content">${esc(n.content)}</div>
     <div class="note-footer">
       <span class="note-date">${fmtDt(n.createdAt)}</span>
       <div class="note-btns">
-        <button class="note-btn edit" onclick="startEdit(${n.id})"><svg class=ici><use href=icons.svg#ic-pencil></use></svg></button>
-        <button class="note-btn del" onclick="delNote(${n.id})">✕</button>
+        <button class="note-btn edit" aria-label="수정" onclick="startEdit(${n.id})"><svg class=ici><use href=icons.svg#ic-pencil></use></svg></button>
+        <button class="note-btn del" aria-label="삭제" onclick="delNote(${n.id})"><svg class=ici><use href=icons.svg#ic-x></use></svg></button>
       </div>
     </div>
   </div>`).join("");
@@ -1301,11 +1319,11 @@ function closeEuPV() {
 
 </script>
 <script>window.EM_SIDE_ACTION = function(){ toggleEasyMode(); };</script>
-<script src="easymode-side.js"></script>
-<script src="brokerage-calc.js"></script>
-<script src="landlord-guide-side.js"></script>
-<script src="tax-helper.js"></script>
-<script src="apply-btn.js"></script>
+<script src="easymode-side.js?v=2"></script>
+<script src="brokerage-calc.js?v=2"></script>
+<script src="landlord-guide-side.js?v=2"></script>
+<script src="tax-helper.js?v=2"></script>
+<script src="apply-btn.js?v=2"></script>
 <script src="footer.js?v=5"></script>
 </body>
 </html>

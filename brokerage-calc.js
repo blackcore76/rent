@@ -10,12 +10,12 @@
     #bc-side-btn{
       position:fixed;left:-52px;bottom:280px;z-index:500;
       width:80px;padding:16px 6px 16px 8px;
-      background:rgba(5,150,105,.85);
-      border:1.5px solid rgba(5,150,105,.85);border-left:none;
+      background:#1E2D3D;
+      border:1px solid rgba(255,255,255,.12);border-left:none;
       border-radius:0 16px 16px 0;
       cursor:pointer;
       transition:left .28s cubic-bezier(.4,0,.2,1);
-      box-shadow:2px 2px 12px rgba(0,0,0,.35);
+      box-shadow:0 2px 8px rgba(15,23,42,.16);
       display:flex;align-items:center;justify-content:flex-end;
       user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;
     }
@@ -23,7 +23,7 @@
     @media(hover:hover){#bc-side-btn:hover{left:0;justify-content:center;}}
 
     #bc-stxt,#bc-stxt-hid{
-      writing-mode:vertical-rl;font-weight:900;color:#fff;
+      writing-mode:vertical-rl;font-weight:500;color:#fff;
       font-family:'Noto Sans KR',sans-serif;
     }
     #bc-stxt{font-size:12px;letter-spacing:2px;display:none;}
@@ -43,8 +43,8 @@
       pointer-events:none;display:none;
       animation:bcPulse 1.5s ease-in-out infinite;
     }
-    #bc-side-btn.peeking #bc-side-ring{display:block;}
-    @media(hover:hover){#bc-side-btn:hover #bc-side-ring{display:block;}}
+    #bc-side-btn.peeking #bc-side-ring{display:none;}
+    @media(hover:hover){#bc-side-btn:hover #bc-side-ring{display:none;}}
     @keyframes bcPulse{
       0%,100%{transform:scale(1);opacity:.6;}
       50%{transform:scale(1.18);opacity:1;}

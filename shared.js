@@ -99,11 +99,11 @@ function showDemoBanner(){
   if(document.getElementById("demo-banner"))return;
   const b=document.createElement("div");
   b.id="demo-banner";
-  b.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:linear-gradient(135deg,rgba(14,165,233,.18),rgba(14,165,233,.06));border-bottom:1px solid rgba(14,165,233,.35);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
+  b.style.cssText="position:fixed;top:100px;left:0;right:0;z-index:150;background:#F0F7FC;border-bottom:1px solid rgba(2,132,199,.15);padding:8px 16px;display:flex;align-items:center;justify-content:space-between";
   const btn=cu
-    ?`<button onclick="auth.signOut()" style="background:rgba(14,165,233,.2);border:1px solid rgba(14,165,233,.4);border-radius:8px;padding:5px 12px;color:#0EA5E9;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit"><svg class=ici><use href=icons.svg#ic-log-out></use></svg> 로그아웃</button>`
-    :`<button onclick="startSignIn()" style="background:rgba(14,165,233,.2);border:1px solid rgba(14,165,233,.4);border-radius:8px;padding:5px 12px;color:#0EA5E9;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit"><svg class=ici><use href=icons.svg#ic-key></use></svg> 시작하기</button>`;
-  b.innerHTML=`<span style="font-size:12px;font-weight:700;color:#0EA5E9"><svg class=ici><use href=icons.svg#ic-eye></use></svg> 구경 모드 · 데모 데이터 표시 중</span>${btn}`;
+    ?`<button onclick="auth.signOut()" style="background:#fff;border:1px solid rgba(2,132,199,.25);border-radius:8px;padding:4px 12px;color:#0369A1;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit"><svg class=ici><use href=icons.svg#ic-log-out></use></svg> 로그아웃</button>`
+    :`<button onclick="startSignIn()" style="background:#fff;border:1px solid rgba(2,132,199,.25);border-radius:8px;padding:4px 12px;color:#0369A1;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit"><svg class=ici><use href=icons.svg#ic-key></use></svg> 시작하기</button>`;
+  b.innerHTML=`<span style="font-size:12px;font-weight:500;color:#0369A1"><svg class=ici><use href=icons.svg#ic-eye></use></svg> 구경 모드 · 예시 데이터</span>${btn}`;
   document.body.appendChild(b);
   document.querySelector(".content").style.marginTop="136px";
 }

@@ -20,19 +20,19 @@
 html,body{height:100%;font-family:'Noto Sans KR',system-ui,sans-serif;background:var(--bg);color:var(--text)}
 
 /* ── HEADER ── */
-.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,#0A1628,#1A2B3C);border-bottom:1px solid rgba(245,158,11,.2);box-shadow:0 3px 20px rgba(0,0,0,.5);padding:0 16px}
+.hdr{position:fixed;top:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,#0A1628,#1A2B3C);border-bottom:1px solid rgba(245,158,11,.2);box-shadow:0 1px 0 rgba(0,0,0,.2);padding:0 16px}
 .hdr-top{display:flex;align-items:center;justify-content:space-between;height:52px}
 .hdr-title{font-size:18px;font-weight:900;color:#fff;letter-spacing:-.5px;display:flex;align-items:center;gap:6px}
 .hdr-actions{display:flex;align-items:center;gap:8px;position:relative}
 .av-img{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);cursor:pointer;object-fit:cover}
 .av-txt{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.4);background:var(--sky);color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.guide-btn{padding:5px 10px;background:rgba(14,165,233,.15);border:1.5px solid rgba(14,165,233,.5);border-radius:8px;color:#7DD3FC;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:background .15s;text-decoration:none;display:flex;align-items:center;gap:3px}
-.guide-btn:active{background:rgba(14,165,233,.32)}
+.guide-btn{padding:6px 10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:rgba(255,255,255,.85);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:background-color .15s;text-decoration:none;display:flex;align-items:center;gap:3px}
+.guide-btn:active{background:rgba(255,255,255,.16)}
 .admin-btn{padding:5px 10px;background:rgba(255,200,0,.15);border:1.5px solid rgba(255,200,0,.5);border-radius:8px;color:#FFD700;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:none;letter-spacing:.3px;transition:background .15s}
 .admin-btn:active{background:rgba(255,200,0,.32)}
 .nav{display:flex;border-top:1px solid rgba(255,255,255,.08)}
-.nav-tab{flex:1;padding:9px 2px 11px;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,.4);border-bottom:3px solid transparent;text-decoration:none;transition:all .2s;white-space:nowrap}
-.nav-tab.on{color:var(--gold);border-bottom-color:var(--gold);font-weight:700}
+.nav-tab{flex:1;padding:9px 2px 11px;text-align:center;font-size:11px;font-weight:500;color:rgba(255,255,255,.4);border-bottom:3px solid transparent;text-decoration:none;transition:color .15s,border-color .15s;white-space:nowrap}
+.nav-tab.on{color:var(--gold);border-bottom-color:var(--gold);font-weight:500}
 
 /* ── USER MENU ── */
 .user-menu{position:fixed;top:56px;right:12px;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:16px;min-width:210px;z-index:300;display:none;border:1px solid var(--border)}

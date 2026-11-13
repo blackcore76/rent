@@ -70,4 +70,5 @@
 <symbol id="ic-message-circle" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719" /></symbol>
 <symbol id="ic-search" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="m21 21-4.34-4.34" /> <circle vector-effect="non-scaling-stroke" cx="11" cy="11" r="8" /></symbol>
 <symbol id="ic-timer" viewBox="0 0 24 24"><line vector-effect="non-scaling-stroke" x1="10" x2="14" y1="2" y2="2" /> <line vector-effect="non-scaling-stroke" x1="12" x2="15" y1="14" y2="11" /> <circle vector-effect="non-scaling-stroke" cx="12" cy="14" r="8" /></symbol>
+<symbol id="ic-x" viewBox="0 0 24 24"><path vector-effect="non-scaling-stroke" d="M18 6 6 18" /> <path vector-effect="non-scaling-stroke" d="m6 6 12 12" /></symbol>
 </svg>

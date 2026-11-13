@@ -7,18 +7,18 @@
   /* ── CSS 주입 (시트 내부는 항상 라이트) ─────────────────── */
   const s = document.createElement('style');
   s.textContent = `
-    #taxh-side-btn{position:fixed;left:-52px;bottom:200px;z-index:500;width:80px;padding:16px 6px 16px 8px;background:rgba(217,119,6,.9);border:1.5px solid rgba(217,119,6,.9);border-left:none;border-radius:0 16px 16px 0;cursor:pointer;transition:left .28s cubic-bezier(.4,0,.2,1);box-shadow:2px 2px 12px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:flex-end;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+    #taxh-side-btn{position:fixed;left:-52px;bottom:200px;z-index:500;width:80px;padding:16px 6px 16px 8px;background:#1E2D3D;border:1px solid rgba(255,255,255,.12);border-left:none;border-radius:0 16px 16px 0;cursor:pointer;transition:left .28s cubic-bezier(.4,0,.2,1);box-shadow:0 2px 8px rgba(15,23,42,.16);display:flex;align-items:center;justify-content:flex-end;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
     #taxh-side-btn.peeking{left:0;justify-content:center}
     @media(hover:hover){#taxh-side-btn:hover{left:0;justify-content:center}}
-    #taxh-stxt,#taxh-stxt-hid{writing-mode:vertical-rl;font-weight:900;color:#fff;font-family:'Noto Sans KR',sans-serif}
+    #taxh-stxt,#taxh-stxt-hid{writing-mode:vertical-rl;font-weight:500;color:#fff;font-family:'Noto Sans KR',sans-serif}
     #taxh-stxt{font-size:12px;letter-spacing:2px;display:none}
     #taxh-stxt-hid{font-size:11px;letter-spacing:2px}
     #taxh-side-btn.peeking #taxh-stxt{display:inline}
     #taxh-side-btn.peeking #taxh-stxt-hid{display:none}
     @media(hover:hover){#taxh-side-btn:hover #taxh-stxt{display:inline}#taxh-side-btn:hover #taxh-stxt-hid{display:none}}
     #taxh-side-ring{position:absolute;left:50%;top:50%;width:32px;height:32px;margin-left:-16px;margin-top:-16px;border:2px solid rgba(255,255,255,.7);border-radius:50%;pointer-events:none;display:none;animation:taxhPulse 1.5s ease-in-out infinite}
-    #taxh-side-btn.peeking #taxh-side-ring{display:block}
-    @media(hover:hover){#taxh-side-btn:hover #taxh-side-ring{display:block}}
+    #taxh-side-btn.peeking #taxh-side-ring{display:none}
+    @media(hover:hover){#taxh-side-btn:hover #taxh-side-ring{display:none}}
     @keyframes taxhPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.18);opacity:1}}
 
     #taxh-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:600}
